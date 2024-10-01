@@ -1,17 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaGooglePlusG } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLock, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import './Login.scss';
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("")
     const [isShowed, setIsShowed] = useState(false)
 
+    const [isVisible, setIsVisible] = useState(false);
+    useEffect(() => {
+      setIsVisible(true);
+    }, []);
+
     return (
-        <div className='login-container'>
+        <div className={`login-container no-x-scroll ${isVisible ? 'slide-in' : ''}`}>
             <div className='sidepart-container'>
                 <div className='sidepart-header'>
                     <div className='header'>
@@ -19,10 +27,11 @@ const Login = () => {
                         <span>Easily and Effectively!</span>
                     </div>
                     <div className='image'></div>
-                    <span className='small-text'>Do you have an account yet?</span>
+                    <span className='small-text'>Don't have an account yet?</span>
                     <div className='but-container'>
                         <button
                             className='register-button'
+                            onClick={() => navigate('/register')}
                         >Register</button>
                     </div>
                 </div>
@@ -32,6 +41,7 @@ const Login = () => {
                     <div className='mainpart-content'>
                         <sp className='header-text'>Sign in</sp>
                     </div>
+                    
                     <div className='mainpart-content'>
                         <div className="mb-3">
                             <LuUser color='#757575' className='icon-head' />
@@ -41,9 +51,12 @@ const Login = () => {
                                 className='form-control'
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
+                                tabIndex={1}
+                                required
                             />
                         </div>
-                        <div className="mb-3 remove-marginbottom">
+
+                        <div className="mb-3 marginbottom-5px">
                             <LuLock color='#757575' className='icon-head' />
                             <input
                                 type={isShowed ? "text" : "password"}
@@ -51,6 +64,8 @@ const Login = () => {
                                 className='form-control'
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
+                                tabIndex={2}
+                                required
                             />
                             {isShowed ?
                                 <LuEye
@@ -66,10 +81,12 @@ const Login = () => {
                                 />
                             }
                         </div>
+
                         <div className="mb-3">
                             <span className="forgot-pw">Forgot your password?</span>
                         </div>
                     </div>
+
                     <div className="mainpart-content">
                         <button
                             className='signin-button'

@@ -7,10 +7,27 @@
   --border-gray: #D9D9D9;
   --text-gray: #757575;
   --black-color: #1e1e1e;
+  --red-color: #C00F0C;
 }
 
 *{
   font-family: "Inter", sans-serif;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(25%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Slide-in CSS class */
+.slide-in {
+  animation: slideIn 0.75s ease-in-out forwards;
 }
 
 .App {

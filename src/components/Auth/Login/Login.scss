@@ -95,15 +95,16 @@
                 .mb-3 {
                     width: 400px;
                     position: relative;
-                    &.remove-marginbottom {
-                        margin-bottom: 0 !important;
+                    
+                    &.marginbottom-5px {
+                        margin-bottom: 5px !important;
                     }
     
                     svg {
                         width: 24px;
                         height: 24px;
                         position: absolute;
-                        top: 25%;
+                        top: 23%;
                     }
                     .icon-head {
                         left: 12px;
@@ -121,6 +122,7 @@
                     }
                     .icon-eye {
                         right: 12px;
+                        top: 25%;
                         &:hover {
                             width: 26px;
                             height: 26px;

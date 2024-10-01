@@ -1,3 +1,9 @@
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .register-container {
     width: 1000px;
     height: 600px;
@@ -37,15 +43,23 @@
                 .mb-3 {
                     width: 400px;
                     position: relative;
-                    &.remove-marginbottom {
-                        margin-bottom: 0 !important;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+
+                    &.marginbottom-5px {
+                        margin-bottom: 5px !important;
                     }
     
+                    &.margintop-1rem {
+                        margin-top: 1rem
+                    }
+
                     svg {
                         width: 24px;
                         height: 24px;
                         position: absolute;
-                        top: 25%;
+                        top: 23%;
                     }
                     .icon-head {
                         left: 12px;
@@ -67,6 +81,7 @@
                     }
                     .icon-eye {
                         right: 12px;
+                        top: 25%;
                         &:hover {
                             width: 26px;
                             height: 26px;
@@ -75,18 +90,26 @@
                         }
                     }
     
-                    .forgot-pw {
-                        color: var(--text-gray);
-                        font-weight: 300;
-                        text-decoration: underline;
+                    .error-noti {
+                        font-size: 14px;
+                        color: var(--red-color);
+                        font-weight: 500;
                         cursor: pointer;
     
                         &:hover {
                             color: var(--black-color);
                         }
                     } 
+
+                    .AC-check {
+                        cursor: pointer;
+                        margin-right: 10px;
+                        width: 16px;
+                        height: 16px;
+                        border: none;
+                    }
                 }
-                .signin-button {
+                .register-button {
                     width: 100px;
                     height: 40px;
                     font-size: 20px;
@@ -145,11 +168,12 @@
             color: var(--white-color);
             display: flex;
             flex-direction: column;
-            height: 70%;
+            height: 55%;
 
             span {
                 margin: auto;
             }
+
             .header{
                 font-size: 24px;
                 font-weight: 400;
@@ -160,7 +184,7 @@
             .image {
                 width: 180px;
                 height: 156px;
-                background-image: url('../../../assets/img/login_pic.png');
+                background-image: url('../../../assets/img/register_pic.png');
                 background-repeat: no-repeat;
                 background-position: center;
                 background-size: cover;
@@ -174,7 +198,7 @@
             .but-container {
                 margin: auto;
 
-                .register-button{
+                .signin-button{
                     width: 100px;
                     height: 40px;
                     font-size: 20px;

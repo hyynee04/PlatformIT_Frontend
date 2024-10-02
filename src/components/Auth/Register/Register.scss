@@ -14,6 +14,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
     display: flex;
     flex-direction: row;
+    opacity: 0;
 
     .mainpart-container {
         width: 70%;
@@ -94,11 +95,6 @@ input[type="number"]::-webkit-outer-spin-button {
                         font-size: 14px;
                         color: var(--red-color);
                         font-weight: 500;
-                        cursor: pointer;
-    
-                        &:hover {
-                            color: var(--black-color);
-                        }
                     } 
 
                     .AC-check {

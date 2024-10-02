@@ -8,6 +8,7 @@
 
     display: flex;
     flex-direction: row;
+    opacity: 0;
     
     .sidepart-container {
         width: 30%;
@@ -140,6 +141,12 @@
                         &:hover {
                             color: var(--black-color);
                         }
+                    } 
+
+                    .error-noti {
+                        font-size: 14px;
+                        color: var(--red-color);
+                        font-weight: 500;
                     } 
                 }
                 .signin-button {

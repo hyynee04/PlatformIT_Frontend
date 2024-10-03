@@ -6,8 +6,9 @@ import { LuEye, LuEyeOff, LuLock, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { postLogin } from "../../../services/authService";
-import "./Login.scss";
+import { postLogin } from "../services/authService";
+import { Status } from "../constants/constants";
+import "../assets/scss/Login.scss";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,8 +32,11 @@ const Login = () => {
     // submit login
     let data = await postLogin(username, password);
     console.log(">>> Check register: ", data);
-    if (data && data.idUser > 0) {
-      navigate("/");
+    if (data && data.idUser > Status.inactive) {
+      let roleBasesPath = "/";
+      navigate(roleBasesPath, {
+        state: { idUser: data.idUser, idRole: data.idRole },
+      });
     } else {
       setIsFailed(true);
     }

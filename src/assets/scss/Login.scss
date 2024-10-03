@@ -1,0 +1,210 @@
+.login-container {
+  width: 1000px;
+  height: 500px;
+  margin: 75px auto 0px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(
+    to bottom,
+    var(--second-main-color),
+    var(--main-color)
+  );
+
+  display: flex;
+  flex-direction: row;
+  opacity: 0;
+
+  .sidepart-container {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .sidepart-header {
+      color: var(--white-color);
+      display: flex;
+      flex-direction: column;
+      height: 70%;
+
+      span {
+        margin: auto;
+      }
+      .header {
+        font-size: 24px;
+        font-weight: 400;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .image {
+        width: 180px;
+        height: 156px;
+        background-image: url("../img/login_pic.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        margin: auto;
+      }
+
+      .small-text {
+        font-weight: 200;
+      }
+
+      .but-container {
+        margin: auto;
+
+        .register-button {
+          width: 100px;
+          height: 40px;
+          font-size: 20px;
+          font-weight: 400;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+
+          background-color: var(--second-main-color);
+          color: var(--white-color);
+          &:hover {
+            background-color: rgba(0, 59, 87, 0.7);
+          }
+        }
+      }
+    }
+  }
+
+  .mainpart-container {
+    width: 70%;
+    height: 100%;
+    background-color: var(--white-color);
+    border-radius: 8px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .holder {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      .mainpart-content {
+        margin: auto;
+        width: fit-content;
+        height: fit-content;
+        .header-text {
+          font-size: 40px;
+          font-weight: 800;
+          color: var(--black-color);
+        }
+
+        .mb-3 {
+          width: 400px;
+          position: relative;
+
+          &.marginbottom-5px {
+            margin-bottom: 5px !important;
+          }
+
+          svg {
+            width: 24px;
+            height: 24px;
+            position: absolute;
+            top: 23%;
+          }
+          .icon-head {
+            left: 12px;
+          }
+          .form-control {
+            height: 45px;
+            padding: 4px 40px;
+            border-radius: 90px;
+            border-color: var(--border-gray);
+            color: var(--text-gray);
+
+            &:focus {
+              box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
+            }
+          }
+          .icon-eye {
+            right: 12px;
+            top: 25%;
+            &:hover {
+              width: 26px;
+              height: 26px;
+              top: 20%;
+              right: 10px;
+            }
+          }
+
+          .forgot-pw {
+            color: var(--text-gray);
+            font-weight: 300;
+            text-decoration: underline;
+            cursor: pointer;
+
+            &:hover {
+              color: var(--black-color);
+            }
+          }
+
+          .error-noti {
+            font-size: 14px;
+            color: var(--red-color);
+            font-weight: 500;
+          }
+        }
+        .signin-button {
+          width: 100px;
+          height: 40px;
+          font-size: 20px;
+          font-weight: 400;
+          border-radius: 8px;
+          border: none;
+          cursor: pointer;
+
+          background-color: var(--second-main-color);
+          color: var(--white-color);
+          &:hover {
+            background-color: rgba(0, 59, 87, 0.7);
+          }
+        }
+        .sep {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 8px;
+          hr {
+            width: 30px;
+            height: 2px;
+            background-color: var(--text-gray);
+            border: none;
+            margin: 0;
+          }
+          span {
+            font-weight: 300;
+            color: var(--text-gray);
+          }
+
+          svg {
+            width: 30px;
+            height: 30px;
+            padding: 5px;
+            border: 1px solid rgba(117, 117, 117, 0.5);
+            border-radius: 180px;
+
+            &:hover {
+              box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
+              // background-color: #eae9e9;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// .slide-up {
+//     opacity: 0;
+//     transform: translateY(20px);
+//     transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+// }

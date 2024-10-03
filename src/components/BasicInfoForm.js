@@ -2,7 +2,7 @@ import React from "react";
 import { LuCamera } from "react-icons/lu";
 import { FaChevronDown } from "react-icons/fa";
 
-const BasicInfo = () => {
+const BasicInfoForm = () => {
   return (
     <div>
       <div className="title-info">
@@ -75,4 +75,4 @@ const BasicInfo = () => {
   );
 };
 
-export default BasicInfo;
+export default BasicInfoForm;

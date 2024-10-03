@@ -1,11 +1,11 @@
 import React from "react";
-import BasicInfo from "../BasicInfo/BasicInfo";
+import BasicInfo from "../../components/BasicInfoForm";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { FaRegTrashCan, FaPlus } from "react-icons/fa6";
 import { LuFile } from "react-icons/lu";
 
-const Teacher = () => {
+const TeacherPI = () => {
   return (
     <div>
       <div className="basic-info">
@@ -155,4 +155,4 @@ const Teacher = () => {
   );
 };
 
-export default Teacher;
+export default TeacherPI;

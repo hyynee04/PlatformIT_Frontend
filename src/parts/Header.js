@@ -1,7 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LuBell, LuMessageCircle } from "react-icons/lu";
 import { Role } from "../constants/constants";
 
@@ -10,51 +10,51 @@ import "../assets/scss/Header.scss";
 const Header = ({ idRole, idUser }) => {
   console.log(idRole);
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname; //current path
+  console.log(currentPath);
+
+  const navLinks = {
+    [Role.platformAdmin]: [
+      { title: "Dashboard", path: "/platformAdminDashboard" },
+      { title: "User", path: "/platformAdminUser" },
+      { title: "Center", path: "/platformAdminCenter" },
+      { title: "Course", path: "/platformAdminCourse" },
+    ],
+    [Role.centerAdmin]: [
+      { title: "Dashboard", path: "/centerAdminDashboard" },
+      { title: "Course", path: "/centerAdminCourse" },
+      { title: "User", path: "/centerAdminUser" },
+      { title: "Center", path: "/centerAdminCenter" },
+    ],
+    [Role.teacher]: [
+      { title: "Home", path: "/teacherHome" },
+      { title: "My Course", path: "/teacherCourse" },
+      { title: "My Lecture", path: "/teacherLecture" },
+    ],
+    [Role.student]: [
+      { title: "Home", path: "/studentHome" },
+      { title: "My Course", path: "/studentCourse" },
+      { title: "Assignment", path: "/studentAssignment" },
+    ],
+    default: [
+      { title: "Home", path: "/" },
+      { title: "About Us", path: "/aboutUs" },
+    ],
+  };
+  const links = navLinks[idRole] || navLinks.default;
+
   const renderNavLinksByRole = () => {
     console.log(idRole);
-    switch (idRole) {
-      case Role.platformAdmin: //PlatformAdmin
-        return (
-          <>
-            <Nav.Link href="/">Dashboard</Nav.Link>
-            <Nav.Link href="/">User</Nav.Link>
-            <Nav.Link href="/">Center</Nav.Link>
-            <Nav.Link href="/">Course</Nav.Link>
-          </>
-        );
-      case Role.centerAdmin:
-        return (
-          <>
-            <Nav.Link href="/">Dashboard</Nav.Link>
-            <Nav.Link href="/">Course</Nav.Link>
-            <Nav.Link href="/">User</Nav.Link>
-            <Nav.Link href="/">Center</Nav.Link>
-          </>
-        );
-      case Role.teacher:
-        return (
-          <>
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">My Course</Nav.Link>
-            <Nav.Link href="/">My Lecture</Nav.Link>
-          </>
-        );
-      case 3:
-        return (
-          <>
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">My Course</Nav.Link>
-            <Nav.Link href="/">Assignment</Nav.Link>
-          </>
-        );
-      default:
-        return (
-          <>
-            <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">About Us</Nav.Link>
-          </>
-        );
-    }
+    return links.map(({ title, path }, index) => (
+      <Nav.Link
+        key={index}
+        href={path}
+        className={currentPath === path ? "active" : ""}
+      >
+        {title}
+      </Nav.Link>
+    ));
   };
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
@@ -94,7 +94,10 @@ const Header = ({ idRole, idUser }) => {
                 </button>
                 <button
                   className="circle-buts pi "
-                  onClick={() => navigate("/pi_teacher")}
+                  onClick={() => {
+                    (idRole === Role.teacher && navigate("./teacherPI")) ||
+                      (idRole === Role.student && navigate("./studentPI"));
+                  }}
                 >
                   <div className="ava-img" />
                 </button>

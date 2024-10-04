@@ -5,13 +5,15 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-// import PlatformAdminPI from "./pages/home/PlatformAdminPI";
+import PlatformAdminPI from "./pages/pi/PlatformAdminPI";
 
 import StudentPI from "./pages/pi/StudentPI";
 import StudentHome from "./pages/home/StudentHome";
 
 import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
+import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
+import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 
 const Layout = (props) => {
   return (
@@ -23,17 +25,25 @@ const Layout = (props) => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           {/* Platform Admin */}
-          {/* <Route path="/platformAdminPI" index element={<PlatformAdminPI />} /> */}
+          <Route
+            path="/platformAdminDashboard"
+            element={<PlatformAdminDashboard />}
+          />
+          <Route path="/platformAdminPI" element={<PlatformAdminPI />} />
 
           {/* Center Admin */}
+          <Route
+            path="/centerAdminDashboard"
+            element={<CenterAdminDashboard />}
+          />
 
           {/* Teacher */}
-          <Route path="/teacherHome" index element={<TeacherHome />} />
-          <Route path="/teacherPI" index element={<TeacherPI />} />
+          <Route path="/teacherHome" element={<TeacherHome />} />
+          <Route path="/teacherPI" element={<TeacherPI />} />
 
           {/* Student */}
-          <Route path="/studentHome" index element={<StudentHome />} />
-          <Route path="/studentPI" index element={<StudentPI />} />
+          <Route path="/studentHome" element={<StudentHome />} />
+          <Route path="/studentPI" element={<StudentPI />} />
         </Route>
 
         {/* <Route path='admin' element={<Admin />}>

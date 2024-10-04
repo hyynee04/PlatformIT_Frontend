@@ -4,14 +4,17 @@ import Navbar from "react-bootstrap/Navbar";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LuBell, LuMessageCircle } from "react-icons/lu";
 import { Role } from "../constants/constants";
-
+import default_ava from "../assets/img/default_ava.png";
 import "../assets/scss/Header.scss";
+import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import { useState } from "react";
 
 const Header = ({ idRole, idUser }) => {
-  console.log(idRole);
+  const [showOptionAva, setShowOptionAva] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname; //current path
+
   console.log(currentPath);
 
   const navLinks = {
@@ -23,14 +26,14 @@ const Header = ({ idRole, idUser }) => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdminDashboard" },
-      { title: "Course", path: "/centerAdminCourse" },
-      { title: "User", path: "/centerAdminUser" },
-      { title: "Center", path: "/centerAdminCenter" },
+      { title: "Course Management", path: "/centerAdminCourse" },
+      { title: "User Management", path: "/centerAdminUser" },
+      { title: "Center Management", path: "/centerAdminCenter" },
     ],
     [Role.teacher]: [
       { title: "Home", path: "/teacherHome" },
-      { title: "My Course", path: "/teacherCourse" },
-      { title: "My Lecture", path: "/teacherLecture" },
+      { title: "Course Management", path: "/teacherCourse" },
+      { title: "Lecture Management", path: "/teacherLecture" },
     ],
     [Role.student]: [
       { title: "Home", path: "/studentHome" },
@@ -56,57 +59,64 @@ const Header = ({ idRole, idUser }) => {
       </Nav.Link>
     ));
   };
+
+  const toggleVisibility = () => {
+    setShowOptionAva(!showOptionAva);
+  };
+
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Container>
-        <NavLink to="/" className="navbar-brand">
-          <div className="logo-container">
-            <span className="name-brand">PLAIT</span>
-          </div>
-        </NavLink>
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">{renderNavLinksByRole()}</Nav>
-          <div className="auth-buttons">
-            {!idRole ? (
-              <>
-                <button
-                  className="buts sign-in"
-                  onClick={() => navigate("/login")}
-                >
-                  Sign in
-                </button>
-                <button
-                  className="buts register"
-                  onClick={() => navigate("/register")}
-                >
-                  Register
-                </button>
-              </>
-            ) : (
-              <>
-                {(idRole === Role.student || Role.teacher) && (
-                  <button className="circle-buts">
-                    <LuMessageCircle className="header-icon" />
+    <>
+      <Navbar expand="lg" className="bg-body-tertiary">
+        <Container>
+          <NavLink to="/" className="navbar-brand">
+            <div className="logo-container">
+              <span className="name-brand">PLAIT</span>
+            </div>
+          </NavLink>
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">{renderNavLinksByRole()}</Nav>
+            <div className="auth-buttons">
+              {!idRole ? (
+                <>
+                  <button
+                    className="buts sign-in"
+                    onClick={() => navigate("/login")}
+                  >
+                    Sign in
                   </button>
-                )}
-                <button className="circle-buts">
-                  <LuBell className="header-icon" />
-                </button>
-                <button
-                  className="circle-buts pi "
-                  onClick={() => {
-                    (idRole === Role.teacher && navigate("./teacherPI")) ||
-                      (idRole === Role.student && navigate("./studentPI"));
-                  }}
-                >
-                  <div className="ava-img" />
-                </button>
-              </>
+                  <button
+                    className="buts register"
+                    onClick={() => navigate("/register")}
+                  >
+                    Register
+                  </button>
+                </>
+              ) : (
+                <>
+                  {(idRole === Role.student || Role.teacher) && (
+                    <button className="circle-buts">
+                      <LuMessageCircle className="header-icon" />
+                    </button>
+                  )}
+                  <button className="circle-buts">
+                    <LuBell className="header-icon" />
+                  </button>
+                  <button
+                    className="circle-buts pi "
+                    onClick={toggleVisibility}
+                  >
+                    <img src={default_ava} alt="" className="header-avatar" />
+                  </button>
+                </>
+              )}
+            </div>
+            {showOptionAva && (
+              <HeaderAvatarOption setShowOptionAva={setShowOptionAva} />
             )}
-          </div>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
   );
 };
 

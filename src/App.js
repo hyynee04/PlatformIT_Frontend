@@ -2,11 +2,13 @@ import { Outlet, useLocation } from "react-router-dom";
 import "./App.scss";
 import Header from "./parts/Header";
 import Footer from "./parts/Footer";
+import { useCookies } from "react-cookie";
 
 const App = () => {
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const location = useLocation(); //Lấy thông tin vị trí hiện tại
-  const idRole = location.state?.idRole || null;
-  const idUser = location.state?.idUser || null;
+  const idRole = location.state?.idRole || cookies.idRole;
+  const idUser = location.state?.idUser || cookies.idUser;
   // console.log(idRole);
 
   return (

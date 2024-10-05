@@ -1,4 +1,4 @@
-import "../assets/scss/Home.scss";
+import "../assets/scss/Home.css";
 import DialogForm from "../components/DialogForm";
 
 const Home = () => {

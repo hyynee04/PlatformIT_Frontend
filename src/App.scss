@@ -30,12 +30,15 @@
   animation: slideIn 0.75s ease-in-out forwards;
 }
 
-.App-container {
+.app-container {
   overflow: scroll; /* or auto */
   -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.App-container::-webkit-scrollbar {
+.app-container::-webkit-scrollbar {
   display: none;
 }
 
@@ -43,6 +46,9 @@
   .bg-body-tertiary {
     background-color: var(--main-color) !important;
   }
+}
+.main-container {
+  flex: 1;
 }
 
 .footer-container {

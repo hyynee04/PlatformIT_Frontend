@@ -9,7 +9,7 @@ import { TbBrandGithubFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { postLogin } from "../services/authService";
 import { Role, Status } from "../constants/constants";
-import "../assets/scss/Login.scss";
+import "../assets/scss/Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,14 +29,17 @@ const Login = () => {
     setIsVisible(true);
   }, []);
 
-  const [cookies, setCookie, removeCookie] = useCookies(["user"]); //khai báo hook useCookies
+  // const [cookies, setCookie, removeCookie] = useCookies(["user"]); //khai báo hook useCookies
   const handleLogin = async () => {
     // submit login
     let data = await postLogin(username, password);
     console.log(">>> Check register: ", data);
     if (data && data.idUser > Status.inactive) {
-      setCookie("idRole", data.idRole, { path: "/" });
-      setCookie("idUser", data.idUser, { path: "/" });
+      // setCookie("idRole", data.idRole, { path: "/" });
+      // setCookie("idUser", data.idUser, { path: "/" });
+      localStorage.setItem("idRole", data.idRole);
+      localStorage.setItem("idUser", data.idUser);
+
       let roleBasesPath = "/";
       switch (data.idRole) {
         case Role.platformAdmin: {

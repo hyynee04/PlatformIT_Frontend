@@ -1,0 +1,50 @@
+.foot-container {
+  padding: 16px 72px 64px;
+  margin: 0;
+  width: 100%;
+  background-color: var(--main-color);
+
+  display: flex;
+  flex-direction: row;
+  gap: 128px;
+}
+
+.foot-container .column {
+  height: fit-content;
+  width: fit-content;
+  color: var(--white-color);
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.foot-container .column .title-brand {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.foot-container .column .references {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.foot-container .column .references svg {
+  height: 20px;
+  width: 20px;
+}
+
+.foot-container .column .col-header {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.foot-container .column .col-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-weight: 300;
+  font-size: 14px;
+}

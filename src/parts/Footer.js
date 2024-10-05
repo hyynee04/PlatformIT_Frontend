@@ -1,12 +1,7 @@
 import React from "react";
-import {
-  BsInstagram,
-  BsLinkedin,
-  BsTwitterX,
-  BsYoutube
-} from "react-icons/bs";
+import { BsInstagram, BsLinkedin, BsTwitterX, BsYoutube } from "react-icons/bs";
 
-import '../assets/scss/Footer.scss';
+import "../assets/scss/Footer.css";
 
 const Footer = () => {
   return (

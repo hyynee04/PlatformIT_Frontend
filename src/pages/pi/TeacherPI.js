@@ -5,6 +5,8 @@ import InputGroup from "react-bootstrap/InputGroup";
 import { FaRegTrashCan, FaPlus } from "react-icons/fa6";
 import { LuFile } from "react-icons/lu";
 
+import "../../assets/scss/PI.css";
+
 const TeacherPI = () => {
   return (
     <div>

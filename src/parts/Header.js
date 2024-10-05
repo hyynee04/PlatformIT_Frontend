@@ -4,18 +4,19 @@ import Navbar from "react-bootstrap/Navbar";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LuBell, LuMessageCircle } from "react-icons/lu";
 import { Role } from "../constants/constants";
-import default_ava from "../assets/img/default_ava.png";
-import "../assets/scss/Header.scss";
-import HeaderAvatarOption from "../components/HeaderAvatarOption";
 import { useState } from "react";
+import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import default_ava from "../assets/img/default_ava.png";
 
-const Header = ({ idRole, idUser }) => {
+import "../assets/scss/Header.css";
+import { useCookies } from "react-cookie";
+const Header = () => {
   const [showOptionAva, setShowOptionAva] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+  const location = useLocation(); //Lấy thông tin vị trí hiện tại
+  const idRole = location.state?.idRole || cookies.idRole;
   const navigate = useNavigate();
-  const location = useLocation();
   const currentPath = location.pathname; //current path
-
-  console.log(currentPath);
 
   const navLinks = {
     [Role.platformAdmin]: [

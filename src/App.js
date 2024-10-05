@@ -3,18 +3,26 @@ import "./App.scss";
 import Header from "./parts/Header";
 import Footer from "./parts/Footer";
 import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
 
 const App = () => {
-  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
-  const location = useLocation(); //Lấy thông tin vị trí hiện tại
-  const idRole = location.state?.idRole || cookies.idRole;
-  const idUser = location.state?.idUser || cookies.idUser;
-  // console.log(idRole);
+  // const [cookies, setCookie, removeCookie] = useCookies(["user"]);
 
+  // const idRole = cookies.idRole || null;
+  // const idUser = cookies.idUser || null;
+  // useEffect(() => {
+  //   if (idUser) {
+  //     const userInfo = {
+  //       idUser,
+  //       idRole,
+  //     };
+  //     setUser(userInfo);
+  //   }
+  // }, [idUser, idRole]);
   return (
     <div className="app-container">
       <div className="header-container">
-        <Header idRole={idRole} idUser={idUser} />
+        <Header />
       </div>
       <div className="main-container">
         <div className="app-content">

@@ -9,7 +9,7 @@ import {
   LuUser,
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import "../assets/scss/Register.scss";
+import "../assets/scss/Register.css";
 import { postRegister } from "../services/authService";
 
 const Register = () => {

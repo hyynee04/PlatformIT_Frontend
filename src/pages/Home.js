@@ -1,5 +1,13 @@
+import "../assets/scss/Home.scss";
+import DialogForm from "../components/DialogForm";
+
 const Home = () => {
-  return <div>This is Home Page Of Guest</div>;
+  return (
+    <div>
+      <div className="main-container"></div>
+      {/* <DialogForm /> */}
+    </div>
+  );
 };
 
 export default Home;

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useCookies } from "react-cookie";
 import { FaGooglePlusG } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLock, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { postLogin } from "../services/authService";
-import { Status } from "../constants/constants";
+import { Role, Status } from "../constants/constants";
 import "../assets/scss/Login.scss";
 
 const Login = () => {
@@ -28,12 +29,37 @@ const Login = () => {
     setIsVisible(true);
   }, []);
 
+  const [cookies, setCookie, removeCookie] = useCookies(["user"]); //khai báo hook useCookies
   const handleLogin = async () => {
     // submit login
     let data = await postLogin(username, password);
     console.log(">>> Check register: ", data);
     if (data && data.idUser > Status.inactive) {
+      setCookie("idRole", data.idRole, { path: "/" });
+      setCookie("idUser", data.idUser, { path: "/" });
       let roleBasesPath = "/";
+      switch (data.idRole) {
+        case Role.platformAdmin: {
+          roleBasesPath = "/platformAdminDashboard";
+          break;
+        }
+        case Role.centerAdmin: {
+          roleBasesPath = "/centerAdminDashboard";
+          break;
+        }
+        case Role.teacher: {
+          roleBasesPath = "/teacherHome";
+          break;
+        }
+        case Role.student: {
+          roleBasesPath = "/studentHome";
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
       navigate(roleBasesPath, {
         state: { idUser: data.idUser, idRole: data.idRole },
       });

@@ -12,9 +12,11 @@ import "../assets/scss/Header.css";
 import { useCookies } from "react-cookie";
 const Header = () => {
   const [showOptionAva, setShowOptionAva] = useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const location = useLocation(); //Lấy thông tin vị trí hiện tại
-  const idRole = location.state?.idRole || cookies.idRole;
+  // const idRole = location.state?.idRole || cookies.idRole;
+  const idRole = location.state?.idRole || localStorage.getItem("idRole");
+  const idUser = location.state?.idUser || localStorage.getItem("idUser");
   const navigate = useNavigate();
   const currentPath = location.pathname; //current path
 

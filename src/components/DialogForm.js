@@ -6,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 const DialogForm = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const [cookies, setCookie, removeCookie] = useCookies(["user"]);
+  // const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const handleSignout = () => {
-    removeCookie("idRole");
-    removeCookie("idUser");
+    // removeCookie("idRole");
+    // removeCookie("idUser");
+    localStorage.removeItem("idRole");
+    localStorage.removeItem("idUser");
     navigate("/");
   };
   if (!isOpen) return null;

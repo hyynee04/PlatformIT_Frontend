@@ -30,15 +30,23 @@
   animation: slideIn 0.75s ease-in-out forwards;
 }
 
-.App {
-  text-align: center;
+.App-container {
+  overflow: scroll; /* or auto */
+  -webkit-overflow-scrolling: touch;
+}
+  
+.App-container::-webkit-scrollbar {
+    display: none;
 }
 
 .header-container {
   .bg-body-tertiary {
     background-color: var(--main-color) !important;
   }
-  
+}
+
+.footer-container {
+  background-color: var(--main-color);
 }
 
 // .App-logo {

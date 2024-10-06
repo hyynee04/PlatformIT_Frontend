@@ -1,8 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LuCamera } from "react-icons/lu";
 import { FaChevronDown } from "react-icons/fa";
+import { getPI } from "../services/authService";
+import { UserGender } from "../constants/constants";
 
 const BasicInfoForm = () => {
+  const today = new Date().toISOString().split("T")[0];
+
+  const idUser = +localStorage.getItem("idUser");
+  const [name, setName] = useState(null);
+  const [phoneNum, setPhoneNum] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [gender, setGender] = useState(UserGender.male);
+  const [dob, setDob] = useState(today);
+  const [nationnality, setNationality] = useState(null);
+
+  useEffect(() => {
+    if (!idUser) {
+      console.error("Không tìm thấy idUser trong localStorage");
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        let data = await getPI(idUser); // Chờ API trả về dữ liệu
+
+        setName(data.fullName);
+        setPhoneNum(data.phoneNumber);
+        setEmail(data.email);
+        setGender(data.gender);
+        setDob(data.dob.split("T")[0]);
+        setNationality(data.nationality);
+      } catch (error) {
+        console.error("Có lỗi xảy ra khi lấy thông tin cá nhân:", error);
+      }
+    };
+
+    fetchData(); // Gọi hàm để lấy dữ liệu
+  }, [idUser]); // useEffect chỉ chạy khi idUser thay đổi
   return (
     <div>
       <div className="title-info">
@@ -25,15 +60,30 @@ const BasicInfoForm = () => {
           <div className="container-left">
             <div className="info">
               <span>Name</span>
-              <input type="text" className="input-form-pi" />
+              <input
+                type="text"
+                className="input-form-pi"
+                value={name || ""}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
             <div className="info">
               <span>Phone Number</span>
-              <input type="text" className="input-form-pi" />
+              <input
+                type="text"
+                className="input-form-pi"
+                value={phoneNum || ""}
+                onChange={(e) => setPhoneNum(e.target.value)}
+              />
             </div>
             <div className="info">
               <span>Email</span>
-              <input type="text" className="input-form-pi" />
+              <input
+                type="text"
+                className="input-form-pi"
+                value={email || ""}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
           </div>
           <div className="container-gap"></div>
@@ -41,17 +91,27 @@ const BasicInfoForm = () => {
             <div className="info">
               <span>Gender</span>
               <div className="select-container">
-                <select className="input-form-pi">
-                  <option value="">Male</option>
-                  <option value="">Female</option>
-                  <option value="">Other</option>
+                <select
+                  className="input-form-pi"
+                  value={gender || UserGender.male}
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <option value={UserGender.male}>Male</option>
+                  <option value={UserGender.female}>Female</option>
+                  <option value={UserGender.other}>Other</option>
                 </select>
                 <FaChevronDown className="arrow-icon" />
               </div>
             </div>
             <div className="info">
               <span>Birthday</span>
-              <input type="date" className="input-form-pi" />
+              <input
+                type="date"
+                className="input-form-pi"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                fotmat="mm-dd-yyy"
+              />
             </div>
             <div className="info">
               <span>Nationality</span>

@@ -8,3 +8,9 @@ export const Status = {
   active: 1,
   inactive: 2,
 };
+
+export const UserGender = {
+  male: 0,
+  female: 1,
+  other: 2,
+};

@@ -114,7 +114,7 @@
 }
 
 .container-field .info .container-link .mb-3 {
-  height: 40px;
+  height: 45px;
   width: 83.33%;
   border-radius: 100rem;
   color: var(--text-gray);
@@ -122,18 +122,22 @@
 }
 
 .container-field .info .container-link .mb-3 .title-link {
-  border: none;
+  height: 100%;
+  width: 100px;
   border-top-left-radius: 100rem;
   border-bottom-left-radius: 100rem;
   border: 1px solid var(--border-gray);
-  width: 100px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  display: flex; /* Dùng flexbox để quản lý kích thước bên trong */
+  align-items: center;
 }
 
 .container-field .info .container-link .mb-3 .main-link {
-  border: none;
   border-top-right-radius: 100rem;
   border-bottom-right-radius: 100rem;
   border: 1px solid var(--border-gray);
+  padding: 0 12px;
 }
 
 .container-field .info .input-form-pi {

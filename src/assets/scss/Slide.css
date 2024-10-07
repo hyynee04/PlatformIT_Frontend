@@ -1,0 +1,39 @@
+.slide-container {
+    height: 500px;
+    width: 100%;
+}
+.carousel {
+    margin: 32px 64px;
+    padding: 0 32px;
+}
+.carousel-indicators {
+    position: absolute;
+    margin-bottom: -3%;
+}
+.carousel-indicators > button {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 90px;
+    background-clip: content-box;
+    border: none !important;
+}
+.carousel-dark .carousel-indicators [data-bs-target] {
+    background-color: var(--text-gray);
+}
+.carousel-indicators > .active {
+    background-color: var(--main-color) !important;
+}
+.course-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.carousel-control-next, .carousel-control-prev {
+    width: 32px;
+}
+.active {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+

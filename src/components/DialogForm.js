@@ -1,7 +1,7 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
 import "../assets/scss/card/DiagForm.scss";
-import { useCookies } from "react-cookie";
+
 import { useNavigate } from "react-router-dom";
 
 const DialogForm = ({ isOpen, onClose }) => {

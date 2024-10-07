@@ -1,11 +1,13 @@
 import "../assets/scss/Home.css";
-import DialogForm from "../components/DialogForm";
+import Slide from "../components/Slide";
+
 
 const Home = () => {
   return (
     <div>
-      <div className="main-container"></div>
-      {/* <DialogForm /> */}
+      <div className="main-container">
+        <Slide />
+      </div>
     </div>
   );
 };

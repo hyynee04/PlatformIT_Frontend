@@ -2,7 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import "./App.scss";
 import Header from "./parts/Header";
 import Footer from "./parts/Footer";
-import { useCookies } from "react-cookie";
+
 import { useEffect, useState } from "react";
 
 const App = () => {

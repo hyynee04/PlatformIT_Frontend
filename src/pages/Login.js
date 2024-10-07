@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { useCookies } from "react-cookie";
+
 import { FaGooglePlusG } from "react-icons/fa";
-import { LuEye, LuEyeOff, LuLock, LuUser } from "react-icons/lu";
+import { LuEye, LuEyeOff, LuLock, LuUser, LuMail } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
-import { postLogin } from "../services/authService";
-import { Role, Status } from "../constants/constants";
 import "../assets/scss/Login.css";
+import { Role, Status } from "../constants/constants";
+import { postLogin } from "../services/authService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -188,16 +187,28 @@ const Login = () => {
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Forgot Password?</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+        <Modal.Body>
+          <div className="mb-3 justify-margin">
+            <LuMail color="#757575" className="icon-head" />
+            <input
+              type="text"
+              placeholder="Email"
+              className="form-control"
+              value={username}
+              onChange={(event) => {
+                setUsername(event.target.value);
+                setIsFailed(false);
+              }}
+              tabIndex={1}
+              required
+            />
+          </div>
+        </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
+          <button className="footer-btn send-btn">Send</button>
+          <button className="footer-btn cancel-btn">Cancel</button>
         </Modal.Footer>
       </Modal>
     </>

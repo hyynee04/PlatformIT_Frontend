@@ -6,7 +6,7 @@ export const Role = {
 };
 export const Status = {
   active: 1,
-  inactive: 2,
+  inactive: 0,
 };
 
 export const UserGender = {

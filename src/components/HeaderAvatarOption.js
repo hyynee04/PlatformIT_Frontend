@@ -32,8 +32,9 @@ const HeaderAvatarOption = ({}) => {
         <button
           className="op-buts"
           onClick={() => {
-            (idRole === Role.teacher && navigate("./teacherPI")) ||
-              (idRole === Role.student && navigate("./studentPI"));
+            idRole === Role.teacher
+              ? navigate("./teacherPI")
+              : navigate("./pi");
             setIsOptionVisible(false);
           }}
         >

@@ -18,16 +18,16 @@ const Header = () => {
 
   const navLinks = {
     [Role.platformAdmin]: [
-      { title: "Dashboard", path: "/platformAdminDashboard" },
-      { title: "User", path: "/platformAdminUser" },
-      { title: "Center", path: "/platformAdminCenter" },
-      { title: "Course", path: "/platformAdminCourse" },
+      { title: "Dashboard", path: "/platformAdDashboard" },
+      { title: "User Management", path: "/platformAdUser" },
+      { title: "Center Management", path: "/platformAdminCenter" },
+      { title: "Course Management", path: "/platformAdminCourse" },
     ],
     [Role.centerAdmin]: [
-      { title: "Dashboard", path: "/centerAdminDashboard" },
-      { title: "Course Management", path: "/centerAdminCourse" },
-      { title: "User Management", path: "/centerAdminUser" },
-      { title: "Center Management", path: "/centerAdminCenter" },
+      { title: "Dashboard", path: "/centerAdDashboard" },
+      { title: "Course Management", path: "/centerAdCourse" },
+      { title: "User Management", path: "/centerAdUser" },
+      { title: "Center Management", path: "/centerAdCenter" },
     ],
     [Role.teacher]: [
       { title: "Home", path: "/teacherHome" },

@@ -2,9 +2,8 @@ import React from "react";
 
 import "../../assets/scss/PI.css";
 import BasicInfoForm from "../../components/BasicInfoForm";
-import { useCookies } from "react-cookie";
 
-const StudentPI = () => {
+const UserPI = () => {
   return (
     <div>
       <BasicInfoForm></BasicInfoForm>
@@ -12,4 +11,4 @@ const StudentPI = () => {
   );
 };
 
-export default StudentPI;
+export default UserPI;

@@ -17,11 +17,4 @@ const postLogin = (username, password) => {
   });
 };
 
-const getPI = (idUser) => {
-  return axios.get("api/User/showPI", {
-    params: {
-      id: idUser,
-    },
-  });
-};
-export { postRegister, postLogin, getPI };
+export { postRegister, postLogin };

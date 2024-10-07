@@ -256,4 +256,15 @@
 .cancel-btn:hover{
   background-color: var(--border-gray);
 }
+@media (min-width: 576px) {
+  .modal-dialog {
+      max-width: var(--bs-modal-width);
+      margin-right: auto;
+      margin-left: auto;
+      margin-top: 5%;
+  }
+}
+.btn-close:focus {
+  box-shadow: none;
+}
 

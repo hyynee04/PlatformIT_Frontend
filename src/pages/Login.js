@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
 import { FaGooglePlusG } from "react-icons/fa";
-import { LuEye, LuEyeOff, LuLock, LuUser, LuMail } from "react-icons/lu";
+import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
 import { Role, Status } from "../constants/constants";
 import { postLogin } from "../services/authService";
+import { postForgotPassword } from "../services/userService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Login = () => {
   const [isShowed, setIsShowed] = useState(false);
 
   const [isFailed, setIsFailed] = useState(false);
+  const [isValid, setIsValid] = useState(true)
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -28,11 +30,19 @@ const Login = () => {
     setIsVisible(true);
   }, []);
 
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
   // const [cookies, setCookie, removeCookie] = useCookies(["user"]); //khai báo hook useCookies
   const handleLogin = async () => {
     // submit login
     let data = await postLogin(username, password);
-    console.log(">>> Check register: ", data);
+    // console.log(">>> Check register: ", data);
     if (data && data.idUser > Status.inactive) {
       // setCookie("idRole", data.idRole, { path: "/" });
       // setCookie("idUser", data.idUser, { path: "/" });
@@ -69,6 +79,26 @@ const Login = () => {
       setIsFailed(true);
     }
   };
+
+  const handleForgotPassword = async () => {
+
+    // validate email
+    const isValidEmail = validateEmail(username);
+    if (!isValidEmail) {
+      setIsValid(false);
+      return;
+    }
+
+    // submit email
+    let data = await postForgotPassword(username, 0)
+    console.log(">>> Check register: ", data);
+    if (data === 'Internal Server Error.') {
+      setIsValid(false);
+      return
+    } else {
+      handleClose()
+    }
+  }
 
   return (
     <>
@@ -199,16 +229,25 @@ const Login = () => {
               value={username}
               onChange={(event) => {
                 setUsername(event.target.value);
-                setIsFailed(false);
+                setIsValid(true);
               }}
               tabIndex={1}
               required
             />
           </div>
+          {!isValid && (
+            <div className="mb-3 justify-margin">
+              <span className="error-noti">Invalid Email!</span>
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <button className="footer-btn send-btn">Send</button>
-          <button className="footer-btn cancel-btn">Cancel</button>
+          <button
+            className="footer-btn send-btn"
+            onClick={() => handleForgotPassword()}
+            disabled={!isValid}
+          >Send</button>
+
         </Modal.Footer>
       </Modal>
     </>

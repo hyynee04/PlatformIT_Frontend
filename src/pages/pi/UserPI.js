@@ -1,7 +1,9 @@
 import React from "react";
+
+import "../../assets/scss/PI.css";
 import BasicInfoForm from "../../components/BasicInfoForm";
 
-const CenterAdminPI = () => {
+const UserPI = () => {
   return (
     <div>
       <BasicInfoForm></BasicInfoForm>
@@ -9,4 +11,4 @@ const CenterAdminPI = () => {
   );
 };
 
-export default CenterAdminPI;
+export default UserPI;

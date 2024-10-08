@@ -7,6 +7,7 @@ import {
   LuMail,
   LuPenTool,
   LuUser,
+  LuBuilding2
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import "../assets/scss/Register.css";
@@ -21,6 +22,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [TIN, setTIN] = useState("");
+  const [centerName, setCenterName] = useState("");
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
@@ -56,7 +58,6 @@ const Register = () => {
       password === "" ||
       confirmPassword === ""
     ) {
-      alert("here");
       setIsError(true);
       return;
     }
@@ -226,6 +227,19 @@ const Register = () => {
             </div>
             {isChecked && (
               <>
+                <div className="mb-3">
+                  <LuBuilding2 color="#757575" className="icon-head" />
+                  <input
+                    type="number"
+                    placeholder="Center Name"
+                    className="form-control"
+                    value={centerName}
+                    onChange={(event) => {
+                      setCenterName(event.target.value);
+                      setIsError(false);
+                    }}
+                  />
+                </div>
                 <div className="mb-3 marginbottom-5px">
                   <LuCreditCard color="#757575" className="icon-head" />
                   <input
@@ -246,6 +260,7 @@ const Register = () => {
                     </span>
                   </div>
                 )}
+                
               </>
             )}
             {isError && (

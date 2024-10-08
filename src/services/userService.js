@@ -1,10 +1,9 @@
 import axios from "../utils/axiosCustomize";
 
-const postForgotPassword = (email, idUserUpdatedBy) => {
+const postForgotPassword = (email) => {
   return axios.post('api/User/ForgotPassword', null, {
     params: {
-      email,
-      idUserUpdatedBy
+      email
     }
   })
 }

@@ -1,6 +1,6 @@
 .slide-container {
-    margin: 32px 0px;
-    height: 500px;
+    margin: 32px 0px 72px;
+    height: fit-content;
     width: 100%;
 }
 .carousel-header {
@@ -30,7 +30,7 @@
 
 .carousel {
     margin-top: 10px;
-    padding: 0 32px;
+    padding: 0 64px;
 }
 .carousel-indicators {
     position: absolute;
@@ -52,7 +52,7 @@
 .item-holder {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
 .carousel-control-next, .carousel-control-prev {
     width: 32px;

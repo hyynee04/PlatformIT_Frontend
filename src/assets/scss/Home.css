@@ -1,3 +1,85 @@
 .home-main-container {
-   padding: 6px 72px;
+   padding: 32px 72px 0;
 }
+
+.introduction-container {
+    border: 1px solid var(--second-main-color);
+    border-radius: 16px;
+    height: 500px;
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.left-introduction {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: auto;
+    padding-left: 45px;
+}
+
+.introduction-brand-title {
+    font-size: 40px;
+    font-weight: 700;
+}
+
+.introduction-brand-title > b {
+    color: var(--main-color);
+}
+
+.introduction-brand-name {
+    font-size: 24px;
+    color: var(--second-main-color);
+    font-weight: 500;
+}
+
+.introduction-register {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.introduction-register > span {
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.introduction-register > button {
+    border: none;
+    border-radius: 8px;
+    background-color: var(--second-main-color);
+    color: var(--white-color);
+
+    padding: 4px 8px;
+}
+
+.introduction-register > button:hover {
+    background-color: rgba(0, 59, 87, 0.7);
+}
+
+.right-introduction {
+    width: 65%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: linear-gradient(
+    to bottom,
+    var(--second-main-color),
+    var(--main-color)
+    );
+    border-radius: 16px;
+
+}
+
+.right-introduction > img {
+    width: 300px;
+    border-radius: 16px;
+    margin: auto;
+}
+

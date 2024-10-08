@@ -90,7 +90,7 @@ const Login = () => {
     }
 
     // submit email
-    let data = await postForgotPassword(username, 0)
+    let data = await postForgotPassword(username)
     console.log(">>> Check register: ", data);
     if (data === 'Internal Server Error.') {
       setIsValid(false);

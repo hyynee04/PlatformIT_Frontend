@@ -1,8 +1,9 @@
 import Carousel from 'react-bootstrap/Carousel';
+import { MdArrowForwardIos } from "react-icons/md";
 import "../assets/scss/Slide.css";
+import CenterCard from './CenterCard';
 import Course from './Course';
 import TeacherCard from './TeacherCard';
-import { MdArrowForwardIos } from "react-icons/md";
 
 
 const Slide = (props) => {
@@ -43,7 +44,7 @@ const Slide = (props) => {
 
 
             <div className="slide-container" slide={true}>
-            <div className='carousel-header'>
+                <div className='carousel-header'>
                     <span className='carousel-header-title'>Top Teacher</span>
                     <span className='carousel-header-viewall'>View all teachers <MdArrowForwardIos color='#757575' /> </span>
                 </div>
@@ -76,20 +77,38 @@ const Slide = (props) => {
 
 
             <div className="slide-container" slide={false}>
-            <div className='carousel-header'>
-                    <span className='carousel-header-title'>Top Teacher</span>
-                    <span className='carousel-header-viewall'>View all teachers <MdArrowForwardIos color='#757575' /> </span>
+                <div className='carousel-header'>
+                    <span className='carousel-header-title'>Top Center</span>
+                    <span className='carousel-header-viewall'>View all centers <MdArrowForwardIos color='#757575' /> </span>
                 </div>
                 <Carousel variant='dark'>
                     <Carousel.Item>
                         <div className='item-holder'>
-                            <TeacherCard />
-
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
+                        </div>
+                    </Carousel.Item>
+                    <Carousel.Item>
+                        <div className='item-holder'>
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
+                        </div>
+                    </Carousel.Item>
+                    <Carousel.Item>
+                        <div className='item-holder'>
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
+                            <CenterCard />
                         </div>
                     </Carousel.Item>
                 </Carousel>
             </div>
-            
+
         </>
 
     )

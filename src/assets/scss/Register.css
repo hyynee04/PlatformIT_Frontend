@@ -7,7 +7,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .register-container {
   width: 1000px;
   height: 600px;
-  margin: 75px auto 75px;
+  margin: 25px auto 25px;
   border-radius: 8px;
   box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
   background: linear-gradient(

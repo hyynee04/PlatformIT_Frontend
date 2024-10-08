@@ -5,7 +5,7 @@ import Slide from "../components/Slide";
 const Home = () => {
   return (
     <div>
-      <div className="main-container">
+      <div className="home-main-container">
         <Slide />
       </div>
     </div>

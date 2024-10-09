@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { useCookies } from "react-cookie";
 import { FaGooglePlusG } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLock, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
@@ -39,15 +38,17 @@ const Login = () => {
       // setCookie("idUser", data.idUser, { path: "/" });
       localStorage.setItem("idRole", data.idRole);
       localStorage.setItem("idUser", data.idUser);
-
+      if (data.idCenter !== null) {
+        localStorage.setItem("idCenter", data.idCenter);
+      }
       let roleBasesPath = "/";
       switch (data.idRole) {
         case Role.platformAdmin: {
-          roleBasesPath = "/platformAdminDashboard";
+          roleBasesPath = "/platformAdDashboard";
           break;
         }
         case Role.centerAdmin: {
-          roleBasesPath = "/centerAdminDashboard";
+          roleBasesPath = "/centerAdDashboard";
           break;
         }
         case Role.teacher: {

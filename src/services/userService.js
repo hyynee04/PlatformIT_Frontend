@@ -10,4 +10,16 @@ const getPI = (idUser) => {
 const getAllUser = () => {
   return axios.post("api/User/getAllUser");
 };
-export { getPI, getAllUser };
+const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
+  console.log(idUserInactive);
+  console.log(idUserUpdatedBy);
+
+  return axios.post("api/User/InactiveUser", null, {
+    params: {
+      idUserInactive: idUserInactive,
+      idUserUpdatedBy: idUserUpdatedBy,
+    },
+  });
+};
+
+export { getPI, getAllUser, postInactiveUser };

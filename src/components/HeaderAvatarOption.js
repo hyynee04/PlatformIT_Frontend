@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Role } from "../constants/constants";
-import DialogForm from "./DialogForm";
+import DiagSignOutForm from "./DiagSignOutForm";
+import "../assets/scss/card/OptionCard.css";
 
-const HeaderAvatarOption = ({}) => {
+const HeaderAvatarOption = () => {
   const [isOptionVisible, setIsOptionVisible] = useState(true);
   const [isModalSignoutOpen, setIsModalSignoutOpen] = useState(false);
 
@@ -17,7 +18,7 @@ const HeaderAvatarOption = ({}) => {
       <>
         {isModalSignoutOpen && (
           <div>
-            <DialogForm
+            <DiagSignOutForm
               isOpen={isModalSignoutOpen}
               onClose={closeSignoutModal}
             />
@@ -27,8 +28,8 @@ const HeaderAvatarOption = ({}) => {
     );
 
   return (
-    <div id="headerAvatarOption">
-      <div className="container-options">
+    <div>
+      <div className="container-options headerOption">
         <button
           className="op-buts"
           onClick={() => {
@@ -54,7 +55,10 @@ const HeaderAvatarOption = ({}) => {
         </button>
       </div>
       <div>
-        <DialogForm isOpen={isModalSignoutOpen} onClose={closeSignoutModal} />
+        <DiagSignOutForm
+          isOpen={isModalSignoutOpen}
+          onClose={closeSignoutModal}
+        />
       </div>
     </div>
   );

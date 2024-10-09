@@ -20,8 +20,8 @@ const Header = () => {
     [Role.platformAdmin]: [
       { title: "Dashboard", path: "/platformAdDashboard" },
       { title: "User Management", path: "/platformAdUser" },
-      { title: "Center Management", path: "/platformAdminCenter" },
-      { title: "Course Management", path: "/platformAdminCourse" },
+      { title: "Center Management", path: "/platformAdCenter" },
+      { title: "Course Management", path: "/platformAdCourse" },
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },

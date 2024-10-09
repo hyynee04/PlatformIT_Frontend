@@ -1,5 +1,10 @@
+.course-card-container {
+    width: fit-content;
+    height: fit-content;
+    position: relative;
+}
 .card {
-    width: 18rem;
+    width: 266px;
     padding: 24px;
 
     display: flex;
@@ -11,9 +16,20 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.card-img-top {
+.hover-card {
+    width: 348px !important;
+    height: fit-content;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+.course-card-img-top {
     min-width: 100%;
-    height: 160px;
+    min-height: 160px !important;
+    max-height: 200px !important;
     border: 1px solid var(--border-gray);
     border-radius: 8px;
 }
@@ -25,9 +41,9 @@
     gap: 5px;
 }
 
-.card-title {
+.course-title, .course-title-hover {
     margin: 0;
-    font-size: 24px;
+    font-size: 20px !important;
     font-weight: 700;
 
     display: -webkit-box;
@@ -39,10 +55,14 @@
     max-width: 100%;          /* Adjust this to your container's width */
 }
 
+.course-title-hover {
+    -webkit-line-clamp: 3 !important;   /* Show only 2 lines */
+}
+
 .tag-container {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 4px;
 
     white-space: nowrap;      /* Prevents wrapping of the inner divs */
     overflow: hidden;         /* Hides the overflowing content */
@@ -120,4 +140,17 @@
     color: var(--text-gray);
     height: fit-content;
     width: fit-content;
+}
+
+.view-detail-btn {
+    padding: 8px 8px;
+    color: var(--white-color);
+    background-color: var(--main-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 300;
+}
+
+.view-detail-btn:hover {
+    background-color: rgba(57, 121, 121, 0.8);
 }

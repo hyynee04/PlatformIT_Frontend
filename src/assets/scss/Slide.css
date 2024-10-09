@@ -49,6 +49,9 @@
 .carousel-indicators > .active {
     background-color: var(--main-color) !important;
 }
+.carousel-inner {
+    overflow: visible;
+}
 .item-holder {
     display: flex;
     flex-direction: row;

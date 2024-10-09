@@ -56,7 +56,9 @@ const Register = () => {
       email === "" ||
       username === "" ||
       password === "" ||
-      confirmPassword === ""
+      confirmPassword === "" ||
+      (isChecked && TIN === "") ||
+      (isChecked && centerName === "")
     ) {
       setIsError(true);
       return;
@@ -230,7 +232,7 @@ const Register = () => {
                 <div className="mb-3">
                   <LuBuilding2 color="#757575" className="icon-head" />
                   <input
-                    type="number"
+                    type="text"
                     placeholder="Center Name"
                     className="form-control"
                     value={centerName}

@@ -83,3 +83,11 @@
     margin: auto;
 }
 
+.rotate {
+    width: 200px; /* Set width of the image */
+    transition: transform 2s ease; /* Transition for smooth rotation */
+}
+
+.rotate:hover {
+    transform: rotate(360deg); /* Rotate the image 360 degrees on hover */
+}

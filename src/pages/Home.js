@@ -16,7 +16,7 @@ const Home = () => {
             </div>
           </div>
           <div className="right-introduction">
-            <img id="image" className="" src={logoPlait}/>
+            <img className="rotate " src={logoPlait}/>
           </div>
         </div>
         <Slide />

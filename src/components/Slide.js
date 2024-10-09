@@ -9,12 +9,12 @@ import TeacherCard from './TeacherCard';
 const Slide = (props) => {
     return (
         <>
-            <div className="slide-container" slide={true}>
+            <div className="slide-container">
                 <div className='carousel-header'>
                     <span className='carousel-header-title'>Top Course</span>
                     <span className='carousel-header-viewall'>View all courses <MdArrowForwardIos color='#757575' /> </span>
                 </div>
-                <Carousel variant='dark'>
+                <Carousel variant='dark' slide={false}>
                     <Carousel.Item>
                         <div className='item-holder'>
                             <Course />

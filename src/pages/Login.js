@@ -14,7 +14,7 @@ import { postForgotPassword } from "../services/userService";
 const Login = () => {
   const navigate = useNavigate();
 
-  //const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isShowed, setIsShowed] = useState(false);
@@ -23,7 +23,13 @@ const Login = () => {
   const [isValid, setIsValid] = useState(true)
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleShow = () => {
+    const isValidEmail = validateEmail(username);
+    if (isValidEmail) {
+      setEmail(username)
+    }
+    setShow(true);
+  }
 
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
@@ -81,16 +87,15 @@ const Login = () => {
   };
 
   const handleForgotPassword = async () => {
-
     // validate email
-    const isValidEmail = validateEmail(username);
+    const isValidEmail = validateEmail(email);
     if (!isValidEmail) {
       setIsValid(false);
       return;
     }
 
     // submit email
-    let data = await postForgotPassword(username)
+    let data = await postForgotPassword(email)
     console.log(">>> Check register: ", data);
     if (data === 'Internal Server Error.') {
       setIsValid(false);
@@ -226,9 +231,9 @@ const Login = () => {
               type="text"
               placeholder="Email"
               className="form-control"
-              value={username}
+              value={email}
               onChange={(event) => {
-                setUsername(event.target.value);
+                setEmail(event.target.value);
                 setIsValid(true);
               }}
               tabIndex={1}

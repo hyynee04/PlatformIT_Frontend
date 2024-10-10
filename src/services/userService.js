@@ -19,9 +19,16 @@ const getPI = (idUser) => {
 const getAllUser = () => {
   return axios.post("api/User/getAllUser");
 };
+const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
+  console.log(idUserInactive);
+  console.log(idUserUpdatedBy);
 
-
-export {
-  getAllUser, getPI, postForgotPassword
+  return axios.post("api/User/InactiveUser", null, {
+    params: {
+      idUserInactive: idUserInactive,
+      idUserUpdatedBy: idUserUpdatedBy,
+    },
+  });
 };
 
+export { getPI, getAllUser, postInactiveUser };

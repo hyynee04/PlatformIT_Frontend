@@ -79,7 +79,38 @@
         color: var(--white-color);
       }
     }
-
-    // height: fit-content;
+    .container-diag-field {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 12px;
+      .left-diag-container,
+      .right-diag-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 8px 24px;
+        .info {
+          display: flex;
+          flex-direction: column;
+          .input-form-diag {
+            width: 400px;
+            height: 40px;
+            border-radius: 100rem;
+            border: 1px solid var(--border-gray);
+            padding: 0 16px;
+            font-size: 14px;
+            color: var(--text-color);
+          }
+          .input-form-diag:focus {
+            outline: none;
+            box-shadow: none;
+            border: 1px solid var(--text-gray);
+          }
+        }
+      }
+    }
   }
 }

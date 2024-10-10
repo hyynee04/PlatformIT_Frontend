@@ -54,15 +54,17 @@ const Login = () => {
       // setCookie("idUser", data.idUser, { path: "/" });
       localStorage.setItem("idRole", data.idRole);
       localStorage.setItem("idUser", data.idUser);
-
+      if (data.idCenter !== null) {
+        localStorage.setItem("idCenter", data.idCenter);
+      }
       let roleBasesPath = "/";
       switch (data.idRole) {
         case Role.platformAdmin: {
-          roleBasesPath = "/platformAdminDashboard";
+          roleBasesPath = "/platformAdDashboard";
           break;
         }
         case Role.centerAdmin: {
-          roleBasesPath = "/centerAdminDashboard";
+          roleBasesPath = "/centerAdDashboard";
           break;
         }
         case Role.teacher: {

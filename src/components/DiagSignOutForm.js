@@ -1,15 +1,11 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
 import "../assets/scss/card/DiagForm.scss";
-
 import { useNavigate } from "react-router-dom";
 
-const DialogForm = ({ isOpen, onClose }) => {
+const DiagSignOutForm = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  // const [cookies, setCookie, removeCookie] = useCookies(["user"]);
   const handleSignout = () => {
-    // removeCookie("idRole");
-    // removeCookie("idUser");
     localStorage.removeItem("idRole");
     localStorage.removeItem("idUser");
     navigate("/");
@@ -48,4 +44,4 @@ const DialogForm = ({ isOpen, onClose }) => {
   );
 };
 
-export default DialogForm;
+export default DiagSignOutForm;

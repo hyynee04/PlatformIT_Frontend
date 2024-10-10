@@ -9,6 +9,7 @@ import UserPI from "./pages/pi/UserPI";
 
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
+import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 
@@ -16,6 +17,7 @@ import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
+import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 const Layout = (props) => {
   return (
@@ -33,9 +35,11 @@ const Layout = (props) => {
             element={<PlatformAdminDashboard />}
           />
           <Route path="platformAdUser" element={<PlatformAdUserMgmt />} />
+          <Route path="platformAdCenter" element={<PlatformAdCenterMgmt />} />
 
           {/* Center Admin */}
           <Route path="/centerAdDashboard" element={<CenterAdminDashboard />} />
+          <Route path="/centerAdUser" element={<CenterAdUserMgmt />} />
 
           {/* Teacher */}
           <Route path="/teacherHome" element={<TeacherHome />} />

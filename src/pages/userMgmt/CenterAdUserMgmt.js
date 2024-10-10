@@ -6,58 +6,64 @@ import {
   LuMoreHorizontal,
   LuChevronsLeft,
   LuChevronsRight,
+  LuUserPlus,
 } from "react-icons/lu";
-import {
-  CenterAdminLevel,
-  Role,
-  Status,
-  UserGender,
-} from "../../constants/constants";
-import { getAllUser } from "../../services/userService";
-import UserOption from "../../components/UserOption";
+import { CenterAdminLevel, Role, Status } from "../../constants/constants";
 import FilterUser from "../../components/FilterUser";
+import UserOption from "../../components/UserOption";
+import {
+  getAllStudentByIdCenter,
+  getAllTeacherByIdCenter,
+} from "../../services/centerService";
 
 import "../../assets/scss/UserMgmt.css";
+import DiagAddTeacherForm from "../../components/DiagAddTeacherForm";
 
-const PlatformAdUserMgmt = () => {
-  const [activeRole, setActiveRole] = useState(Role.centerAdmin);
+const CenterAdUserMgmt = () => {
+  const idCenter = +localStorage.getItem("idCenter");
+  const [activeRole, setActiveRole] = useState(Role.teacher);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filterVisble, setFilterVisble] = useState(false);
 
-  const [gender, setGender] = useState(null); // Giá trị mặc định là ""
+  const [gender, setGender] = useState(null);
   const [level, setLevel] = useState(null);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
 
+  const [isModalAddTeacherOpen, setIsModalAddTeacherOpen] = useState(false);
+  const openAddTeacherModal = () => setIsModalAddTeacherOpen(true);
+  const closeAddTeacherModal = () => setIsModalAddTeacherOpen(false);
   useEffect(() => {
     const getListUser = async () => {
       try {
-        let data = await getAllUser();
+        let data;
 
-        let usersWithRole = data.filter((user) => user.idRole === activeRole);
-        console.log(usersWithRole);
+        if (activeRole === Role.teacher) {
+          const response = await getAllTeacherByIdCenter(idCenter);
+          data = response;
+        } else if (activeRole === Role.student) {
+          const response = await getAllStudentByIdCenter(idCenter);
+          data = response;
+        }
 
-        setListUser(usersWithRole);
-      } catch (error) {}
+        console.log("data", data);
+
+        if (data) {
+          let usersWithRole = data.filter((user) => user.idRole === activeRole);
+          setListUser(usersWithRole);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     };
+
     getListUser();
-  }, [activeRole]);
+  }, [activeRole, idCenter]);
+
   const handleRoleClick = (role) => {
     setActiveRole(role);
-  };
-  const renderGender = (gender) => {
-    switch (gender) {
-      case UserGender.male:
-        return "Male";
-      case UserGender.female:
-        return "Female";
-      case UserGender.other:
-        return "Other";
-      default:
-        return "";
-    }
   };
   const handleFilterChange = ({ gender, level, dateRange, status }) => {
     setGender(gender);
@@ -141,14 +147,6 @@ const PlatformAdUserMgmt = () => {
         <div className="role-users-group">
           <button
             className={`role-btn ${
-              activeRole === Role.centerAdmin ? "active" : ""
-            }`}
-            onClick={() => handleRoleClick(Role.centerAdmin)}
-          >
-            Center Administrator
-          </button>
-          <button
-            className={`role-btn ${
               activeRole === Role.teacher ? "active" : ""
             }`}
             onClick={() => handleRoleClick(Role.teacher)}
@@ -188,18 +186,28 @@ const PlatformAdUserMgmt = () => {
             <LuSearch className="icon search-icon" />
           </div>
         </div>
+        {activeRole === Role.teacher && (
+          <div className="add-btn">
+            <div className="btn" onClick={() => openAddTeacherModal()}>
+              <LuUserPlus className="icon" />
+              <span>Add teacher</span>
+            </div>
+            <DiagAddTeacherForm
+              isOpen={isModalAddTeacherOpen}
+              onClose={closeAddTeacherModal}
+            />
+          </div>
+        )}
         <div className="list-container">
           <table>
             <thead>
               <tr>
                 <th>No.</th>
                 <th>Full Name</th>
-                <th>Gender</th>
+                <th>Phone Number</th>
                 <th>Email</th>
-                {activeRole !== Role.student && <th>Affiliated Center</th>}
-                {activeRole === Role.centerAdmin && <th>Level</th>}
                 <th>Date Joined</th>
-                <th>Status</th>
+                {activeRole === Role.teacher && <th>Teaching Major</th>}
                 <th></th>
               </tr>
             </thead>
@@ -208,12 +216,8 @@ const PlatformAdUserMgmt = () => {
                 <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{user.fullName}</td>
-                  <td>{renderGender(user.gender)}</td>
+                  <td>{user.phoneNumber}</td>
                   <td>{user.email}</td>
-                  {activeRole !== Role.student && <td>{user.centerName}</td>}
-                  {activeRole === Role.centerAdmin && (
-                    <td>{user.isMainCenterAdmin ? "Main" : "Mem"}</td>
-                  )}
                   <td>
                     {user.joinedDate &&
                       (() => {
@@ -228,21 +232,7 @@ const PlatformAdUserMgmt = () => {
                         return `${month}/${day}/${year}`;
                       })()}
                   </td>
-                  <td
-                    className={`status ${
-                      user.status === Status.active
-                        ? "active"
-                        : user.status === Status.pending
-                        ? "pending"
-                        : "inactive"
-                    }`}
-                  >
-                    {user.status === Status.active
-                      ? "Active"
-                      : user.status === Status.pending
-                      ? "Pending"
-                      : "Inactive"}
-                  </td>
+                  {activeRole === Role.teacher && <td>{user.teachingMajor}</td>}
                   <td className="table-cell" style={{ cursor: "pointer" }}>
                     <LuMoreHorizontal
                       onClick={() => handleMoreIconClick(user.idUser)}
@@ -306,4 +296,4 @@ const PlatformAdUserMgmt = () => {
   }
 };
 
-export default PlatformAdUserMgmt;
+export default CenterAdUserMgmt;

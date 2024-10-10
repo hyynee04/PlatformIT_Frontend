@@ -31,4 +31,4 @@ const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
   });
 };
 
-export { getPI, getAllUser, postInactiveUser };
+export { getPI, getAllUser, postInactiveUser, postForgotPassword };

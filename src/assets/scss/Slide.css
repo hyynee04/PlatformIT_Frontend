@@ -60,9 +60,10 @@
 .carousel-control-next, .carousel-control-prev {
     width: 32px;
 }
-.active {
-    display: flex;
+.carousel-inner > .active {
+    /* display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-between; */
+    display: block;
 }
 

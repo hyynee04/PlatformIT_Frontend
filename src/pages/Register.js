@@ -75,7 +75,7 @@ const Register = () => {
       return;
     }
 
-    if (TIN && (TIN.length != 10 && TIN.length != 13)) {
+    if (TIN && (TIN.length !== 10 && TIN.length !== 13)) {
       setIsValidTIN(false)
       return;
     }
@@ -269,7 +269,7 @@ const Register = () => {
                 <span className="error-noti">Fill all information!</span>
               </div>
             )}
-            {coincidedInform != "" && (
+            {coincidedInform !== "" && (
               <div className="mb-3">
                 <span className="error-noti">{coincidedInform}</span>
               </div>

@@ -14,7 +14,7 @@ const Slide = (props) => {
                     <span className='carousel-header-title'>Top Course</span>
                     <span className='carousel-header-viewall'>View all courses <MdArrowForwardIos color='#757575' /> </span>
                 </div>
-                <Carousel variant='dark' slide={false}>
+                <Carousel variant='dark' slide={true}>
                     <Carousel.Item>
                         <div className='item-holder'>
                             <Course />

@@ -26,11 +26,13 @@
 .role-users-group > .role-btn:hover {
   background-color: var(--border-gray);
   border-radius: 8px;
+  text-align: center;
 }
 .role-users-group > .role-btn.active {
   background-color: var(--main-color);
   border-radius: 8px;
   color: var(--white-color);
+  text-align: center;
 }
 .filter-search {
   justify-content: space-between;

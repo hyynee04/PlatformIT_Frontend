@@ -26,7 +26,7 @@ const PlatformAdUserMgmt = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filterVisble, setFilterVisble] = useState(false);
 
-  const [gender, setGender] = useState(null); // Giá trị mặc định là ""
+  const [gender, setGender] = useState(null);
   const [level, setLevel] = useState(null);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
@@ -37,8 +37,6 @@ const PlatformAdUserMgmt = () => {
         let data = await getAllUser();
 
         let usersWithRole = data.filter((user) => user.idRole === activeRole);
-        console.log(usersWithRole);
-
         setListUser(usersWithRole);
       } catch (error) {}
     };

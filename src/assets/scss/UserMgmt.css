@@ -60,6 +60,9 @@
   color: var(--main-color);
   font-size: 14px;
 }
+.filter-sort-btns .save-filter {
+  color: var(--white-color);
+}
 .add-btn {
   margin: 12px 72px;
 }

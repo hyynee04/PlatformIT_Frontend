@@ -90,7 +90,7 @@ const FilterUser = ({ onFilterChange }) => {
                 type="radio"
                 value="all"
                 checked={level === "all"}
-                onChange={() => setLevel("all")} // Đặt giá trị là "all"
+                onChange={() => setLevel("all")}
               />
               All
             </label>

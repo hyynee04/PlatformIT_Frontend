@@ -1,0 +1,75 @@
+.card {
+    width: 266px;
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    min-width: 100%;
+    height: 160px;
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+}
+
+.card-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;   /* Show only 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;      /* Allow wrapping */
+    max-width: 100%;          /* Adjust this to your container's width */
+}
+
+.star {
+    border: 2px solid black;  /* Add a border around the star */
+    border-radius: 50%;       /* Optional: Make the border rounded */
+    padding: 2px;             /* Optional: Add padding for spacing */
+}
+
+.center-infor {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text-gray);
+}
+
+.centercard-footer {
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.centercard-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3px;
+
+    color: var(--text-gray);
+}
+
+.centercard-group > svg {
+    width: 24px;
+    height: 24px;
+}

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import {
+  LuBuilding2,
   LuCreditCard,
   LuEye,
   LuEyeOff,
   LuLock,
   LuMail,
   LuPenTool,
-  LuUser,
+  LuUser
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import "../assets/scss/Register.css";
@@ -21,18 +22,20 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [TIN, setTIN] = useState("");
+  const [centerName, setCenterName] = useState("");
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
 
   const [isChecked, setIsChecked] = useState(false);
 
-  const [isCoincided, setIsCoincided] = useState(false);
+  const [coincidedInform, setCoincidedInform] = useState("");
 
   const [isVisible, setIsVisible] = useState(false);
 
   const [isError, setIsError] = useState(false);
   const [isValid, setIsValid] = useState(true);
+  const [isValidTIN, setIsValidTIN] = useState(true);
   const [isConfirmed, setIsConfirmed] = useState(true);
   useEffect(() => {
     setIsVisible(true);
@@ -54,9 +57,10 @@ const Register = () => {
       email === "" ||
       username === "" ||
       password === "" ||
-      confirmPassword === ""
+      confirmPassword === "" ||
+      (isChecked && TIN === "") ||
+      (isChecked && centerName === "")
     ) {
-      alert("here");
       setIsError(true);
       return;
     }
@@ -71,18 +75,18 @@ const Register = () => {
       return;
     }
 
-    // if(confirmPassword !== password) {
-    //     toast.error("Invalid confirmPassword!")
-    //     return
-    // }
+    if (TIN && (TIN.length !== 10 && TIN.length !== 13)) {
+      setIsValidTIN(false)
+      return;
+    }
 
     //submit api
-    let data = await postRegister(fullName, email, username, password, TIN);
+    let data = await postRegister(fullName, email, username, password, centerName, TIN);
     console.log(">>> Check register: ", data);
-    if (data > 0) {
+    if (Number.isInteger(data)) {
       navigate("/login");
     } else {
-      alert("failed");
+      setCoincidedInform(data)
     }
   };
 
@@ -119,6 +123,7 @@ const Register = () => {
                   setEmail(event.target.value);
                   setIsError(false);
                   setIsValid(true);
+                  setCoincidedInform("");
                 }}
               />
             </div>
@@ -127,13 +132,8 @@ const Register = () => {
                 <span className="error-noti">Invalid Email!</span>
               </div>
             )}
-            {/* {isCoincided && (
-                            <div className="mb-3">
-                                <span className="error-noti">Email has already existed!</span>
-                            </div>
-                        )} */}
 
-            <div className={`mb-3 ${isCoincided ? "marginbottom-5px" : ""}`}>
+            <div className="mb-3">
               <LuUser color="#757575" className="icon-head" />
               <input
                 type="text"
@@ -143,14 +143,10 @@ const Register = () => {
                 onChange={(event) => {
                   setUsername(event.target.value);
                   setIsError(false);
+                  setCoincidedInform("");
                 }}
               />
             </div>
-            {/* {isCoincided && (
-                            <div className="mb-3">
-                                <span className="error-noti">Username has already existed!</span>
-                            </div>
-                        )} */}
 
             <div className="mb-3">
               <LuLock color="#757575" className="icon-head" />
@@ -189,6 +185,7 @@ const Register = () => {
                 onChange={(event) => {
                   setConfirmPassword(event.target.value);
                   setIsError(false);
+                  setIsConfirmed(true);
                 }}
                 required
               />
@@ -206,7 +203,6 @@ const Register = () => {
                 />
               )}
             </div>
-
             {!isConfirmed && (
               <div className="mb-3">
                 <span className="error-noti">
@@ -220,12 +216,29 @@ const Register = () => {
                 type="checkbox"
                 className="AC-check"
                 checked={isChecked}
-                onChange={(event) => setIsChecked(event.target.checked)}
+                onChange={(event) => {
+                  setCoincidedInform("");
+                  setIsChecked(event.target.checked)
+                }}
               />
               Register as Admin Center
             </div>
             {isChecked && (
               <>
+                <div className="mb-3">
+                  <LuBuilding2 color="#757575" className="icon-head" />
+                  <input
+                    type="text"
+                    placeholder="Center Name"
+                    className="form-control"
+                    value={centerName}
+                    onChange={(event) => {
+                      setCenterName(event.target.value);
+                      setIsError(false);
+                      setCoincidedInform("");
+                    }}
+                  />
+                </div>
                 <div className="mb-3 marginbottom-5px">
                   <LuCreditCard color="#757575" className="icon-head" />
                   <input
@@ -236,16 +249,19 @@ const Register = () => {
                     onChange={(event) => {
                       setTIN(event.target.value);
                       setIsError(false);
+                      setCoincidedInform("");
+                      setIsValidTIN(true);
                     }}
                   />
                 </div>
-                {TIN && TIN.length > 13 && (
+                {!isValidTIN && (
                   <div className="mb-3">
                     <span className="error-noti">
                       TIN has 10 or 13 numbers!
                     </span>
                   </div>
                 )}
+
               </>
             )}
             {isError && (
@@ -253,12 +269,17 @@ const Register = () => {
                 <span className="error-noti">Fill all information!</span>
               </div>
             )}
+            {coincidedInform !== "" && (
+              <div className="mb-3">
+                <span className="error-noti">{coincidedInform}</span>
+              </div>
+            )}
           </div>
           <div className="mainpart-content">
             <button
               className="register-button"
               onClick={() => handleRegister()}
-              disabled={!(!isError && isValid && isConfirmed)}
+              disabled={!(!isError && isValid && isConfirmed && isValidTIN)}
             >
               Register
             </button>

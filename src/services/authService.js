@@ -1,11 +1,12 @@
 import axios from "../utils/axiosCustomize";
 
-const postRegister = (fullName, email, username, password, tin) => {
+const postRegister = (fullName, email, username, password, centername, tin) => {
   return axios.post("api/Authentication/signup", {
     fullName: fullName,
-    username: username,
     email: email,
+    username: username,
     password: password,
+    centername: centername,
     tin: tin,
   });
 };
@@ -16,5 +17,7 @@ const postLogin = (username, password) => {
     password,
   });
 };
+
+
 
 export { postRegister, postLogin };

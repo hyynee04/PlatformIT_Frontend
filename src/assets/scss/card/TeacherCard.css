@@ -1,10 +1,10 @@
 .card {
-    width: 266px;
+    width: 15rem;
     padding: 24px;
 
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
 
     border: 1px solid var(--border-gray);
     border-radius: 8px;
@@ -17,6 +17,7 @@
     margin: auto;
     border: 1px solid var(--border-gray);
     border-radius: 90px;
+    object-fit: cover;
 }
 
 .card-body {
@@ -28,7 +29,7 @@
 
 .card-title {
     margin: auto;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
 
     display: -webkit-box;

@@ -13,10 +13,10 @@ const CenterCard = (props) => {
     return (
         <div className='course-card-container'>
             <Card>
-                <Card.Img variant="top" src={default_image} />
+                <img className='card-img-top' src={default_image} />
                 <Card.Body>
                     <Card.Title>IT CENTER</Card.Title>
-                    <StarRatings
+                    {/* <StarRatings
                         rating={2.403}
                         starRatedColor='rgb(255, 204, 0)'
                         // changeRating={this.changeRating}
@@ -24,17 +24,17 @@ const CenterCard = (props) => {
                         starSpacing="4px"
                         numberOfStars={5}
                         name='rating'
-                    />
+                    /> */}
                     <span className='center-infor'>Say something i'm giving up on you</span>
                 </Card.Body>
                 <div className='centercard-footer'>
                     <div className='centercard-group'>
-                        <RiGroupLine color='#757575' />
+                        <LuFile color='#757575' />
                         <span className='now-price'>100</span>
                     </div>
                     <div className='centercard-group'>
                         <span className='now-price'>100</span>
-                        <LuFile color='#757575' />
+                        <RiGroupLine color='#757575' />
                     </div>
                 </div>
             </Card>

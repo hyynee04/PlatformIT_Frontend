@@ -4,12 +4,12 @@
     position: relative;
 }
 .card {
-    width: 266px;
+    width: 15rem;
     padding: 24px;
 
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 18px;
 
     border: 1px solid var(--border-gray);
     border-radius: 8px;
@@ -17,7 +17,7 @@
 }
 
 .hover-card {
-    width: 348px !important;
+    width: 18rem !important;
     height: fit-content;
 
     position: absolute;
@@ -27,11 +27,12 @@
 }
 
 .course-card-img-top {
-    min-width: 100%;
-    min-height: 160px !important;
-    max-height: 200px !important;
+    width: 100%;
+    max-height: 127px;
     border: 1px solid var(--border-gray);
     border-radius: 8px;
+    resize: both;
+    object-fit: cover;
 }
 
 .card-body {
@@ -43,7 +44,7 @@
 
 .course-title, .course-title-hover {
     margin: 0;
-    font-size: 20px !important;
+    font-size: 18px !important;
     font-weight: 700;
 
     display: -webkit-box;
@@ -77,7 +78,7 @@
     background-color: rgba(20, 174, 92, 0.3);
     border-radius: 8px;
 
-    font-size: 14px;
+    font-size: 12px;
     color: var(--main-color);
 }
 
@@ -94,13 +95,13 @@
     gap: 8px;
 
     color: var(--black-color);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 .course-time > svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .course-footer {

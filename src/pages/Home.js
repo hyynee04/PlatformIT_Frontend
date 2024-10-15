@@ -23,7 +23,15 @@ const Home = () => {
             <img className="rotate " src={logoPlait}/>
           </div>
         </div>
-        <Slide />
+        {/* <Slide 
+          object={"Course"}
+        />
+        <Slide 
+          object={"Teacher"}
+        /> */}
+        {/* <Slide 
+          object={"Center"}
+        /> */}
       </div>
     </div>
   );

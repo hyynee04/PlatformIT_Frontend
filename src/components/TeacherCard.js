@@ -19,12 +19,8 @@ const TeacherCard = () => {
                 </Card.Body>
                 <div className='teachercard-footer'>
                     <div className='teachercard-group'>
-                        <RiGroupLine color='#757575' />
+                    <LuFile color='#757575' />
                         <span className='now-price'>100</span>
-                    </div>
-                    <div className='teachercard-group'>
-                        <span className='now-price'>100</span>
-                        <LuFile color='#757575' />
                     </div>
                 </div>
             </Card>

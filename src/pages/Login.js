@@ -5,14 +5,20 @@ import { FaGooglePlusG } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
-import { useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate
+} from "react-router-dom";
 import "../assets/scss/Login.css";
 import { Role, Status } from "../constants/constants";
-import { postLogin } from "../services/authService";
+import {
+  postLogin
+} from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -34,7 +40,15 @@ const Login = () => {
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     setIsVisible(true);
-  }, []);
+
+    // Step 1: Check if there is state from the previous navigation
+    const state = location.state;
+    if (state && state.idUser && state.idRole) {
+      // Automatically log in the user
+      handleAutoLogin(state.idUser, state.idRole);
+    }
+  }, [location.state]);
+
 
   const validateEmail = (email) => {
     return String(email)
@@ -44,14 +58,37 @@ const Login = () => {
       );
   };
 
-  // const [cookies, setCookie, removeCookie] = useCookies(["user"]); //khai báo hook useCookies
+  const handleAutoLogin = async (idUser, idRole) => {
+    // Step 2: Simulate a login action based on the received idUser and idRole
+    localStorage.setItem("idRole", idRole);
+    localStorage.setItem("idUser", idUser);
+    //console.log(localStorage.getItem("idRole"))
+    // Navigate to the appropriate page based on role
+    let roleBasesPath = "/";
+    switch (parseInt(idRole)) {
+      case Role.platformAdmin:
+        roleBasesPath = "/platformAdDashboard";
+        break;
+      case Role.centerAdmin:
+        roleBasesPath = "/centerAdDashboard";
+        break;
+      case Role.teacher:
+        roleBasesPath = "/teacherHome";
+        break;
+      case Role.student:
+        roleBasesPath = "/studentHome";
+        break;
+      default:
+        break;
+    }
+    navigate(roleBasesPath, {
+      state: { idUser: idUser, idRole: idRole },
+    });
+  };
+
   const handleLogin = async () => {
-    // submit login
     let data = await postLogin(username, password);
-    // console.log(">>> Check register: ", data);
     if (data && data.idUser > Status.inactive) {
-      // setCookie("idRole", data.idRole, { path: "/" });
-      // setCookie("idUser", data.idUser, { path: "/" });
       localStorage.setItem("idRole", data.idRole);
       localStorage.setItem("idUser", data.idUser);
       if (data.idCenter !== null) {
@@ -59,25 +96,20 @@ const Login = () => {
       }
       let roleBasesPath = "/";
       switch (data.idRole) {
-        case Role.platformAdmin: {
+        case Role.platformAdmin:
           roleBasesPath = "/platformAdDashboard";
           break;
-        }
-        case Role.centerAdmin: {
+        case Role.centerAdmin:
           roleBasesPath = "/centerAdDashboard";
           break;
-        }
-        case Role.teacher: {
+        case Role.teacher:
           roleBasesPath = "/teacherHome";
           break;
-        }
-        case Role.student: {
+        case Role.student:
           roleBasesPath = "/studentHome";
           break;
-        }
-        default: {
+        default:
           break;
-        }
       }
 
       navigate(roleBasesPath, {
@@ -105,6 +137,26 @@ const Login = () => {
     } else {
       handleClose()
     }
+  }
+
+  const handleLoginGoogle = async () => {
+    // await getLoginGoogle()
+    // console.log(loginGoogle)
+    window.location.href = "http://localhost:5251/api/Authen/login-google"
+
+    // // Set up an event listener for messages from the new window (e.g., the OAuth response)
+    // window.addEventListener("message", (event) => {
+    //   // Make sure the message is from your own app (check origin)
+    //   if (event.origin === "http://localhost:5251/api/Authen/GoogleResponse") {
+    //     const { data } = event;
+
+    //     // Handle the response data (e.g., store tokens, update UI)
+    //     console.log("Received OAuth response:", data);
+
+    //     // Optionally, close the new window after processing
+    //     newWindow.close();
+    //   }
+    // });
   }
 
   return (
@@ -214,7 +266,10 @@ const Login = () => {
             <div className="mainpart-content">
               <div className="sep">
                 <RiFacebookFill color="#1E1E1E" />
-                <FaGooglePlusG color="#1E1E1E" />
+                <FaGooglePlusG
+                  color="#1E1E1E"
+                  onClick={() => handleLoginGoogle()}
+                />
                 <TbBrandGithubFilled color="#1E1E1E" />
               </div>
             </div>

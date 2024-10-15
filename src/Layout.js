@@ -18,6 +18,7 @@ import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
+import LoginSuccess from "./pages/LoginSuccess";
 
 const Layout = (props) => {
   return (
@@ -29,6 +30,7 @@ const Layout = (props) => {
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
           {/* Platform Admin */}
           <Route
             path="/platformAdDashboard"
@@ -51,7 +53,7 @@ const Layout = (props) => {
           {/* General */}
           <Route path="/pi" element={<UserPI />} />
         </Route>
-
+        <Route path="/login-success" element={<LoginSuccess />}/>
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />
                     <Route path='manage-user' element={<ManageUser />} />

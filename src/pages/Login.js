@@ -12,6 +12,7 @@ import {
 import "../assets/scss/Login.css";
 import { Role, Status } from "../constants/constants";
 import {
+  getLoginGoogle,
   postLogin
 } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
@@ -140,23 +141,9 @@ const Login = () => {
   }
 
   const handleLoginGoogle = async () => {
-    // await getLoginGoogle()
+    // window.location.href = await getLoginGoogle()
     // console.log(loginGoogle)
-    window.location.href = "http://localhost:5251/api/Authen/login-google"
-
-    // // Set up an event listener for messages from the new window (e.g., the OAuth response)
-    // window.addEventListener("message", (event) => {
-    //   // Make sure the message is from your own app (check origin)
-    //   if (event.origin === "http://localhost:5251/api/Authen/GoogleResponse") {
-    //     const { data } = event;
-
-    //     // Handle the response data (e.g., store tokens, update UI)
-    //     console.log("Received OAuth response:", data);
-
-    //     // Optionally, close the new window after processing
-    //     newWindow.close();
-    //   }
-    // });
+    window.location.href = "http://localhost:5000/api/Authen/login-google"
   }
 
   return (

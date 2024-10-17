@@ -23,3 +23,8 @@ export const CenterStatus = {
   active: 1,
   pending: 2,
 };
+export const SlideObject = {
+  course: 1,
+  teacher: 2,
+  center: 3,
+}

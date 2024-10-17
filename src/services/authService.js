@@ -39,18 +39,6 @@ const postVerifyOtp = (email, otp) => {
 
 const getLoginGoogle = () => {
   return axios.get("api/Authen/login-google")
-    .then(response => {
-      if (response.status === 200 && response.data.redirectUrl) {
-        // Redirect the user to the Google OAuth URL
-        window.location.href = response.data.redirectUrl;
-      } else {
-        // Handle error or invalid response
-        console.error('No redirect URL found in response');
-      }
-    })
-    .catch(error => {
-      console.error('Error during Google login:', error);
-    });
 };
 
 export { 

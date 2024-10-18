@@ -1,17 +1,32 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
+import { useDispatch } from "react-redux";
+import { addTeacher, fetchListUserOfCenter } from "../store/listUserOfCenter";
+import { Role } from "../constants/constants";
+
 import "../assets/scss/card/DiagForm.scss";
-import { postAddTeacher } from "../services/centerService";
 const DiagAddTeacherForm = ({ isOpen, onClose }) => {
   const idCenter = +localStorage.getItem("idCenter");
+  const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
   const handleAddTeacher = async () => {
-    let data = await postAddTeacher(email, username, password, idCenter);
+    // let data = await postAddTeacher(email, username, password, idCenter);
 
-    console.log(data);
+    // console.log(data);
+    try {
+      const resultAction = await dispatch(
+        addTeacher({ email, username, password, idCenter })
+      );
+      if (addTeacher.fulfilled.match(resultAction)) {
+        console.log("Add teacher successfully");
+        dispatch(fetchListUserOfCenter(Role.teacher));
+      }
+    } catch (error) {
+      console.error("Error while approving center: ", error);
+    }
   };
 
   if (!isOpen) return null;
@@ -63,8 +78,8 @@ const DiagAddTeacherForm = ({ isOpen, onClose }) => {
             </button>
             <button
               className="btn diag-btn signout"
-              onClick={() => {
-                handleAddTeacher();
+              onClick={async () => {
+                await handleAddTeacher();
                 onClose();
               }}
             >

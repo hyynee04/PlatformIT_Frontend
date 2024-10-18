@@ -1,21 +1,35 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
-import { postInactiveUser } from "../services/userService";
+// import { postInactiveUser } from "../services/userService";
 
 import "../assets/scss/card/DiagForm.scss";
+import { fetchAllUsers, updateUserStatus } from "../store/userSlice";
+import { useDispatch } from "react-redux";
+import { fetchListUserOfCenter } from "../store/listUserOfCenter";
+import { Role } from "../constants/constants";
 
-const DiagInactiveForm = ({ isOpen, onClose, idUserSelected }) => {
+const DiagInactiveForm = ({
+  isOpen,
+  onClose,
+  idUserSelected,
+  onUserInactivated,
+}) => {
+  const dispatch = useDispatch();
+
   const handleInactiverUser = async () => {
     const idUserUpdatedBy = +localStorage.getItem("idUser");
     try {
-      let data = await postInactiveUser(idUserSelected, idUserUpdatedBy);
+      const resultAction = await dispatch(
+        updateUserStatus({ idUser: idUserSelected, idUserUpdatedBy })
+      );
 
-      console.log("Response data:", data);
-
-      if (data === true) {
-        console.log("User successfully set to inactive.");
+      if (updateUserStatus.fulfilled.match(resultAction)) {
+        // console.log("User successfully set to inactive.");
+        dispatch(fetchAllUsers());
+        dispatch(fetchListUserOfCenter(Role.teacher));
+        onUserInactivated();
       } else {
-        console.error("Failed to set user inactive:", data);
+        console.error("Failed to set user inactive.");
       }
     } catch (error) {
       console.error("Error while inactivating user:", error);
@@ -36,16 +50,16 @@ const DiagInactiveForm = ({ isOpen, onClose, idUserSelected }) => {
           <span>Are you sure you want to inactive this user!</span>
           <div className="act-btns">
             <button className="btn diag-btn cancle" onClick={onClose}>
-              Cancle
+              No
             </button>
             <button
               className="btn diag-btn signout"
               onClick={() => {
                 handleInactiverUser();
-                onClose();
+                // onClose();
               }}
             >
-              Submit
+              Yes
             </button>
           </div>
         </div>

@@ -31,7 +31,7 @@ const postApproveCenter = (id, idUserUpdated) => {
 const postAddTeacher = async (email, username, password, idCenter) => {
   try {
     const response = await axios.post(
-      "https://localhost:7167/api/Authentication/AddTeacher",
+      "api/Authen/AddTeacher",
       {
         email: email,
         username: username,

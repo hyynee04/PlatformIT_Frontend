@@ -41,9 +41,12 @@ const HeaderAvatarOption = () => {
         >
           <span>View Profile</span>
         </button>
-        <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
-          <span>Payment History</span>
-        </button>
+        {idRole === Role.student && (
+          <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
+            <span>Payment History</span>
+          </button>
+        )}
+
         <button
           className="op-buts"
           onClick={() => {

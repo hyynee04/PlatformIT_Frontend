@@ -4,8 +4,8 @@ import {
   LuFilter,
   LuSearch,
   LuMoreHorizontal,
-  LuChevronsLeft,
-  LuChevronsRight,
+  LuChevronRight,
+  LuChevronLeft,
 } from "react-icons/lu";
 import {
   CenterAdminLevel,
@@ -13,18 +13,28 @@ import {
   Status,
   UserGender,
 } from "../../constants/constants";
-import { getAllUser } from "../../services/userService";
 import UserOption from "../../components/UserOption";
 import FilterUser from "../../components/FilterUser";
+import SortByUser from "../../components/SortByUser";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllUsers } from "../../store/userSlice";
 
 import "../../assets/scss/UserMgmt.css";
 
 const PlatformAdUserMgmt = () => {
+  const dispatch = useDispatch();
+  const {
+    users = [],
+    loading,
+    error,
+  } = useSelector((state) => state.users || {});
   const [activeRole, setActiveRole] = useState(Role.centerAdmin);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filterVisble, setFilterVisble] = useState(false);
+  const [sortByVisible, setSortByVisible] = useState(false);
 
   const [gender, setGender] = useState(null);
   const [level, setLevel] = useState(null);
@@ -32,18 +42,21 @@ const PlatformAdUserMgmt = () => {
   const [status, setStatus] = useState(null);
 
   useEffect(() => {
-    const getListUser = async () => {
-      try {
-        let data = await getAllUser();
+    dispatch(fetchAllUsers());
+  }, [dispatch]);
 
-        let usersWithRole = data.filter((user) => user.idRole === activeRole);
-        setListUser(usersWithRole);
-      } catch (error) {}
-    };
-    getListUser();
-  }, [activeRole]);
+  useEffect(() => {
+    if (users && users.length > 0) {
+      const usersWithRole = users.filter((user) => user.idRole === activeRole);
+      setListUser(usersWithRole);
+    }
+  }, [users, activeRole]);
   const handleRoleClick = (role) => {
     setActiveRole(role);
+    setGender(null);
+    setLevel(null);
+    setDateRange({ startDate: "", endDate: "" });
+    setStatus(null);
   };
   const renderGender = (gender) => {
     switch (gender) {
@@ -63,61 +76,96 @@ const PlatformAdUserMgmt = () => {
     setDateRange(dateRange);
     setStatus(status);
   };
+  const handleSortByChange = ({ field, order }) => {
+    setSortBy({ field, order });
+  };
+  const getStatusString = (status) => {
+    switch (status) {
+      case Status.active:
+        return "Active";
+      case Status.pending:
+        return "Pending";
+      case Status.inactive:
+        return "Inactive";
+      default:
+        return "";
+    }
+  };
+  const filteredUser = listUser
+    .filter((user) => {
+      const searchTermLower = searchTerm.toLowerCase();
+      const matchesSearchTerm =
+        (user.fullName &&
+          user.fullName.toLowerCase().includes(searchTermLower)) ||
+        (user.gender &&
+          (user.gender === UserGender.female
+            ? "Female"
+            : user.gender === UserGender.male
+            ? "Male"
+            : "Other"
+          )
+            .toLowerCase()
+            .includes(searchTermLower)) ||
+        (user.email && user.email.toLowerCase().includes(searchTermLower)) ||
+        (user.centerName &&
+          user.centerName.toLowerCase().includes(searchTermLower)) ||
+        (activeRole === Role.centerAdmin &&
+          (user.isMainCenterAdmin ? "Main" : "Sub")
+            .toLowerCase()
+            .includes(searchTermLower)) ||
+        (user.joinedDate &&
+          new Date(user.joinedDate)
+            .toLocaleDateString("en-US")
+            .includes(searchTermLower)) ||
+        getStatusString(user.status).toLowerCase().includes(searchTermLower);
 
-  const filteredUser = listUser.filter((user) => {
-    const searchTermLower = searchTerm.toLowerCase();
+      const matchesGender =
+        gender === null || gender === undefined || user.gender === gender;
 
-    const matchesSearchTerm = Object.keys(user).some((key) => {
-      if (user[key] === null || user[key] === undefined) return false;
-      if (typeof user[key] === "string" || typeof user[key] === "number") {
-        return user[key].toString().toLowerCase().includes(searchTermLower);
+      const matchesLevel =
+        level === null ||
+        level === undefined ||
+        (activeRole === Role.centerAdmin &&
+          (level === CenterAdminLevel.main
+            ? user.isMainCenterAdmin
+            : !user.isMainCenterAdmin));
+
+      const matchesDateJoined =
+        (!dateRange.startDate && !dateRange.endDate) ||
+        (user.joinedDate &&
+          new Date(user.joinedDate) >= new Date(dateRange.startDate) &&
+          new Date(user.joinedDate) <= new Date(dateRange.endDate));
+
+      const matchesStatus =
+        status === null || status === undefined || user.status === status;
+
+      return (
+        matchesSearchTerm &&
+        matchesGender &&
+        matchesLevel &&
+        matchesDateJoined &&
+        matchesStatus
+      );
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortBy.field === "fullname") {
+        aValue = a.fullName ? a.fullName.toLowerCase() : "";
+        bValue = b.fullName ? b.fullName.toLowerCase() : "";
+      } else if (sortBy.field === "dateJoined") {
+        aValue = new Date(a.joinedDate) || new Date(0);
+        bValue = new Date(b.joinedDate) || new Date(0);
       }
-      if (key === "joinedDate") {
-        return new Date(user[key])
-          .toLocaleDateString("en-US")
-          .includes(searchTermLower);
-      }
-      if (key === "status") {
-        return (user[key] === Status.active ? "Active" : "Inactive")
-          .toLowerCase()
-          .includes(searchTermLower);
-      }
-      if (key === "isMainCenterAdmin" && activeRole === Role.centerAdmin) {
-        return (user[key] ? "Main" : "Mem")
-          .toLowerCase()
-          .includes(searchTermLower);
-      }
-      return false;
+
+      return sortBy.order === "asc"
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
     });
-
-    const matchesGender =
-      gender === null || gender === undefined || user.gender === gender;
-
-    const matchesLevel =
-      level === null ||
-      level === undefined ||
-      (activeRole === Role.centerAdmin &&
-        (level === CenterAdminLevel.main
-          ? user.isMainCenterAdmin
-          : !user.isMainCenterAdmin));
-
-    const matchesDateJoined =
-      (!dateRange.startDate && !dateRange.endDate) ||
-      (user.joinedDate &&
-        new Date(user.joinedDate) >= new Date(dateRange.startDate) &&
-        new Date(user.joinedDate) <= new Date(dateRange.endDate));
-
-    const matchesStatus =
-      status === null || status === undefined || user.status === status;
-
-    return (
-      matchesSearchTerm &&
-      matchesGender &&
-      matchesLevel &&
-      matchesDateJoined &&
-      matchesStatus
-    );
-  });
 
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -133,6 +181,13 @@ const PlatformAdUserMgmt = () => {
       prevSelectedId === idUser ? null : idUser
     );
   };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   return (
     <>
       <div className="page-user-container">
@@ -164,15 +219,30 @@ const PlatformAdUserMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div className="btn" onClick={() => setFilterVisble(!filterVisble)}>
+            <div
+              className="btn"
+              onClick={() => {
+                setFilterVisble(!filterVisble);
+                setSortByVisible(false);
+              }}
+            >
               <LuFilter className="icon" />
               <span>Filter</span>
             </div>
             {filterVisble && <FilterUser onFilterChange={handleFilterChange} />}
-            <div className="btn">
+            <div
+              className="btn"
+              onClick={() => {
+                setSortByVisible(!sortByVisible);
+                setFilterVisble(false);
+              }}
+            >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
             </div>
+            {sortByVisible && (
+              <SortByUser onSortByChange={handleSortByChange} />
+            )}
           </div>
 
           <div className="search-container">
@@ -190,7 +260,7 @@ const PlatformAdUserMgmt = () => {
           <table>
             <thead>
               <tr>
-                <th>No.</th>
+                <th style={{ textAlign: "center" }}>No.</th>
                 <th>Full Name</th>
                 <th>Gender</th>
                 <th>Email</th>
@@ -204,13 +274,13 @@ const PlatformAdUserMgmt = () => {
             <tbody>
               {records.map((user, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
+                  <td style={{ textAlign: "center" }}>{index + 1}</td>
                   <td>{user.fullName}</td>
                   <td>{renderGender(user.gender)}</td>
                   <td>{user.email}</td>
                   {activeRole !== Role.student && <td>{user.centerName}</td>}
                   {activeRole === Role.centerAdmin && (
-                    <td>{user.isMainCenterAdmin ? "Main" : "Mem"}</td>
+                    <td>{user.isMainCenterAdmin ? "Main" : "Sub"}</td>
                   )}
                   <td>
                     {user.joinedDate &&
@@ -226,20 +296,26 @@ const PlatformAdUserMgmt = () => {
                         return `${month}/${day}/${year}`;
                       })()}
                   </td>
-                  <td
-                    className={`status ${
-                      user.status === Status.active
-                        ? "active"
+                  <td>
+                    <span
+                      className={`status ${
+                        user.status === Status.active
+                          ? "active"
+                          : user.status === Status.pending
+                          ? "pending"
+                          : user.status === Status.inactive
+                          ? "inactive"
+                          : ""
+                      }`}
+                    >
+                      {user.status === Status.active
+                        ? "Active"
                         : user.status === Status.pending
-                        ? "pending"
-                        : "inactive"
-                    }`}
-                  >
-                    {user.status === Status.active
-                      ? "Active"
-                      : user.status === Status.pending
-                      ? "Pending"
-                      : "Inactive"}
+                        ? "Pending"
+                        : user.status === Status.inactive
+                        ? "Inactive"
+                        : ""}
+                    </span>
                   </td>
                   <td className="table-cell" style={{ cursor: "pointer" }}>
                     <LuMoreHorizontal
@@ -249,6 +325,8 @@ const PlatformAdUserMgmt = () => {
                       <UserOption
                         className="user-option"
                         idUserSelected={user.idUser}
+                        statusUserSelected={user.status}
+                        onUserInactivated={() => setSelectedUserId(null)}
                       />
                     )}
                   </td>
@@ -262,7 +340,7 @@ const PlatformAdUserMgmt = () => {
             <ul className="pagination">
               <li className="page-item">
                 <button className="page-link" onClick={prePage}>
-                  <LuChevronsLeft />
+                  <LuChevronLeft />
                 </button>
               </li>
               {numbers.map((n, i) => (
@@ -280,7 +358,7 @@ const PlatformAdUserMgmt = () => {
               ))}
               <li className="page-item">
                 <button className="page-link" onClick={nextPage}>
-                  <LuChevronsRight />
+                  <LuChevronRight />
                 </button>
               </li>
             </ul>

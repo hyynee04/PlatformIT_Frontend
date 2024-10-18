@@ -19,7 +19,6 @@ import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
-import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 import LoginSuccess from "./pages/LoginSuccess";
 
 const Layout = (props) => {

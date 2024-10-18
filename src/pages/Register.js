@@ -29,29 +29,25 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [TIN, setTIN] = useState("");
   const [centerName, setCenterName] = useState("");
-  const [OTP, setOTP] = useState("")
+  const [OTP, setOTP] = useState("");
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [coincidedInform, setCoincidedInform] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isValid, setIsValid] = useState(true);
-  const [isValidTIN, setIsValidTIN] = useState(true);
-  const [isConfirmed, setIsConfirmed] = useState(true);
-  const [isSent, setIsSent] = useState(false)
-  const [isVerified, setIsVerified] = useState(false);
-  const [checkVerify, setCheckVerify] = useState("")
-
-
+  const [isChecked, setIsChecked] = useState(false);
   const [show, setShow] = useState(false);
+
+  const [error, setError] = useState(0);
+  const [coincidedInform, setCoincidedInform] = useState("");
+
+  const [errorVerify, setErrorVerify] = useState("")
+
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  
+
   useEffect(() => {
     setIsVisible(true);
-    localStorage.setItem('verifiedEmail', "");
+    localStorage.setItem("verifiedEmail", "");
   }, []);
 
   const validateEmail = (email) => {
@@ -62,7 +58,7 @@ const Register = () => {
       );
   };
 
-  const handleSendOTP = async () => {
+  const checkInput = () => {
     const isValidEmail = validateEmail(email);
     // Check all inputs are filled
     if (
@@ -74,67 +70,93 @@ const Register = () => {
       (isChecked && TIN === "") ||
       (isChecked && centerName === "")
     ) {
-      setIsError(true);
+      setError(1);
       return;
     }
 
     // Check email vaild
     if (!isValidEmail) {
-      setIsValid(false);
+      setError(2);
+      return;
+    }
+
+    if (password.length <= 5) {
+      setError(3);
       return;
     }
 
     // Check confirm password
     if (confirmPassword && confirmPassword !== password) {
-      setIsConfirmed(false);
+      setError(4);
       return;
     }
 
     // Check TIN length
     if (TIN && (TIN.length !== 10 && TIN.length !== 13)) {
-      setIsValidTIN(false)
+      setError(5);
       return;
     }
 
-    if (localStorage.getItem('verifiedEmail') !== email) {
-      let checkEmail = await postCheckEmail(email)
-      if (checkEmail !== "Email already exists.") {
-        await postSendOTP(email);
-        handleShow();
-        setIsSent(true);
-      }
-      else {
-        setCoincidedInform(checkEmail)
-        return
-      }
+    setError(0);
+    return true;
+  }
+
+  const handleSendOTP = async () => {
+    const isValid = checkInput()
+    if (!isValid) return;
+
+    let checkEmail = await postCheckEmail(email)
+    if (checkEmail !== "Email already exists.") {
+      await postSendOTP(email);
+      handleShow();
+      setErrorVerify("OTP has been sent to your email. It will expire in 2 minutes!");
     }
+    else {
+      setCoincidedInform(checkEmail)
+      return
+    }
+
   };
 
   const handleVerify = async () => {
     let verifyOTP = await postVerifyOtp(email, OTP)
     if (verifyOTP === "OTP verified successfully! You can now proceed with the registration.") {
       localStorage.setItem('verifiedEmail', email);
-      setIsSent(false);
-      setIsVerified(true)
-      handleClose()
+      handleClose();
+      handleRegister();
     }
     else {
-      setCheckVerify(verifyOTP)
+      setErrorVerify(verifyOTP)
     }
-    
+
   }
 
   const handleRegister = async () => {
-    console.log(">>>", isVerified, localStorage.getItem('verifiedEmail') === email)
     //submit api
     let data = await postRegister(fullName, email, username, password, centerName, TIN);
-    // console.log(">>> Check register: ", data);
     if (Number.isInteger(data)) {
       localStorage.removeItem('verifiedEmail');
       navigate("/login");
     } else {
       setCoincidedInform(data)
       return
+    }
+  }
+
+  const getErrorMessage = (error) => {
+    switch (error) {
+      case 1:
+        return 'Fill all information!';
+      case 2:
+        return 'Invalid email address!';
+      case 3:
+        return 'Password must be at least 5 characters!';
+      case 4:
+        return 'Confirm password is not right!';
+      case 5:
+        return 'TIN must be 10 or 13 characters!';
+      default:
+        return '';
     }
   }
 
@@ -147,6 +169,7 @@ const Register = () => {
               <sp className="header-text">Register</sp>
             </div>
             <div className="mainpart-content">
+
               <div className="mb-3">
                 <LuPenTool color="#757575" className="icon-head rotate-icon" />
                 <input
@@ -156,12 +179,11 @@ const Register = () => {
                   value={fullName}
                   onChange={(event) => {
                     setFullName(event.target.value);
-                    setIsError(false);
                   }}
                 />
               </div>
 
-              <div className={`mb-3 ${!isValid ? "marginbottom-5px" : ""}`}>
+              <div className="mb-3">
                 <LuMail color="#757575" className="icon-head" />
                 <input
                   type="text"
@@ -170,17 +192,11 @@ const Register = () => {
                   value={email}
                   onChange={(event) => {
                     setEmail(event.target.value);
-                    setIsError(false);
-                    setIsValid(true);
+                    setError(0);
                     setCoincidedInform("");
                   }}
                 />
               </div>
-              {!isValid && (
-                <div className="mb-3">
-                  <span className="error-noti">Invalid Email!</span>
-                </div>
-              )}
 
               <div className="mb-3">
                 <LuUser color="#757575" className="icon-head" />
@@ -191,7 +207,7 @@ const Register = () => {
                   value={username}
                   onChange={(event) => {
                     setUsername(event.target.value);
-                    setIsError(false);
+                    setError(0);
                     setCoincidedInform("");
                   }}
                 />
@@ -206,7 +222,7 @@ const Register = () => {
                   value={password}
                   onChange={(event) => {
                     setPassword(event.target.value);
-                    setIsError(false);
+                    setError(0);
                   }}
                 />
                 {isShowedP ? (
@@ -233,10 +249,8 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(event) => {
                     setConfirmPassword(event.target.value);
-                    setIsError(false);
-                    setIsConfirmed(true);
+                    setError(0);
                   }}
-                  required
                 />
                 {isShowedCP ? (
                   <LuEye
@@ -252,13 +266,6 @@ const Register = () => {
                   />
                 )}
               </div>
-              {!isConfirmed && (
-                <div className="mb-3">
-                  <span className="error-noti">
-                    Confirm password is not right!
-                  </span>
-                </div>
-              )}
 
               <div className="mb-3 margintop-1rem">
                 <input
@@ -266,8 +273,9 @@ const Register = () => {
                   className="AC-check"
                   checked={isChecked}
                   onChange={(event) => {
-                    setCoincidedInform("");
                     setIsChecked(event.target.checked)
+                    setCoincidedInform("");
+                    setError(0);
                   }}
                 />
                 Register as Admin Center
@@ -283,8 +291,7 @@ const Register = () => {
                       value={centerName}
                       onChange={(event) => {
                         setCenterName(event.target.value);
-                        setIsError(false);
-                        setCoincidedInform("");
+                        setError(0);
                       }}
                     />
                   </div>
@@ -297,25 +304,17 @@ const Register = () => {
                       value={TIN}
                       onChange={(event) => {
                         setTIN(event.target.value);
-                        setIsError(false);
+                        setError(0);
                         setCoincidedInform("");
-                        setIsValidTIN(true);
                       }}
                     />
                   </div>
-                  {!isValidTIN && (
-                    <div className="mb-3">
-                      <span className="error-noti">
-                        TIN has 10 or 13 numbers!
-                      </span>
-                    </div>
-                  )}
-
                 </>
               )}
-              {isError && (
+
+              {error !== 0 && (
                 <div className="mb-3">
-                  <span className="error-noti">Fill all information!</span>
+                  <span className="error-noti">{getErrorMessage(error)}</span>
                 </div>
               )}
               {coincidedInform !== "" && (
@@ -324,18 +323,18 @@ const Register = () => {
                 </div>
               )}
             </div>
+
             <div className="mainpart-content">
               <button
                 className="register-button"
                 onClick={() => {
-                  if(isVerified && localStorage.getItem('verifiedEmail') === email) {
+                  if (localStorage.getItem('verifiedEmail') === email) {
                     handleRegister();
-                    setIsVerified(false);
                     return
                   }
                   handleSendOTP();
                 }}
-                disabled={!(!isError && isValid && isConfirmed && isValidTIN && coincidedInform === "")}
+                disabled={!(error === 0 && coincidedInform === "")}
               >
                 Register
               </button>
@@ -376,6 +375,7 @@ const Register = () => {
               className="form-control"
               value={OTP}
               onChange={(event) => {
+                setErrorVerify("")
                 const inputOTP = event.target.value;
                 if (inputOTP.length <= 6) {
                   setOTP(inputOTP);
@@ -385,10 +385,10 @@ const Register = () => {
               required
             />
           </div>
-          {isSent && (
+          {errorVerify && (
             <div className="mb-3 justify-margin">
               <span className="error-noti">
-                {checkVerify === "" ? 'OTP has been sent to your email. It will expire in 2 minutes!' : checkVerify}
+                {errorVerify}
               </span>
             </div>
           )}
@@ -397,9 +397,9 @@ const Register = () => {
           <button
             className="footer-btn send-btn"
             onClick={() => {
-              if(isSent) handleVerify()
+              handleVerify()
             }}
-            disabled={OTP.length < 6}
+            disabled={!(OTP.length == 6 && errorVerify === "")}
           >Verify</button>
         </Modal.Footer>
       </Modal>

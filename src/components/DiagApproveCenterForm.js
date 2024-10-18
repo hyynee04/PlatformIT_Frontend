@@ -1,21 +1,26 @@
 import React from "react";
 import { LuListPlus, LuX } from "react-icons/lu";
-import "../assets/scss/card/DiagForm.scss";
-import { postApproveCenter } from "../services/centerService";
+import { useDispatch } from "react-redux";
+import { approveCenter, fetchCenters } from "../store/listCenterSlice";
 
-const DiagApproveCenterForm = ({ isOpen, onClose, idCenterSelected }) => {
+import "../assets/scss/card/DiagForm.scss";
+const DiagApproveCenterForm = ({
+  isOpen,
+  onClose,
+  idCenterSelected,
+  activeStatus,
+}) => {
+  const dispatch = useDispatch();
   const handleApproveCenter = async () => {
     const idUserUpdated = +localStorage.getItem("idUser");
     try {
-      let data = await postApproveCenter(idCenterSelected, idUserUpdated);
-
-      console.log("Response data:", data);
-
-      //   if (data === true) {
-      //     console.log("Center successfully approved.");
-      //   } else {
-      //     console.error("Failed to approve center:", data);
-      //   }
+      const resultAction = await dispatch(
+        approveCenter({ idCenterSelected: idCenterSelected, idUserUpdated })
+      );
+      if (approveCenter.fulfilled.match(resultAction)) {
+        console.log("Approve center successfully.");
+        dispatch(fetchCenters(activeStatus));
+      }
     } catch (error) {
       console.error("Error while approving center: ", error);
     }
@@ -39,8 +44,8 @@ const DiagApproveCenterForm = ({ isOpen, onClose, idCenterSelected }) => {
             </button>
             <button
               className="btn diag-btn signout"
-              onClick={() => {
-                handleApproveCenter();
+              onClick={async () => {
+                await handleApproveCenter();
                 onClose();
               }}
             >

@@ -3,12 +3,21 @@ import React, { useState } from "react";
 import "../assets/scss/card/OptionCard.css";
 import DiagInactiveForm from "./DiagInactiveForm";
 
-const UserOption = ({ idUserSelected }) => {
+const UserOption = ({
+  idUserSelected,
+  statusUserSelected,
+  onUserInactivated,
+}) => {
   const [isOptionVisible, setIsOptionVisible] = useState(true);
   const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
+
   const openInactiveModal = () => setIsModalInactiveOpen(true);
   const closeInactiveModal = () => setIsModalInactiveOpen(false);
 
+  const handleInactiveClick = () => {
+    setIsOptionVisible(false);
+    openInactiveModal();
+  };
   if (!isOptionVisible)
     return (
       <>
@@ -17,6 +26,7 @@ const UserOption = ({ idUserSelected }) => {
             isOpen={isModalInactiveOpen}
             onClose={closeInactiveModal}
             idUserSelected={idUserSelected}
+            onUserInactivated={onUserInactivated}
           />
         )}
       </>
@@ -24,17 +34,13 @@ const UserOption = ({ idUserSelected }) => {
   return (
     <div>
       <div className="container-options userOption">
-        <button
-          className="op-buts"
-          onClick={() => {
-            openInactiveModal();
-            setIsOptionVisible(false);
-          }}
-        >
-          <span>Inactive account</span>
-        </button>
+        {statusUserSelected > 0 && (
+          <button className="op-buts" onClick={handleInactiveClick}>
+            <span>Inactive user</span>
+          </button>
+        )}
         <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
-          <span>View profile</span>
+          <span>View detail</span>
         </button>
       </div>
       <div>
@@ -42,6 +48,7 @@ const UserOption = ({ idUserSelected }) => {
           isOpen={isModalInactiveOpen}
           onClose={closeInactiveModal}
           idUserSelected={idUserSelected}
+          onUserInactivated={onUserInactivated}
         />
       </div>
     </div>

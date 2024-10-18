@@ -71,11 +71,20 @@
   background-color: var(--main-color);
   border-radius: 100rem;
 }
-.date-picker {
+.date-picker,
+.input-sortby {
   padding: 8px 12px;
   border-radius: 100rem;
   border: 1px solid var(--border-gray);
+  width: 140px;
 }
+.date-picker:focus,
+.input-sortby:focus {
+  outline: none;
+  box-shadow: none;
+  border: 1px solid var(--text-gray);
+}
+
 .btn-filter {
   width: 100%;
   display: flex;

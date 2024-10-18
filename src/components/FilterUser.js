@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/scss/card/FilterCard.css";
 import { CenterAdminLevel, Status, UserGender } from "../constants/constants";
+
 const FilterUser = ({ onFilterChange }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
   const [gender, setGender] = useState("all");
@@ -90,7 +91,7 @@ const FilterUser = ({ onFilterChange }) => {
                 type="radio"
                 value="all"
                 checked={level === "all"}
-                onChange={() => setLevel("all")} // Đặt giá trị là "all"
+                onChange={() => setLevel("all")}
               />
               All
             </label>

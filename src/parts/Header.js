@@ -15,7 +15,11 @@ const Header = () => {
   const idRole = location.state?.idRole || localStorage.getItem("idRole");
   const navigate = useNavigate();
   const currentPath = location.pathname; //current path
-
+  // useEffect(() => {
+  //   if (idRole === Role.platformAdmin && currentPath === "/") {
+  //     navigate("/platformAdDashboard");
+  //   }
+  // }, [idRole, currentPath, navigate]);
   const navLinks = {
     [Role.platformAdmin]: [
       { title: "Dashboard", path: "/platformAdDashboard" },
@@ -108,9 +112,7 @@ const Header = () => {
                 </>
               )}
             </div>
-            {showOptionAva && (
-              <HeaderAvatarOption setShowOptionAva={setShowOptionAva} />
-            )}
+            {showOptionAva && <HeaderAvatarOption />}
           </Navbar.Collapse>
         </Container>
       </Navbar>

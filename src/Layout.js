@@ -12,6 +12,8 @@ import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
+import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
+import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 
 import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
@@ -42,6 +44,7 @@ const Layout = (props) => {
           {/* Center Admin */}
           <Route path="/centerAdDashboard" element={<CenterAdminDashboard />} />
           <Route path="/centerAdUser" element={<CenterAdUserMgmt />} />
+          <Route path="/centerAdCenter" element={<CenterAdCenterMgmt />} />
 
           {/* Teacher */}
           <Route path="/teacherHome" element={<TeacherHome />} />

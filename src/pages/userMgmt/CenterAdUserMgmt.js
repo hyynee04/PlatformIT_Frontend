@@ -8,124 +8,129 @@ import {
   LuChevronsRight,
   LuUserPlus,
 } from "react-icons/lu";
-import { CenterAdminLevel, Role, Status } from "../../constants/constants";
-import FilterUser from "../../components/FilterUser";
+import { Role, Status } from "../../constants/constants";
 import UserOption from "../../components/UserOption";
-import {
-  getAllStudentByIdCenter,
-  getAllTeacherByIdCenter,
-} from "../../services/centerService";
+import DiagAddTeacherForm from "../../components/DiagAddTeacherForm";
+import { useDispatch, useSelector } from "react-redux";
 
 import "../../assets/scss/UserMgmt.css";
-import DiagAddTeacherForm from "../../components/DiagAddTeacherForm";
+import {
+  fetchListUserOfCenter,
+  setActiveRoleUserOfCenter,
+} from "../../store/listUserOfCenter";
+import FilterUserOfCenter from "../../components/FilterUserOfCenter";
+import SortByUserOfCenter from "../../components/SortByUserOfCenter";
 
 const CenterAdUserMgmt = () => {
-  const idCenter = +localStorage.getItem("idCenter");
-  const [activeRole, setActiveRole] = useState(Role.teacher);
+  const dispatch = useDispatch();
+  const {
+    listUserOfCenter = [],
+    loading,
+    error,
+  } = useSelector((state) => state.listUserOfCenter || {});
+
+  const activeRole = useSelector((state) => state.listUserOfCenter.activeRole);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filterVisble, setFilterVisble] = useState(false);
+  const [sortByVisible, setSortByVisible] = useState(false);
 
-  const [gender, setGender] = useState(null);
-  const [level, setLevel] = useState(null);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
 
   const [isModalAddTeacherOpen, setIsModalAddTeacherOpen] = useState(false);
   const openAddTeacherModal = () => setIsModalAddTeacherOpen(true);
   const closeAddTeacherModal = () => setIsModalAddTeacherOpen(false);
+
   useEffect(() => {
-    const getListUser = async () => {
-      try {
-        let data;
+    dispatch(fetchListUserOfCenter(activeRole));
+  }, [dispatch, activeRole]);
 
-        if (activeRole === Role.teacher) {
-          const response = await getAllTeacherByIdCenter(idCenter);
-          data = response;
-        } else if (activeRole === Role.student) {
-          const response = await getAllStudentByIdCenter(idCenter);
-          data = response;
-        }
-
-        console.log("data", data);
-
-        if (data) {
-          let usersWithRole = data.filter((user) => user.idRole === activeRole);
-          setListUser(usersWithRole);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
-
-    getListUser();
-  }, [activeRole, idCenter]);
+  useEffect(() => {
+    setListUser(listUserOfCenter);
+  }, [listUserOfCenter]);
 
   const handleRoleClick = (role) => {
-    setActiveRole(role);
+    dispatch(setActiveRoleUserOfCenter(role));
   };
   const handleFilterChange = ({ gender, level, dateRange, status }) => {
-    setGender(gender);
-    setLevel(level);
     setDateRange(dateRange);
     setStatus(status);
   };
+  const handleSortByChange = ({ field, order }) => {
+    setSortBy({ field, order });
+  };
+  const getStatusString = (status) => {
+    switch (status) {
+      case Status.active:
+        return "Active";
+      case Status.pending:
+        return "Pending";
+      case Status.inactive:
+        return "Inactive";
+      default:
+        return "";
+    }
+  };
+  const filteredUser = listUser
+    .filter((user) => {
+      const searchTermLower = searchTerm.toLowerCase();
 
-  const filteredUser = listUser.filter((user) => {
-    const searchTermLower = searchTerm.toLowerCase();
+      const matchesSearchTerm =
+        (user.fullName &&
+          user.fullName.toLowerCase().includes(searchTermLower)) ||
+        (user.phoneNumber &&
+          user.phoneNumber.toLowerCase().includes(searchTermLower)) ||
+        (user.email && user.email.toLowerCase().includes(searchTermLower)) ||
+        (user.joinedDate &&
+          new Date(user.joinedDate)
+            .toLocaleDateString("en-US")
+            .includes(searchTermLower)) ||
+        getStatusString(user.status).toLowerCase().includes(searchTermLower);
+      user.teachingMajor &&
+        user.teachingMajor.toLowerCase().includes(searchTermLower);
 
-    const matchesSearchTerm = Object.keys(user).some((key) => {
-      if (user[key] === null || user[key] === undefined) return false;
-      if (typeof user[key] === "string" || typeof user[key] === "number") {
-        return user[key].toString().toLowerCase().includes(searchTermLower);
+      const matchesDateJoined =
+        (!dateRange.startDate && !dateRange.endDate) ||
+        (user.joinedDate &&
+          new Date(user.joinedDate) >= new Date(dateRange.startDate) &&
+          new Date(user.joinedDate) <= new Date(dateRange.endDate));
+
+      const matchesStatus =
+        status === null || status === undefined || user.status === status;
+
+      return matchesSearchTerm && matchesDateJoined && matchesStatus;
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortBy.field === "fullname") {
+        aValue = a.fullName ? a.fullName.toLowerCase() : "";
+        bValue = b.fullName ? b.fullName.toLowerCase() : "";
+      } else if (sortBy.field === "phoneNumber") {
+        aValue = a.phoneNumber ? a.phoneNumber.toLowerCase() : "";
+        bValue = b.phoneNumber ? b.phoneNumber.toLowerCase() : "";
+      } else if (sortBy.field === "email") {
+        aValue = a.email ? a.email.toLowerCase() : "";
+        bValue = b.email ? b.email.toLowerCase() : "";
+      } else if (sortBy.field === "dateJoined") {
+        aValue = new Date(a.joinedDate) || new Date(0);
+        bValue = new Date(b.joinedDate) || new Date(0);
+      } else if (sortBy.field === "teachingMajor") {
+        aValue = a.teachingMajor ? a.teachingMajor.toLowerCase() : "";
+        bValue = b.teachingMajor ? b.teachingMajor.toLowerCase() : "";
       }
-      if (key === "joinedDate") {
-        return new Date(user[key])
-          .toLocaleDateString("en-US")
-          .includes(searchTermLower);
-      }
-      if (key === "status") {
-        return (user[key] === Status.active ? "Active" : "Inactive")
-          .toLowerCase()
-          .includes(searchTermLower);
-      }
-      if (key === "isMainCenterAdmin" && activeRole === Role.centerAdmin) {
-        return (user[key] ? "Main" : "Mem")
-          .toLowerCase()
-          .includes(searchTermLower);
-      }
-      return false;
+
+      return sortBy.order === "asc"
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
     });
-
-    const matchesGender =
-      gender === null || gender === undefined || user.gender === gender;
-
-    const matchesLevel =
-      level === null ||
-      level === undefined ||
-      (activeRole === Role.centerAdmin &&
-        (level === CenterAdminLevel.main
-          ? user.isMainCenterAdmin
-          : !user.isMainCenterAdmin));
-
-    const matchesDateJoined =
-      (!dateRange.startDate && !dateRange.endDate) ||
-      (user.joinedDate &&
-        new Date(user.joinedDate) >= new Date(dateRange.startDate) &&
-        new Date(user.joinedDate) <= new Date(dateRange.endDate));
-
-    const matchesStatus =
-      status === null || status === undefined || user.status === status;
-
-    return (
-      matchesSearchTerm &&
-      matchesGender &&
-      matchesLevel &&
-      matchesDateJoined &&
-      matchesStatus
-    );
-  });
 
   //pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -141,6 +146,13 @@ const CenterAdUserMgmt = () => {
       prevSelectedId === idUser ? null : idUser
     );
   };
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   return (
     <>
       <div className="page-user-container">
@@ -164,15 +176,32 @@ const CenterAdUserMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div className="btn" onClick={() => setFilterVisble(!filterVisble)}>
+            <div
+              className="btn"
+              onClick={() => {
+                setFilterVisble(!filterVisble);
+                setSortByVisible(false);
+              }}
+            >
               <LuFilter className="icon" />
               <span>Filter</span>
             </div>
-            {filterVisble && <FilterUser onFilterChange={handleFilterChange} />}
-            <div className="btn">
+            {filterVisble && (
+              <FilterUserOfCenter onFilterChange={handleFilterChange} />
+            )}
+            <div
+              className="btn"
+              onClick={() => {
+                setSortByVisible(!sortByVisible);
+                setFilterVisble(false);
+              }}
+            >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
             </div>
+            {sortByVisible && (
+              <SortByUserOfCenter onSortByChange={handleSortByChange} />
+            )}
           </div>
 
           <div className="search-container">
@@ -208,6 +237,7 @@ const CenterAdUserMgmt = () => {
                 <th>Email</th>
                 <th>Date Joined</th>
                 {activeRole === Role.teacher && <th>Teaching Major</th>}
+                {activeRole === Role.teacher && <th>Status</th>}
                 <th></th>
               </tr>
             </thead>
@@ -226,13 +256,34 @@ const CenterAdUserMgmt = () => {
                         const month = String(date.getMonth() + 1).padStart(
                           2,
                           "0"
-                        ); // Tháng trong JavaScript bắt đầu từ 0
+                        );
                         const year = date.getFullYear();
 
                         return `${month}/${day}/${year}`;
                       })()}
                   </td>
                   {activeRole === Role.teacher && <td>{user.teachingMajor}</td>}
+                  {activeRole === Role.teacher && (
+                    <td
+                      className={`status ${
+                        user.status === Status.active
+                          ? "active"
+                          : user.status === Status.pending
+                          ? "pending"
+                          : user.status === Status.inactive
+                          ? "inactive"
+                          : ""
+                      }`}
+                    >
+                      {user.status === Status.active
+                        ? "Active"
+                        : user.status === Status.pending
+                        ? "Pending"
+                        : user.status === Status.inactive
+                        ? "Inactive"
+                        : ""}
+                    </td>
+                  )}
                   <td className="table-cell" style={{ cursor: "pointer" }}>
                     <LuMoreHorizontal
                       onClick={() => handleMoreIconClick(user.idUser)}
@@ -241,6 +292,10 @@ const CenterAdUserMgmt = () => {
                       <UserOption
                         className="user-option"
                         idUserSelected={user.idUser}
+                        {...(activeRole === Role.teacher && {
+                          statusUserSelected: user.status,
+                        })}
+                        onUserInactivated={() => setSelectedUserId(null)}
                       />
                     )}
                   </td>

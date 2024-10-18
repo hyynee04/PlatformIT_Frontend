@@ -4,9 +4,17 @@
   display: flex;
   flex-direction: column;
 }
-.role-users-group,
+
 .filter-search {
   padding: 16px 72px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+.role-users-group {
+  padding: 16px 72px 0;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -24,15 +32,13 @@
   min-width: 100px;
 }
 .role-users-group > .role-btn:hover {
-  background-color: var(--border-gray);
-  border-radius: 8px;
+  color: var(--border-gray);
   text-align: center;
 }
 .role-users-group > .role-btn.active {
-  background-color: var(--main-color);
-  border-radius: 8px;
-  color: var(--white-color);
+  color: var(--main-color);
   text-align: center;
+  border-bottom: 3px solid var(--main-color);
 }
 .filter-search {
   justify-content: space-between;
@@ -57,10 +63,19 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: 1px solid var(--main-color);
   width: 100px;
   color: var(--main-color);
   font-size: 14px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+.filter-sort-btns .btn:active {
+  border: none;
+  outline: none;
+  color: var(--main-color);
+}
+.filter-sort-btns .save-filter {
+  color: var(--white-color);
 }
 .add-btn {
   margin: 12px 72px;
@@ -90,13 +105,15 @@
   height: 40px;
   width: 100%;
   border-radius: 100rem;
-  border: 1px solid var(--main-color);
+  border: none;
   color: var(--text-gray);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 .search-container .search-field:focus {
   outline: none;
   box-shadow: none;
-  border: 1px solid var(--main-color);
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 .search-container .search-icon {
   position: absolute;
@@ -105,8 +122,6 @@
 }
 .list-container {
   margin: 16px 72px 24px;
-  /* overflow-x: auto;
-  min-height: 100vh; */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -114,11 +129,22 @@
 .list-container > table {
   flex: 1;
   width: 100%;
-  border-collapse: collapse; /* Giảm khoảng cách giữa các ô */
+  border-collapse: collapse;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.list-container > table tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+.list-container > table tr:nth-child(even) {
+  background-color: var(--white-color);
 }
 .list-container tr {
   padding: 6px 8px;
-  border-bottom: 1px solid var(--text-gray);
+}
+.list-container th {
+  background-color: var(--white-color);
+  border-bottom: 1px solid var(--border-gray);
 }
 .list-container th,
 td {
@@ -127,15 +153,31 @@ td {
   font-weight: 500px;
   color: var(--second-main-color);
 }
-
-.list-container > table > tbody > tr > td.status.inactive {
-  color: var(--red-color); /* Màu đỏ cho trạng thái inactive */
+.list-container > table > tbody > tr > td > span {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 80px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-align: center;
 }
-.list-container > table > tbody > tr > td.status.pending {
-  color: var(--yellow-color); /* Màu đỏ cho trạng thái inactive */
+.list-container > table > tbody > tr > td > span.status.active {
+  color: var(--green-color);
+  background-color: rgba(20, 174, 92, 0.3);
+}
+.list-container > table > tbody > tr > td > span.status.inactive {
+  color: var(--red-color);
+  background-color: rgba(192, 15, 12, 0.3);
+}
+.list-container > table > tbody > tr > td > span.status.pending {
+  color: var(--yellow-color);
+  background-color: rgba(255, 204, 0, 0.3);
 }
 .list-container > table > tbody td {
   color: var(--black-color);
+}
+.list-container > table > tbody tr:hover {
+  background-color: rgba(217, 217, 217, 0.5);
 }
 .table-cell {
   position: relative;

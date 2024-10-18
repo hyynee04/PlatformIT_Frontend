@@ -172,7 +172,7 @@
     border-radius: 8px;
 }
 
-.fade {
+.fade-effect {
     z-index: 1;
     width: 200px; /* Width of the div */
     height: 200px; /* Height of the div */

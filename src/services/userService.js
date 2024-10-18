@@ -121,6 +121,7 @@ const postChangeAvatar = async (userId, avatarFile, idUpdatedBy) => {
 const getAllUser = () => {
   return axios.post("api/User/getAllUser");
 };
+
 const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
   return axios.post("api/User/InactiveUser", null, {
     params: {

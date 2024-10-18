@@ -21,12 +21,11 @@ const Course = (props) => {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <Card.Img className='course-card-img-top' variant="top" src={ExampleImage_Course} />
+                <img className='course-card-img-top' variant="top" src={ExampleImage_Course} />
                 <Card.Body>
                     <Card.Title className='course-title'>Artificial Intelligence - First Bootscamp of 2024 - Join now for good deal</Card.Title>
                     <div className='tag-container'>
                         <div className='tag-content'>Web Developer</div>
-                        <div className='tag-content'>Software</div>
                         <div className='tag-content-more'>+3</div>
                     </div>
                     <div className='course-time'> <LuClock color='#757575' /> 8/6/2024 - 8/12/2024</div>
@@ -53,7 +52,6 @@ const Course = (props) => {
                         <Card.Title className='course-title-hover'>Artificial Intelligence - First Bootscamp of 2024 - Join now for good deal</Card.Title>
                         <div className='tag-container'>
                             <div className='tag-content'>Web Developer</div>
-                            <div className='tag-content'>Software</div>
                             <div className='tag-content-more'>+3</div>
                         </div>
                         <div className='course-time'> <LuBuilding2 color='#757575' /> Center Name</div>

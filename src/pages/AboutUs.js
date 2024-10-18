@@ -15,7 +15,7 @@ const AboutUs = () => {
   return (
     <>
       <div className="logo-aboutus-container">
-        <img className="fade" src={logoPlait} />
+        <img className="fade-effect" src={logoPlait} />
         <img className="" src={logoPlait2} />
       </div>
       <div className="horizontal-line">

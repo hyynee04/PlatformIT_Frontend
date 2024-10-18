@@ -18,4 +18,34 @@ const postLogin = (username, password) => {
   });
 };
 
-export { postRegister, postLogin };
+const postCheckEmail = (email) => {
+  return axios.post("api/Authen/CheckEmail", email, {
+    headers: { "Content-Type": "application/json" }, // Đảm bảo gửi kiểu chuỗi văn bản
+  });
+};
+
+const postSendOTP = (email) => {
+  return axios.post("api/Authen/SendOTP", email, {
+    headers: { "Content-Type": "application/json" }, // Đảm bảo gửi kiểu chuỗi văn bản
+  });
+};
+
+const postVerifyOtp = (email, otp) => {
+  return axios.post("api/Authen/VerifyOtp", {
+    email,
+    otp,
+  });
+};
+
+const getLoginGoogle = () => {
+  return axios.get("api/Authen/login-google");
+};
+
+export {
+  postRegister,
+  postLogin,
+  postCheckEmail,
+  postSendOTP,
+  postVerifyOtp,
+  getLoginGoogle,
+};

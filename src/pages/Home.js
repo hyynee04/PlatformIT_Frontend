@@ -2,9 +2,28 @@ import "../assets/scss/Home.css";
 import Slide from "../components/Slide";
 import logoPlait from "../assets/img/logoPlait.png"
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Role } from "../constants/constants"
+
+import { getAllUser } from "../services/userService";
+import { getAllCenter } from "../services/centerService";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [listInfo, setListInfo] = useState([])
+
+  const getListCenter= async () => {
+    let data = await getAllCenter();
+    //let usersWithRole = data.filter((user) => user.idRole === Role.teacher);
+    console.log(data);
+    // setListUser(usersWithRole);
+    
+  };
+
+  useEffect(() => {
+    getListCenter();
+  }, []);
+
   return (
     <div>
       <div className="home-main-container">
@@ -23,7 +42,15 @@ const Home = () => {
             <img className="rotate " src={logoPlait}/>
           </div>
         </div>
-        <Slide />
+        {/* <Slide 
+          object={"Course"}
+        />
+        <Slide 
+          object={"Teacher"}
+        /> */}
+        <Slide 
+          object={"Center"}
+        />
       </div>
     </div>
   );

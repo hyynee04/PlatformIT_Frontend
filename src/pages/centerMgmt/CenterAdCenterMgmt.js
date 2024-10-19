@@ -137,165 +137,171 @@ const CenterAdCenterMgmt = () => {
               />
             </div>
           </div>
-          <div className="container-field">
-            <div className="container-left">
-              <div className="info">
-                <span>Center Name</span>
-                <input
-                  type="text"
-                  className="input-form-pi"
-                  value={centerName || ""}
-                  onChange={(e) => setCenterName(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Contact Number</span>
-                <input
-                  type="text"
-                  className="input-form-pi"
-                  value={contactNumber || ""}
-                  onChange={(e) => setContactNumber(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Date Created</span>
-                <input
-                  type="date"
-                  className="input-form-pi"
-                  value={dateCreated}
-                  onChange={(e) => setDateCreated(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Tax Identification Number (TIN)</span>
-                <input
-                  type="text"
-                  className="input-form-pi"
-                  value={TIN || ""}
-                  onChange={(e) => setTIN(e.target.value)}
-                  disabled
-                />
-              </div>
-              <div className="info">
-                <span>Social/Website Center Links</span>
-                {centerLinks.some((profile) => profile.name && profile.url) &&
-                  centerLinks.map((profile, index) => (
-                    <div className="container-link" key={index}>
+          <div className="container-specialized">
+            <div className="container-info">
+              <div className="container-field">
+                <div className="container-left">
+                  <div className="info">
+                    <span>Center Name</span>
+                    <input
+                      type="text"
+                      className="input-form-pi"
+                      value={centerName || ""}
+                      onChange={(e) => setCenterName(e.target.value)}
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Contact Number</span>
+                    <input
+                      type="text"
+                      className="input-form-pi"
+                      value={contactNumber || ""}
+                      onChange={(e) => setContactNumber(e.target.value)}
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Date Created</span>
+                    <input
+                      type="date"
+                      className="input-form-pi"
+                      value={dateCreated}
+                      onChange={(e) => setDateCreated(e.target.value)}
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Tax Identification Number (TIN)</span>
+                    <input
+                      type="text"
+                      className="input-form-pi"
+                      value={TIN || ""}
+                      onChange={(e) => setTIN(e.target.value)}
+                      disabled
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Social/Website Center Links</span>
+                    {centerLinks.some(
+                      (profile) => profile.name && profile.url
+                    ) &&
+                      centerLinks.map((profile, index) => (
+                        <div className="container-link" key={index}>
+                          <InputGroup className="mb-3">
+                            <input
+                              type="text"
+                              value={profile.name}
+                              className="title-link"
+                              readOnly
+                            />
+                            <Form.Control
+                              placeholder="Link"
+                              className="main-link"
+                              value={profile.url}
+                              readOnly
+                            />
+                          </InputGroup>
+                          <div
+                            className="icon-button"
+                            onClick={() => {
+                              //   removeProfileLinks(profile.idProfileLink, index);
+                            }}
+                          >
+                            <LuTrash2 className="icon" />
+                          </div>
+                        </div>
+                      ))}
+                    <div className="container-link">
                       <InputGroup className="mb-3">
-                        <input
-                          type="text"
-                          value={profile.name}
+                        <select
+                          //   onChange={handleNameProfileLinkChange}
                           className="title-link"
-                          readOnly
-                        />
+                        >
+                          <option value="" className="option-link">
+                            Select type
+                          </option>
+                          <option value="Github" className="option-link">
+                            Github
+                          </option>
+                          <option value="LinkedIn" className="option-link">
+                            LinkedIn
+                          </option>
+                          <option value="Portfolio" className="option-link">
+                            Portfolio
+                          </option>
+                          <option value="Youtube" className="option-link">
+                            Youtube
+                          </option>
+                          <option value="Facebook" className="option-link">
+                            Facebook
+                          </option>
+                        </select>
                         <Form.Control
                           placeholder="Link"
                           className="main-link"
-                          value={profile.url}
-                          readOnly
+                          //   value={newProfileLink.url}
+                          //   onChange={handleURLProfileLinkChange}
                         />
                       </InputGroup>
                       <div
                         className="icon-button"
-                        onClick={() => {
-                          //   removeProfileLinks(profile.idProfileLink, index);
-                        }}
+                        //   onClick={addProfileLink}
                       >
-                        <LuTrash2 className="icon" />
+                        <LuCheck className="icon" />
                       </div>
                     </div>
-                  ))}
-                <div className="container-link">
-                  <InputGroup className="mb-3">
-                    <select
-                      //   onChange={handleNameProfileLinkChange}
-                      className="title-link"
-                    >
-                      <option value="" className="option-link">
-                        Select type
-                      </option>
-                      <option value="Github" className="option-link">
-                        Github
-                      </option>
-                      <option value="LinkedIn" className="option-link">
-                        LinkedIn
-                      </option>
-                      <option value="Portfolio" className="option-link">
-                        Portfolio
-                      </option>
-                      <option value="Youtube" className="option-link">
-                        Youtube
-                      </option>
-                      <option value="Facebook" className="option-link">
-                        Facebook
-                      </option>
-                    </select>
-                    <Form.Control
-                      placeholder="Link"
-                      className="main-link"
-                      //   value={newProfileLink.url}
-                      //   onChange={handleURLProfileLinkChange}
+                  </div>
+                </div>
+                <div className="container-gap"></div>
+                <div className="container-right">
+                  <div className="info">
+                    <span>Address</span>
+                    <input
+                      type="text"
+                      className="input-form-pi"
+                      value={address || ""}
+                      onChange={(e) => setAddress(e.target.value)}
                     />
-                  </InputGroup>
-                  <div
-                    className="icon-button"
-                    //   onClick={addProfileLink}
-                  >
-                    <LuCheck className="icon" />
+                  </div>
+                  <div className="info">
+                    <span>Email</span>
+                    <input
+                      type="text"
+                      className="input-form-pi"
+                      value={email || ""}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Date Established</span>
+                    <input
+                      type="date"
+                      className="input-form-pi"
+                      value={dateEstablished}
+                      onChange={(e) => setDateEstablished(e.target.value)}
+                    />
+                  </div>
+                  <div className="info">
+                    <span>Description</span>
+                    <Form.Control
+                      as="textarea"
+                      className="input-area-form-pi"
+                      value={description || ""}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="container-gap"></div>
-            <div className="container-right">
-              <div className="info">
-                <span>Address</span>
-                <input
-                  type="text"
-                  className="input-form-pi"
-                  value={address || ""}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Email</span>
-                <input
-                  type="text"
-                  className="input-form-pi"
-                  value={email || ""}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Date Established</span>
-                <input
-                  type="date"
-                  className="input-form-pi"
-                  value={dateEstablished}
-                  onChange={(e) => setDateEstablished(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Description</span>
-                <Form.Control
-                  as="textarea"
-                  className="input-area-form-pi"
-                  value={description || ""}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
+              <div className="container-button">
+                <button className="change-pass">Add Working Hours</button>
+                <button
+                  className="save-change"
+                  onClick={() => {
+                    // updateBasicInfo();
+                  }}
+                >
+                  Save change
+                </button>
               </div>
             </div>
-          </div>
-          <div className="container-button">
-            <button className="change-pass">Add Working Hours</button>
-            <button
-              className="save-change"
-              onClick={() => {
-                // updateBasicInfo();
-              }}
-            >
-              Save change
-            </button>
           </div>
         </div>
       </div>

@@ -78,7 +78,7 @@
   padding: 24px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   border-radius: 8px;
-  min-height: 580px;
+  min-height: 610px;
 }
 .container-info.auto {
   min-height: auto;
@@ -363,6 +363,14 @@
   justify-content: center;
   border-radius: 8px;
 }
+.container-info-img .quali-content span.warning-error {
+  padding: 4px 12px;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--red-color);
+  width: 100%;
+}
+
 .container-info-img .quali-content .span.approved {
   background-color: rgba(20, 174, 92, 0.3);
   color: var(--color);
@@ -382,9 +390,10 @@
   justify-content: space-between;
 }
 .container-info-img .quali-content .status-action .icon-btn-container {
+  margin-left: auto;
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: auto;
   justify-content: flex-end;
   gap: 10px;
 }

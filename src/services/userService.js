@@ -97,6 +97,41 @@ const deleteProfileLink = async (idProfileLink) => {
     console.error("Error delete profile link: ", error);
   }
 };
+const deleteQualification = async (idQualification) => {
+  try {
+    const response = await axios.delete("api/User/DeleteQualification", {
+      params: {
+        id: idQualification,
+      },
+    });
+    console.log(response);
+  } catch (error) {
+    console.error("Error delete qualification: ", error);
+  }
+};
+const postAddQualification = async (
+  idUser,
+  qualificationName,
+  description,
+  qualificationFile
+) => {
+  try {
+    const formData = new FormData();
+    formData.append("QualificationName", qualificationName);
+    formData.append("Description", description);
+    formData.append("QualificationFile", qualificationFile);
+    await axios.post(`api/User/AddQualification?IdUser=${idUser}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Error add qualification:",
+      error.response?.data || error.message
+    );
+  }
+};
 const postChangeAvatar = async (userId, avatarFile, idUpdatedBy) => {
   try {
     const formData = new FormData();
@@ -137,6 +172,8 @@ export {
   postUpdateTeacherSpecializedPI,
   postAddProfileLink,
   deleteProfileLink,
+  postAddQualification,
+  deleteQualification,
   postChangeAvatar,
   getAllUser,
   postInactiveUser,

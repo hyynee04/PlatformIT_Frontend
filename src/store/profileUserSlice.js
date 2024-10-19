@@ -19,8 +19,6 @@ export const fetchUserProfile = createAsyncThunk(
   "profileUser/fetchUserProfile",
   async (idUser, { dispatch }) => {
     const data = await getPI(idUser);
-    console.log("data", data);
-
     const today = new Date().toISOString().split("T")[0];
     const respone = await fetch(
       "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"

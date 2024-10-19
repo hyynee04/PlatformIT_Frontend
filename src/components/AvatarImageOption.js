@@ -1,15 +1,11 @@
 import React, { useRef, useState } from "react";
 import { postChangeAvatar } from "../services/userService";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  changeAvatar,
-  fetchUserProfile,
-  updateUserPI,
-} from "../store/profileUserSlice";
+import { useDispatch } from "react-redux";
+import { fetchUserProfile } from "../store/profileUserSlice";
 
 const AvatarImageOption = () => {
   const dispatch = useDispatch();
-  const userPI = useSelector((state) => state.profileUser);
+  // const userPI = useSelector((state) => state.profileUser);
   const userId = +localStorage.getItem("idUser");
   const [isOptionVisible, setIsOptionVisible] = useState(true);
 

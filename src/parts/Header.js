@@ -9,29 +9,29 @@ import HeaderAvatarOption from "../components/HeaderAvatarOption";
 import default_ava from "../assets/img/default_ava.png";
 
 import "../assets/scss/Header.css";
-import { useCookies } from "react-cookie";
 const Header = () => {
   const [showOptionAva, setShowOptionAva] = useState(false);
-  // const [cookies, setCookie, removeCookie] = useCookies(["user"]);
-  const location = useLocation(); //Lấy thông tin vị trí hiện tại
-  // const idRole = location.state?.idRole || cookies.idRole;
+  const location = useLocation();
   const idRole = location.state?.idRole || localStorage.getItem("idRole");
-  const idUser = location.state?.idUser || localStorage.getItem("idUser");
   const navigate = useNavigate();
   const currentPath = location.pathname; //current path
-
+  // useEffect(() => {
+  //   if (idRole === Role.platformAdmin && currentPath === "/") {
+  //     navigate("/platformAdDashboard");
+  //   }
+  // }, [idRole, currentPath, navigate]);
   const navLinks = {
     [Role.platformAdmin]: [
-      { title: "Dashboard", path: "/platformAdminDashboard" },
-      { title: "User", path: "/platformAdminUser" },
-      { title: "Center", path: "/platformAdminCenter" },
-      { title: "Course", path: "/platformAdminCourse" },
+      { title: "Dashboard", path: "/platformAdDashboard" },
+      { title: "User Management", path: "/platformAdUser" },
+      { title: "Center Management", path: "/platformAdCenter" },
+      { title: "Course Management", path: "/platformAdCourse" },
     ],
     [Role.centerAdmin]: [
-      { title: "Dashboard", path: "/centerAdminDashboard" },
-      { title: "Course Management", path: "/centerAdminCourse" },
-      { title: "User Management", path: "/centerAdminUser" },
-      { title: "Center Management", path: "/centerAdminCenter" },
+      { title: "Dashboard", path: "/centerAdDashboard" },
+      { title: "Course Management", path: "/centerAdCourse" },
+      { title: "User Management", path: "/centerAdUser" },
+      { title: "Center Management", path: "/centerAdCenter" },
     ],
     [Role.teacher]: [
       { title: "Home", path: "/teacherHome" },
@@ -51,7 +51,6 @@ const Header = () => {
   const links = navLinks[idRole] || navLinks.default;
 
   const renderNavLinksByRole = () => {
-    console.log(idRole);
     return links.map(({ title, path }, index) => (
       <Nav.Link
         key={index}
@@ -113,9 +112,7 @@ const Header = () => {
                 </>
               )}
             </div>
-            {showOptionAva && (
-              <HeaderAvatarOption setShowOptionAva={setShowOptionAva} />
-            )}
+            {showOptionAva && <HeaderAvatarOption />}
           </Navbar.Collapse>
         </Container>
       </Navbar>

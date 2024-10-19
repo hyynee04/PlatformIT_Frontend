@@ -1,7 +1,7 @@
 .login-container {
   width: 1000px;
   height: 500px;
-  margin: 75px auto 0px;
+  margin: 75px auto 75px;
   border-radius: 8px;
   box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
   background: linear-gradient(
@@ -231,9 +231,40 @@
 .login-container .mainpart-container .holder .mainpart-content .sep svg:hover {
   box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
 }
+.justify-margin {
+  margin-bottom: 0 !important;
+  margin: auto;
+}
+.footer-btn {
+  padding: 4px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--main-color);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.send-btn {
+  background-color: var(--main-color);
+  color: var(--white-color);
+}
+.send-btn:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
+.cancel-btn {
+  color: var(--second-main-color);
+}
+.cancel-btn:hover{
+  background-color: var(--border-gray);
+}
+@media (min-width: 576px) {
+  .modal-dialog {
+      max-width: var(--bs-modal-width);
+      margin-right: auto;
+      margin-left: auto;
+      margin-top: 5%;
+  }
+}
+.btn-close:focus {
+  box-shadow: none;
+}
 
-/* .slide-up {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-  } */

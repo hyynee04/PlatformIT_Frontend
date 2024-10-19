@@ -1,14 +1,51 @@
-import axios from '../utils/axiosCustomize';
+import axios from "../utils/axiosCustomize";
 
-const postRegister = (fullName, email, username, password, tin) => {
-    return axios.post('api/Authentication/signup', {fullName: fullName, username: username, email: email, password: password, tin: tin})
-}
+const postRegister = (fullName, email, username, password, centername, tin) => {
+  return axios.post("api/Authen/signup", {
+    fullName: fullName,
+    email: email,
+    username: username,
+    password: password,
+    centername: centername,
+    tin: tin,
+  });
+};
 
 const postLogin = (username, password) => {
-    return axios.post('api/Authentication/SignInByPassword', {username, password})
-}
+  return axios.post("api/Authen/SignInByPassword", {
+    username,
+    password,
+  });
+};
+
+const postCheckEmail = (email) => {
+  return axios.post("api/Authen/CheckEmail", email, {
+    headers: { "Content-Type": "application/json" }, // Đảm bảo gửi kiểu chuỗi văn bản
+  });
+};
+
+const postSendOTP = (email) => {
+  return axios.post("api/Authen/SendOTP", email, {
+    headers: { "Content-Type": "application/json" }, // Đảm bảo gửi kiểu chuỗi văn bản
+  });
+};
+
+const postVerifyOtp = (email, otp) => {
+  return axios.post("api/Authen/VerifyOtp", {
+    email,
+    otp,
+  });
+};
+
+const getLoginGoogle = () => {
+  return axios.get("api/Authen/login-google");
+};
 
 export {
-    postRegister,
-    postLogin,
-}
+  postRegister,
+  postLogin,
+  postCheckEmail,
+  postSendOTP,
+  postVerifyOtp,
+  getLoginGoogle,
+};

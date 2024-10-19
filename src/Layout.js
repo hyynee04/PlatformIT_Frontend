@@ -2,18 +2,24 @@ import { Route, Routes } from "react-router-dom";
 
 import App from "./App";
 import Home from "./pages/Home";
+import AboutUs from "./pages/AboutUs";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import UserPI from "./pages/pi/UserPI";
 
-import PlatformAdminPI from "./pages/pi/PlatformAdminPI";
+import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
+import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
+import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 
-import StudentPI from "./pages/pi/StudentPI";
-import StudentHome from "./pages/home/StudentHome";
+import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
+import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
+import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 
 import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
-import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
-import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
+
+import StudentHome from "./pages/home/StudentHome";
+import LoginSuccess from "./pages/LoginSuccess";
 
 const Layout = (props) => {
   return (
@@ -22,20 +28,22 @@ const Layout = (props) => {
         <Route path="/" element={<App />}>
           {/* Guest */}
           <Route index element={<Home />} />
+          <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
           {/* Platform Admin */}
           <Route
-            path="/platformAdminDashboard"
+            path="/platformAdDashboard"
             element={<PlatformAdminDashboard />}
           />
-          <Route path="/platformAdminPI" element={<PlatformAdminPI />} />
+          <Route path="platformAdUser" element={<PlatformAdUserMgmt />} />
+          <Route path="platformAdCenter" element={<PlatformAdCenterMgmt />} />
 
           {/* Center Admin */}
-          <Route
-            path="/centerAdminDashboard"
-            element={<CenterAdminDashboard />}
-          />
+          <Route path="/centerAdDashboard" element={<CenterAdminDashboard />} />
+          <Route path="/centerAdUser" element={<CenterAdUserMgmt />} />
+          <Route path="/centerAdCenter" element={<CenterAdCenterMgmt />} />
 
           {/* Teacher */}
           <Route path="/teacherHome" element={<TeacherHome />} />
@@ -43,9 +51,11 @@ const Layout = (props) => {
 
           {/* Student */}
           <Route path="/studentHome" element={<StudentHome />} />
-          <Route path="/studentPI" element={<StudentPI />} />
-        </Route>
 
+          {/* General */}
+          <Route path="/pi" element={<UserPI />} />
+        </Route>
+        <Route path="/login-success" element={<LoginSuccess />} />
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />
                     <Route path='manage-user' element={<ManageUser />} />

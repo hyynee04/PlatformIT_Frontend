@@ -1,0 +1,207 @@
+.detail-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2.5rem;
+    padding: 32px 96px;
+
+    border: 1px solid black;
+}
+
+.detail-container > .left-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+
+    width: 30%;
+}
+
+
+.detail-container .left-container > .biography-container,
+.detail-container .left-container > .center-card-container,
+.detail-container .left-container > .link-container,
+.detail-container .right-container > .qualification-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    width: 100%;
+    padding: 1.5rem;
+    border: 1px solid var(--border-gray);
+    border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.detail-container .left-container .biography-container > img {
+    width: 8rem;
+    margin: auto;
+    object-fit: cover;
+    border: 1px solid var(--border-gray);
+    border-radius: 90px;
+}
+
+.detail-container .left-container .biography-container > .biography-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-container .left-container 
+.biography-container .biography-content > .biography-name  {
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: var(--second-main-color);
+
+    display: flex;
+    text-align: center;
+}
+
+.detail-container .left-container .biography-container .biography-content > .teacher-information {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-container .left-container 
+.biography-container .biography-content 
+.teacher-information > span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    font-size: 1rem;
+    color: var(--text-gray);
+}
+
+.detail-container .left-container > .center-card-container,
+.detail-container .left-container > .link-container,
+.detail-container .right-container > .qualification-container {
+    gap: 10px !important;
+    min-height: 9rem;
+}
+ 
+.detail-container .left-container .center-card-container > span,
+.detail-container .left-container .link-container > span,
+.detail-container .right-container .qualification-container > span {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--main-color);
+}
+
+.detail-container 
+.left-container .center-card-container > .center-card-information,
+.right-container .qualification-container .qualification-content > .qualification {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.detail-container 
+.left-container .center-card-container .center-card-information > img,
+.right-container .qualification-container .qualification-content .qualification > img {
+    width: 8.5rem;
+    object-fit: cover;
+    border: 1px solid var(--border-gray);
+}
+
+.detail-container 
+.left-container .center-card-container .center-card-information > .center-card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.detail-container 
+.left-container .center-card-container .center-card-information
+.center-card-body > .name-center,
+.right-container .qualification-container .qualification-content
+.qualification .qualification-body > .qualification-name
+{
+    font-size: 1.2rem;
+    color: var(--black-color);
+    font-weight: 700;
+}
+
+.detail-container .left-container 
+.center-card-container .center-card-information
+.center-card-body > .quote-center {
+    font-size: .875rem;
+    color: var(--text-gray);
+    font-weight: 400;
+}
+
+.detail-container 
+.left-container .link-container > .link-content,
+.right-container .qualification-container > .qualification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.detail-container .left-container 
+.link-container .link-content > .link-transfer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 8px 16px;
+    width: 100%;
+
+    border: 1px solid var(--border-gray);
+    border-radius: 0.5rem;
+    color: var(--text-gray);
+    font-weight: 400;
+}
+
+.detail-container .left-container 
+.link-container .link-content > .link-transfer:hover {
+    background-color: #f4f4f4;
+}
+
+.detail-container .left-container 
+.link-container .link-content .link-transfer > svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+
+.detail-container > .right-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+
+    width: 70%;
+}
+
+.detail-container .right-container 
+.qualification-container .qualification-content > .qualification {
+    padding: 20px;
+    border: 1px solid var(--border-gray);
+    border-radius: .75rem;
+}
+
+.detail-container .right-container .qualification-container 
+.qualification-content .qualification > .qualification-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+}
+
+.detail-container .right-container > .course-carousel-container {
+    width: 100%;
+    padding: 2rem;
+    border: 1px solid var(--border-gray);
+    border-radius: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+
+    
+}
+
+.detail-container .right-container 
+.course-carousel-container > .carousel {
+    padding: 0 3rem;
+    overflow: visible;
+    clip-path: inset(0 0 0 5px); /* Hides 50px from the left side */
+}

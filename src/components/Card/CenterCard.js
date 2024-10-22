@@ -2,8 +2,8 @@ import { useState } from 'react';
 import Card from 'react-bootstrap/Card';
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
-import default_image from "../assets/img/default_image.png";
-import '../assets/scss/card/CenterCard.css';
+import default_image from "../../assets/img/default_image.png";
+import "../../assets/scss/card/Card.css";
 import StarRatings from 'react-star-ratings';
 
 
@@ -11,11 +11,11 @@ const CenterCard = (props) => {
     const [imgCourse, setImgCourse] = useState("")
 
     return (
-        <div className='course-card-container'>
-            <Card>
-                <img className='card-img-top' src={default_image} />
-                <Card.Body>
-                    <Card.Title>IT CENTER</Card.Title>
+        <div className='card-container'>
+            <div className='center-card-container'>
+                <img src={default_image} />
+                <div className='center-card-body'>
+                    <span className="center-card-title">IT CENTER</span>
                     {/* <StarRatings
                         rating={2.403}
                         starRatedColor='rgb(255, 204, 0)'
@@ -25,19 +25,21 @@ const CenterCard = (props) => {
                         numberOfStars={5}
                         name='rating'
                     /> */}
-                    <span className='center-infor'>Say something i'm giving up on you</span>
-                </Card.Body>
-                <div className='centercard-footer'>
-                    <div className='centercard-group'>
-                        <LuFile color='#757575' />
-                        <span className='now-price'>100</span>
+                    <span className='center-card-quote'>
+                        Say something I'm giving up on you
+                    </span>
+                </div>
+                <div className='center-card-footer'>
+                    <div className='center-card-info'>
+                        <LuFile color='#757575' /> 
+                        <span>100</span> 
                     </div>
-                    <div className='centercard-group'>
-                        <span className='now-price'>100</span>
+                    <div className='center-card-info'>
+                        <span>100</span> 
                         <RiGroupLine color='#757575' />
                     </div>
                 </div>
-            </Card>
+            </div>
         </div>
     )
 }

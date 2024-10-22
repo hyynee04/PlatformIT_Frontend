@@ -20,6 +20,7 @@ import TeacherPI from "./pages/pi/TeacherPI";
 
 import StudentHome from "./pages/home/StudentHome";
 import LoginResponse from "./pages/LoginResponse";
+import TeacherDetail from "./pages/detail/TeacherDetail";
 
 const Layout = (props) => {
   return (
@@ -31,6 +32,7 @@ const Layout = (props) => {
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/teacherDetail" element={<TeacherDetail />} />
 
           {/* Platform Admin */}
           <Route

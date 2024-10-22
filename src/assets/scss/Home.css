@@ -91,3 +91,12 @@
 .rotate:hover {
     transform: rotate(360deg); /* Rotate the image 360 degrees on hover */
 }
+
+.home-main-container > .carousel-container {
+    width: 100%;
+    height: fit-content;
+    padding: 32px 32px;
+
+    display: flex;
+    justify-content: center;
+}

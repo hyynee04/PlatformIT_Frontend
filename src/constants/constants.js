@@ -23,7 +23,7 @@ export const CenterStatus = {
   active: 1,
   pending: 2,
 };
-export const SlideObject = {
+export const CarouselObject = {
   course: 1,
   teacher: 2,
   center: 3,

@@ -56,9 +56,43 @@
     justify-content: space-between;
     border-bottom-left-radius: 8px;
     border-bottom-right-radius: 8px;
+    // gap: 12px;
     span {
-      padding: 12px 0;
-      font-weight: 400;
+      padding: 16px 0;
+      font-weight: 460;
+      font-size: 16px;
+      color: var(--black-gray);
+    }
+    .reject-container {
+      span {
+        padding: 24px 0 8px;
+        font-weight: 460;
+        font-size: 16px;
+        color: var(--black-gray);
+      }
+      .input-area-form-diag {
+        padding: 8px 16px;
+        min-height: 100px;
+        max-height: 500px;
+        width: 500px;
+        border-radius: 8px;
+        border: none;
+        color: var(--black-gray);
+        background-color: rgba(217, 217, 217, 0.3);
+        font-size: 14px;
+        margin: 8px 0 24px;
+      }
+    }
+    .input-area-form-diag:focus {
+      outline: none;
+      /* box-shadow: none; */
+      box-shadow: rgba(14, 63, 126, 0.04) 0px 0px 0px 1px,
+        rgba(42, 51, 69, 0.04) 0px 1px 1px -0.5px,
+        rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px,
+        rgba(42, 51, 70, 0.04) 0px 6px 6px -3px,
+        rgba(14, 63, 126, 0.04) 0px 12px 12px -6px,
+        rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;
+      border: none;
     }
     .act-btns {
       display: flex;

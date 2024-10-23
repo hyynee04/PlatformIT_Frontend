@@ -5,16 +5,10 @@ import { FaGooglePlusG } from "react-icons/fa";
 import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
-import {
-  useLocation,
-  useNavigate
-} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
 import { Role, Status } from "../constants/constants";
-import {
-  getLoginGoogle,
-  postLogin
-} from "../services/authService";
+import { getLoginGoogle, postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
 const Login = () => {
@@ -27,16 +21,16 @@ const Login = () => {
   const [isShowed, setIsShowed] = useState(false);
 
   const [isFailed, setIsFailed] = useState(false);
-  const [isValid, setIsValid] = useState(true)
+  const [isValid, setIsValid] = useState(true);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => {
     const isValidEmail = validateEmail(username);
     if (isValidEmail) {
-      setEmail(username)
+      setEmail(username);
     }
     setShow(true);
-  }
+  };
 
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
@@ -49,7 +43,6 @@ const Login = () => {
       handleAutoLogin(state.idUser, state.idRole);
     }
   }, [location.state]);
-
 
   const validateEmail = (email) => {
     return String(email)
@@ -92,9 +85,7 @@ const Login = () => {
     if (data && data.idUser > Status.inactive) {
       localStorage.setItem("idRole", data.idRole);
       localStorage.setItem("idUser", data.idUser);
-      if (data.idCenter !== null) {
-        localStorage.setItem("idCenter", data.idCenter);
-      }
+      localStorage.setItem("idCenter", data.idCenter);
       let roleBasesPath = "/";
       switch (data.idRole) {
         case Role.platformAdmin:
@@ -130,21 +121,21 @@ const Login = () => {
     }
 
     // submit email
-    let data = await postForgotPassword(email)
+    let data = await postForgotPassword(email);
     console.log(">>> Check register: ", data);
-    if (data === 'Internal Server Error.') {
+    if (data === "Internal Server Error.") {
       setIsValid(false);
-      return
+      return;
     } else {
-      handleClose()
+      handleClose();
     }
-  }
+  };
 
   const handleLoginGoogle = async () => {
     // window.location.href = await getLoginGoogle()
     // console.log(loginGoogle)
-    window.location.href = "http://localhost:5000/api/Authen/login-google"
-  }
+    window.location.href = "http://localhost:5000/api/Authen/login-google";
+  };
 
   return (
     <>
@@ -295,8 +286,9 @@ const Login = () => {
             className="footer-btn send-btn"
             onClick={() => handleForgotPassword()}
             disabled={!isValid}
-          >Send</button>
-
+          >
+            Send
+          </button>
         </Modal.Footer>
       </Modal>
     </>

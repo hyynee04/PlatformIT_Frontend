@@ -1,6 +1,5 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
-// import { postInactiveUser } from "../services/userService";
 
 import "../assets/scss/card/DiagForm.scss";
 import { fetchAllUsers, updateUserStatus } from "../store/userSlice";
@@ -13,9 +12,10 @@ const DiagInactiveForm = ({
   onClose,
   idUserSelected,
   onUserInactivated,
+  roleUserSelected,
 }) => {
   const dispatch = useDispatch();
-
+  const idRole = +localStorage.getItem("idRole");
   const handleInactiverUser = async () => {
     const idUserUpdatedBy = +localStorage.getItem("idUser");
     try {
@@ -24,9 +24,16 @@ const DiagInactiveForm = ({
       );
 
       if (updateUserStatus.fulfilled.match(resultAction)) {
-        // console.log("User successfully set to inactive.");
-        dispatch(fetchAllUsers());
-        dispatch(fetchListUserOfCenter(Role.teacher));
+        if (idRole === Role.platformAdmin) {
+          dispatch(fetchAllUsers());
+        } else if (idRole === Role.centerAdmin) {
+          if (roleUserSelected === Role.teacher) {
+            dispatch(fetchListUserOfCenter(Role.teacher));
+          } else if (roleUserSelected === Role.centerAdmin) {
+            dispatch(fetchListUserOfCenter(Role.centerAdmin));
+          }
+        }
+
         onUserInactivated();
       } else {
         console.error("Failed to set user inactive.");

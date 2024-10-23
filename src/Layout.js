@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import UserPI from "./pages/pi/UserPI";
+import UserPI from "./pages/UserPI";
 
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
@@ -15,11 +15,12 @@ import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 
-import TeacherPI from "./pages/pi/TeacherPI";
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
 import LoginSuccess from "./pages/LoginSuccess";
+import PrivateRoute from "./PrivateRoute";
+import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 
 const Layout = (props) => {
   return (
@@ -35,25 +36,91 @@ const Layout = (props) => {
           {/* Platform Admin */}
           <Route
             path="/platformAdDashboard"
-            element={<PlatformAdminDashboard />}
+            element={
+              <PrivateRoute>
+                <PlatformAdminDashboard />
+              </PrivateRoute>
+            }
           />
-          <Route path="platformAdUser" element={<PlatformAdUserMgmt />} />
-          <Route path="platformAdCenter" element={<PlatformAdCenterMgmt />} />
+          <Route
+            path="/platformAdUser"
+            element={
+              <PrivateRoute>
+                <PlatformAdUserMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/platformAdCenter"
+            element={
+              <PrivateRoute>
+                <PlatformAdCenterMgmt />
+              </PrivateRoute>
+            }
+          />
 
           {/* Center Admin */}
-          <Route path="/centerAdDashboard" element={<CenterAdminDashboard />} />
-          <Route path="/centerAdUser" element={<CenterAdUserMgmt />} />
-          <Route path="/centerAdCenter" element={<CenterAdCenterMgmt />} />
-
+          <Route
+            path="/centerAdDashboard"
+            element={
+              <PrivateRoute>
+                <CenterAdminDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/centerAdUser"
+            element={
+              <PrivateRoute>
+                <CenterAdUserMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/centerAdCenter"
+            element={
+              <PrivateRoute>
+                <CenterAdCenterMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/centerAdPendingTask"
+            element={
+              <PrivateRoute>
+                <CenterAdPendingTask />
+              </PrivateRoute>
+            }
+          />
           {/* Teacher */}
-          <Route path="/teacherHome" element={<TeacherHome />} />
-          <Route path="/teacherPI" element={<TeacherPI />} />
+          <Route
+            path="/teacherHome"
+            element={
+              <PrivateRoute>
+                <TeacherHome />
+              </PrivateRoute>
+            }
+          />
 
           {/* Student */}
-          <Route path="/studentHome" element={<StudentHome />} />
+          <Route
+            path="/studentHome"
+            element={
+              <PrivateRoute>
+                <StudentHome />
+              </PrivateRoute>
+            }
+          />
 
           {/* General */}
-          <Route path="/pi" element={<UserPI />} />
+          <Route
+            path="/pi"
+            element={
+              <PrivateRoute>
+                <UserPI />
+              </PrivateRoute>
+            }
+          />
         </Route>
         <Route path="/login-success" element={<LoginSuccess />} />
         {/* <Route path='admin' element={<Admin />}>

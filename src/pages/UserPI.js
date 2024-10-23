@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
+import { Alert } from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import {
   LuCamera,
@@ -10,9 +11,9 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { FaChevronDown, FaUser, FaUserGraduate, FaLock } from "react-icons/fa";
-import default_ava from "../../assets/img/default_ava.png";
-import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/PI.css";
+import default_ava from "../assets/img/default_ava.png";
+import default_image from "../assets/img/default_image.png";
+import "../assets/scss/PI.css";
 import {
   deleteProfileLink,
   deleteQualification,
@@ -20,11 +21,11 @@ import {
   postAddQualification,
   postUpdateTeacherSpecializedPI,
   postUpdateUserBasicPI,
-} from "../../services/userService";
+} from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserProfile, updateUserPI } from "../../store/profileUserSlice";
-import { Role, Status, UserGender } from "../../constants/constants";
-import AvatarImageOption from "../../components/AvatarImageOption";
+import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
+import { Role, Status, UserGender } from "../constants/constants";
+import AvatarImageOption from "../components/AvatarImageOption";
 
 const TeacherPI = () => {
   const idUser = +localStorage.getItem("idUser");
@@ -48,6 +49,13 @@ const TeacherPI = () => {
     qualificationModels,
   } = userPI;
   const [countries, setCountries] = useState([]);
+  const [originalData, setOriginalData] = useState({
+    name: "",
+    phoneNum: "",
+    gender: "",
+    dob: "",
+    nationality: "",
+  });
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const [roleDes, setRoleDes] = useState("");
   const [activeAction, setActiveAction] = useState("basicPI");
@@ -59,7 +67,9 @@ const TeacherPI = () => {
     qualificationUrl: "",
   });
   const [qualiWarning, setQualiWarning] = useState("");
-
+  const [phoneNumWarning, setPhoneNumWarning] = useState("");
+  const [updateSuccess, setUpdateSuccess] = useState("");
+  const [updatePITeacherSuccess, setUpdatePITeacherSuccess] = useState("");
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -68,6 +78,22 @@ const TeacherPI = () => {
   };
   const inputFileRef = useRef(null);
 
+  const fetchContries = async () => {
+    try {
+      //API for nationality
+      const respone = await fetch(
+        "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
+      );
+      const countryData = await respone.json();
+      const countriesData = countryData.countries.map((country) => ({
+        label: country.label.split(" ")[1],
+      }));
+
+      setCountries(countriesData);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
   useEffect(() => {
     if (!idUser) {
       console.error("Không tìm thấy idUser trong localStorage");
@@ -86,39 +112,68 @@ const TeacherPI = () => {
         } else if (idRole === Role.student) {
           setRoleDes("Student");
         }
-        //API for nationality
-        const respone = await fetch(
-          "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
-        );
-        const countryData = await respone.json();
-        const countriesData = countryData.countries.map((country) => ({
-          label: country.label.split(" ")[1],
-        }));
-
-        setCountries(countriesData);
       } catch (error) {
         console.error("Có lỗi xảy ra khi lấy thông tin cá nhân:", error);
       }
     };
 
     fetchData();
+    fetchContries();
   }, [dispatch, idUser, idRole]);
+
+  useEffect(() => {
+    console.log("userPi", userPI);
+
+    setOriginalData({
+      name: userPI.name,
+      phoneNum: userPI.phoneNum,
+      gender: userPI.gender,
+      dob: userPI.dob,
+      nationality: userPI.nationality,
+    });
+    console.log(originalData);
+  }, [userPI]);
+
+  const validatePhoneNum = (num) => /^\d{10}$/.test(num);
+
   const updateBasicInfo = async () => {
-    await postUpdateUserBasicPI(
-      idUser,
-      name,
-      phoneNum,
-      gender,
-      dob,
-      nationality
-    );
-    dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
-    await dispatch(fetchUserProfile(idUser));
+    if (!validatePhoneNum(phoneNum)) {
+      setPhoneNumWarning("Phone number must be exactly 10 digits.");
+    } else {
+      setPhoneNumWarning("");
+      try {
+        await postUpdateUserBasicPI(
+          idUser,
+          name,
+          phoneNum,
+          gender,
+          dob,
+          nationality
+        );
+        dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
+        await dispatch(fetchUserProfile(idUser));
+        setUpdateSuccess("Your profile has been updated successfully!");
+
+        setTimeout(() => {
+          setUpdateSuccess("");
+        }, 3000);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        setUpdateSuccess("There was an error updating your profile.");
+      }
+    }
   };
   const updateTeacherSpecializedPI = async () => {
     await postUpdateTeacherSpecializedPI(idUser, teachingMajor, description);
     dispatch(updateUserPI({ teachingMajor, description }));
     await dispatch(fetchUserProfile(idUser));
+    setUpdatePITeacherSuccess(
+      "Your specialized infomation has been updated successfully!"
+    );
+
+    setTimeout(() => {
+      setUpdateSuccess("");
+    }, 3000);
   };
 
   const handleActionClick = (action) => {
@@ -231,6 +286,7 @@ const TeacherPI = () => {
     await deleteQualification(idQualification);
     await dispatch(fetchUserProfile(idUser));
   };
+
   return (
     <div>
       <div className="container-pi">
@@ -247,7 +303,7 @@ const TeacherPI = () => {
             {showAvatarImageOption && <AvatarImageOption />}
           </div>
           <div className="sub-container-action">
-            <span className="name-info">{name}</span>
+            <span className="name-info">{originalData.name}</span>
             <span className="role-des">{roleDes}</span>
 
             <div className="action-btn">
@@ -300,7 +356,7 @@ const TeacherPI = () => {
                   type="text"
                   className="input-form-pi"
                   value={email || ""}
-                  readOnly
+                  disabled
                 />
               </div>
               <div className="container-field">
@@ -310,7 +366,7 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={gender || UserGender.male}
+                        value={gender}
                         onChange={(e) =>
                           dispatch(updateUserPI({ gender: e.target.value }))
                         }
@@ -323,7 +379,17 @@ const TeacherPI = () => {
                     </div>
                   </div>
                   <div className="info">
-                    <span>Phone Number</span>
+                    <div className="container-phone">
+                      <span>Phone Number</span>
+                      {phoneNumWarning && (
+                        <span
+                          className={"warning-error"}
+                          style={{ color: "var(--red-color)" }}
+                        >
+                          {phoneNumWarning}
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       className="input-form-pi"
@@ -352,7 +418,7 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={nationality || ""}
+                        value={nationality}
                         onChange={(e) =>
                           dispatch(
                             updateUserPI({ nationality: e.target.value })
@@ -370,23 +436,34 @@ const TeacherPI = () => {
                   </div>
                 </div>
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => {
-                    updateBasicInfo();
-                  }}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                {updateSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setUpdateSuccess("")}
+                    dismissible
+                  >
+                    {updateSuccess}
+                  </Alert>
+                )}
+                <div className="container-button">
+                  <button className="discard-changes">Discard changes</button>
+                  <button
+                    className="save-change"
+                    onClick={() => {
+                      updateBasicInfo();
+                    }}
+                  >
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ) : activeAction === "specializedPI" ? (
           <div className="container-specialized">
             <div className="container-info">
-              <span className="title-span">Major Infomation</span>
+              <span className="title-span">Specialized Infomation</span>
               <div className="info">
                 <span>Affiliated Center</span>
                 <input
@@ -418,14 +495,25 @@ const TeacherPI = () => {
                   }
                 />
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => updateTeacherSpecializedPI()}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                {updatePITeacherSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setUpdatePITeacherSuccess("")}
+                    dismissible
+                  >
+                    {updatePITeacherSuccess}
+                  </Alert>
+                )}
+                <div className="container-button">
+                  <button className="discard-changes">Discard changes</button>
+                  <button
+                    className="save-change"
+                    onClick={() => updateTeacherSpecializedPI()}
+                  >
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
             <div className="container-info auto">
@@ -664,16 +752,18 @@ const TeacherPI = () => {
                   )}
                 </span>
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => {
-                    updateBasicInfo();
-                  }}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                <div className="container-button">
+                  <button className="discard-changes">Discard changes</button>
+                  <button
+                    className="save-change"
+                    onClick={() => {
+                      updateBasicInfo();
+                    }}
+                  >
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>

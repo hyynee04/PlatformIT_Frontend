@@ -4,12 +4,12 @@ import {
   LuFilter,
   LuSearch,
   LuMoreHorizontal,
-  LuChevronsLeft,
-  LuChevronsRight,
+  LuChevronLeft,
+  LuChevronRight,
 } from "react-icons/lu";
-import { CenterStatus } from "../../constants/constants";
+import { CenterStatus, Status } from "../../constants/constants";
 import UserOption from "../../components/UserOption";
-import DiagApproveCenterForm from "../../components/DiagApproveCenterForm";
+import DiagActionCenterForm from "../../components/DiagActionCenterForm";
 import FilterCenter from "../../components/FilterCenter";
 import SortByCenter from "../../components/SortByCenter";
 
@@ -39,7 +39,8 @@ const PlatformAdCenterMgmt = () => {
   const [sortByVisible, setSortByVisible] = useState(false);
   const [selectedCenterId, setSelectedCenterId] = useState(null);
   const [approvedCenterId, setApprovedCenterId] = useState(null);
-  const [isModalApproveOpen, setIsModalApproveOpen] = useState(false);
+  const [rejectedCenterId, setRejectedCenterId] = useState(null);
+  const [isModalActionOpen, setIsModalActionOpen] = useState(false);
 
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
@@ -150,9 +151,16 @@ const PlatformAdCenterMgmt = () => {
     setApprovedCenterId((prevSelectedId) =>
       prevSelectedId === idCenter ? null : idCenter
     );
+    setRejectedCenterId(null);
   };
-  const openApproveModal = () => setIsModalApproveOpen(true);
-  const closeApproveModal = () => setIsModalApproveOpen(false);
+  const handleRejectCenter = (idCenter) => {
+    setRejectedCenterId((prevSelectedId) =>
+      prevSelectedId === idCenter ? null : idCenter
+    );
+    setApprovedCenterId(null);
+  };
+  const openActionModal = () => setIsModalActionOpen(true);
+  const closeActionModal = () => setIsModalActionOpen(false);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -273,20 +281,38 @@ const PlatformAdCenterMgmt = () => {
                         className="btn approve"
                         onClick={() => {
                           handleApproveCenter(center.idCenter);
-                          openApproveModal();
+                          openActionModal();
                         }}
                       >
                         Approve
                       </button>
                       {approvedCenterId === center.idCenter && (
-                        <DiagApproveCenterForm
-                          isOpen={isModalApproveOpen}
-                          onClose={closeApproveModal}
+                        <DiagActionCenterForm
+                          isOpen={isModalActionOpen}
+                          onClose={closeActionModal}
                           idCenterSelected={center.idCenter}
                           activeStatus={activeStatusCenter}
+                          isApproveAction={true}
                         />
                       )}
-                      <button className="btn reject">Reject</button>
+                      <button
+                        className="btn reject"
+                        onClick={() => {
+                          handleRejectCenter(center.idCenter);
+                          openActionModal();
+                        }}
+                      >
+                        Reject
+                      </button>
+                      {rejectedCenterId === center.idCenter && (
+                        <DiagActionCenterForm
+                          isOpen={isModalActionOpen}
+                          onClose={closeActionModal}
+                          idCenterSelected={center.idCenter}
+                          activeStatus={activeStatusCenter}
+                          isApproveAction={false}
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -307,44 +333,50 @@ const PlatformAdCenterMgmt = () => {
               </thead>
               <tbody>
                 {records.map((center, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{center.centerName}</td>
-                    <td>{center.centerEmail}</td>
-                    <td>{center.centerAdminEmail}</td>
-                    <td>{center.tin}</td>
-                    <td>
-                      {center.establishedDate &&
-                        (() => {
-                          const date = new Date(center.submissionDate);
-                          const day = String(date.getDate()).padStart(2, "0");
-                          const month = String(date.getMonth() + 1).padStart(
-                            2,
-                            "0"
-                          );
-                          const year = date.getFullYear();
-                          return `${month}/${day}/${year}`;
-                        })()}
-                    </td>
-                    <td
-                      className={`table-cell ${
-                        activeStatusCenter === CenterStatus.pending
-                          ? "pending"
-                          : ""
-                      }`}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <LuMoreHorizontal
-                        onClick={() => handleMoreIconClick(center.idCenter)}
-                      />
-                      {selectedCenterId === center.idCenter && (
-                        <UserOption
-                          className="user-option"
-                          idUserSelected={center.idCenter}
-                        />
-                      )}
-                    </td>
-                  </tr>
+                  <React.Fragment key={index}>
+                    {center.centerStatus === Status.active && (
+                      <tr>
+                        <td>{index + 1}</td>
+                        <td>{center.centerName}</td>
+                        <td>{center.centerEmail}</td>
+                        <td>{center.centerAdminEmail}</td>
+                        <td>{center.tin}</td>
+                        <td>
+                          {center.establishedDate &&
+                            (() => {
+                              const date = new Date(center.submissionDate);
+                              const day = String(date.getDate()).padStart(
+                                2,
+                                "0"
+                              );
+                              const month = String(
+                                date.getMonth() + 1
+                              ).padStart(2, "0");
+                              const year = date.getFullYear();
+                              return `${month}/${day}/${year}`;
+                            })()}
+                        </td>
+                        <td
+                          className={`table-cell ${
+                            activeStatusCenter === CenterStatus.pending
+                              ? "pending"
+                              : ""
+                          }`}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <LuMoreHorizontal
+                            onClick={() => handleMoreIconClick(center.idCenter)}
+                          />
+                          {selectedCenterId === center.idCenter && (
+                            <UserOption
+                              className="user-option"
+                              idUserSelected={center.idCenter}
+                            />
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -355,7 +387,7 @@ const PlatformAdCenterMgmt = () => {
             <ul className="pagination">
               <li className="page-item">
                 <button className="page-link" onClick={prePage}>
-                  <LuChevronsLeft />
+                  <LuChevronLeft />
                 </button>
               </li>
               {numbers.map((n, i) => (
@@ -373,7 +405,7 @@ const PlatformAdCenterMgmt = () => {
               ))}
               <li className="page-item">
                 <button className="page-link" onClick={nextPage}>
-                  <LuChevronsRight />
+                  <LuChevronRight />
                 </button>
               </li>
             </ul>

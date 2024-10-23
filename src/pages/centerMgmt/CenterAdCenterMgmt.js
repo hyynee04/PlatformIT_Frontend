@@ -1,22 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LuChevronDown,
   LuFilter,
   LuSearch,
   LuMoreHorizontal,
-  LuChevronsLeft,
-  LuChevronsRight,
+  LuChevronLeft,
+  LuChevronRight,
   LuUserPlus,
   LuTrash2,
   LuCheck,
   LuLock,
 } from "react-icons/lu";
-import { Status } from "../../constants/constants";
+import { Role, Status } from "../../constants/constants";
 import UserOption from "../../components/UserOption";
 import default_ava from "../../assets/img/default_image.png";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import "../../assets/scss/PI.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import FilterUserOfCenter from "../../components/FilterUserOfCenter";
+import SortByUserOfCenter from "../../components/SortByUserOfCenter";
+import DiagAddUserForm from "../../components/DiagAddUserForm";
 
 const CenterAdCenterMgmt = () => {
   //Center Infomation
@@ -34,14 +39,28 @@ const CenterAdCenterMgmt = () => {
   const [description, setDescription] = useState(null);
 
   //Admin Management
+  const idUser = +localStorage.getItem("idUser");
+  const dispatch = useDispatch();
+  const {
+    listUserOfCenter = [],
+    loading,
+    error,
+  } = useSelector((state) => state.listUserOfCenter || {});
   const [listUser, setListUser] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
+  const [sortBy, setSortBy] = useState({
+    field: "isMainCenterAdmin",
+    order: "desc",
+  });
   const [filterVisble, setFilterVisble] = useState(false);
   const [sortByVisible, setSortByVisible] = useState(false);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
+
+  const [isModalAddAdminOpen, setIsModalAddAdminOpen] = useState(false);
+  const openAddAdminModal = () => setIsModalAddAdminOpen(true);
+  const closeAddAdminModal = () => setIsModalAddAdminOpen(false);
 
   const getStatusString = (status) => {
     switch (status) {
@@ -55,9 +74,18 @@ const CenterAdCenterMgmt = () => {
         return "";
     }
   };
+  useEffect(() => {
+    dispatch(fetchListUserOfCenter(Role.centerAdmin));
+  }, [dispatch]);
+
+  useEffect(() => {
+    setListUser(listUserOfCenter);
+  }, [listUserOfCenter]);
+
   const filteredUser = listUser
     .filter((user) => {
       const searchTermLower = searchTerm.toLowerCase();
+
       const matchesSearchTerm =
         (user.fullName &&
           user.fullName.toLowerCase().includes(searchTermLower)) ||
@@ -84,9 +112,18 @@ const CenterAdCenterMgmt = () => {
     .sort((a, b) => {
       let aValue, bValue;
 
-      if (sortBy.field === "fullname") {
+      if (sortBy.field === "isMainCenterAdmin") {
+        aValue = a.isMainCenterAdmin ? a.isMainCenterAdmin : "";
+        bValue = b.isMainCenterAdmin ? b.isMainCenterAdmin : "";
+      } else if (sortBy.field === "fullname") {
         aValue = a.fullName ? a.fullName.toLowerCase() : "";
         bValue = b.fullName ? b.fullName.toLowerCase() : "";
+      } else if (sortBy.field === "phoneNumber") {
+        aValue = a.phoneNumber ? a.phoneNumber.toLowerCase() : "";
+        bValue = b.phoneNumber ? b.phoneNumber.toLowerCase() : "";
+      } else if (sortBy.field === "email") {
+        aValue = a.email ? a.email.toLowerCase() : "";
+        bValue = b.email ? b.email.toLowerCase() : "";
       } else if (sortBy.field === "dateJoined") {
         aValue = new Date(a.joinedDate) || new Date(0);
         bValue = new Date(b.joinedDate) || new Date(0);
@@ -101,6 +138,14 @@ const CenterAdCenterMgmt = () => {
         : -1;
     });
 
+  const handleFilterChange = ({ dateRange, status }) => {
+    setDateRange(dateRange);
+    setStatus(status);
+  };
+
+  const handleSortByChange = ({ field, order }) => {
+    setSortBy({ field, order });
+  };
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 30;
   const lastIndex = currentPage * recordsPerPage;
@@ -290,16 +335,18 @@ const CenterAdCenterMgmt = () => {
                   </div>
                 </div>
               </div>
-              <div className="container-button">
-                <button className="change-pass">Add Working Hours</button>
-                <button
-                  className="save-change"
-                  onClick={() => {
-                    // updateBasicInfo();
-                  }}
-                >
-                  Save change
-                </button>
+              <div className="alert-option">
+                <div className="container-button">
+                  <button className="discard-changes">Add Working Hours</button>
+                  <button
+                    className="save-change"
+                    onClick={() => {
+                      // updateBasicInfo();
+                    }}
+                  >
+                    Save change
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -322,9 +369,9 @@ const CenterAdCenterMgmt = () => {
                 <LuFilter className="icon" />
                 <span>Filter</span>
               </div>
-              {/* {filterVisble && (
-                <FilterUser onFilterChange={handleFilterChange} />
-              )} */}
+              {filterVisble && (
+                <FilterUserOfCenter onFilterChange={handleFilterChange} />
+              )}
               <div
                 className="btn"
                 onClick={() => {
@@ -335,9 +382,12 @@ const CenterAdCenterMgmt = () => {
                 <span>Sort by</span>
                 <LuChevronDown className="icon" />
               </div>
-              {/* {sortByVisible && (
-                <SortByUser onSortByChange={handleSortByChange} />
-              )} */}
+              {sortByVisible && (
+                <SortByUserOfCenter
+                  onSortByChange={handleSortByChange}
+                  sortCenterAdmin={true}
+                />
+              )}
             </div>
 
             <div className="search-container">
@@ -352,17 +402,15 @@ const CenterAdCenterMgmt = () => {
             </div>
           </div>
           <div className="add-btn">
-            <div
-              className="btn"
-              // onClick={() => openAddTeacherModal()}
-            >
+            <div className="btn" onClick={() => openAddAdminModal()}>
               <LuUserPlus className="icon" />
               <span>Add admin</span>
             </div>
-            {/* <DiagAddTeacherForm
-              isOpen={isModalAddTeacherOpen}
-              onClose={closeAddTeacherModal}
-            /> */}
+            <DiagAddUserForm
+              isOpen={isModalAddAdminOpen}
+              onClose={closeAddAdminModal}
+              roleAdded={Role.centerAdmin}
+            />
           </div>
           <div className="list-container">
             <table>
@@ -372,6 +420,7 @@ const CenterAdCenterMgmt = () => {
                   <th>Full Name</th>
                   <th>Phone Number</th>
                   <th>Email</th>
+                  <th>Admin Level</th>
                   <th>Date Joined</th>
                   <th>Status</th>
                   <th></th>
@@ -382,8 +431,9 @@ const CenterAdCenterMgmt = () => {
                   <tr key={index}>
                     <td>{index + 1}</td>
                     <td>{user.fullName}</td>
-                    <td>{user.phoneNum}</td>
+                    <td>{user.phoneNumber}</td>
                     <td>{user.email}</td>
+                    <td>{user.isMainCenterAdmin ? "Main" : "Sub"}</td>
                     <td>
                       {user.joinedDate &&
                         (() => {
@@ -398,35 +448,40 @@ const CenterAdCenterMgmt = () => {
                           return `${month}/${day}/${year}`;
                         })()}
                     </td>
-                    <td
-                      className={`status ${
-                        user.status === Status.active
-                          ? "active"
+                    <td>
+                      <span
+                        className={`status ${
+                          user.status === Status.active
+                            ? "active"
+                            : user.status === Status.pending
+                            ? "pending"
+                            : user.status === Status.inactive
+                            ? "inactive"
+                            : ""
+                        }`}
+                      >
+                        {user.status === Status.active
+                          ? "Active"
                           : user.status === Status.pending
-                          ? "pending"
+                          ? "Pending"
                           : user.status === Status.inactive
-                          ? "inactive"
-                          : ""
-                      }`}
-                    >
-                      {user.status === Status.active
-                        ? "Active"
-                        : user.status === Status.pending
-                        ? "Pending"
-                        : user.status === Status.inactive
-                        ? "Inactive"
-                        : ""}
+                          ? "Inactive"
+                          : ""}
+                      </span>
                     </td>
                     <td className="table-cell" style={{ cursor: "pointer" }}>
-                      <LuMoreHorizontal
-                        onClick={() => handleMoreIconClick(user.idUser)}
-                      />
+                      {user.idUser !== idUser && (
+                        <LuMoreHorizontal
+                          onClick={() => handleMoreIconClick(user.idUser)}
+                        />
+                      )}
                       {selectedUserId === user.idUser && (
                         <UserOption
                           className="user-option"
                           idUserSelected={user.idUser}
                           statusUserSelected={user.status}
                           onUserInactivated={() => setSelectedUserId(null)}
+                          roleUserSelected={Role.centerAdmin}
                         />
                       )}
                     </td>
@@ -440,7 +495,7 @@ const CenterAdCenterMgmt = () => {
               <ul className="pagination">
                 <li className="page-item">
                   <button className="page-link" onClick={prePage}>
-                    <LuChevronsLeft />
+                    <LuChevronLeft />
                   </button>
                 </li>
                 {numbers.map((n, i) => (
@@ -458,7 +513,7 @@ const CenterAdCenterMgmt = () => {
                 ))}
                 <li className="page-item">
                   <button className="page-link" onClick={nextPage}>
-                    <LuChevronsRight />
+                    <LuChevronRight />
                   </button>
                 </li>
               </ul>

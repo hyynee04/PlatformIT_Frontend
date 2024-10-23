@@ -1,31 +1,53 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import { addTeacher, fetchListUserOfCenter } from "../store/listUserOfCenter";
+import {
+  addAdminCenter,
+  addTeacher,
+  fetchListUserOfCenter,
+} from "../store/listUserOfCenter";
 import { Role } from "../constants/constants";
 
 import "../assets/scss/card/DiagForm.scss";
-const DiagAddTeacherForm = ({ isOpen, onClose }) => {
+const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const idCenter = +localStorage.getItem("idCenter");
+  const idUserUpdatedBy = +localStorage.getItem("idUser");
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
 
-  const handleAddTeacher = async () => {
-    // let data = await postAddTeacher(email, username, password, idCenter);
-
-    // console.log(data);
-    try {
-      const resultAction = await dispatch(
-        addTeacher({ email, username, password, idCenter })
-      );
-      if (addTeacher.fulfilled.match(resultAction)) {
-        console.log("Add teacher successfully");
-        dispatch(fetchListUserOfCenter(Role.teacher));
+  const handleAddUser = async () => {
+    if (roleAdded === Role.teacher) {
+      try {
+        const resultAction = await dispatch(
+          addTeacher({ email, username, password, idCenter })
+        );
+        if (addTeacher.fulfilled.match(resultAction)) {
+          console.log("Add teacher successfully");
+          dispatch(fetchListUserOfCenter(Role.teacher));
+        }
+      } catch (error) {
+        console.error("Error while approving center: ", error);
       }
-    } catch (error) {
-      console.error("Error while approving center: ", error);
+    } else if (roleAdded === Role.centerAdmin) {
+      try {
+        const resultAction = await dispatch(
+          addAdminCenter({
+            username,
+            email,
+            password,
+            idCenter,
+            idUserUpdatedBy,
+          })
+        );
+        if (addAdminCenter.fulfilled.match(resultAction)) {
+          console.log("Add center admin successfully");
+          dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        }
+      } catch (error) {
+        console.error("Error while approving center: ", error);
+      }
     }
   };
 
@@ -36,12 +58,15 @@ const DiagAddTeacherForm = ({ isOpen, onClose }) => {
         <div className="diag-header">
           <div className="container-title">
             <LuUserPlus className="diag-icon" />
-            <span className="diag-title">Add new teacher</span>
+            {roleAdded === Role.teacher ? (
+              <span className="diag-title">Add new teacher</span>
+            ) : (
+              <span className="diag-title">Add new admin</span>
+            )}
           </div>
           <LuX className="diag-icon" onClick={onClose} />
         </div>
         <div className="diag-body">
-          {/* <span>Are you sure you want to inactive this user!</span> */}
           <div className="container-diag-field">
             <div className="left-diag-container">
               <div className="info">
@@ -79,7 +104,7 @@ const DiagAddTeacherForm = ({ isOpen, onClose }) => {
             <button
               className="btn diag-btn signout"
               onClick={async () => {
-                await handleAddTeacher();
+                await handleAddUser();
                 onClose();
               }}
             >
@@ -92,4 +117,4 @@ const DiagAddTeacherForm = ({ isOpen, onClose }) => {
   );
 };
 
-export default DiagAddTeacherForm;
+export default DiagAddUserForm;

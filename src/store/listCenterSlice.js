@@ -4,6 +4,7 @@ import {
   getAllCenter,
   getPendingCenter,
   postApproveCenter,
+  postRejectCenter,
 } from "../services/centerService";
 
 export const fetchCenters = createAsyncThunk(
@@ -22,6 +23,19 @@ export const approveCenter = createAsyncThunk(
   "centers/approveCenter",
   async ({ idCenterSelected, idUserUpdated }) => {
     const data = await postApproveCenter(idCenterSelected, idUserUpdated);
+    return data;
+  }
+);
+export const rejectCenter = createAsyncThunk(
+  "centers/rejectCenter",
+  async ({ idCenterSelected, reasonReject, idUserUpdated }) => {
+    console.log(idCenterSelected, reasonReject);
+
+    const data = await postRejectCenter(
+      idCenterSelected,
+      reasonReject,
+      idUserUpdated
+    );
     return data;
   }
 );
@@ -50,7 +64,6 @@ const listCenterSlice = createSlice({
       })
       .addCase(fetchCenters.rejected, (state, action) => {
         state.status = "failed";
-        // console.error("Fetch centers failed:", action.error.message);
         state.centers = []; //if fetch failed, also reset list
       })
       .addCase(approveCenter.fulfilled, (state, action) => {

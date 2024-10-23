@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const SortByUserOfCenter = ({ onSortByChange }) => {
+const SortByUserOfCenter = ({ onSortByChange, sortCenterAdmin }) => {
   const [isSortByFormVisible, setIsSortByFormVisible] = useState(true);
   const [sortField, setSortField] = useState("fullname");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -29,7 +29,9 @@ const SortByUserOfCenter = ({ onSortByChange }) => {
                 <option value="phoneNumber">Phone Number</option>
                 <option value="email">Email</option>
                 <option value="dateJoined">Date Joined</option>
-                <option value="teachingMajor">Teaching Major</option>
+                {!sortCenterAdmin && (
+                  <option value="teachingMajor">Teaching Major</option>
+                )}
               </select>
             </div>
             <div className="select-sort-container">

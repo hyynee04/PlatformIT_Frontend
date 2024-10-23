@@ -8,6 +8,7 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
   const handleSignout = () => {
     localStorage.removeItem("idRole");
     localStorage.removeItem("idUser");
+    localStorage.removeItem("idCenter");
     navigate("/");
   };
   if (!isOpen) return null;

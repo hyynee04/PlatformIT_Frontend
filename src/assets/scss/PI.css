@@ -208,7 +208,16 @@
   font-size: 16px;
   color: var(--text-gray);
 }
-
+.container-info .info .container-phone {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.container-info .info .container-phone > .warning-error {
+  color: var(--red-color);
+  font-size: 12px;
+  font-weight: 700;
+}
 .container-field .info .select-container {
   position: relative;
   display: inline-block;
@@ -310,9 +319,15 @@
   transform: translateY(-50%);
   pointer-events: none; /* Để không ảnh hưởng đến sự kiện chuột */
 }
+.alert-option {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
 
-.container-button {
-  width: 100%;
+.alert-option .container-button {
+  margin-left: auto;
   padding: 12px 0;
   display: flex;
   flex-direction: row;
@@ -320,9 +335,9 @@
   gap: 20px;
 }
 
-.container-button button {
+.alert-option .container-button button {
   width: 160px;
-  height: auto;
+  height: 32px;
   border-radius: 8px;
   padding: 4px;
   background-color: var(--white-color);
@@ -330,12 +345,12 @@
   font-size: 14px;
 }
 
-.container-button .change-pass {
+.alert-option .container-button .discard-changes {
   border: 2px solid var(--main-color);
   color: var(--main-color);
 }
 
-.container-button .save-change {
+.alert-option .container-button .save-change {
   background-color: var(--main-color);
   color: var(--white-color);
 }
@@ -347,7 +362,7 @@
   width: 100%;
   height: auto;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 .container-info-img .quali-content {
   display: flex;
@@ -373,7 +388,7 @@
 
 .container-info-img .quali-content .span.approved {
   background-color: rgba(20, 174, 92, 0.3);
-  color: var(--color);
+  color: var(--main-color);
 }
 .container-info-img .quali-content .span.pending {
   background-color: rgba(255, 204, 0, 0.3);

@@ -9,11 +9,12 @@
   background-color: var(--white-color);
   color: var(--black-color);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.06);
+  position: relative;
 }
 .user {
   position: absolute;
   left: 72px;
-  top: 200px;
+  top: 72px;
 }
 .title-filter {
   font-size: 20px;

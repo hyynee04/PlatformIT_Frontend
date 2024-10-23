@@ -4,22 +4,22 @@ import {
   LuFilter,
   LuSearch,
   LuMoreHorizontal,
-  LuChevronsLeft,
-  LuChevronsRight,
+  LuChevronLeft,
+  LuChevronRight,
   LuUserPlus,
 } from "react-icons/lu";
 import { Role, Status } from "../../constants/constants";
-import UserOption from "../../components/UserOption";
-import DiagAddTeacherForm from "../../components/DiagAddTeacherForm";
 import { useDispatch, useSelector } from "react-redux";
-
-import "../../assets/scss/UserMgmt.css";
 import {
   fetchListUserOfCenter,
   setActiveRoleUserOfCenter,
 } from "../../store/listUserOfCenter";
+import UserOption from "../../components/UserOption";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
 import SortByUserOfCenter from "../../components/SortByUserOfCenter";
+import DiagAddUserForm from "../../components/DiagAddUserForm";
+
+import "../../assets/scss/UserMgmt.css";
 
 const CenterAdUserMgmt = () => {
   const dispatch = useDispatch();
@@ -55,7 +55,7 @@ const CenterAdUserMgmt = () => {
   const handleRoleClick = (role) => {
     dispatch(setActiveRoleUserOfCenter(role));
   };
-  const handleFilterChange = ({ gender, level, dateRange, status }) => {
+  const handleFilterChange = ({ dateRange, status }) => {
     setDateRange(dateRange);
     setStatus(status);
   };
@@ -221,9 +221,10 @@ const CenterAdUserMgmt = () => {
               <LuUserPlus className="icon" />
               <span>Add teacher</span>
             </div>
-            <DiagAddTeacherForm
+            <DiagAddUserForm
               isOpen={isModalAddTeacherOpen}
               onClose={closeAddTeacherModal}
+              roleAdded={Role.teacher}
             />
           </div>
         )}
@@ -264,24 +265,26 @@ const CenterAdUserMgmt = () => {
                   </td>
                   {activeRole === Role.teacher && <td>{user.teachingMajor}</td>}
                   {activeRole === Role.teacher && (
-                    <td
-                      className={`status ${
-                        user.status === Status.active
-                          ? "active"
+                    <td>
+                      <span
+                        className={`status ${
+                          user.status === Status.active
+                            ? "active"
+                            : user.status === Status.pending
+                            ? "pending"
+                            : user.status === Status.inactive
+                            ? "inactive"
+                            : ""
+                        }`}
+                      >
+                        {user.status === Status.active
+                          ? "Active"
                           : user.status === Status.pending
-                          ? "pending"
+                          ? "Pending"
                           : user.status === Status.inactive
-                          ? "inactive"
-                          : ""
-                      }`}
-                    >
-                      {user.status === Status.active
-                        ? "Active"
-                        : user.status === Status.pending
-                        ? "Pending"
-                        : user.status === Status.inactive
-                        ? "Inactive"
-                        : ""}
+                          ? "Inactive"
+                          : ""}
+                      </span>
                     </td>
                   )}
                   <td className="table-cell" style={{ cursor: "pointer" }}>
@@ -296,6 +299,7 @@ const CenterAdUserMgmt = () => {
                           statusUserSelected: user.status,
                         })}
                         onUserInactivated={() => setSelectedUserId(null)}
+                        roleUserSelected={Role.teacher}
                       />
                     )}
                   </td>
@@ -309,7 +313,7 @@ const CenterAdUserMgmt = () => {
             <ul className="pagination">
               <li className="page-item">
                 <button className="page-link" onClick={prePage}>
-                  <LuChevronsLeft />
+                  <LuChevronLeft />
                 </button>
               </li>
               {numbers.map((n, i) => (
@@ -327,7 +331,7 @@ const CenterAdUserMgmt = () => {
               ))}
               <li className="page-item">
                 <button className="page-link" onClick={nextPage}>
-                  <LuChevronsRight />
+                  <LuChevronRight />
                 </button>
               </li>
             </ul>

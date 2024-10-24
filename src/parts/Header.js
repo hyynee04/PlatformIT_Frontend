@@ -9,13 +9,20 @@ import HeaderAvatarOption from "../components/HeaderAvatarOption";
 import default_ava from "../assets/img/default_ava.png";
 
 import "../assets/scss/Header.css";
+import { getAvaImg } from "../services/userService";
+import { useDispatch, useSelector } from "react-redux";
+import { setAvatar } from "../store/profileUserSlice";
 const Header = () => {
+  const dispatch = useDispatch();
+  const avaImg = useSelector((state) => state.profileUser.avaImg);
   const [showOptionAva, setShowOptionAva] = useState(false);
   const location = useLocation();
   const idRole = +localStorage.getItem("idRole");
+  const idUser = +localStorage.getItem("idUser");
   const navigate = useNavigate();
   const currentPath = location.pathname; //current path
   const [activeButton, setActiveButton] = useState(null);
+  // const [avaImg, setAvaImg] = useState(null);
   useEffect(() => {
     if (idRole === Role.platformAdmin && currentPath === "/") {
       navigate("/platformAdDashboard");
@@ -27,6 +34,15 @@ const Header = () => {
       navigate("/studentHome");
     }
   }, [idRole, currentPath, navigate]);
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (idUser) {
+        const response = await getAvaImg(idUser);
+        dispatch(setAvatar(response));
+      }
+    };
+    fetchAvatar();
+  }, [dispatch, idUser]);
   const navLinks = {
     [Role.platformAdmin]: [
       { title: "Dashboard", path: "/platformAdDashboard" },
@@ -144,7 +160,11 @@ const Header = () => {
                     }`}
                     onClick={() => handleButtonClick("avatar")}
                   >
-                    <img src={default_ava} alt="" className="header-avatar" />
+                    <img
+                      src={avaImg || default_ava}
+                      alt=""
+                      className="header-avatar"
+                    />
                   </button>
                 </>
               )}

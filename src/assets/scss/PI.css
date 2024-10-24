@@ -48,6 +48,7 @@
   padding: 12px 0;
   height: auto;
   flex: 0.4;
+  max-width: 430px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -91,12 +92,13 @@
   width: 200px;
   height: 200px;
   object-fit: cover;
+  flex-shrink: 0;
   border-radius: 100rem;
   border: 1px solid rgba(117, 117, 117, 0.46);
 }
 .sub-container-ava > .main-center-image {
-  width: 500px;
-  height: 360px;
+  width: 400px;
+  height: auto;
   object-fit: cover;
   cursor: pointer;
 }
@@ -112,6 +114,7 @@
   font-weight: 800;
   color: var(--black-color);
   max-width: 100%;
+  text-align: center;
 }
 .sub-container-action .role-des {
   font-size: 18px;

@@ -86,6 +86,7 @@ const Login = () => {
       localStorage.setItem("idRole", data.idRole);
       localStorage.setItem("idUser", data.idUser);
       localStorage.setItem("idCenter", data.idCenter);
+      localStorage.setItem("idAccount", data.idAccount);
       let roleBasesPath = "/";
       switch (data.idRole) {
         case Role.platformAdmin:

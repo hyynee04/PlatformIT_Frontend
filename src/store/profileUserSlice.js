@@ -59,11 +59,17 @@ const profileUserSlice = createSlice({
     setUserPI: (state, action) => {
       return { ...state, ...action.payload };
     },
+    setAvatar: (state, action) => {
+      state.avaImg = action.payload;
+    },
     updateUserPI: (state, action) => {
       return { ...state, ...action.payload };
     },
     changeAvatar: (state, action) => {
       state.avaImg = action.payload;
+    },
+    resetUserPI: (state) => {
+      return initialState;
     },
   },
   extraReducers: (builder) => {
@@ -73,6 +79,6 @@ const profileUserSlice = createSlice({
   },
 });
 
-export const { setUserPI, updateUserPI, changeAvatar } =
+export const { setUserPI, setAvatar, updateUserPI, changeAvatar, resetUserPI } =
   profileUserSlice.actions;
 export default profileUserSlice.reducer;

@@ -100,10 +100,11 @@
 }
 
 .navbar > .container .auth-buttons .header-avatar {
-  max-width: 40px;
-  max-height: 40px;
+  object-fit: cover;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 100rem;
-  object-fit: cover;
+
   flex-shrink: 0;
 }

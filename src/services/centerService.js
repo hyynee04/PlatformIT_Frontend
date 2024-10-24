@@ -40,8 +40,6 @@ const postRejectCenter = async (
   reasonReject,
   idUserUpdated
 ) => {
-  // console.log(id, reason);
-
   const rejectModel = {
     id: idCenterSelected,
     reason: reasonReject,

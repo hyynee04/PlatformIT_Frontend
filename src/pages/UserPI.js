@@ -19,6 +19,7 @@ import {
   deleteQualification,
   postAddProfileLink,
   postAddQualification,
+  postChangePassword,
   postUpdateTeacherSpecializedPI,
   postUpdateUserBasicPI,
 } from "../services/userService";
@@ -49,13 +50,16 @@ const TeacherPI = () => {
     qualificationModels,
   } = userPI;
   const [countries, setCountries] = useState([]);
-  const [originalData, setOriginalData] = useState({
+  const [tempUserPI, setTempUserPI] = useState({
     name: "",
     phoneNum: "",
     gender: "",
     dob: "",
     nationality: "",
+    teachingMajor: "",
+    description: "",
   });
+
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const [roleDes, setRoleDes] = useState("");
   const [activeAction, setActiveAction] = useState("basicPI");
@@ -70,6 +74,10 @@ const TeacherPI = () => {
   const [phoneNumWarning, setPhoneNumWarning] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState("");
   const [updatePITeacherSuccess, setUpdatePITeacherSuccess] = useState("");
+  const [changePWSuccess, setChangePWSuccess] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -122,35 +130,37 @@ const TeacherPI = () => {
   }, [dispatch, idUser, idRole]);
 
   useEffect(() => {
-    console.log("userPi", userPI);
-
-    setOriginalData({
+    setTempUserPI({
       name: userPI.name,
       phoneNum: userPI.phoneNum,
       gender: userPI.gender,
       dob: userPI.dob,
       nationality: userPI.nationality,
+      teachingMajor: userPI.teachingMajor,
+      description: userPI.description,
     });
-    console.log(originalData);
   }, [userPI]);
+  const handleInputChange = (field, value) => {
+    setTempUserPI({ ...tempUserPI, [field]: value });
+  };
 
   const validatePhoneNum = (num) => /^\d{10}$/.test(num);
 
   const updateBasicInfo = async () => {
-    if (!validatePhoneNum(phoneNum)) {
+    if (!validatePhoneNum(tempUserPI.phoneNum)) {
       setPhoneNumWarning("Phone number must be exactly 10 digits.");
     } else {
       setPhoneNumWarning("");
       try {
         await postUpdateUserBasicPI(
           idUser,
-          name,
-          phoneNum,
-          gender,
-          dob,
-          nationality
+          tempUserPI.name,
+          tempUserPI.phoneNum,
+          tempUserPI.gender,
+          tempUserPI.dob,
+          tempUserPI.nationality
         );
-        dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
+        // dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
         await dispatch(fetchUserProfile(idUser));
         setUpdateSuccess("Your profile has been updated successfully!");
 
@@ -163,8 +173,32 @@ const TeacherPI = () => {
       }
     }
   };
+  const handleDiscardChanges = () => {
+    const currentUserPI = {
+      name,
+      phoneNum,
+      gender,
+      dob,
+      nationality,
+      teachingMajor,
+      description,
+    };
+    setTempUserPI(currentUserPI);
+    setPhoneNumWarning("");
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+  const handleSaveChanges = () => {
+    dispatch(updateUserPI(tempUserPI));
+    updateBasicInfo();
+  };
   const updateTeacherSpecializedPI = async () => {
-    await postUpdateTeacherSpecializedPI(idUser, teachingMajor, description);
+    await postUpdateTeacherSpecializedPI(
+      idUser,
+      tempUserPI.teachingMajor,
+      tempUserPI.description
+    );
     dispatch(updateUserPI({ teachingMajor, description }));
     await dispatch(fetchUserProfile(idUser));
     setUpdatePITeacherSuccess(
@@ -172,7 +206,7 @@ const TeacherPI = () => {
     );
 
     setTimeout(() => {
-      setUpdateSuccess("");
+      setUpdatePITeacherSuccess("");
     }, 3000);
   };
 
@@ -287,6 +321,21 @@ const TeacherPI = () => {
     await dispatch(fetchUserProfile(idUser));
   };
 
+  const handleChangePassword = async () => {
+    if (oldPassword && newPassword && confirmPassword) {
+      const idAccount = +localStorage.getItem("idAccount");
+      await postChangePassword(oldPassword, newPassword, idAccount, idUser);
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setChangePWSuccess("Your password has been changed successfully!");
+
+      setTimeout(() => {
+        setChangePWSuccess("");
+      }, 3000);
+    }
+  };
+
   return (
     <div>
       <div className="container-pi">
@@ -303,7 +352,7 @@ const TeacherPI = () => {
             {showAvatarImageOption && <AvatarImageOption />}
           </div>
           <div className="sub-container-action">
-            <span className="name-info">{originalData.name}</span>
+            <span className="name-info">{name}</span>
             <span className="role-des">{roleDes}</span>
 
             <div className="action-btn">
@@ -344,10 +393,8 @@ const TeacherPI = () => {
                 <input
                   type="text"
                   className="input-form-pi"
-                  value={name || ""}
-                  onChange={(e) =>
-                    dispatch(updateUserPI({ name: e.target.value }))
-                  }
+                  value={tempUserPI.name || ""}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                 />
               </div>
               <div className="info">
@@ -366,9 +413,9 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={gender}
+                        value={tempUserPI.gender}
                         onChange={(e) =>
-                          dispatch(updateUserPI({ gender: e.target.value }))
+                          handleInputChange("gender", e.target.value)
                         }
                       >
                         <option value={UserGender.male}>Male</option>
@@ -393,9 +440,9 @@ const TeacherPI = () => {
                     <input
                       type="text"
                       className="input-form-pi"
-                      value={phoneNum || ""}
+                      value={tempUserPI.phoneNum || ""}
                       onChange={(e) =>
-                        dispatch(updateUserPI({ phoneNum: e.target.value }))
+                        handleInputChange("phoneNum", e.target.value)
                       }
                     />
                   </div>
@@ -407,10 +454,8 @@ const TeacherPI = () => {
                     <input
                       type="date"
                       className="input-form-pi"
-                      value={dob}
-                      onChange={(e) =>
-                        dispatch(updateUserPI({ dob: e.target.value }))
-                      }
+                      value={tempUserPI.dob}
+                      onChange={(e) => handleInputChange("dob", e.target.value)}
                     />
                   </div>
                   <div className="info">
@@ -418,11 +463,9 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={nationality}
+                        value={tempUserPI.nationality}
                         onChange={(e) =>
-                          dispatch(
-                            updateUserPI({ nationality: e.target.value })
-                          )
+                          handleInputChange("nationality", e.target.value)
                         }
                       >
                         {countries.map((country, index) => (
@@ -447,13 +490,13 @@ const TeacherPI = () => {
                   </Alert>
                 )}
                 <div className="container-button">
-                  <button className="discard-changes">Discard changes</button>
                   <button
-                    className="save-change"
-                    onClick={() => {
-                      updateBasicInfo();
-                    }}
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
                   >
+                    Discard changes
+                  </button>
+                  <button className="save-change" onClick={handleSaveChanges}>
                     Save changes
                   </button>
                 </div>
@@ -478,9 +521,9 @@ const TeacherPI = () => {
                 <input
                   type="text"
                   className="input-form-pi"
-                  value={teachingMajor || ""}
+                  value={tempUserPI.teachingMajor || ""}
                   onChange={(e) =>
-                    dispatch(updateUserPI({ teachingMajor: e.target.value }))
+                    handleInputChange("teachingMajor", e.target.value)
                   }
                 />
               </div>
@@ -489,9 +532,9 @@ const TeacherPI = () => {
                 <Form.Control
                   as="textarea"
                   className="input-area-form-pi"
-                  value={description || ""}
+                  value={tempUserPI.description || ""}
                   onChange={(e) =>
-                    dispatch(updateUserPI({ description: e.target.value }))
+                    handleInputChange("description", e.target.value)
                   }
                 />
               </div>
@@ -506,7 +549,12 @@ const TeacherPI = () => {
                   </Alert>
                 )}
                 <div className="container-button">
-                  <button className="discard-changes">Discard changes</button>
+                  <button
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
+                  >
+                    Discard changes
+                  </button>
                   <button
                     className="save-change"
                     onClick={() => updateTeacherSpecializedPI()}
@@ -705,10 +753,8 @@ const TeacherPI = () => {
                 <input
                   type={showOldPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={name || ""}
-                  onChange={(e) =>
-                    dispatch(updateUserPI({ name: e.target.value }))
-                  }
+                  value={oldPassword || ""}
+                  onChange={(e) => setOldPassword(e.target.value)}
                 />
                 <span onClick={() => setShowOldPassword(!showOldPassword)}>
                   {showOldPassword ? (
@@ -723,8 +769,8 @@ const TeacherPI = () => {
                 <input
                   type={showNewPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={email || ""}
-                  readOnly
+                  value={newPassword || ""}
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
                 <span onClick={() => setShowNewPassword(!showNewPassword)}>
                   {showNewPassword ? (
@@ -739,8 +785,8 @@ const TeacherPI = () => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={email || ""}
-                  readOnly
+                  value={confirmPassword || ""}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <span
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -753,15 +799,29 @@ const TeacherPI = () => {
                 </span>
               </div>
               <div className="alert-option">
+                {changePWSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setChangePWSuccess("")}
+                    dismissible
+                  >
+                    {changePWSuccess}
+                  </Alert>
+                )}
                 <div className="container-button">
-                  <button className="discard-changes">Discard changes</button>
+                  <button
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
+                  >
+                    Cancel
+                  </button>
                   <button
                     className="save-change"
                     onClick={() => {
-                      updateBasicInfo();
+                      handleChangePassword();
                     }}
                   >
-                    Save changes
+                    Change password
                   </button>
                 </div>
               </div>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Card from 'react-bootstrap/Card';
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import default_image from "../../assets/img/default_image.png";
@@ -16,15 +15,7 @@ const CenterCard = (props) => {
                 <img src={default_image} />
                 <div className='center-card-body'>
                     <span className="center-card-title">IT CENTER</span>
-                    {/* <StarRatings
-                        rating={2.403}
-                        starRatedColor='rgb(255, 204, 0)'
-                        // changeRating={this.changeRating}
-                        starDimension="25px"
-                        starSpacing="4px"
-                        numberOfStars={5}
-                        name='rating'
-                    /> */}
+                    
                     <span className='center-card-quote'>
                         Say something I'm giving up on you
                     </span>

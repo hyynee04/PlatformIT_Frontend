@@ -1,53 +1,33 @@
 import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { IoMdOpen } from "react-icons/io";
-import default_ava from "../../assets/img/default_ava.png";
+import { LuFile } from "react-icons/lu";
+import { RiGroupLine } from "react-icons/ri";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
 
-const TeacherDetail = (props) => {
+const CenterDetail = (props) => {
     return (
         <div className="detail-container">
             <div className="left-container">
                 <div className="block-container">
-                    <img className="biography-ava teacher" src={default_ava} />
+                    <img className="biography-ava center" src={default_image} />
                     <div className="biography-block">
-                        <span className="biography-name">Alexander Happy Hoogan Morgan Hana</span>
-                        <div className="teacher-information">
-                            <span className="biography-brand">Biography</span>
-                            <span className="teaching-major"><FaGraduationCap color="#757575" /> Teaching major</span>
-                            <span className="number-course"><FaRegFile color="#757575" /> 100 courses</span>
+                        <span className="biography-name center">Do IT Center</span>
+                        <div className="tag-container">
+                            <div className='tag-content'>Web Developer</div>
+                            <div className='tag-content'>Web Developer</div>
+                            <div className='tag-content'>Web Developer</div>
+                            <div className='tag-content'>Web Developer</div>
+                        </div>
+                        <div className="center-information">
+                            <span className="number-course"><LuFile color="#757575" /> 100 courses</span>
+                            <span className=""><RiGroupLine color="#757575" /> 100 students</span>
+                            <span>Say something about this center</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="block-container">
-                    <span className="block-container-title">Center</span>
-                    <div className="block-container-row">
-                        <img src={default_image} />
-                        <div className="center-block">
-                            <span className="name-center">Name</span>
-                            <span className="quote-center">Say something I'm giving up on you</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="block-container">
-                    <span className="block-container-title">Social/Profile Link</span>
-                    <div className="block-container-col">
-                        <div className="link-transfer">
-                            <span>Github</span>
-                            <IoMdOpen color="#757575" />
-                        </div>
-                        <div className="link-transfer">
-                            <span>Facebook</span>
-                            <IoMdOpen color="#757575" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="right-container">
                 <div className="block-container">
                     <span className="block-container-title">Professional Qualification</span>
                     <div className="block-container-col">
@@ -68,7 +48,9 @@ const TeacherDetail = (props) => {
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div className="right-container">
                 <div className="block-container">
                     <div className="carousel-block">
                         <Carousel
@@ -79,9 +61,20 @@ const TeacherDetail = (props) => {
                         />
                     </div>
                 </div>
+
+                <div className="block-container">
+                    <div className="carousel-block">
+                        <Carousel
+                            object={2}
+                            header={"Teacher"}
+                            totalTracks={2}
+                            itemsPerTrack={3}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     )
 }
 
-export default TeacherDetail;
+export default CenterDetail;

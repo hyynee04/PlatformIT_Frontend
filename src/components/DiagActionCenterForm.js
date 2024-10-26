@@ -70,19 +70,21 @@ const DiagActionCenterForm = ({
           </div>
           <div className="diag-body">
             <span>Are you sure to Approve this center?</span>
-            <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                No
-              </button>
-              <button
-                className="btn diag-btn signout"
-                onClick={async () => {
-                  await handleApproveCenter();
-                  onClose();
-                }}
-              >
-                Yes
-              </button>
+            <div className="str-btns">
+              <div className="act-btns">
+                <button className="btn diag-btn cancle" onClick={onClose}>
+                  No
+                </button>
+                <button
+                  className="btn diag-btn signout"
+                  onClick={async () => {
+                    await handleApproveCenter();
+                    onClose();
+                  }}
+                >
+                  Yes
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -106,20 +108,21 @@ const DiagActionCenterForm = ({
                 onChange={(e) => setReasonReject(e.target.value)}
               />
             </div>
-
-            <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                Cancel
-              </button>
-              <button
-                className="btn diag-btn signout"
-                onClick={async () => {
-                  await handleRejectCenter();
-                  onClose();
-                }}
-              >
-                Submit
-              </button>
+            <div className="str-btns">
+              <div className="act-btns">
+                <button className="btn diag-btn cancle" onClick={onClose}>
+                  Cancel
+                </button>
+                <button
+                  className="btn diag-btn signout"
+                  onClick={async () => {
+                    await handleRejectCenter();
+                    onClose();
+                  }}
+                >
+                  Submit
+                </button>
+              </div>
             </div>
           </div>
         </div>

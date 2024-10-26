@@ -4,9 +4,8 @@ import App from "./App";
 import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import UserPI from "./pages/pi/UserPI";
-import Register from "./pages/Register";
 import UserPI from "./pages/UserPI";
+import Register from "./pages/Register";
 
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
@@ -17,10 +16,8 @@ import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 import TeacherHome from "./pages/home/TeacherHome";
-import TeacherPI from "./pages/pi/TeacherPI";
 
 import StudentHome from "./pages/home/StudentHome";
-import LoginSuccess from "./pages/LoginSuccess";
 import PrivateRoute from "./PrivateRoute";
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import LoginResponse from "./pages/LoginResponse";
@@ -134,7 +131,6 @@ const Layout = (props) => {
             }
           />
         </Route>
-        <Route path="/login-success" element={<LoginSuccess />} />
 
         <Route path="/login-response" element={<LoginResponse />} />
         {/* <Route path='admin' element={<Admin />}>

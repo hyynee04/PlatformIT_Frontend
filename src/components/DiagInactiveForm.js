@@ -55,19 +55,21 @@ const DiagInactiveForm = ({
         </div>
         <div className="diag-body">
           <span>Are you sure you want to inactive this user!</span>
-          <div className="act-btns">
-            <button className="btn diag-btn cancle" onClick={onClose}>
-              No
-            </button>
-            <button
-              className="btn diag-btn signout"
-              onClick={() => {
-                handleInactiverUser();
-                // onClose();
-              }}
-            >
-              Yes
-            </button>
+          <div className="str-btns">
+            <div className="act-btns">
+              <button className="btn diag-btn cancle" onClick={onClose}>
+                No
+              </button>
+              <button
+                className="btn diag-btn signout"
+                onClick={() => {
+                  handleInactiverUser();
+                  // onClose();
+                }}
+              >
+                Yes
+              </button>
+            </div>
           </div>
         </div>
       </div>

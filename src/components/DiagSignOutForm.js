@@ -31,19 +31,21 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
         </div>
         <div className="diag-body">
           <span>Are you sure you want to sign out!</span>
-          <div className="act-btns">
-            <button className="btn diag-btn cancle" onClick={onClose}>
-              Cancle
-            </button>
-            <button
-              className="btn diag-btn signout"
-              onClick={() => {
-                handleSignout();
-                onClose();
-              }}
-            >
-              Sign Out
-            </button>
+          <div className="str-btns">
+            <div className="act-btns">
+              <button className="btn diag-btn cancle" onClick={onClose}>
+                Cancle
+              </button>
+              <button
+                className="btn diag-btn signout"
+                onClick={() => {
+                  handleSignout();
+                  onClose();
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </div>

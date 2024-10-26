@@ -104,7 +104,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
             </div>
           </div>
           <div className="str-btns">
-            <span className="error-str">{errorString}</span>
+            {errorString && <span className="error-str">{errorString}</span>}
             <div className="act-btns">
               <button className="btn diag-btn cancle" onClick={onClose}>
                 Cancle

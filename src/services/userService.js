@@ -15,6 +15,44 @@ const getPI = (idUser) => {
     },
   });
 };
+const getAvaImg = async (idUser) => {
+  const response = await axios.get("api/User/GetAvaImg", {
+    params: {
+      id: idUser,
+    },
+    responseType: "text",
+  });
+  return response;
+};
+
+const postChangePassword = async (
+  currentPW,
+  newPW,
+  idAccountUpdated,
+  idUserUpdatedBy
+) => {
+  console.log(currentPW, newPW);
+
+  try {
+    const response = await axios.post(
+      "api/User/ChangePassword",
+      {
+        currentPW: currentPW,
+        newPW: newPW,
+        idAccountUpdated: idAccountUpdated,
+        idUserUpdatedBy: idUserUpdatedBy,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json", // Đảm bảo server nhận dữ liệu dưới dạng JSON
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error adding admin center:", error);
+  }
+};
 
 const postUpdateUserBasicPI = async (
   idUser,
@@ -160,14 +198,16 @@ const getAllUser = () => {
 const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
   return axios.post("api/User/InactiveUser", null, {
     params: {
-      idUserInactive: idUserInactive,
-      idUserUpdatedBy: idUserUpdatedBy,
+      idUserInactive: +idUserInactive,
+      idUserUpdatedBy: +idUserUpdatedBy,
     },
   });
 };
 
 export {
   getPI,
+  getAvaImg,
+  postChangePassword,
   postUpdateUserBasicPI,
   postUpdateTeacherSpecializedPI,
   postAddProfileLink,

@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Role } from "../constants/constants";
 import {
+  getAllAdminOfCenter,
   getAllStudentByIdCenter,
   getAllTeacherByIdCenter,
+  postAddCenterAmin,
   postAddTeacher,
 } from "../services/centerService";
 
@@ -15,10 +17,9 @@ export const fetchListUserOfCenter = createAsyncThunk(
       response = await getAllTeacherByIdCenter(idCenter);
     } else if (role === Role.student) {
       response = await getAllStudentByIdCenter(idCenter);
+    } else if (role === Role.centerAdmin) {
+      response = await getAllAdminOfCenter(idCenter);
     }
-    // else if (role === Role.centerAdmin) {
-
-    // }
     return response || [];
   }
 );
@@ -27,6 +28,22 @@ export const addTeacher = createAsyncThunk(
   "usersOfCenter/addTeacher",
   async ({ email, username, password, idCenter }) => {
     const data = await postAddTeacher(email, username, password, idCenter);
+    console.log(data);
+
+    return data;
+  }
+);
+
+export const addAdminCenter = createAsyncThunk(
+  "usersOfCenter/addAdmin",
+  async ({ username, email, password, idCenter, idUserUpdatedBy }) => {
+    const data = await postAddCenterAmin(
+      username,
+      email,
+      password,
+      idCenter,
+      idUserUpdatedBy
+    );
     return data;
   }
 );

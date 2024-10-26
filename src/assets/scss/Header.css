@@ -27,6 +27,7 @@
   display: flex;
   gap: 24px;
   font-size: 16px;
+  align-items: flex-end;
 }
 .navbar > .container .me-auto .nav-link {
   padding: 0px;
@@ -35,6 +36,7 @@
 }
 .navbar > .container .me-auto .active {
   padding: 0px;
+  font-size: 18px;
   font-weight: 500;
   border-bottom: 3px solid var(--white-color);
   color: var(--white-color) !important;
@@ -64,6 +66,19 @@
   align-items: center;
   background-color: var(--main-color);
 }
+/* .navbar > .container .auth-buttons .pi {
+  background-color: var(--border-gray);
+  padding: 1px;
+} */
+.navbar > .container .auth-buttons .circle-buts.clicked {
+  background-color: var(--white-color);
+  box-shadow: rgba(0, 0, 0, 0.3) 1.95px 1.95px 2.6px;
+}
+.navbar > .container .auth-buttons .circle-buts.clicked .header-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--main-color);
+}
 .navbar > .container .auth-buttons .register {
   background-color: var(--second-main-color);
   color: var(--white-color);
@@ -83,15 +98,13 @@
   height: 24px;
   color: var(--border-gray);
 }
-.navbar > .container .auth-buttons .pi {
-  background-color: var(--border-gray);
-  padding: 1px;
-}
+
 .navbar > .container .auth-buttons .header-avatar {
-  max-width: 40px;
-  max-height: 40px;
+  object-fit: cover;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 100rem;
-  object-fit: cover;
+
   flex-shrink: 0;
 }

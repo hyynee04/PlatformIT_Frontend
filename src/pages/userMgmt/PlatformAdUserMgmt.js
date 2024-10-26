@@ -180,6 +180,8 @@ const PlatformAdUserMgmt = () => {
     setSelectedUserId((prevSelectedId) =>
       prevSelectedId === idUser ? null : idUser
     );
+    setFilterVisble(false);
+    setSortByVisible(false);
   };
   if (loading) {
     return <div>Loading...</div>;

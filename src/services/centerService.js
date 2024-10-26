@@ -20,6 +20,13 @@ const getAllStudentByIdCenter = (idCenter) => {
     },
   });
 };
+const getAllAdminOfCenter = (idCenter) => {
+  return axios.get("api/Center/GetAllAdminOfCenter", {
+    params: {
+      idCenter: idCenter,
+    },
+  });
+};
 const postApproveCenter = (id, idUserUpdated) => {
   return axios.post("api/Center/ApproveCenter", null, {
     params: {
@@ -27,6 +34,54 @@ const postApproveCenter = (id, idUserUpdated) => {
       idUserUpdated: idUserUpdated,
     },
   });
+};
+const postRejectCenter = async (
+  idCenterSelected,
+  reasonReject,
+  idUserUpdated
+) => {
+  const rejectModel = {
+    id: idCenterSelected,
+    reason: reasonReject,
+  };
+  try {
+    const response = await axios.post("api/Center/RejectCenter", rejectModel, {
+      params: {
+        idUserUpdated: idUserUpdated,
+      },
+    });
+    console.log(response);
+  } catch (error) {
+    console.error("Error updating basic info: ", error);
+  }
+};
+const postAddCenterAmin = async (
+  username,
+  email,
+  password,
+  idCenter,
+  idUserUpdatedBy
+) => {
+  try {
+    const response = await axios.post(
+      "api/Center/AddCenterAdmin",
+      {
+        username: username,
+        email: email,
+        password: password,
+        idCenter: idCenter,
+        idUserUpdatedBy: idUserUpdatedBy,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json", // Đảm bảo server nhận dữ liệu dưới dạng JSON
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error adding admin center:", error);
+  }
 };
 const postAddTeacher = async (email, username, password, idCenter) => {
   try {
@@ -55,6 +110,9 @@ export {
   getPendingCenter,
   getAllTeacherByIdCenter,
   getAllStudentByIdCenter,
+  getAllAdminOfCenter,
   postApproveCenter,
+  postRejectCenter,
+  postAddCenterAmin,
   postAddTeacher,
 };

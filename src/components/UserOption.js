@@ -7,6 +7,7 @@ const UserOption = ({
   idUserSelected,
   statusUserSelected,
   onUserInactivated,
+  roleUserSelected,
 }) => {
   const [isOptionVisible, setIsOptionVisible] = useState(true);
   const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
@@ -27,6 +28,7 @@ const UserOption = ({
             onClose={closeInactiveModal}
             idUserSelected={idUserSelected}
             onUserInactivated={onUserInactivated}
+            roleUserSelected={roleUserSelected}
           />
         )}
       </>
@@ -49,6 +51,7 @@ const UserOption = ({
           onClose={closeInactiveModal}
           idUserSelected={idUserSelected}
           onUserInactivated={onUserInactivated}
+          roleUserSelected={roleUserSelected}
         />
       </div>
     </div>

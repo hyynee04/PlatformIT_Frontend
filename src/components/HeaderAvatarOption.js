@@ -33,7 +33,7 @@ const HeaderAvatarOption = () => {
         <button
           className="op-buts"
           onClick={() => {
-            navigate("./teacherPI");
+            navigate("./pi");
             setIsOptionVisible(false);
           }}
         >

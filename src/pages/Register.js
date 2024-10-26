@@ -80,7 +80,7 @@ const Register = () => {
       return;
     }
 
-    if (password.length <= 5) {
+    if (password.length < 5) {
       setError(3);
       return;
     }
@@ -174,7 +174,7 @@ const Register = () => {
                 <LuPenTool color="#757575" className="icon-head rotate-icon" />
                 <input
                   type="text"
-                  placeholder="Name"
+                  placeholder="Name (*)"
                   className="form-control"
                   value={fullName}
                   onChange={(event) => {
@@ -187,7 +187,7 @@ const Register = () => {
                 <LuMail color="#757575" className="icon-head" />
                 <input
                   type="text"
-                  placeholder="Email"
+                  placeholder="Email (*)"
                   className="form-control"
                   value={email}
                   onChange={(event) => {
@@ -202,7 +202,7 @@ const Register = () => {
                 <LuUser color="#757575" className="icon-head" />
                 <input
                   type="text"
-                  placeholder="Username"
+                  placeholder="Username (*)"
                   className="form-control"
                   value={username}
                   onChange={(event) => {
@@ -217,7 +217,7 @@ const Register = () => {
                 <LuLock color="#757575" className="icon-head" />
                 <input
                   type={isShowedP ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="Password (*)"
                   className="form-control"
                   value={password}
                   onChange={(event) => {
@@ -244,7 +244,7 @@ const Register = () => {
                 <LuLock color="#757575" className="icon-head" />
                 <input
                   type={isShowedCP ? "text" : "password"}
-                  placeholder="Confirm password"
+                  placeholder="Confirm password (*)"
                   className="form-control"
                   value={confirmPassword}
                   onChange={(event) => {
@@ -286,7 +286,7 @@ const Register = () => {
                     <LuBuilding2 color="#757575" className="icon-head" />
                     <input
                       type="text"
-                      placeholder="Center Name"
+                      placeholder="Center Name (*)"
                       className="form-control"
                       value={centerName}
                       onChange={(event) => {
@@ -299,7 +299,7 @@ const Register = () => {
                     <LuCreditCard color="#757575" className="icon-head" />
                     <input
                       type="number"
-                      placeholder="TIN"
+                      placeholder="TIN (*)"
                       className="form-control"
                       value={TIN}
                       onChange={(event) => {
@@ -399,7 +399,7 @@ const Register = () => {
             onClick={() => {
               handleVerify()
             }}
-            disabled={!(OTP.length == 6 && errorVerify === "")}
+            disabled={!(OTP.length === 6 && errorVerify === "")}
           >Verify</button>
         </Modal.Footer>
       </Modal>

@@ -12,6 +12,7 @@
   flex-direction: row;
   gap: 8px;
   align-items: center;
+  position: relative;
 }
 .role-users-group {
   padding: 16px 72px 0;

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
+import { Alert } from "react-bootstrap";
 import InputGroup from "react-bootstrap/InputGroup";
 import {
   LuCamera,
@@ -10,21 +11,22 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { FaChevronDown, FaUser, FaUserGraduate, FaLock } from "react-icons/fa";
-import default_ava from "../../assets/img/default_ava.png";
-import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/PI.css";
+import default_ava from "../assets/img/default_ava.png";
+import default_image from "../assets/img/default_image.png";
+import "../assets/scss/PI.css";
 import {
   deleteProfileLink,
   deleteQualification,
   postAddProfileLink,
   postAddQualification,
+  postChangePassword,
   postUpdateTeacherSpecializedPI,
   postUpdateUserBasicPI,
-} from "../../services/userService";
+} from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserProfile, updateUserPI } from "../../store/profileUserSlice";
-import { Role, Status, UserGender } from "../../constants/constants";
-import AvatarImageOption from "../../components/AvatarImageOption";
+import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
+import { Role, Status, UserGender } from "../constants/constants";
+import AvatarImageOption from "../components/AvatarImageOption";
 
 const TeacherPI = () => {
   const idUser = +localStorage.getItem("idUser");
@@ -48,6 +50,16 @@ const TeacherPI = () => {
     qualificationModels,
   } = userPI;
   const [countries, setCountries] = useState([]);
+  const [tempUserPI, setTempUserPI] = useState({
+    name: "",
+    phoneNum: "",
+    gender: "",
+    dob: "",
+    nationality: "",
+    teachingMajor: "",
+    description: "",
+  });
+
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const [roleDes, setRoleDes] = useState("");
   const [activeAction, setActiveAction] = useState("basicPI");
@@ -59,7 +71,13 @@ const TeacherPI = () => {
     qualificationUrl: "",
   });
   const [qualiWarning, setQualiWarning] = useState("");
-
+  const [phoneNumWarning, setPhoneNumWarning] = useState("");
+  const [updateSuccess, setUpdateSuccess] = useState("");
+  const [updatePITeacherSuccess, setUpdatePITeacherSuccess] = useState("");
+  const [changePWSuccess, setChangePWSuccess] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -68,6 +86,22 @@ const TeacherPI = () => {
   };
   const inputFileRef = useRef(null);
 
+  const fetchContries = async () => {
+    try {
+      //API for nationality
+      const respone = await fetch(
+        "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
+      );
+      const countryData = await respone.json();
+      const countriesData = countryData.countries.map((country) => ({
+        label: country.label.split(" ")[1],
+      }));
+
+      setCountries(countriesData);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
   useEffect(() => {
     if (!idUser) {
       console.error("Không tìm thấy idUser trong localStorage");
@@ -86,39 +120,94 @@ const TeacherPI = () => {
         } else if (idRole === Role.student) {
           setRoleDes("Student");
         }
-        //API for nationality
-        const respone = await fetch(
-          "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
-        );
-        const countryData = await respone.json();
-        const countriesData = countryData.countries.map((country) => ({
-          label: country.label.split(" ")[1],
-        }));
-
-        setCountries(countriesData);
       } catch (error) {
         console.error("Có lỗi xảy ra khi lấy thông tin cá nhân:", error);
       }
     };
 
     fetchData();
+    fetchContries();
   }, [dispatch, idUser, idRole]);
+
+  useEffect(() => {
+    setTempUserPI({
+      name: userPI.name,
+      phoneNum: userPI.phoneNum,
+      gender: userPI.gender,
+      dob: userPI.dob,
+      nationality: userPI.nationality,
+      teachingMajor: userPI.teachingMajor,
+      description: userPI.description,
+    });
+  }, [userPI]);
+  const handleInputChange = (field, value) => {
+    setTempUserPI({ ...tempUserPI, [field]: value });
+  };
+
+  const validatePhoneNum = (num) => /^\d{10}$/.test(num);
+
   const updateBasicInfo = async () => {
-    await postUpdateUserBasicPI(
-      idUser,
+    if (!validatePhoneNum(tempUserPI.phoneNum)) {
+      setPhoneNumWarning("Phone number must be exactly 10 digits.");
+    } else {
+      setPhoneNumWarning("");
+      try {
+        await postUpdateUserBasicPI(
+          idUser,
+          tempUserPI.name,
+          tempUserPI.phoneNum,
+          tempUserPI.gender,
+          tempUserPI.dob,
+          tempUserPI.nationality
+        );
+        // dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
+        await dispatch(fetchUserProfile(idUser));
+        setUpdateSuccess("Your profile has been updated successfully!");
+
+        setTimeout(() => {
+          setUpdateSuccess("");
+        }, 3000);
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        setUpdateSuccess("There was an error updating your profile.");
+      }
+    }
+  };
+  const handleDiscardChanges = () => {
+    const currentUserPI = {
       name,
       phoneNum,
       gender,
       dob,
-      nationality
-    );
-    dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
-    await dispatch(fetchUserProfile(idUser));
+      nationality,
+      teachingMajor,
+      description,
+    };
+    setTempUserPI(currentUserPI);
+    setPhoneNumWarning("");
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+  const handleSaveChanges = () => {
+    dispatch(updateUserPI(tempUserPI));
+    updateBasicInfo();
   };
   const updateTeacherSpecializedPI = async () => {
-    await postUpdateTeacherSpecializedPI(idUser, teachingMajor, description);
+    await postUpdateTeacherSpecializedPI(
+      idUser,
+      tempUserPI.teachingMajor,
+      tempUserPI.description
+    );
     dispatch(updateUserPI({ teachingMajor, description }));
     await dispatch(fetchUserProfile(idUser));
+    setUpdatePITeacherSuccess(
+      "Your specialized infomation has been updated successfully!"
+    );
+
+    setTimeout(() => {
+      setUpdatePITeacherSuccess("");
+    }, 3000);
   };
 
   const handleActionClick = (action) => {
@@ -231,6 +320,22 @@ const TeacherPI = () => {
     await deleteQualification(idQualification);
     await dispatch(fetchUserProfile(idUser));
   };
+
+  const handleChangePassword = async () => {
+    if (oldPassword && newPassword && confirmPassword) {
+      const idAccount = +localStorage.getItem("idAccount");
+      await postChangePassword(oldPassword, newPassword, idAccount, idUser);
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setChangePWSuccess("Your password has been changed successfully!");
+
+      setTimeout(() => {
+        setChangePWSuccess("");
+      }, 3000);
+    }
+  };
+
   return (
     <div>
       <div className="container-pi">
@@ -288,10 +393,8 @@ const TeacherPI = () => {
                 <input
                   type="text"
                   className="input-form-pi"
-                  value={name || ""}
-                  onChange={(e) =>
-                    dispatch(updateUserPI({ name: e.target.value }))
-                  }
+                  value={tempUserPI.name || ""}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
                 />
               </div>
               <div className="info">
@@ -300,7 +403,7 @@ const TeacherPI = () => {
                   type="text"
                   className="input-form-pi"
                   value={email || ""}
-                  readOnly
+                  disabled
                 />
               </div>
               <div className="container-field">
@@ -310,9 +413,9 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={gender || UserGender.male}
+                        value={tempUserPI.gender}
                         onChange={(e) =>
-                          dispatch(updateUserPI({ gender: e.target.value }))
+                          handleInputChange("gender", e.target.value)
                         }
                       >
                         <option value={UserGender.male}>Male</option>
@@ -323,13 +426,23 @@ const TeacherPI = () => {
                     </div>
                   </div>
                   <div className="info">
-                    <span>Phone Number</span>
+                    <div className="container-phone">
+                      <span>Phone Number</span>
+                      {phoneNumWarning && (
+                        <span
+                          className={"warning-error"}
+                          style={{ color: "var(--red-color)" }}
+                        >
+                          {phoneNumWarning}
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="text"
                       className="input-form-pi"
-                      value={phoneNum || ""}
+                      value={tempUserPI.phoneNum || ""}
                       onChange={(e) =>
-                        dispatch(updateUserPI({ phoneNum: e.target.value }))
+                        handleInputChange("phoneNum", e.target.value)
                       }
                     />
                   </div>
@@ -341,10 +454,8 @@ const TeacherPI = () => {
                     <input
                       type="date"
                       className="input-form-pi"
-                      value={dob}
-                      onChange={(e) =>
-                        dispatch(updateUserPI({ dob: e.target.value }))
-                      }
+                      value={tempUserPI.dob}
+                      onChange={(e) => handleInputChange("dob", e.target.value)}
                     />
                   </div>
                   <div className="info">
@@ -352,11 +463,9 @@ const TeacherPI = () => {
                     <div className="select-container">
                       <select
                         className="input-form-pi"
-                        value={nationality || ""}
+                        value={tempUserPI.nationality}
                         onChange={(e) =>
-                          dispatch(
-                            updateUserPI({ nationality: e.target.value })
-                          )
+                          handleInputChange("nationality", e.target.value)
                         }
                       >
                         {countries.map((country, index) => (
@@ -370,23 +479,34 @@ const TeacherPI = () => {
                   </div>
                 </div>
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => {
-                    updateBasicInfo();
-                  }}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                {updateSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setUpdateSuccess("")}
+                    dismissible
+                  >
+                    {updateSuccess}
+                  </Alert>
+                )}
+                <div className="container-button">
+                  <button
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
+                  >
+                    Discard changes
+                  </button>
+                  <button className="save-change" onClick={handleSaveChanges}>
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         ) : activeAction === "specializedPI" ? (
           <div className="container-specialized">
             <div className="container-info">
-              <span className="title-span">Major Infomation</span>
+              <span className="title-span">Specialized Infomation</span>
               <div className="info">
                 <span>Affiliated Center</span>
                 <input
@@ -401,9 +521,9 @@ const TeacherPI = () => {
                 <input
                   type="text"
                   className="input-form-pi"
-                  value={teachingMajor || ""}
+                  value={tempUserPI.teachingMajor || ""}
                   onChange={(e) =>
-                    dispatch(updateUserPI({ teachingMajor: e.target.value }))
+                    handleInputChange("teachingMajor", e.target.value)
                   }
                 />
               </div>
@@ -412,20 +532,36 @@ const TeacherPI = () => {
                 <Form.Control
                   as="textarea"
                   className="input-area-form-pi"
-                  value={description || ""}
+                  value={tempUserPI.description || ""}
                   onChange={(e) =>
-                    dispatch(updateUserPI({ description: e.target.value }))
+                    handleInputChange("description", e.target.value)
                   }
                 />
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => updateTeacherSpecializedPI()}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                {updatePITeacherSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setUpdatePITeacherSuccess("")}
+                    dismissible
+                  >
+                    {updatePITeacherSuccess}
+                  </Alert>
+                )}
+                <div className="container-button">
+                  <button
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
+                  >
+                    Discard changes
+                  </button>
+                  <button
+                    className="save-change"
+                    onClick={() => updateTeacherSpecializedPI()}
+                  >
+                    Save changes
+                  </button>
+                </div>
               </div>
             </div>
             <div className="container-info auto">
@@ -617,10 +753,8 @@ const TeacherPI = () => {
                 <input
                   type={showOldPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={name || ""}
-                  onChange={(e) =>
-                    dispatch(updateUserPI({ name: e.target.value }))
-                  }
+                  value={oldPassword || ""}
+                  onChange={(e) => setOldPassword(e.target.value)}
                 />
                 <span onClick={() => setShowOldPassword(!showOldPassword)}>
                   {showOldPassword ? (
@@ -635,8 +769,8 @@ const TeacherPI = () => {
                 <input
                   type={showNewPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={email || ""}
-                  readOnly
+                  value={newPassword || ""}
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
                 <span onClick={() => setShowNewPassword(!showNewPassword)}>
                   {showNewPassword ? (
@@ -651,8 +785,8 @@ const TeacherPI = () => {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   className="input-form-pi"
-                  value={email || ""}
-                  readOnly
+                  value={confirmPassword || ""}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
                 <span
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -664,16 +798,32 @@ const TeacherPI = () => {
                   )}
                 </span>
               </div>
-              <div className="container-button">
-                <button className="change-pass">Discard changes</button>
-                <button
-                  className="save-change"
-                  onClick={() => {
-                    updateBasicInfo();
-                  }}
-                >
-                  Save changes
-                </button>
+              <div className="alert-option">
+                {changePWSuccess && (
+                  <Alert
+                    variant="success"
+                    onClose={() => setChangePWSuccess("")}
+                    dismissible
+                  >
+                    {changePWSuccess}
+                  </Alert>
+                )}
+                <div className="container-button">
+                  <button
+                    className="discard-changes"
+                    onClick={handleDiscardChanges}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="save-change"
+                    onClick={() => {
+                      handleChangePassword();
+                    }}
+                  >
+                    Change password
+                  </button>
+                </div>
               </div>
             </div>
           </div>

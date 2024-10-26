@@ -267,4 +267,13 @@
 .btn-close:focus {
   box-shadow: none;
 }
+.modal-header > svg {
+  margin-right: 5px;
+  width: 26px;
+  height: 26px;
+}
+
+.red-color {
+  color: var(--red-color);
+}
 

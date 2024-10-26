@@ -1,0 +1,164 @@
+/* Carousel.css */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: fit-content;
+    overflow: visible;
+    padding: 0 20px;
+    padding: 0 4rem;
+}
+
+.carousel > .carousel-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.carousel .carousel-header > span {
+    font-size: 1.3rem;
+    color: var(--main-color);
+    font-weight: 600;
+    margin-left: -4rem;
+}
+
+.carousel .carousel-header > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+
+    margin-right: -4rem;
+    padding: 8px 12px;
+    border: none;
+    border-radius: .5rem;
+    background-color: rgba(217, 217, 217, 0.3);
+
+    color: var(--main-color);
+    font-size: .8rem;
+    font-weight: 700;
+    
+}
+
+.carousel .carousel-header > button:hover {
+    background-color: var(--border-gray);
+}
+
+.carousel .carousel-header button > svg {
+    width: .9rem;
+    height: .9rem;
+}
+
+.carousel > .carousel-wrapper {
+    display: flex;
+    width: 100%; /* Ensures the wrapper takes full width */
+    height: fit-content;
+}
+
+.carousel .carousel-wrapper > .carousel-track {
+    display: flex; /* Align items in a row */
+    min-width: 100%; /* Each track takes the full width */
+    height: fit-content;
+    transition: transform 0.5s ease-in-out; /* Smooth transition */
+    justify-content: space-between;
+}
+
+.carousel .carousel-wrapper > .carousel-track.no-opacity {
+    animation: fadeout .2s forwards; /* Apply the animation */
+    pointer-events: none; /* Prevent interaction when invisible */
+}
+
+.carousel .carousel-wrapper > .carousel-track.add-opacity {
+    animation: fadein .2s forwards;
+}
+
+.carousel .carousel-wrapper .carousel-track > .ca-item {
+    box-sizing: border-box; /* Include padding and border in the width */
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #ccc; /* Optional styling */
+    background-color: #f9f9f9; /* Optional styling */
+    height: 300px;
+    width: 200px;
+}
+
+.carousel > .carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: var(--main-color);
+    border: none;
+    padding: 0 0px 40px;
+    cursor: pointer;
+
+    width: fit-content;
+    height: 100%;
+}
+
+.carousel > .carousel-button:disabled,
+.carousel > .carousel-button:disabled:hover {
+    color: var(--text-gray);
+}
+
+.carousel > .carousel-button:hover {
+    color: rgba(57, 121, 121, 0.8);
+}
+
+.carousel .carousel-button > svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+.carousel > .carousel-button.prev {
+    left: 10px;
+}
+
+.carousel > .carousel-button.next {
+    right: 10px;
+}
+
+.carousel > .carousel-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px; /* Space between carousel and dots */
+}
+
+.carousel .carousel-dots > .dot {
+    height: .5rem;
+    width: .5rem;
+    margin: 0 5px;
+    background-color: var(--text-gray); /* Inactive dot color */
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.carousel .carousel-dots > .dot.active {
+    background-color: var(--main-color); /* Active dot color */
+}
+
+@keyframes 
+fadeout {
+    0% {
+        opacity: 1; /* Fully visible */
+    }
+    100% {
+        opacity: 0; /* Fully transparent */
+    }
+}
+
+@keyframes 
+fadein {
+    0% {
+        opacity: 0; /* Fully visible */
+    }
+    90% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1; /* Fully transparent */
+    }
+
+}

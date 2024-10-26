@@ -2,13 +2,20 @@ import { useEffect, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
 import { FaGooglePlusG } from "react-icons/fa";
-import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
+import {
+  LuAlertTriangle,
+  LuEye,
+  LuEyeOff,
+  LuLock,
+  LuMail,
+  LuUser,
+} from "react-icons/lu";
 import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
 import { Role, Status } from "../constants/constants";
-import { getLoginGoogle, postLogin } from "../services/authService";
+import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
 const Login = () => {
@@ -22,7 +29,11 @@ const Login = () => {
 
   const [isFailed, setIsFailed] = useState(false);
   const [isValid, setIsValid] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [show, setShow] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [message, setMessage] = useState("");
+
   const handleClose = () => setShow(false);
   const handleShow = () => {
     const isValidEmail = validateEmail(username);
@@ -32,15 +43,19 @@ const Login = () => {
     setShow(true);
   };
 
-  const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     setIsVisible(true);
-
-    // Step 1: Check if there is state from the previous navigation
+    //setShowAlert(false);
     const state = location.state;
+    // Automatically log in the user if idUser and idRole are available
     if (state && state.idUser && state.idRole) {
-      // Automatically log in the user
       handleAutoLogin(state.idUser, state.idRole);
+    }
+    // Alert the message if it exists
+    else if (state && state.message) {
+      // alert(state.message);
+      setMessage(state.message);
+      setShowAlert(true);
     }
   }, [location.state]);
 
@@ -132,10 +147,14 @@ const Login = () => {
     }
   };
 
-  const handleLoginGoogle = async () => {
-    // window.location.href = await getLoginGoogle()
-    // console.log(loginGoogle)
-    window.location.href = "http://localhost:5000/api/Authen/login-google";
+  const handleLoginThirdParty = async (base) => {
+    if (base === "Google")
+      window.location.href = "http://localhost:5000/api/Authen/login-google";
+    else if (base === "Facebook")
+      window.open("http://localhost:5000/api/Authen/login-facebook");
+    else window.open("http://localhost:5000/api/Authen/login-github");
+
+    // window.open("http://localhost:5000/api/Authen/login-google")
   };
 
   return (
@@ -170,7 +189,7 @@ const Login = () => {
                 <LuUser color="#757575" className="icon-head" />
                 <input
                   type="text"
-                  placeholder="Username or Email"
+                  placeholder="Username"
                   className="form-control"
                   value={username}
                   onChange={(event) => {
@@ -212,7 +231,7 @@ const Login = () => {
               </div>
 
               <div className={`mb-3 ${isFailed ? "marginbottom-5px" : ""}`}>
-                <span className="forgot-pw" onClick={handleShow}>
+                <span className="forgot-pw" onClick={() => handleShow()}>
                   Forgot your password?
                 </span>
               </div>
@@ -244,17 +263,50 @@ const Login = () => {
             </div>
             <div className="mainpart-content">
               <div className="sep">
-                <RiFacebookFill color="#1E1E1E" />
+                <RiFacebookFill
+                  color="#1E1E1E"
+                  onClick={() => handleLoginThirdParty("Facebook")}
+                />
                 <FaGooglePlusG
                   color="#1E1E1E"
-                  onClick={() => handleLoginGoogle()}
+                  onClick={() => handleLoginThirdParty("Google")}
                 />
-                <TbBrandGithubFilled color="#1E1E1E" />
+                <TbBrandGithubFilled
+                  color="#1E1E1E"
+                  onClick={() => handleLoginThirdParty("Github")}
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <Modal
+        show={showAlert}
+        onHide={() => {
+          setShowAlert(false);
+          navigate("/login");
+        }}
+      >
+        <Modal.Header closeButton>
+          <LuAlertTriangle color="#c00f0c" />
+          <Modal.Title className="red-color">Alert</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-3 justify-margin">{message}</div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="footer-btn send-btn"
+            onClick={() => {
+              setShowAlert(false);
+              navigate("/login");
+            }}
+          >
+            Got it
+          </button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

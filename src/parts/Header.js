@@ -38,7 +38,8 @@ const Header = () => {
     const fetchAvatar = async () => {
       if (idUser) {
         const response = await getAvaImg(idUser);
-        dispatch(setAvatar(response));
+        if (response !== "This user has not set up avatar yet!")
+          dispatch(setAvatar(response));
       }
     };
     fetchAvatar();

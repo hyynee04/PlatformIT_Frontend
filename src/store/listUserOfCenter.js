@@ -28,6 +28,8 @@ export const addTeacher = createAsyncThunk(
   "usersOfCenter/addTeacher",
   async ({ email, username, password, idCenter }) => {
     const data = await postAddTeacher(email, username, password, idCenter);
+    console.log(data);
+
     return data;
   }
 );

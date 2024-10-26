@@ -198,8 +198,8 @@ const getAllUser = () => {
 const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
   return axios.post("api/User/InactiveUser", null, {
     params: {
-      idUserInactive: idUserInactive,
-      idUserUpdatedBy: idUserUpdatedBy,
+      idUserInactive: +idUserInactive,
+      idUserUpdatedBy: +idUserUpdatedBy,
     },
   });
 };

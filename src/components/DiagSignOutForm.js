@@ -12,7 +12,7 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
     localStorage.removeItem("idRole");
     localStorage.removeItem("idUser");
     localStorage.removeItem("idCenter");
-
+    localStorage.removeItem("idAccount");
     dispatch(resetUserPI());
 
     navigate("/");

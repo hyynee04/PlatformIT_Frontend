@@ -12,16 +12,17 @@ import {
   LuLock,
 } from "react-icons/lu";
 import { Role, Status } from "../../constants/constants";
-import UserOption from "../../components/UserOption";
-import default_ava from "../../assets/img/default_image.png";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import "../../assets/scss/PI.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
 import SortByUserOfCenter from "../../components/SortByUserOfCenter";
 import DiagAddUserForm from "../../components/DiagAddUserForm";
+import UserOption from "../../components/UserOption";
+
+import default_ava from "../../assets/img/default_image.png";
+import "../../assets/scss/PI.css";
 
 const CenterAdCenterMgmt = () => {
   //Center Infomation
@@ -164,13 +165,14 @@ const CenterAdCenterMgmt = () => {
       <div className="center-info">
         <div className="title-info">
           <b>Center Infomation</b>
-          <div
-            className="btn"
-            // onClick={() => openAddTeacherModal()}
-          >
-            <LuLock className="icon" />
-            <span>Lock</span>
-          </div>
+          {records.some(
+            (user) => user.idUser === idUser && user.isMainCenterAdmin
+          ) && (
+            <div className="btn">
+              <LuLock className="icon" />
+              <span>Lock</span>
+            </div>
+          )}
         </div>
         <div className="container-pi">
           <div className="container-ava">
@@ -401,17 +403,21 @@ const CenterAdCenterMgmt = () => {
               <LuSearch className="icon search-icon" />
             </div>
           </div>
-          <div className="add-btn">
-            <div className="btn" onClick={() => openAddAdminModal()}>
-              <LuUserPlus className="icon" />
-              <span>Add admin</span>
+          {records.some(
+            (user) => user.idUser === idUser && user.isMainCenterAdmin
+          ) && (
+            <div className="add-btn">
+              <div className="btn" onClick={() => openAddAdminModal()}>
+                <LuUserPlus className="icon" />
+                <span>Add admin</span>
+              </div>
+              <DiagAddUserForm
+                isOpen={isModalAddAdminOpen}
+                onClose={closeAddAdminModal}
+                roleAdded={Role.centerAdmin}
+              />
             </div>
-            <DiagAddUserForm
-              isOpen={isModalAddAdminOpen}
-              onClose={closeAddAdminModal}
-              roleAdded={Role.centerAdmin}
-            />
-          </div>
+          )}
           <div className="list-container">
             <table>
               <thead>

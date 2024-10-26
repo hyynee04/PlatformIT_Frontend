@@ -16,19 +16,23 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-
+  const [errorString, setErrorString] = useState("");
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
         const resultAction = await dispatch(
           addTeacher({ email, username, password, idCenter })
-        );
-        if (addTeacher.fulfilled.match(resultAction)) {
-          console.log("Add teacher successfully");
-          dispatch(fetchListUserOfCenter(Role.teacher));
-        }
+        ).unwrap();
+        // const result = await dispatch(
+        //   addTeacher({ email, username, password, idCenter })
+        // ).unwrap();
+        console.log(resultAction.message);
+        // if (addTeacher.fulfilled.match(resultAction)) {
+        //   console.log("Add teacher successfully");
+        //   dispatch(fetchListUserOfCenter(Role.teacher));
+        // }
       } catch (error) {
-        console.error("Error while approving center: ", error);
+        console.error("Error while add teacher center: ", error);
       }
     } else if (roleAdded === Role.centerAdmin) {
       try {
@@ -41,10 +45,12 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
             idUserUpdatedBy,
           })
         );
-        if (addAdminCenter.fulfilled.match(resultAction)) {
-          console.log("Add center admin successfully");
-          dispatch(fetchListUserOfCenter(Role.centerAdmin));
-        }
+        console.log(resultAction);
+
+        // if (addAdminCenter.fulfilled.match(resultAction)) {
+        //   console.log("Add center admin successfully");
+        //   dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        // }
       } catch (error) {
         console.error("Error while approving center: ", error);
       }
@@ -97,19 +103,22 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
               </div>
             </div>
           </div>
-          <div className="act-btns">
-            <button className="btn diag-btn cancle" onClick={onClose}>
-              Cancle
-            </button>
-            <button
-              className="btn diag-btn signout"
-              onClick={async () => {
-                await handleAddUser();
-                onClose();
-              }}
-            >
-              Submit
-            </button>
+          <div className="str-btns">
+            <span className="error-str">{errorString}</span>
+            <div className="act-btns">
+              <button className="btn diag-btn cancle" onClick={onClose}>
+                Cancle
+              </button>
+              <button
+                className="btn diag-btn signout"
+                onClick={async () => {
+                  await handleAddUser();
+                  onClose();
+                }}
+              >
+                Submit
+              </button>
+            </div>
           </div>
         </div>
       </div>

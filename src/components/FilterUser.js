@@ -84,7 +84,7 @@ const FilterUser = ({ onFilterChange }) => {
                 checked={level === CenterAdminLevel.mem}
                 onChange={() => setLevel(CenterAdminLevel.mem)}
               />
-              Mem
+              Sub
             </label>
             <label className="radio-container level">
               <input

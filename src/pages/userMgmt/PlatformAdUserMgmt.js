@@ -327,7 +327,9 @@ const PlatformAdUserMgmt = () => {
                       <UserOption
                         className="user-option"
                         idUserSelected={user.idUser}
-                        statusUserSelected={user.status}
+                        {...(!user.isMainCenterAdmin
+                          ? { statusUserSelected: user.status }
+                          : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
                       />
                     )}

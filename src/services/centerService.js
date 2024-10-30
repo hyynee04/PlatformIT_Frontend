@@ -104,7 +104,121 @@ const postAddTeacher = async (email, username, password, idCenter) => {
     console.error("Error adding teacher:", error);
   }
 };
+const getCenterInfo = async () => {
+  const idCenter = +localStorage.getItem("idCenter");
 
+  const data = await axios.get("api/Center/GetCenterInfo", {
+    params: {
+      idCenter: idCenter,
+    },
+  });
+  return data;
+};
+const postUpdateCenterBasicInfo = async (
+  centerName,
+  centerEmail,
+  address,
+  phoneNumber,
+  description,
+  establishedDate
+) => {
+  const idCenter = +localStorage.getItem("idCenter");
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  const model = {
+    idCenter: idCenter,
+    centerName: centerName,
+    centerEmail: centerEmail,
+    address: address,
+    phoneNumber: phoneNumber,
+    description: description,
+    establishedDate: establishedDate,
+  };
+  try {
+    await axios.post("api/Center/UpdateCenterInfo", model, {
+      params: {
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+const postAddCenterLink = async (name, url) => {
+  const idCenter = +localStorage.getItem("idCenter");
+  const model = {
+    idCenter: idCenter,
+    name: name,
+    url: url,
+  };
+  try {
+    await axios.post("api/User/AddProfileLink", model);
+  } catch (error) {
+    throw error;
+  }
+};
+const postAddCenterQualification = async (
+  qualificationName,
+  description,
+  qualificationFile
+) => {
+  const idCenter = +localStorage.getItem("idCenter");
+  try {
+    const formData = new FormData();
+    formData.append("IdCenter", idCenter);
+    formData.append("QualificationName", qualificationName);
+    formData.append("Description", description);
+    formData.append("QualificationFile", qualificationFile);
+    await axios.post(`api/User/AddQualification`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Error add qualification:",
+      error.response?.data || error.message
+    );
+  }
+};
+const getWorkingHours = async () => {
+  const centerId = +localStorage.getItem("idCenter");
+  try {
+    return axios.get("api/Center/getWorkingHours", {
+      params: {
+        centerId: centerId,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+const postAddOrUpdateWorkingHours = async (hoursModel) => {
+  const centerId = +localStorage.getItem("idCenter");
+  const idUpdated = +localStorage.getItem("idUser");
+  try {
+    return axios.post("api/Center/AddOrUpdateWorkingHours", hoursModel, {
+      params: {
+        centerId: centerId,
+        idUpdated: idUpdated,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+const postTransferMainAdmin = async (idNewAdmin) => {
+  const idUpdated = +localStorage.getItem("idUser");
+  try {
+    return axios.post("api/Center/TransferMainAdmin", null, {
+      params: {
+        IdNewAdmin: idNewAdmin,
+        idUpdated: idUpdated,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 export {
   getAllCenter,
   getPendingCenter,
@@ -115,4 +229,11 @@ export {
   postRejectCenter,
   postAddCenterAmin,
   postAddTeacher,
+  getCenterInfo,
+  postUpdateCenterBasicInfo,
+  postAddCenterLink,
+  postAddCenterQualification,
+  postAddOrUpdateWorkingHours,
+  getWorkingHours,
+  postTransferMainAdmin,
 };

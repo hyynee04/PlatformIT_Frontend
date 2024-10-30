@@ -79,7 +79,7 @@
   padding: 24px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   border-radius: 8px;
-  min-height: 610px;
+  min-height: 580px;
 }
 .container-info.auto {
   min-height: auto;
@@ -98,6 +98,7 @@
 }
 .sub-container-ava > .main-center-image {
   width: 400px;
+  min-height: 300px;
   height: auto;
   object-fit: cover;
   cursor: pointer;
@@ -133,23 +134,31 @@
   color: var(--text-gray);
   font-weight: 400;
   text-align: left;
-  width: 220px;
-  padding: 4px 8px;
+  width: 300px;
+  padding: 8px 32px;
   display: flex;
   align-items: center;
 }
+.sub-container-action .action-btn .btn:active {
+  border: none;
+  outline: none;
+}
 .sub-container-action .action-btn .btn:hover {
-  padding: 4px 8px;
+  padding: 8px 32px;
   border-radius: 8px;
   background-color: var(--border-gray);
 }
 .sub-container-action .action-btn .btn.active {
   outline: none;
   border: none;
-  padding: 4px 8px;
+  padding: 8px 32px;
   border-radius: 8px;
   color: var(--main-color);
   background-color: rgba(57, 121, 121, 0.3);
+}
+.sub-container-action .action-btn .btn.active:active {
+  border: none;
+  outline: none;
 }
 .sub-container-action .action-btn .btn.active .icon {
   color: var(--main-color);
@@ -287,9 +296,10 @@
   padding: 8px 16px;
   min-height: 80px;
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--border-gray);
-  color: var(--text-gray);
+  border-radius: 4px;
+  border: none;
+  color: var(--black-gray);
+  background-color: rgba(217, 217, 217, 0.3);
   font-size: 14px;
 }
 
@@ -298,7 +308,6 @@
 .container-link .mb-3 .main-link:focus,
 .container-info .info .container-link .mb-3 .title-link:focus {
   outline: none;
-  /* box-shadow: none; */
   box-shadow: rgba(14, 63, 126, 0.04) 0px 0px 0px 1px,
     rgba(42, 51, 69, 0.04) 0px 1px 1px -0.5px,
     rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px,
@@ -335,6 +344,7 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  align-items: flex-start;
   gap: 20px;
 }
 
@@ -376,7 +386,7 @@
 
 .container-info-img .quali-content .span {
   padding: 4px 12px;
-  width: 100px;
+  min-width: 100px;
   display: flex;
   justify-content: center;
   border-radius: 8px;
@@ -416,13 +426,23 @@
   gap: 10px;
 }
 
-.container-info-img .quali-image > img {
+.container-info-img .quali-image > img,
+.container-info-img .quali-image > .main-ava-image {
   width: 244px;
   height: 160px;
   object-fit: cover;
   display: block;
 }
-
+.container-info-img .quali-image > .pdf-link {
+  cursor: pointer;
+  background-color: rgba(217, 217, 217, 0.5);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+  gap: 8px;
+}
 .icon-button {
   z-index: 1;
   height: 40px;

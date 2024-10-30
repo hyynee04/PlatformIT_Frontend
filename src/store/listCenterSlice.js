@@ -11,10 +11,10 @@ export const fetchCenters = createAsyncThunk(
   "centers/fetchCenters",
   async (status, thunkAPI) => {
     let response;
-    if (status === CenterStatus.active) {
-      response = await getAllCenter();
-    } else if (status === CenterStatus.pending) {
+    if (status === CenterStatus.pending) {
       response = await getPendingCenter();
+    } else {
+      response = await getAllCenter();
     }
     return response || [];
   }
@@ -56,7 +56,7 @@ const listCenterSlice = createSlice({
     builder
       .addCase(fetchCenters.pending, (state) => {
         state.status = "loading";
-        state.centers = []; //reset list to delete old data
+        state.centers = [];
       })
       .addCase(fetchCenters.fulfilled, (state, action) => {
         state.status = "succeeded";

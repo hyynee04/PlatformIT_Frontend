@@ -2,7 +2,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LuBell, LuMessageCircle, LuClipboard } from "react-icons/lu";
+import { LuBell, LuMessageCircle, LuClipboardCheck } from "react-icons/lu";
 import { Role } from "../constants/constants";
 import { useEffect, useState } from "react";
 import HeaderAvatarOption from "../components/HeaderAvatarOption";
@@ -14,9 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAvatar } from "../store/profileUserSlice";
 const Header = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const avaImg = useSelector((state) => state.profileUser.avaImg);
   const [showOptionAva, setShowOptionAva] = useState(false);
-  const location = useLocation();
+  const isAvatarPage = location.pathname === "/pi";
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
   const navigate = useNavigate();
@@ -85,17 +86,25 @@ const Header = () => {
       </Nav.Link>
     ));
   };
-  const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
-    if (buttonName === "clipboard") {
-      navigate("/centerAdPendingTask");
-    } else if (buttonName === "avatar") {
-      toggleVisibility();
-    }
+  const buttonPaths = {
+    clipboard: "/centerAdPendingTask",
+    bell: "/notifications",
   };
-
   const toggleVisibility = () => {
     setShowOptionAva(!showOptionAva);
+  };
+  const handleButtonClick = (buttonName) => {
+    if (buttonName === "avatar") {
+      if (!isAvatarPage) {
+        setShowOptionAva(!showOptionAva);
+      } else {
+        navigate("/pi");
+        toggleVisibility();
+      }
+    } else {
+      navigate(buttonPaths[buttonName]);
+      setShowOptionAva(false);
+    }
   };
 
   return (
@@ -140,24 +149,27 @@ const Header = () => {
                   {idRole === Role.centerAdmin && (
                     <button
                       className={`circle-buts ${
-                        activeButton === "clipboard" ? "clicked" : ""
+                        location.pathname === buttonPaths["clipboard"]
+                          ? "clicked"
+                          : ""
                       }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >
-                      <LuClipboard className="header-icon" />
+                      <LuClipboardCheck className="header-icon" />
                     </button>
                   )}
                   <button
                     className={`circle-buts ${
-                      activeButton === "bell" ? "clicked" : ""
+                      location.pathname === buttonPaths["bell"] ? "clicked" : ""
                     }`}
                     onClick={() => handleButtonClick("bell")}
                   >
                     <LuBell className="header-icon" />
                   </button>
+
                   <button
                     className={`circle-buts ${
-                      activeButton === "avatar" ? "clicked" : ""
+                      isAvatarPage || showOptionAva ? "clicked" : ""
                     }`}
                     onClick={() => handleButtonClick("avatar")}
                   >

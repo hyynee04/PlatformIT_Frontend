@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 import "../assets/scss/card/OptionCard.css";
 import DiagInactiveForm from "./DiagInactiveForm";
+import { Role } from "../constants/constants";
+import DiagTransmitForm from "./DiagTransmitForm";
 
 const UserOption = ({
   idUserSelected,
@@ -10,14 +12,22 @@ const UserOption = ({
   roleUserSelected,
 }) => {
   const [isOptionVisible, setIsOptionVisible] = useState(true);
-  const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
 
+  const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
   const openInactiveModal = () => setIsModalInactiveOpen(true);
   const closeInactiveModal = () => setIsModalInactiveOpen(false);
+
+  const [isModalTransmitOpen, setIsModalTransmitOpen] = useState(false);
+  const openTransmitModal = () => setIsModalTransmitOpen(true);
+  const closeTransmitModal = () => setIsModalTransmitOpen(false);
 
   const handleInactiveClick = () => {
     setIsOptionVisible(false);
     openInactiveModal();
+  };
+  const handleTransmitMainAdmin = () => {
+    setIsOptionVisible(false);
+    openTransmitModal();
   };
   if (!isOptionVisible)
     return (
@@ -31,6 +41,13 @@ const UserOption = ({
             roleUserSelected={roleUserSelected}
           />
         )}
+        {isModalTransmitOpen && (
+          <DiagTransmitForm
+            isOpen={isModalTransmitOpen}
+            onClose={closeTransmitModal}
+            idUserSelected={idUserSelected}
+          />
+        )}
       </>
     );
   return (
@@ -41,18 +58,14 @@ const UserOption = ({
             <span>Inactive user</span>
           </button>
         )}
+        {roleUserSelected === Role.centerAdmin && statusUserSelected > 0 && (
+          <button className="op-buts" onClick={handleTransmitMainAdmin}>
+            <span>Set as Main Admin</span>
+          </button>
+        )}
         <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
           <span>View detail</span>
         </button>
-      </div>
-      <div>
-        <DiagInactiveForm
-          isOpen={isModalInactiveOpen}
-          onClose={closeInactiveModal}
-          idUserSelected={idUserSelected}
-          onUserInactivated={onUserInactivated}
-          roleUserSelected={roleUserSelected}
-        />
       </div>
     </div>
   );

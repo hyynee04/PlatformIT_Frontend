@@ -4,6 +4,7 @@ import "../assets/scss/card/DiagForm.scss";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetUserPI } from "../store/profileUserSlice";
+import { resetCenterPI } from "../store/profileCenterSlice";
 
 const DiagSignOutForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
     localStorage.removeItem("idCenter");
     localStorage.removeItem("idAccount");
     dispatch(resetUserPI());
+    dispatch(resetCenterPI());
 
     navigate("/");
   };
@@ -30,7 +32,7 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
           <LuX className="diag-icon" onClick={onClose} />
         </div>
         <div className="diag-body">
-          <span>Are you sure you want to sign out!</span>
+          <span>Are you sure you want to sign out?</span>
           <div className="str-btns">
             <div className="act-btns">
               <button className="btn diag-btn cancle" onClick={onClose}>

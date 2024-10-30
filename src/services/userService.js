@@ -31,8 +31,6 @@ const postChangePassword = async (
   idAccountUpdated,
   idUserUpdatedBy
 ) => {
-  console.log(currentPW, newPW);
-
   try {
     const response = await axios.post(
       "api/User/ChangePassword",
@@ -44,13 +42,13 @@ const postChangePassword = async (
       },
       {
         headers: {
-          "Content-Type": "application/json", // Đảm bảo server nhận dữ liệu dưới dạng JSON
+          "Content-Type": "application/json",
         },
       }
     );
     return response;
   } catch (error) {
-    console.error("Error adding admin center:", error);
+    console.error("Error object:", error);
   }
 };
 
@@ -71,12 +69,11 @@ const postUpdateUserBasicPI = async (
     nationality: nationality,
   };
   try {
-    const response = await axios.post("api/User/UpdateUserBasicPI", model, {
+    await axios.post("api/User/UpdateUserBasicPI", model, {
       params: {
         idUpdatedBy: idUser,
       },
     });
-    console.log(response);
   } catch (error) {
     console.error("Error updating basic info: ", error);
   }
@@ -106,21 +103,17 @@ const postUpdateTeacherSpecializedPI = async (
     console.error("Error updating teacher info: ", error);
   }
 };
-const postAddProfileLink = async (idUser, name, url) => {
+const postAddProfileLink = async (name, url) => {
+  const idUser = +localStorage.getItem("idUser");
   const model = {
-    idProfileLink: 0,
+    idUser: idUser,
     name: name,
     url: url,
   };
   try {
-    const response = await axios.post("api/User/AddProfileLink", model, {
-      params: {
-        idUser: idUser,
-      },
-    });
-    console.log(response);
+    await axios.post("api/User/AddProfileLink", model);
   } catch (error) {
-    console.error("Error add profile link: ", error);
+    throw error;
   }
 };
 const deleteProfileLink = async (idProfileLink) => {
@@ -155,10 +148,11 @@ const postAddQualification = async (
 ) => {
   try {
     const formData = new FormData();
+    formData.append("IdUser", idUser);
     formData.append("QualificationName", qualificationName);
     formData.append("Description", description);
     formData.append("QualificationFile", qualificationFile);
-    await axios.post(`api/User/AddQualification?IdUser=${idUser}`, formData, {
+    await axios.post(`api/User/AddQualification`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -170,20 +164,23 @@ const postAddQualification = async (
     );
   }
 };
-const postChangeAvatar = async (userId, avatarFile, idUpdatedBy) => {
+const postChangeAvatar = async (isChangeAva, avatarFile) => {
+  const idUser = +localStorage.getItem("idUser");
+
   try {
     const formData = new FormData();
-    formData.append("IdUser", userId);
+    if (isChangeAva) {
+      formData.append("IdUser", idUser);
+    } else {
+      const idCenter = +localStorage.getItem("idCenter");
+      formData.append("IdCenter", idCenter);
+    }
     formData.append("AvatarFile", avatarFile);
-    await axios.post(
-      `api/User/ChangeAvatar?idUpdatedBy=${idUpdatedBy}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    await axios.post(`api/User/ChangeAvatar?idUpdatedBy=${idUser}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   } catch (error) {
     console.error(
       "Error changing avatar:",
@@ -191,18 +188,84 @@ const postChangeAvatar = async (userId, avatarFile, idUpdatedBy) => {
     );
   }
 };
+const postRemoveAvatar = async (isAvatar) => {
+  const idUser = +localStorage.getItem("idUser");
+  const idCenter = +localStorage.getItem("idCenter");
 
+  const model = isAvatar ? { idUser } : { idCenter };
+
+  try {
+    await axios.post("api/User/RemoveAvatar", model, {
+      params: {
+        idUpdatedBy: idUser,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const getAllUser = () => {
   return axios.post("api/User/getAllUser");
 };
-
-const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
+const postInactiveUser = (idUserInactive) => {
+  const idUserUpdatedBy = +localStorage.getItem("idUser");
   return axios.post("api/User/InactiveUser", null, {
     params: {
-      idUserInactive: +idUserInactive,
-      idUserUpdatedBy: +idUserUpdatedBy,
+      idUserInactive: idUserInactive,
+      idUserUpdatedBy: idUserUpdatedBy,
     },
   });
+};
+const getPendingQualifications = () => {
+  const idCenter = +localStorage.getItem("idCenter");
+  return axios.get("api/User/GetPendingQualifications", {
+    params: {
+      centerId: idCenter,
+    },
+  });
+};
+const postApproveQualification = async (idUser, idQualification) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  const approveQuaModel = {
+    idUser: idUser,
+    idQualification: idQualification,
+  };
+  try {
+    const response = await axios.post(
+      "api/User/ApproveQualification",
+      approveQuaModel,
+      {
+        params: {
+          idUpdatedBy: idUpdatedBy,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log("Error approve qualification: ", error);
+  }
+};
+const postRejectQualification = async (idUser, idQualification, reason) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  const rejectQuaModel = {
+    idUser: idUser,
+    idQualification: idQualification,
+    reason: reason,
+  };
+  try {
+    const response = await axios.post(
+      "api/User/RejectQualification",
+      rejectQuaModel,
+      {
+        params: {
+          idUpdatedBy: idUpdatedBy,
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log("Error reject qualification: ", error);
+  }
 };
 
 const getAllTeacherCards = () => {
@@ -220,8 +283,12 @@ export {
   postAddQualification,
   deleteQualification,
   postChangeAvatar,
+  postRemoveAvatar,
   getAllUser,
   postInactiveUser,
   postForgotPassword,
+  getPendingQualifications,
+  postApproveQualification,
+  postRejectQualification,
   getAllTeacherCards,
 };

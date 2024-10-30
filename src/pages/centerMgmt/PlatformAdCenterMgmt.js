@@ -161,13 +161,7 @@ const PlatformAdCenterMgmt = () => {
   };
   const openActionModal = () => setIsModalActionOpen(true);
   const closeActionModal = () => setIsModalActionOpen(false);
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
   return (
     <>
       <div className="page-user-container">
@@ -187,6 +181,14 @@ const PlatformAdCenterMgmt = () => {
             onClick={() => handleStatusCenterClick(CenterStatus.pending)}
           >
             Pending Approval
+          </button>
+          <button
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.inactive ? "active" : ""
+            }`}
+            onClick={() => handleStatusCenterClick(CenterStatus.inactive)}
+          >
+            Inactive
           </button>
         </div>
         <div className="filter-search">
@@ -231,17 +233,11 @@ const PlatformAdCenterMgmt = () => {
         </div>
 
         <div className="list-container">
-          {records.length === 0 ? (
-            <div>
-              <p style={{ textAlign: "center", fontStyle: "italic" }}>
-                There are currently no records to display.
-              </p>
-            </div>
-          ) : activeStatusCenter === CenterStatus.pending ? (
+          {activeStatusCenter === CenterStatus.pending ? (
             <table>
               <thead>
                 <tr>
-                  <th>No.</th>
+                  <th style={{ textAlign: "center" }}>No.</th>
                   <th>Center Admin Name</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
@@ -252,7 +248,7 @@ const PlatformAdCenterMgmt = () => {
               <tbody>
                 {records.map((center, index) => (
                   <tr key={index}>
-                    <td>{index + 1}</td>
+                    <td style={{ textAlign: "center" }}>{index + 1}</td>
                     <td>{center.centerAdminName}</td>
                     <td>{center.centerAdminEmail}</td>
                     <td>{center.tin}</td>
@@ -322,62 +318,93 @@ const PlatformAdCenterMgmt = () => {
             <table>
               <thead>
                 <tr>
-                  <th>No.</th>
+                  <th style={{ textAlign: "center" }}>No.</th>
                   <th>Center Name</th>
                   <th>Center Email</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
                   <th>Date Created</th>
+                  <th>Status</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                {records.map((center, index) => (
-                  <React.Fragment key={index}>
-                    {center.centerStatus === Status.active && (
-                      <tr>
-                        <td>{index + 1}</td>
-                        <td>{center.centerName}</td>
-                        <td>{center.centerEmail}</td>
-                        <td>{center.centerAdminEmail}</td>
-                        <td>{center.tin}</td>
-                        <td>
-                          {center.establishedDate &&
-                            (() => {
-                              const date = new Date(center.submissionDate);
-                              const day = String(date.getDate()).padStart(
-                                2,
-                                "0"
-                              );
-                              const month = String(
-                                date.getMonth() + 1
-                              ).padStart(2, "0");
-                              const year = date.getFullYear();
-                              return `${month}/${day}/${year}`;
-                            })()}
-                        </td>
-                        <td
-                          className={`table-cell ${
-                            activeStatusCenter === CenterStatus.pending
-                              ? "pending"
-                              : ""
-                          }`}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <LuMoreHorizontal
-                            onClick={() => handleMoreIconClick(center.idCenter)}
-                          />
-                          {selectedCenterId === center.idCenter && (
-                            <UserOption
-                              className="user-option"
-                              idUserSelected={center.idCenter}
-                            />
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
+                {(() => {
+                  let count = 0; // Khởi tạo biến đếm bên ngoài map
+                  return records.map((center, index) => {
+                    if (center.centerStatus === activeStatusCenter) {
+                      count++; // Tăng biến đếm khi hiển thị dòng
+                      return (
+                        <React.Fragment key={index}>
+                          <tr>
+                            <td style={{ textAlign: "center" }}>{count}</td>
+                            <td>{center.centerName}</td>
+                            <td>{center.centerEmail}</td>
+                            <td>{center.centerAdminEmail}</td>
+                            <td>{center.tin}</td>
+                            <td>
+                              {center.establishedDate &&
+                                (() => {
+                                  const date = new Date(center.submissionDate);
+                                  const day = String(date.getDate()).padStart(
+                                    2,
+                                    "0"
+                                  );
+                                  const month = String(
+                                    date.getMonth() + 1
+                                  ).padStart(2, "0");
+                                  const year = date.getFullYear();
+                                  return `${month}/${day}/${year}`;
+                                })()}
+                            </td>
+                            <td>
+                              <span
+                                className={`status ${
+                                  center.centerStatus === Status.active
+                                    ? "active"
+                                    : center.centerStatus === Status.pending
+                                    ? "pending"
+                                    : center.centerStatus === Status.inactive
+                                    ? "inactive"
+                                    : ""
+                                }`}
+                              >
+                                {center.centerStatus === Status.active
+                                  ? "Active"
+                                  : center.centerStatus === Status.pending
+                                  ? "Pending"
+                                  : center.centerStatus === Status.inactive
+                                  ? "Inactive"
+                                  : ""}
+                              </span>
+                            </td>
+                            <td
+                              className={`table-cell ${
+                                activeStatusCenter === CenterStatus.pending
+                                  ? "pending"
+                                  : ""
+                              }`}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <LuMoreHorizontal
+                                onClick={() =>
+                                  handleMoreIconClick(center.idCenter)
+                                }
+                              />
+                              {selectedCenterId === center.idCenter && (
+                                <UserOption
+                                  className="user-option"
+                                  idUserSelected={center.idCenter}
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      );
+                    }
+                    return null;
+                  });
+                })()}
               </tbody>
             </table>
           )}

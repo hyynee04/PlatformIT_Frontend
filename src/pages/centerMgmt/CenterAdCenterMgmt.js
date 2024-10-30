@@ -1,173 +1,272 @@
-import React, { useEffect, useState } from "react";
-import {
-  LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
-  LuChevronLeft,
-  LuChevronRight,
-  LuUserPlus,
-  LuTrash2,
-  LuCheck,
-  LuLock,
-} from "react-icons/lu";
-import { Role, Status } from "../../constants/constants";
+import React, { useEffect, useRef, useState } from "react";
+import { LuTrash2, LuCheck, LuFile, LuLock } from "react-icons/lu";
+import { FaInfoCircle, FaGlobe, FaRegFilePdf } from "react-icons/fa";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import { Alert } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
-import FilterUserOfCenter from "../../components/FilterUserOfCenter";
-import SortByUserOfCenter from "../../components/SortByUserOfCenter";
-import DiagAddUserForm from "../../components/DiagAddUserForm";
-import UserOption from "../../components/UserOption";
+import { fetchCenterProfile } from "../../store/profileCenterSlice";
+import {
+  postAddCenterLink,
+  postAddCenterQualification,
+  postUpdateCenterBasicInfo,
+} from "../../services/centerService";
+import {
+  deleteProfileLink,
+  deleteQualification,
+} from "../../services/userService";
+import CenterAdAdminMgmt from "../userMgmt/CenterAdAdminMgmt";
 
-import default_ava from "../../assets/img/default_image.png";
+import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/PI.css";
-
+import AvatarImageOption from "../../components/AvatarImageOption";
+import DiagWorkingHourForm from "../../components/DiagWorkingHourForm";
 const CenterAdCenterMgmt = () => {
   //Center Infomation
-  const [avaImg, setAvaImg] = useState(null);
-  const [centerName, setCenterName] = useState(null);
-  const [contactNumber, setContactNumber] = useState(null);
-  const [dateCreated, setDateCreated] = useState(null);
-  const [TIN, setTIN] = useState(null);
-  const [centerLinks, setCenterLinks] = useState([
-    { idCenterLink: 0, name: "", url: "" },
-  ]);
-  const [address, setAddress] = useState(null);
-  const [email, setEmail] = useState(null);
-  const [dateEstablished, setDateEstablished] = useState(null);
-  const [description, setDescription] = useState(null);
-
-  //Admin Management
-  const idUser = +localStorage.getItem("idUser");
-  const dispatch = useDispatch();
+  const dispatchInfo = useDispatch();
+  const centerInfo = useSelector((state) => state.profileCenter);
   const {
-    listUserOfCenter = [],
-    loading,
-    error,
-  } = useSelector((state) => state.listUserOfCenter || {});
-  const [listUser, setListUser] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState({
-    field: "isMainCenterAdmin",
-    order: "desc",
+    avatarPath,
+    centerName,
+    centerEmail,
+    tin,
+    address,
+    phoneNumber,
+    description,
+    establishedDate,
+    submissionDate,
+    centerStatus,
+    idMainAdmin,
+    links,
+    qualificationModels,
+  } = centerInfo;
+  const [tempCenterInfo, setTempCenterInfo] = useState({
+    centerName: "",
+    centerEmail: "",
+    tin: "",
+    address: "",
+    phoneNumber: "",
+    description: "",
+    establishedDate: "",
+    submissionDate: "",
+    centerStatus: 0,
   });
-  const [filterVisble, setFilterVisble] = useState(false);
-  const [sortByVisible, setSortByVisible] = useState(false);
-  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
-  const [status, setStatus] = useState(null);
+  const [activeAction, setActiveAction] = useState("basicInfo");
+  const [phoneNumWarning, setPhoneNumWarning] = useState("");
+  const [emailWarning, setEmailWarning] = useState("");
+  const [updateStr, setUpdateStr] = useState("");
+  const [newProfileLink, setNewProfileLink] = useState({ name: "", url: "" });
+  const [newQualification, setNewQualification] = useState({
+    qualificationName: "",
+    qualificationDescr: "",
+    qualificationFile: null,
+    qualificationUrl: "",
+  });
+  const [qualiPDFCheck, setQualiPDFCheck] = useState(false);
+  const [qualiWarning, setQualiWarning] = useState("");
+  const inputFileRef = useRef(null);
+  const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
+  const toggleVisibility = () => {
+    setShowAvatarImageOption(!showAvatarImageOption);
+  };
+  const [isModalHourOpen, setIsModalHourOpen] = useState(false);
 
-  const [isModalAddAdminOpen, setIsModalAddAdminOpen] = useState(false);
-  const openAddAdminModal = () => setIsModalAddAdminOpen(true);
-  const closeAddAdminModal = () => setIsModalAddAdminOpen(false);
+  const openHourModal = () => {
+    setIsModalHourOpen(true);
+    setShowAvatarImageOption(false);
+  };
+  const closeHourModal = () => setIsModalHourOpen(false);
+  //FETCH DATA
+  const handleActionClick = (action) => {
+    setActiveAction(action);
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await dispatchInfo(fetchCenterProfile());
+      } catch (error) {
+        console.error("Error getting center info", error);
+      }
+    };
+    fetchData();
+  }, [dispatchInfo]);
 
-  const getStatusString = (status) => {
-    switch (status) {
-      case Status.active:
-        return "Active";
-      case Status.pending:
-        return "Pending";
-      case Status.inactive:
-        return "Inactive";
-      default:
-        return "";
+  useEffect(() => {
+    setTempCenterInfo({
+      centerName: centerInfo.centerName,
+      centerEmail: centerInfo.centerEmail,
+      tin: centerInfo.tin,
+      address: centerInfo.address,
+      phoneNumber: centerInfo.phoneNumber,
+      description: centerInfo.description,
+      establishedDate: centerInfo.establishedDate,
+      submissionDate: centerInfo.submissionDate,
+      centerStatus: centerInfo.centerStatus,
+    });
+  }, [centerInfo]);
+
+  const idUser = +localStorage.getItem("idUser");
+  const isCurrentUserMainAdmin = idMainAdmin === idUser;
+  //BASIC INFO
+  const handleInputChange = (field, value) => {
+    setTempCenterInfo({ ...tempCenterInfo, [field]: value });
+  };
+  const validatePhoneNum = (num) => /^\d{10}$/.test(num);
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const updateBasicInfo = async () => {
+    if (
+      tempCenterInfo.phoneNumber &&
+      !validatePhoneNum(tempCenterInfo.phoneNumber)
+    ) {
+      setPhoneNumWarning("Phone number must be exactly 10 digits.");
+    } else {
+      setPhoneNumWarning("");
+      if (
+        tempCenterInfo.centerEmail &&
+        !validateEmail(tempCenterInfo.centerEmail)
+      ) {
+        setEmailWarning("Please enter a valid email format.");
+      } else {
+        setEmailWarning("");
+        try {
+          await postUpdateCenterBasicInfo(
+            tempCenterInfo.centerName,
+            tempCenterInfo.centerEmail,
+            tempCenterInfo.address,
+            tempCenterInfo.phoneNumber,
+            tempCenterInfo.description,
+            tempCenterInfo.establishedDate
+          );
+          await dispatchInfo(fetchCenterProfile());
+          setUpdateStr("Center information has been updated successfully!");
+
+          setTimeout(() => {
+            setUpdateStr("");
+          }, 3000);
+        } catch (error) {
+          setUpdateStr("There was an error updating center information.");
+          throw error;
+        }
+      }
     }
   };
-  useEffect(() => {
-    dispatch(fetchListUserOfCenter(Role.centerAdmin));
-  }, [dispatch]);
 
-  useEffect(() => {
-    setListUser(listUserOfCenter);
-  }, [listUserOfCenter]);
+  //LINKS
+  const removeProfileLink = async (idProfileLink) => {
+    await deleteProfileLink(idProfileLink);
+    await dispatchInfo(fetchCenterProfile());
+  };
+  const handleNameProfileLinkChange = (e) => {
+    setNewProfileLink({ ...newProfileLink, name: e.target.value });
+  };
+  const handleURLProfileLinkChange = (e) => {
+    setNewProfileLink({ ...newProfileLink, url: e.target.value });
+  };
+  const addProfileLink = async () => {
+    if (newProfileLink.name && newProfileLink.url) {
+      await postAddCenterLink(newProfileLink.name, newProfileLink.url);
+      await dispatchInfo(fetchCenterProfile());
+      setNewProfileLink({ name: "", url: "" });
+    }
+  };
 
-  const filteredUser = listUser
-    .filter((user) => {
-      const searchTermLower = searchTerm.toLowerCase();
-
-      const matchesSearchTerm =
-        (user.fullName &&
-          user.fullName.toLowerCase().includes(searchTermLower)) ||
-        (user.email && user.email.toLowerCase().includes(searchTermLower)) ||
-        (user.centerName &&
-          user.centerName.toLowerCase().includes(searchTermLower)) ||
-        (user.joinedDate &&
-          new Date(user.joinedDate)
-            .toLocaleDateString("en-US")
-            .includes(searchTermLower)) ||
-        getStatusString(user.status).toLowerCase().includes(searchTermLower);
-
-      const matchesDateJoined =
-        (!dateRange.startDate && !dateRange.endDate) ||
-        (user.joinedDate &&
-          new Date(user.joinedDate) >= new Date(dateRange.startDate) &&
-          new Date(user.joinedDate) <= new Date(dateRange.endDate));
-
-      const matchesStatus =
-        status === null || status === undefined || user.status === status;
-
-      return matchesSearchTerm && matchesDateJoined && matchesStatus;
-    })
-    .sort((a, b) => {
-      let aValue, bValue;
-
-      if (sortBy.field === "isMainCenterAdmin") {
-        aValue = a.isMainCenterAdmin ? a.isMainCenterAdmin : "";
-        bValue = b.isMainCenterAdmin ? b.isMainCenterAdmin : "";
-      } else if (sortBy.field === "fullname") {
-        aValue = a.fullName ? a.fullName.toLowerCase() : "";
-        bValue = b.fullName ? b.fullName.toLowerCase() : "";
-      } else if (sortBy.field === "phoneNumber") {
-        aValue = a.phoneNumber ? a.phoneNumber.toLowerCase() : "";
-        bValue = b.phoneNumber ? b.phoneNumber.toLowerCase() : "";
-      } else if (sortBy.field === "email") {
-        aValue = a.email ? a.email.toLowerCase() : "";
-        bValue = b.email ? b.email.toLowerCase() : "";
-      } else if (sortBy.field === "dateJoined") {
-        aValue = new Date(a.joinedDate) || new Date(0);
-        bValue = new Date(b.joinedDate) || new Date(0);
-      }
-
-      return sortBy.order === "asc"
-        ? aValue > bValue
-          ? 1
-          : -1
-        : aValue < bValue
-        ? 1
-        : -1;
+  //QUALIFICATIONS
+  const removeQualification = async (idQualification) => {
+    await deleteQualification(idQualification);
+    await dispatchInfo(fetchCenterProfile());
+  };
+  const handleNameQualificationChange = (e) => {
+    setNewQualification({
+      ...newQualification,
+      qualificationName: e.target.value,
     });
+    setQualiWarning("");
+  };
+  const handleDescrQualificationChange = (e) => {
+    setNewQualification({
+      ...newQualification,
+      qualificationDescr: e.target.value,
+    });
+    setQualiWarning("");
+  };
+  const handleOpenQualiInput = () => {
+    inputFileRef.current.click();
+  };
+  const formatFile = (file) => {
+    return {
+      uri: file.uri || "",
+      name: file.name || "avatar.png",
+      type: file.type || "image/png",
+    };
+  };
+  const handleQualiFileChange = async (event) => {
+    const file = event.target.files[0];
 
-  const handleFilterChange = ({ dateRange, status }) => {
-    setDateRange(dateRange);
-    setStatus(status);
+    if (file) {
+      if (file.type === "application/pdf") {
+        setQualiPDFCheck(true);
+      }
+      const formattedFile = formatFile(file);
+      try {
+        let blobFile;
+
+        if (formattedFile.uri && formattedFile.uri.startsWith("blob:")) {
+          let response = await fetch(formattedFile.uri);
+          const blob = await response.blob();
+
+          blobFile = new File([blob], formattedFile.name, {
+            type: formattedFile.type,
+          });
+        } else {
+          blobFile = file;
+        }
+        console.log(blobFile);
+
+        const fileUrl = URL.createObjectURL(blobFile);
+        setNewQualification((prev) => ({
+          ...prev,
+          qualificationFile: blobFile,
+          qualificationUrl: fileUrl,
+        }));
+        setQualiWarning("");
+      } catch (error) {
+        throw error;
+      }
+    }
+  };
+  const AddQualification = async () => {
+    if (
+      newQualification.qualificationName &&
+      newQualification.qualificationDescr &&
+      newQualification.qualificationFile
+    ) {
+      await postAddCenterQualification(
+        newQualification.qualificationName,
+        newQualification.qualificationDescr,
+        newQualification.qualificationFile
+      );
+      await setNewQualification((prev) => ({
+        ...prev,
+        qualificationName: "",
+        qualificationDescr: "",
+        qualificationFile: null,
+        qualificationUrl: "",
+      }));
+      await setQualiPDFCheck(false);
+    } else {
+      setQualiWarning(
+        "Please enter all required fields for the qualification."
+      );
+    }
+    await dispatchInfo(fetchCenterProfile());
   };
 
-  const handleSortByChange = ({ field, order }) => {
-    setSortBy({ field, order });
-  };
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 30;
-  const lastIndex = currentPage * recordsPerPage;
-  const firstIndex = lastIndex - recordsPerPage;
-  const records = filteredUser.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(filteredUser.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
-
-  const handleMoreIconClick = (idUser) => {
-    setSelectedUserId((prevSelectedId) =>
-      prevSelectedId === idUser ? null : idUser
-    );
-  };
   return (
     <>
       <div className="center-info">
         <div className="title-info">
           <b>Center Infomation</b>
-          {records.some(
-            (user) => user.idUser === idUser && user.isMainCenterAdmin
-          ) && (
+          {isCurrentUserMainAdmin && (
             <div className="btn">
               <LuLock className="icon" />
               <span>Lock</span>
@@ -178,370 +277,401 @@ const CenterAdCenterMgmt = () => {
           <div className="container-ava">
             <div className="sub-container-ava">
               <img
-                src={avaImg ? avaImg : default_ava}
+                src={avatarPath ? avatarPath : default_image}
                 alt=""
                 className="main-center-image"
+                onClick={toggleVisibility}
               />
+              {showAvatarImageOption && <AvatarImageOption isAvatar={false} />}
+            </div>
+            <div className="sub-container-action">
+              <div className="action-btn">
+                <div
+                  className={`btn ${
+                    activeAction === "basicInfo" ? "active" : ""
+                  }`}
+                  onClick={() => handleActionClick("basicInfo")}
+                >
+                  <FaInfoCircle className="icon" />
+                  Basic Infomation
+                </div>
+                <div
+                  className={`btn ${
+                    activeAction === "link_quali" ? "active" : ""
+                  }`}
+                  onClick={() => handleActionClick("link_quali")}
+                >
+                  <FaGlobe className="icon" />
+                  Links & Qualifications
+                </div>
+              </div>
             </div>
           </div>
-          <div className="container-specialized">
-            <div className="container-info">
-              <div className="container-field">
-                <div className="container-left">
-                  <div className="info">
-                    <span>Center Name</span>
-                    <input
-                      type="text"
-                      className="input-form-pi"
-                      value={centerName || ""}
-                      onChange={(e) => setCenterName(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Contact Number</span>
-                    <input
-                      type="text"
-                      className="input-form-pi"
-                      value={contactNumber || ""}
-                      onChange={(e) => setContactNumber(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Date Created</span>
-                    <input
-                      type="date"
-                      className="input-form-pi"
-                      value={dateCreated}
-                      onChange={(e) => setDateCreated(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Tax Identification Number (TIN)</span>
-                    <input
-                      type="text"
-                      className="input-form-pi"
-                      value={TIN || ""}
-                      onChange={(e) => setTIN(e.target.value)}
-                      disabled
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Social/Website Center Links</span>
-                    {centerLinks.some(
-                      (profile) => profile.name && profile.url
-                    ) &&
-                      centerLinks.map((profile, index) => (
-                        <div className="container-link" key={index}>
-                          <InputGroup className="mb-3">
-                            <input
-                              type="text"
-                              value={profile.name}
-                              className="title-link"
-                              readOnly
-                            />
-                            <Form.Control
-                              placeholder="Link"
-                              className="main-link"
-                              value={profile.url}
-                              readOnly
-                            />
-                          </InputGroup>
-                          <div
-                            className="icon-button"
-                            onClick={() => {
-                              //   removeProfileLinks(profile.idProfileLink, index);
-                            }}
+          {activeAction === "basicInfo" ? (
+            <div className="container-specialized">
+              <div className="container-info">
+                <div className="container-field">
+                  <div className="container-left">
+                    <div className="info">
+                      <span>Center Name</span>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        value={tempCenterInfo.centerName || ""}
+                        onChange={(e) =>
+                          handleInputChange("centerName", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="info">
+                      <div className="container-phone">
+                        <span>Contact Number</span>
+                        {phoneNumWarning && (
+                          <span
+                            className={"warning-error"}
+                            style={{ color: "var(--red-color)" }}
                           >
-                            <LuTrash2 className="icon" />
-                          </div>
-                        </div>
-                      ))}
-                    <div className="container-link">
+                            {phoneNumWarning}
+                          </span>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        value={tempCenterInfo.phoneNumber || ""}
+                        onChange={(e) =>
+                          handleInputChange("phoneNumber", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="info">
+                      <span>Date Created</span>
+                      <input
+                        type="date"
+                        className="input-form-pi"
+                        value={tempCenterInfo.submissionDate}
+                        disabled
+                      />
+                    </div>
+                    <div className="info">
+                      <span>Tax Identification Number (TIN)</span>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        value={tempCenterInfo.tin || ""}
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div className="container-gap"></div>
+                  <div className="container-right">
+                    <div className="info">
+                      <span>Address</span>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        value={tempCenterInfo.address || ""}
+                        onChange={(e) =>
+                          handleInputChange("address", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="info">
+                      <div className="container-phone">
+                        <span>Email</span>
+                        {emailWarning && (
+                          <span
+                            className={"warning-error"}
+                            style={{ color: "var(--red-color)" }}
+                          >
+                            {emailWarning}
+                          </span>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        value={tempCenterInfo.centerEmail || ""}
+                        onChange={(e) =>
+                          handleInputChange("centerEmail", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="info">
+                      <span>Date Established</span>
+                      <input
+                        type="date"
+                        className="input-form-pi"
+                        value={tempCenterInfo.establishedDate}
+                        onChange={(e) =>
+                          handleInputChange("submissionDate", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="info">
+                      <span>Description</span>
+                      <Form.Control
+                        as="textarea"
+                        className="input-area-form-pi"
+                        value={tempCenterInfo.description || ""}
+                        onChange={(e) =>
+                          handleInputChange("description", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="alert-option">
+                  {updateStr && (
+                    <Alert variant="success" onClose={() => setUpdateStr("")}>
+                      {updateStr}
+                    </Alert>
+                  )}
+                  <div className="container-button">
+                    <button
+                      className="discard-changes"
+                      onClick={() => {
+                        openHourModal();
+                      }}
+                    >
+                      Add Working Hours
+                    </button>
+
+                    <button
+                      className="save-change"
+                      onClick={() => {
+                        updateBasicInfo();
+                      }}
+                    >
+                      Save changes
+                    </button>
+                  </div>
+                  {isModalHourOpen && (
+                    <div>
+                      <DiagWorkingHourForm
+                        isOpen={isModalHourOpen}
+                        onClose={closeHourModal}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="container-specialized">
+              <div className="container-info">
+                <span className="title-span">Social/Website Links</span>
+                <div className="info">
+                  {links.map((link, index) => (
+                    <div className="container-link" key={index}>
                       <InputGroup className="mb-3">
-                        <select
-                          //   onChange={handleNameProfileLinkChange}
+                        <input
+                          type="text"
+                          value={link.name || ""}
                           className="title-link"
-                        >
-                          <option value="" className="option-link">
-                            Select type
-                          </option>
-                          <option value="Github" className="option-link">
-                            Github
-                          </option>
-                          <option value="LinkedIn" className="option-link">
-                            LinkedIn
-                          </option>
-                          <option value="Portfolio" className="option-link">
-                            Portfolio
-                          </option>
-                          <option value="Youtube" className="option-link">
-                            Youtube
-                          </option>
-                          <option value="Facebook" className="option-link">
-                            Facebook
-                          </option>
-                        </select>
+                          readOnly
+                        />
                         <Form.Control
-                          placeholder="Link"
                           className="main-link"
-                          //   value={newProfileLink.url}
-                          //   onChange={handleURLProfileLinkChange}
+                          value={link.url || ""}
+                          readOnly
                         />
                       </InputGroup>
                       <div
                         className="icon-button"
-                        //   onClick={addProfileLink}
+                        onClick={() => {
+                          removeProfileLink(link.idProfileLink);
+                        }}
                       >
-                        <LuCheck className="icon" />
+                        <LuTrash2 className="icon" />
                       </div>
+                    </div>
+                  ))}
+                  <div className="container-link">
+                    <InputGroup className="mb-3">
+                      <select
+                        onChange={handleNameProfileLinkChange}
+                        className="title-link"
+                        value={newProfileLink.name || ""}
+                      >
+                        <option value="" className="option-link">
+                          Select type
+                        </option>
+                        <option value="Github" className="option-link">
+                          Github
+                        </option>
+                        <option value="LinkedIn" className="option-link">
+                          LinkedIn
+                        </option>
+                        <option value="Portfolio" className="option-link">
+                          Portfolio
+                        </option>
+                        <option value="Youtube" className="option-link">
+                          Youtube
+                        </option>
+                        <option value="Facebook" className="option-link">
+                          Facebook
+                        </option>
+                        <option value="Website" className="option-link">
+                          Website
+                        </option>
+                      </select>
+                      <Form.Control
+                        placeholder="Link"
+                        className="main-link"
+                        value={newProfileLink.url}
+                        onChange={handleURLProfileLinkChange}
+                      />
+                    </InputGroup>
+                    <div className="icon-button" onClick={addProfileLink}>
+                      <LuCheck className="icon" />
                     </div>
                   </div>
                 </div>
-                <div className="container-gap"></div>
-                <div className="container-right">
-                  <div className="info">
-                    <span>Address</span>
-                    <input
-                      type="text"
-                      className="input-form-pi"
-                      value={address || ""}
-                      onChange={(e) => setAddress(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Email</span>
-                    <input
-                      type="text"
-                      className="input-form-pi"
-                      value={email || ""}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Date Established</span>
-                    <input
-                      type="date"
-                      className="input-form-pi"
-                      value={dateEstablished}
-                      onChange={(e) => setDateEstablished(e.target.value)}
-                    />
-                  </div>
-                  <div className="info">
-                    <span>Description</span>
-                    <Form.Control
-                      as="textarea"
-                      className="input-area-form-pi"
-                      value={description || ""}
-                      onChange={(e) => setDescription(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="alert-option">
-                <div className="container-button">
-                  <button className="discard-changes">Add Working Hours</button>
-                  <button
-                    className="save-change"
-                    onClick={() => {
-                      // updateBasicInfo();
-                    }}
-                  >
-                    Save change
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="admin-info">
-        <div className="title-info">
-          <b>Admin Management</b>
-        </div>
-        <div className="page-user-container">
-          <div className="filter-search">
-            <div className="filter-sort-btns">
-              <div
-                className="btn"
-                onClick={() => {
-                  setFilterVisble(!filterVisble);
-                  setSortByVisible(false);
-                }}
-              >
-                <LuFilter className="icon" />
-                <span>Filter</span>
-              </div>
-              {filterVisble && (
-                <FilterUserOfCenter onFilterChange={handleFilterChange} />
-              )}
-              <div
-                className="btn"
-                onClick={() => {
-                  setSortByVisible(!sortByVisible);
-                  setFilterVisble(false);
-                }}
-              >
-                <span>Sort by</span>
-                <LuChevronDown className="icon" />
-              </div>
-              {sortByVisible && (
-                <SortByUserOfCenter
-                  onSortByChange={handleSortByChange}
-                  sortCenterAdmin={true}
-                />
-              )}
-            </div>
+                <span className="title-span">Qualifications</span>
+                <div className="info">
+                  {qualificationModels.map((qualification, index) => (
+                    <div className="container-info-img" key={index}>
+                      <div className="quali-content">
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          value={qualification.qualificationName || ""}
+                          disabled
+                        />
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          value={qualification.description || ""}
+                          disabled
+                        />
+                        <div className="status-action">
+                          <div className="icon-btn-container">
+                            <div
+                              className="icon-button"
+                              onClick={() => {
+                                removeQualification(
+                                  qualification.idQualification
+                                );
+                              }}
+                            >
+                              <LuTrash2 className="icon" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="quali-image">
+                        {qualification.path &&
+                        qualification.path.endsWith(".pdf") ? (
+                          <div
+                            onClick={() =>
+                              window.open(qualification.path, "_blank")
+                            }
+                            className="main-ava-image pdf-link"
+                          >
+                            <FaRegFilePdf
+                              style={{ width: "40px", height: "40px" }}
+                            />
+                            <span>Click to view PDF</span>
+                          </div>
+                        ) : (
+                          <img
+                            src={
+                              qualification.path
+                                ? qualification.path
+                                : default_image
+                            }
+                            alt=""
+                            className="main-ava-image"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="container-info-img">
+                    <div className="quali-content">
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        placeholder="Title..."
+                        value={newQualification.qualificationName || ""}
+                        onChange={handleNameQualificationChange}
+                      />
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        placeholder="Description..."
+                        onChange={handleDescrQualificationChange}
+                        value={newQualification.qualificationDescr || ""}
+                      />
+                      <div className="status-action">
+                        {qualiWarning && (
+                          <span className={"warning-error"}>
+                            {qualiWarning}
+                          </span>
+                        )}
 
-            <div className="search-container">
-              <input
-                type="text"
-                className="search-field"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <LuSearch className="icon search-icon" />
-            </div>
-          </div>
-          {records.some(
-            (user) => user.idUser === idUser && user.isMainCenterAdmin
-          ) && (
-            <div className="add-btn">
-              <div className="btn" onClick={() => openAddAdminModal()}>
-                <LuUserPlus className="icon" />
-                <span>Add admin</span>
+                        <div className="icon-btn-container">
+                          <div
+                            className="icon-button"
+                            onClick={handleOpenQualiInput}
+                          >
+                            <LuFile className="icon" />
+                          </div>
+                          <div
+                            className="icon-button"
+                            onClick={AddQualification}
+                          >
+                            <LuCheck className="icon" />
+                          </div>
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        ref={inputFileRef}
+                        style={{ display: "none" }}
+                        accept=".png, .jpg, .jpeg, .pdf"
+                        onChange={handleQualiFileChange}
+                      />
+                    </div>
+                    <div className="quali-image">
+                      {qualiPDFCheck ? (
+                        <div
+                          onClick={() =>
+                            window.open(
+                              newQualification.qualificationUrl,
+                              "_blank"
+                            )
+                          }
+                          className="main-ava-image pdf-link"
+                        >
+                          <FaRegFilePdf
+                            style={{ width: "40px", height: "40px" }}
+                          />
+                          <span>Click to view PDF</span>
+                        </div>
+                      ) : (
+                        <img
+                          src={
+                            newQualification.qualificationUrl
+                              ? newQualification.qualificationUrl
+                              : default_image
+                          }
+                          alt=""
+                          className="main-ava-image"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <DiagAddUserForm
-                isOpen={isModalAddAdminOpen}
-                onClose={closeAddAdminModal}
-                roleAdded={Role.centerAdmin}
-              />
             </div>
           )}
-          <div className="list-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Full Name</th>
-                  <th>Phone Number</th>
-                  <th>Email</th>
-                  <th>Admin Level</th>
-                  <th>Date Joined</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {records.map((user, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{user.fullName}</td>
-                    <td>{user.phoneNumber}</td>
-                    <td>{user.email}</td>
-                    <td>{user.isMainCenterAdmin ? "Main" : "Sub"}</td>
-                    <td>
-                      {user.joinedDate &&
-                        (() => {
-                          const date = new Date(user.joinedDate);
-                          const day = String(date.getDate()).padStart(2, "0");
-                          const month = String(date.getMonth() + 1).padStart(
-                            2,
-                            "0"
-                          );
-                          const year = date.getFullYear();
-
-                          return `${month}/${day}/${year}`;
-                        })()}
-                    </td>
-                    <td>
-                      <span
-                        className={`status ${
-                          user.status === Status.active
-                            ? "active"
-                            : user.status === Status.pending
-                            ? "pending"
-                            : user.status === Status.inactive
-                            ? "inactive"
-                            : ""
-                        }`}
-                      >
-                        {user.status === Status.active
-                          ? "Active"
-                          : user.status === Status.pending
-                          ? "Pending"
-                          : user.status === Status.inactive
-                          ? "Inactive"
-                          : ""}
-                      </span>
-                    </td>
-                    <td className="table-cell" style={{ cursor: "pointer" }}>
-                      {user.idUser !== idUser && (
-                        <LuMoreHorizontal
-                          onClick={() => handleMoreIconClick(user.idUser)}
-                        />
-                      )}
-                      {selectedUserId === user.idUser && (
-                        <UserOption
-                          className="user-option"
-                          idUserSelected={user.idUser}
-                          statusUserSelected={user.status}
-                          onUserInactivated={() => setSelectedUserId(null)}
-                          roleUserSelected={Role.centerAdmin}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="pagination-container">
-            <nav>
-              <ul className="pagination">
-                <li className="page-item">
-                  <button className="page-link" onClick={prePage}>
-                    <LuChevronLeft />
-                  </button>
-                </li>
-                {numbers.map((n, i) => (
-                  <li
-                    className={`page-item ${currentPage === n ? "active" : ""}`}
-                    key={i}
-                  >
-                    <button
-                      className="page-link btn"
-                      onClick={() => changeCPage(n)}
-                    >
-                      {n}
-                    </button>
-                  </li>
-                ))}
-                <li className="page-item">
-                  <button className="page-link" onClick={nextPage}>
-                    <LuChevronRight />
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
         </div>
       </div>
+      <CenterAdAdminMgmt />
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
-  function changeCPage(id) {
-    setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
-  }
 };
 
 export default CenterAdCenterMgmt;

@@ -9,6 +9,7 @@ import {
 import { Role } from "../constants/constants";
 
 import "../assets/scss/card/DiagForm.scss";
+import { postAddTeacher } from "../services/centerService";
 const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const idCenter = +localStorage.getItem("idCenter");
   const idUserUpdatedBy = +localStorage.getItem("idUser");
@@ -20,16 +21,15 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
-        const resultAction = await dispatch(
-          addTeacher({ email, username, password, idCenter })
-        ).unwrap();
-        // const result = await dispatch(
-        //   addTeacher({ email, username, password, idCenter })
-        // ).unwrap();
-        console.log(resultAction.message);
-        // if (addTeacher.fulfilled.match(resultAction)) {
-        //   console.log("Add teacher successfully");
-        //   dispatch(fetchListUserOfCenter(Role.teacher));
+        const data = await postAddTeacher(email, username, password, idCenter);
+        if (!data.accountId) {
+          setErrorString(data.message);
+        } else {
+          onClose();
+          dispatch(fetchListUserOfCenter(Role.teacher));
+        }
+        console.log(data);
+
         // }
       } catch (error) {
         console.error("Error while add teacher center: ", error);
@@ -49,7 +49,8 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
 
         // if (addAdminCenter.fulfilled.match(resultAction)) {
         //   console.log("Add center admin successfully");
-        //   dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        onClose();
         // }
       } catch (error) {
         console.error("Error while approving center: ", error);
@@ -113,7 +114,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
                 className="btn diag-btn signout"
                 onClick={async () => {
                   await handleAddUser();
-                  onClose();
+                  // onClose();
                 }}
               >
                 Submit

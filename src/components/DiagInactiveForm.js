@@ -20,9 +20,8 @@ const DiagInactiveForm = ({
     const idUserUpdatedBy = +localStorage.getItem("idUser");
     try {
       const resultAction = await dispatch(
-        updateUserStatus({ idUser: idUserSelected, idUserUpdatedBy })
+        updateUserStatus({ idUserSelected, idUserUpdatedBy })
       );
-
       if (updateUserStatus.fulfilled.match(resultAction)) {
         if (idRole === Role.platformAdmin) {
           dispatch(fetchAllUsers());

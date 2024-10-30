@@ -105,6 +105,10 @@ const postAddTeacher = async (email, username, password, idCenter) => {
   }
 };
 
+const getAllCenterCards = () => {
+  return axios.get("api/Center/GetAllCenterCards");
+}
+
 export {
   getAllCenter,
   getPendingCenter,
@@ -115,4 +119,5 @@ export {
   postRejectCenter,
   postAddCenterAmin,
   postAddTeacher,
+  getAllCenterCards,
 };

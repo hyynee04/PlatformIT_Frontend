@@ -128,10 +128,11 @@
   .mainpart-content
   .mb-3
   .form-control {
-  height: 45px;
+  height: 43px;
   padding: 4px 40px;
-  border-radius: 90px;
-  border-color: var(--border-gray);
+  border-radius: .5rem;
+  border-color: rgba(217, 217, 217, 0.3);
+  background-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
 }
 .login-container
@@ -141,6 +142,8 @@
   .mb-3
   .form-control:focus {
   box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
+  background-color: #fafafa;
+  border: 1px solid var(--border-gray);
 }
 .login-container .mainpart-container .holder .mainpart-content .mb-3 .icon-eye {
   right: 12px;

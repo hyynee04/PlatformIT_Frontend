@@ -61,6 +61,15 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-bottom: .8rem !important;
 }
 
+.mb-3.change-mb3 {
+  width: fit-content;
+  justify-content: center;
+}
+
+.change-mb3 > input {
+  width: 400px;
+}
+
 .password-container {
   width: 500px;
 
@@ -105,6 +114,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .form-control:focus {
   box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border-gray);
+  background-color: #fafafa;
 }
 
 .form-control.introduce-center {

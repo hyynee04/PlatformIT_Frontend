@@ -191,6 +191,7 @@ const postChangeAvatar = async (userId, avatarFile, idUpdatedBy) => {
     );
   }
 };
+
 const getAllUser = () => {
   return axios.post("api/User/getAllUser");
 };
@@ -203,6 +204,10 @@ const postInactiveUser = (idUserInactive, idUserUpdatedBy) => {
     },
   });
 };
+
+const getAllTeacherCards = () => {
+  return axios.get("api/User/GetAllTeacherCards");
+}
 
 export {
   getPI,
@@ -218,4 +223,5 @@ export {
   getAllUser,
   postInactiveUser,
   postForgotPassword,
+  getAllTeacherCards,
 };

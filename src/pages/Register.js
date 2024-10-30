@@ -147,7 +147,7 @@ const Register = () => {
 
   const handleRegister = async () => {
     //submit api
-    let data = await postRegister(fullName, email, username, password, centerName, TIN);
+    let data = await postRegister(fullName, email, username, password, centerName, centerDescription, TIN);
     if (Number.isInteger(data)) {
       localStorage.removeItem('verifiedEmail');
       navigate("/login");
@@ -443,7 +443,7 @@ const Register = () => {
           <Modal.Title>Verify Email</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="mb-3 justify-margin">
+          <div className="mb-3 change-mb3 justify-margin">
             <LuMail color="#757575" className="icon-head" />
             <input
               type="number"
@@ -462,7 +462,7 @@ const Register = () => {
             />
           </div>
           {errorVerify && (
-            <div className="mb-3 justify-margin">
+            <div className="mb-3 change-mb3 justify-margin">
               <span className="error-noti">
                 {errorVerify}
               </span>

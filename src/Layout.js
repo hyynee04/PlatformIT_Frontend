@@ -25,6 +25,7 @@ import TeacherDetail from "./pages/detail/TeacherDetail";
 import CenterDetail from "./pages/detail/CenterDetail";
 import CourseDetail from "./pages/detail/CourseDetail";
 import StudentDetail from "./pages/detail/StudentDetail";
+import ViewAllTeacher from "./pages/viewAll/ViewAllTeacher";
 
 const Layout = (props) => {
   return (
@@ -36,6 +37,8 @@ const Layout = (props) => {
           <Route path="/aboutUs" element={<AboutUs />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          <Route path="/teacherViewAll" element={<ViewAllTeacher />} />
 
           <Route path="/teacherDetail" element={<TeacherDetail />} />
           <Route path="/centerDetail" element={<CenterDetail />} />

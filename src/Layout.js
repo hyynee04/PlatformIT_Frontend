@@ -28,13 +28,7 @@ import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
-import PrivateRoute from "./PrivateRoute";
-import CenterAdPendingTask from "./pages/CenterAdPendingTask";
-import LoginResponse from "./pages/LoginResponse";
-import TeacherDetail from "./pages/detail/TeacherDetail";
-import CenterDetail from "./pages/detail/CenterDetail";
-import CourseDetail from "./pages/detail/CourseDetail";
-import StudentDetail from "./pages/detail/StudentDetail";
+
 import ViewAllTeacher from "./pages/viewAll/ViewAllTeacher";
 
 const Layout = (props) => {
@@ -80,6 +74,8 @@ const Layout = (props) => {
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
+
+          <Route path="/teacherViewAll" element={<ViewAllTeacher />} />
 
           {/* Platform Admin */}
           <Route

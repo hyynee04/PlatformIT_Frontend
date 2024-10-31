@@ -86,3 +86,14 @@
     right: 10px;
     cursor: pointer;
 }
+
+.viewall-container > .filter-sort-box {
+    width: fit-content;
+    height: fit-content;
+    padding: 1rem;
+    border: 1px solid black;
+}
+
+.viewall-container .filter-sort-box > .filter-box {
+    width: 100%;
+}

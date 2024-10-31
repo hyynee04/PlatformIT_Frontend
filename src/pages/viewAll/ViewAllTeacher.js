@@ -30,8 +30,10 @@ const ViewAllTeacher = () => {
                 </div>
             </div>
 
-            <div className="Filter-sort-box">
-                
+            <div className="filter-sort-box">
+                <div className="filter-box">
+                    
+                </div>
             </div>
 
         </div>

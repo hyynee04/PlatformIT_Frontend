@@ -1,12 +1,45 @@
-import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
-import { IoMdOpen } from "react-icons/io";
+import { useEffect, useState } from "react";
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
+import { getAllCourseCards } from "../../services/courseService";
+import { getAllTeacherCards } from "../../services/userService";
 
 const CenterDetail = (props) => {
+    const [listTeacher, setListTeacher] = useState([])
+    const [totalTeacherTracks, setTotalTeacherTracks] = useState(0)
+
+    const [listCourse, setListCourse] = useState([])
+    const [totalCourseTracks, setTotalCourseTracks] = useState(0)
+
+    const getTeacherCards = async () => {
+        let teachers = await getAllTeacherCards();
+        teachers.sort((a, b) => b.coursesCount - a.coursesCount);
+        if (teachers.length > 12) {
+            setTotalTeacherTracks(3);
+        }
+        else
+            setTotalTeacherTracks(Math.ceil(teachers.length / 4))
+        setListTeacher(teachers)
+    };
+
+    const getCourseCards = async () => {
+        let courses = await getAllCourseCards();
+        //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
+        if (courses.length > 12) {
+            setTotalCourseTracks(3);
+        }
+        else
+            setTotalCourseTracks(Math.ceil(courses.length / 4))
+        setListCourse(courses)
+    };
+
+    useEffect(() => {
+        getTeacherCards();
+        getCourseCards();
+    }, []);
     return (
         <div className="detail-container">
             <div className="left-container">
@@ -54,10 +87,11 @@ const CenterDetail = (props) => {
                 <div className="block-container">
                     <div className="carousel-block">
                         <Carousel
-                            object={1}
-                            header={"Course"}
-                            totalTracks={2}
-                            itemsPerTrack={3}
+                            object={1} //course
+                            totalTracks={totalCourseTracks}
+                            itemsPerTrack={2}
+                            header={"Courses"}
+                            listInfo={listCourse}
                         />
                     </div>
                 </div>
@@ -65,10 +99,11 @@ const CenterDetail = (props) => {
                 <div className="block-container">
                     <div className="carousel-block">
                         <Carousel
-                            object={2}
-                            header={"Teacher"}
-                            totalTracks={2}
-                            itemsPerTrack={3}
+                            object={2} //teacher
+                            totalTracks={totalTeacherTracks}
+                            itemsPerTrack={2}
+                            header={"Top Teachers"}
+                            listInfo={listTeacher}
                         />
                     </div>
                 </div>

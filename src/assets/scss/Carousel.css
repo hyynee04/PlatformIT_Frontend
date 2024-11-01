@@ -3,9 +3,10 @@
     position: relative;
     width: 100%;
     height: fit-content;
+    min-height: 20rem;
     overflow: visible;
     padding: 0 20px;
-    padding: 0 4rem;
+    padding: 0 0;
 }
 
 .carousel > .carousel-header {
@@ -19,7 +20,6 @@
     font-size: 1.3rem;
     color: var(--main-color);
     font-weight: 600;
-    margin-left: -4rem;
 }
 
 .carousel .carousel-header > button {
@@ -28,7 +28,6 @@
     align-items: center;
     gap: 3px;
 
-    margin-right: -4rem;
     padding: 8px 12px;
     border: none;
     border-radius: .5rem;
@@ -60,7 +59,7 @@
     min-width: 100%; /* Each track takes the full width */
     height: fit-content;
     transition: transform 0.5s ease-in-out; /* Smooth transition */
-    justify-content: space-between;
+    justify-content: space-evenly;
 }
 
 .carousel .carousel-wrapper > .carousel-track.no-opacity {

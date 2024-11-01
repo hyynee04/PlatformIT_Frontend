@@ -1,0 +1,99 @@
+.viewall-container {
+    width: 100%;
+    height: fit-content;
+    padding: 1rem 6rem;
+}
+.viewall-container > .filter-search-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    width: 100%;
+    position: relative;
+}
+
+.viewall-container.filter-search-section > .filter-sort-btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.filter-sort-btns .btn {
+    padding: 6px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100px;
+    color: var(--main-color);
+    font-size: 14px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.filter-sort-btns .btn:active {
+    border: none;
+    outline: none;
+    color: var(--main-color);
+}
+
+.filter-sort-btns .save-filter {
+    color: var(--white-color);
+}
+
+.filter-search .icon,
+.add-btn .icon {
+  width: 20px;
+  height: auto;
+  color: var(--main-color);
+}
+
+.search-container .search-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+
+.search-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    width: 300px;
+}
+
+.search-container .search-field {
+    padding: 0 16px;
+    height: 40px;
+    width: 100%;
+    border-radius: 100rem;
+    border: none;
+    color: var(--text-gray);
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.search-container .search-field:focus {
+    outline: none;
+    box-shadow: none;
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+.search-container .search-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+
+.viewall-container > .filter-sort-box {
+    width: fit-content;
+    height: fit-content;
+    padding: 1rem;
+    border: 1px solid black;
+}
+
+.viewall-container .filter-sort-box > .filter-box {
+    width: 100%;
+}

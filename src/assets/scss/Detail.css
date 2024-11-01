@@ -287,7 +287,7 @@
 .detail-container .right-container .block-container .carousel-block  > .carousel {
     padding: 0 3rem;
     overflow: visible;
-    clip-path: inset(0 0 0 5px); /* Hides 50px from the left side */
+    clip-path: inset(0 0 -50px 5px); /* Hides 50px from the left side */
 }
 
 .detail-container .right-container .block-container 

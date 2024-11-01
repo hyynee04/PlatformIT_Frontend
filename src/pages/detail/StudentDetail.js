@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { BsGenderTrans } from "react-icons/bs";
@@ -7,8 +8,26 @@ import { RiChat3Line } from "react-icons/ri";
 import default_ava from "../../assets/img/default_ava.png";
 import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
+import { getAllCourseCards } from "../../services/courseService";
 
 const StudentDetail = (props) => {
+    const [listCourse, setListCourse] = useState([])
+    const [totalCourseTracks, setTotalCourseTracks] = useState(0)
+
+    const getCourseCards = async () => {
+        let courses = await getAllCourseCards();
+        //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
+        if (courses.length > 12) {
+            setTotalCourseTracks(3);
+        }
+        else
+            setTotalCourseTracks(Math.ceil(courses.length / 4))
+        setListCourse(courses)
+    };
+
+    useEffect(() => {
+        getCourseCards();
+    }, []);
     return (
         <div className="detail-container">
             <div className="left-container">
@@ -83,10 +102,11 @@ const StudentDetail = (props) => {
                 <div className="block-container">
                     <div className="carousel-block">
                         <Carousel
-                            object={1}
-                            header={"Course"}
-                            totalTracks={2}
-                            itemsPerTrack={3}
+                            object={1} //course
+                            totalTracks={totalCourseTracks}
+                            itemsPerTrack={2}
+                            header={"Courses"}
+                            listInfo={listCourse}
                         />
                     </div>
                 </div>

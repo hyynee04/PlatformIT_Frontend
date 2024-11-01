@@ -160,9 +160,9 @@ const Login = () => {
   const handleLoginThirdParty = async (base) => {
     if (base === "Google")
       window.location.href = "http://localhost:5000/api/Authen/login-google";
-    else if (base === "Facebook")
-      window.open("http://localhost:5000/api/Authen/login-facebook");
-    else window.open("http://localhost:5000/api/Authen/login-github");
+    // else if (base === "Facebook")
+    //   window.location.href = "http://localhost:5000/api/Authen/login-facebook";
+    else window.location.href = "http://localhost:5000/api/Authen/login-github";
 
     // window.open("http://localhost:5000/api/Authen/login-google")
   };
@@ -273,10 +273,10 @@ const Login = () => {
             </div>
             <div className="mainpart-content">
               <div className="sep">
-                <RiFacebookFill
+                {/* <RiFacebookFill
                   color="#1E1E1E"
                   onClick={() => handleLoginThirdParty("Facebook")}
-                />
+                /> */}
                 <FaGooglePlusG
                   color="#1E1E1E"
                   onClick={() => handleLoginThirdParty("Google")}

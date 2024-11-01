@@ -104,6 +104,10 @@ const postAddTeacher = async (email, username, password, idCenter) => {
     console.error("Error adding teacher:", error);
   }
 };
+
+const getAllCenterCards = () => {
+  return axios.get("api/Center/GetAllCenterCards");
+}
 const getCenterInfo = async () => {
   const idCenter = +localStorage.getItem("idCenter");
 
@@ -243,6 +247,7 @@ export {
   postRejectCenter,
   postAddCenterAmin,
   postAddTeacher,
+  getAllCenterCards,
   getCenterInfo,
   postUpdateCenterBasicInfo,
   postAddCenterLink,

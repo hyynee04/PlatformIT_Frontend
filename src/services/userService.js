@@ -268,6 +268,10 @@ const postRejectQualification = async (idUser, idQualification, reason) => {
   }
 };
 
+const getAllTeacherCards = () => {
+  return axios.get("api/User/GetAllTeacherCards");
+}
+
 export {
   getPI,
   getAvaImg,
@@ -286,4 +290,5 @@ export {
   getPendingQualifications,
   postApproveQualification,
   postRejectQualification,
+  getAllTeacherCards,
 };

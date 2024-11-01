@@ -1,11 +1,30 @@
+import { useEffect, useState } from "react";
 import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { IoMdOpen } from "react-icons/io";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
+import { getAllCourseCards } from "../../services/courseService";
 
 const TeacherDetail = (props) => {
+    const [listCourse, setListCourse] = useState([])
+    const [totalCourseTracks, setTotalCourseTracks] = useState(0)
+
+    const getCourseCards = async () => {
+        let courses = await getAllCourseCards();
+        //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
+        if (courses.length > 12) {
+            setTotalCourseTracks(3);
+        }
+        else
+            setTotalCourseTracks(Math.ceil(courses.length / 4))
+        setListCourse(courses)
+    };
+
+    useEffect(() => {
+        getCourseCards();
+    }, []);
     return (
         <div className="detail-container">
             <div className="left-container">
@@ -72,10 +91,11 @@ const TeacherDetail = (props) => {
                 <div className="block-container">
                     <div className="carousel-block">
                         <Carousel
-                            object={1}
-                            header={"Course"}
-                            totalTracks={2}
-                            itemsPerTrack={3}
+                            object={1} //course
+                            totalTracks={totalCourseTracks}
+                            itemsPerTrack={2}
+                            header={"Courses"}
+                            listInfo={listCourse}
                         />
                     </div>
                 </div>

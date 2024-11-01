@@ -1,16 +1,15 @@
-import { React, useEffect, useState, useRef } from 'react';
-import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { React, useEffect, useRef, useState } from 'react';
 import { IoMdOpen } from "react-icons/io";
+import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import '../assets/scss/Carousel.css'; // Import your CSS file for styling
 import CenterCard from './Card/CenterCard';
 import CourseCard from './Card/CourseCard';
 import TeacherCard from './Card/TeacherCard';
 
 const Carousel = (props) => {
-    const { object, totalTracks, itemsPerTrack, header } = props;
+    const { object, totalTracks, itemsPerTrack, header, listInfo } = props;
     const [currentTrack, setCurrentTrack] = useState(0);
     const autoSlideRef = useRef(null);
-    // const [totalTracks, setTotalTracks] = useState(3);
 
     const handleNext = () => {
         if (currentTrack < totalTracks - 1) {
@@ -43,13 +42,34 @@ const Carousel = (props) => {
     };
 
     const renderItems = () => {
+        const startIndex = currentTrack * itemsPerTrack;
+        const endIndex = startIndex + itemsPerTrack;
+
         switch (object) {
             case 1: // Courses
-                return Array.from({ length: itemsPerTrack }).map((_, i) => <CourseCard key={i} />);
+            const coursesToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
+            return coursesToShow.map((course) => (
+                <CourseCard 
+                    key={course.idCourse} 
+                    course={course} 
+                />
+            ));
             case 2: // Teachers
-                return Array.from({ length: itemsPerTrack }).map((_, i) => <TeacherCard key={i} />);
+                const teachersToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
+                return teachersToShow.map((teacher) => (
+                    <TeacherCard 
+                        key={teacher.idUser} 
+                        teacher={teacher} 
+                    />
+                ));
             case 3: // Centers
-                return Array.from({ length: itemsPerTrack }).map((_, i) => <CenterCard key={i} />);
+                const centersToShow = listInfo.slice(startIndex, endIndex); // Slice the centers to show
+                return centersToShow.map((center, i) => (
+                    <CenterCard 
+                        key={center.idCenter} 
+                        center={center} 
+                    />
+                ));
             default:
                 return null;
         }
@@ -64,7 +84,7 @@ const Carousel = (props) => {
     }, [totalTracks]);
 
     return (
-        <div 
+        <div
             className="carousel"
             onMouseEnter={stopAutoSlide}  // Stop auto-slide on hover
             onMouseLeave={startAutoSlide} // Restart auto-slide on mouse leave
@@ -74,115 +94,6 @@ const Carousel = (props) => {
                 <button>View more <IoMdOpen /></button>
             </div>
             <div className="carousel-wrapper">
-
-                {/* <div
-                    className={`carousel-track ${currentTrack !== 0 ? 'no-opacity' : ''}`}
-                    style={{ transform: `translateX(-${currentTrack * 100}%)` }}
-                >
-                    {object &&
-                        object === CarouselObject.course ?
-                        (
-                            <>
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                            </>
-                        )
-                        :
-                        object === CarouselObject.teacher ?
-                            (
-                                <>
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                </>
-                            )
-                            :
-                            (
-                                <>
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                </>
-                            )
-                    }
-                </div>
-
-                <div
-                    className={`carousel-track ${currentTrack !== 1 ? 'no-opacity' : ''}`}
-                    style={{ transform: `translateX(-${currentTrack * 100}%)` }}
-                >
-                    {object &&
-                        object === CarouselObject.course ?
-                        (
-                            <>
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                            </>
-                        )
-                        :
-                        object === CarouselObject.teacher ?
-                            (
-                                <>
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                </>
-                            )
-                            :
-                            (
-                                <>
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                </>
-                            )
-                    }
-                </div>
-
-                <div
-                    className={`carousel-track ${currentTrack !== 2 ? 'no-opacity' : ''}`}
-                    style={{ transform: `translateX(-${currentTrack * 100}%)` }}
-                >
-                    {object &&
-                        object === CarouselObject.course ?
-                        (
-                            <>
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                                <CourseCard />
-                            </>
-                        )
-                        :
-                        object === CarouselObject.teacher ?
-                            (
-                                <>
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                    <TeacherCard />
-                                </>
-                            )
-                            :
-                            (
-                                <>
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                    <CenterCard />
-                                </>
-                            )
-                    }
-                </div>*/}
-
                 {Array.from({ length: totalTracks }).map((_, index) => (
                     <div
                         key={index}

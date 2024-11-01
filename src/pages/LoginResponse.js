@@ -10,8 +10,9 @@ const LoginResponse = () => {
   const queryParams = new URLSearchParams(location.search);
   const idUser = queryParams.get('idUser');
   const idRole = queryParams.get('idRole');
+  //const status = queryParams.get('status');
   const messageParam = queryParams.get('message');
-
+  console.log(queryParams)
   useEffect(() => {
     // If idUser and idRole are available, store them in localStorage and navigate
     if (idUser && idRole) {

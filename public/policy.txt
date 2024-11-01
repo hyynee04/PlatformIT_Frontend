@@ -1,0 +1,25 @@
+Welcome to Plait, a dedicated platform for IT learning and knowledge-sharing. We aim to foster a collaborative and respectful environment for users to advance their IT skills and knowledge. This Platform Policy outlines the rules and expectations for using our platform. By accessing and participating on our platform, you agree to abide by these terms.
+
+1. User Responsibilities
+    - Account Security: Users must keep their account credentials secure. If any unauthorized access is suspected, users should contact support immediately.
+    - Respectful Interaction: We expect users to communicate professionally and respectfully. Harassment, discrimination, or abusive language will not be tolerated.
+    - Contribution to Learning: Users should contribute constructively to discussions, exercises, and collaborative projects, focusing on accuracy, best practices, and the quality of information.
+2. Content Guidelines
+    - Relevant Content Only: All content posted should be IT-related, enhancing the learning experience and staying within the scope of topics on our platform.
+    - Intellectual Property: Users should ensure that they have the rights to any material (code, documentation, media) they share or, when appropriate, attribute sources in a manner compliant with intellectual property laws.
+    - Quality and Accuracy: Users are encouraged to contribute high-quality, accurate content and avoid posting unverified information.
+3. Prohibited Activities
+    - Unauthorized Access: Attempting to access other users’ accounts or private data without authorization is strictly forbidden.
+    - Malicious Activity: Uploading or linking to malware, harmful scripts, or code intended to harm the platform or users is prohibited.
+    - Inappropriate Conduct: Engaging in spamming, phishing, or other disruptive activities detracts from the learning environment and will not be tolerated.
+4. Privacy and Data Use
+    - Data Collection: We collect only the data necessary for account management, personalization, and improving user experience. Please refer to our Privacy Policy for details on data usage and protection.
+    - User Rights: Users have the right to access, amend, and, when applicable, request the deletion of their data within the scope of our data policies.
+5. Enforcement and Consequences
+    - Violations of this policy may lead to warnings, content removal, temporary suspension, or permanent account termination, depending on the severity of the infraction.
+
+6. Policy Updates
+    - We may update this Platform Policy periodically. Users will be informed of any significant changes. Continued use of the platform after updates signifies acceptance of the revised policy.
+
+Contact Us
+For any questions or concerns, reach out to plaitplatform@gmail.com.

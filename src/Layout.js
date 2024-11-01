@@ -28,6 +28,7 @@ import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
+import PendingApproveCenter from "./pages/PendingApproveCenter";
 
 const Layout = (props) => {
   return (
@@ -158,6 +159,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <UserPI />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pendingCenter"
+            element={
+              <PrivateRoute>
+                <PendingApproveCenter />
               </PrivateRoute>
             }
           />

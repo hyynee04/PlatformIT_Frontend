@@ -1,15 +1,11 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import {
-  addAdminCenter,
-  addTeacher,
-  fetchListUserOfCenter,
-} from "../store/listUserOfCenter";
+import { fetchListUserOfCenter } from "../store/listUserOfCenter";
 import { Role } from "../constants/constants";
 
 import "../assets/scss/card/DiagForm.scss";
-import { postAddTeacher } from "../services/centerService";
+import { postAddCenterAmin, postAddTeacher } from "../services/centerService";
 const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const idCenter = +localStorage.getItem("idCenter");
   const idUserUpdatedBy = +localStorage.getItem("idUser");
@@ -28,30 +24,27 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
           onClose();
           dispatch(fetchListUserOfCenter(Role.teacher));
         }
-        console.log(data);
-
-        // }
       } catch (error) {
         console.error("Error while add teacher center: ", error);
       }
     } else if (roleAdded === Role.centerAdmin) {
       try {
-        const resultAction = await dispatch(
-          addAdminCenter({
-            username,
-            email,
-            password,
-            idCenter,
-            idUserUpdatedBy,
-          })
+        const data = await postAddCenterAmin(
+          username,
+          email,
+          password,
+          idCenter,
+          idUserUpdatedBy
         );
-        console.log(resultAction);
-
-        // if (addAdminCenter.fulfilled.match(resultAction)) {
-        //   console.log("Add center admin successfully");
-        dispatch(fetchListUserOfCenter(Role.centerAdmin));
-        onClose();
-        // }
+        if (
+          data.message !==
+          "Center Admin is created and notification email sent."
+        ) {
+          setErrorString(data.message);
+        } else {
+          onClose();
+          dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        }
       } catch (error) {
         console.error("Error while approving center: ", error);
       }

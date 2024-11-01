@@ -30,6 +30,10 @@
   color: var(--red-color);
   font-size: 14px;
 }
+.title-info > .btn:active {
+  border: 1px solid var(--red-color);
+  color: var(--red-color);
+}
 .title-info > .btn > .icon {
   color: var(--red-color);
   width: 24px;

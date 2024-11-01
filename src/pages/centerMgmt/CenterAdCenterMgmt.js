@@ -21,6 +21,7 @@ import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/PI.css";
 import AvatarImageOption from "../../components/AvatarImageOption";
 import DiagWorkingHourForm from "../../components/DiagWorkingHourForm";
+import DiagLockCenterForm from "../../components/DiagLockCenterForm";
 const CenterAdCenterMgmt = () => {
   //Center Infomation
   const dispatchInfo = useDispatch();
@@ -70,12 +71,19 @@ const CenterAdCenterMgmt = () => {
     setShowAvatarImageOption(!showAvatarImageOption);
   };
   const [isModalHourOpen, setIsModalHourOpen] = useState(false);
-
   const openHourModal = () => {
     setIsModalHourOpen(true);
     setShowAvatarImageOption(false);
   };
   const closeHourModal = () => setIsModalHourOpen(false);
+
+  const [isModalLockCenter, setIsModalLockCenter] = useState(false);
+  const openLockCenterModal = () => {
+    setIsModalLockCenter(true);
+    setIsModalHourOpen(false);
+    setShowAvatarImageOption(false);
+  };
+  const closeLockCenterModal = () => setIsModalLockCenter(false);
   //FETCH DATA
   const handleActionClick = (action) => {
     setActiveAction(action);
@@ -267,12 +275,25 @@ const CenterAdCenterMgmt = () => {
         <div className="title-info">
           <b>Center Infomation</b>
           {isCurrentUserMainAdmin && (
-            <div className="btn">
+            <div
+              className="btn"
+              onClick={() => {
+                openLockCenterModal();
+              }}
+            >
               <LuLock className="icon" />
               <span>Lock</span>
             </div>
           )}
         </div>
+        {isModalLockCenter && (
+          <div>
+            <DiagLockCenterForm
+              isOpen={isModalLockCenter}
+              onClose={closeLockCenterModal}
+            />
+          </div>
+        )}
         <div className="container-pi">
           <div className="container-ava">
             <div className="sub-container-ava">

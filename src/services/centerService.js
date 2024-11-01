@@ -219,6 +219,20 @@ const postTransferMainAdmin = async (idNewAdmin) => {
     throw error;
   }
 };
+const postLockCenter = async () => {
+  const idCenter = +localStorage.getItem("idCenter");
+  const idUserUpdated = +localStorage.getItem("idUser");
+  try {
+    return await axios.post("api/Center/LockCenter", null, {
+      params: {
+        idCenter: idCenter,
+        idUserUpdated: idUserUpdated,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 export {
   getAllCenter,
   getPendingCenter,
@@ -236,4 +250,5 @@ export {
   postAddOrUpdateWorkingHours,
   getWorkingHours,
   postTransferMainAdmin,
+  postLockCenter,
 };

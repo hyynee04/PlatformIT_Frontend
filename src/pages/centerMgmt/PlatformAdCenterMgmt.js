@@ -324,7 +324,10 @@ const PlatformAdCenterMgmt = () => {
                   <th>Center Admin Email</th>
                   <th>TIN</th>
                   <th>Date Created</th>
-                  <th>Status</th>
+                  {/* <th>Status</th> */}
+                  {activeStatusCenter === CenterStatus.inactive && (
+                    <th>Reason Inactive</th>
+                  )}
                   <th></th>
                 </tr>
               </thead>
@@ -357,7 +360,7 @@ const PlatformAdCenterMgmt = () => {
                                   return `${month}/${day}/${year}`;
                                 })()}
                             </td>
-                            <td>
+                            {/* <td>
                               <span
                                 className={`status ${
                                   center.centerStatus === Status.active
@@ -377,7 +380,19 @@ const PlatformAdCenterMgmt = () => {
                                   ? "Inactive"
                                   : ""}
                               </span>
-                            </td>
+                            </td> */}
+                            {activeStatusCenter === CenterStatus.inactive && (
+                              <td
+                                style={{
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                                title={center.reason}
+                              >
+                                {center.reason ? center.reason : "Locked"}
+                              </td>
+                            )}
                             <td
                               className={`table-cell ${
                                 activeStatusCenter === CenterStatus.pending

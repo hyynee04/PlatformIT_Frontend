@@ -152,6 +152,7 @@ td {
   text-align: left;
   font-weight: 500px;
   color: var(--second-main-color);
+  max-width: 300px;
 }
 .list-container > table > tbody > tr > td > span {
   display: inline-block;

@@ -2,7 +2,12 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LuBell, LuMessageCircle, LuClipboardCheck } from "react-icons/lu";
+import {
+  LuBell,
+  LuMessageCircle,
+  LuClipboardCheck,
+  LuLogOut,
+} from "react-icons/lu";
 import { Role } from "../constants/constants";
 import { useEffect, useState } from "react";
 import HeaderAvatarOption from "../components/HeaderAvatarOption";
@@ -12,6 +17,8 @@ import "../assets/scss/Header.css";
 import { getAvaImg } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { setAvatar } from "../store/profileUserSlice";
+import DiagSignOutForm from "../components/DiagSignOutForm";
+
 const Header = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -20,19 +27,28 @@ const Header = () => {
   const isAvatarPage = location.pathname === "/pi";
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
+  const isPendingCenter = localStorage.getItem("isPendingCenter");
   const navigate = useNavigate();
   const currentPath = location.pathname; //current path
   const [activeButton, setActiveButton] = useState(null);
+  const [isModalSignoutOpen, setIsModalSignoutOpen] = useState(false);
+
+  const openSignoutModal = () => setIsModalSignoutOpen(true);
+  const closeSignoutModal = () => setIsModalSignoutOpen(false);
   // const [avaImg, setAvaImg] = useState(null);
   useEffect(() => {
-    if (idRole === Role.platformAdmin && currentPath === "/") {
-      navigate("/platformAdDashboard");
-    } else if (idRole === Role.centerAdmin && currentPath === "/") {
-      navigate("/centerAdDashboard");
-    } else if (idRole === Role.teacher && currentPath === "/") {
-      navigate("/teacherHome");
-    } else if (idRole === Role.student && currentPath === "/") {
-      navigate("/studentHome");
+    if (isPendingCenter) {
+      navigate("/pendingCenter");
+    } else {
+      if (idRole === Role.platformAdmin && currentPath === "/") {
+        navigate("/platformAdDashboard");
+      } else if (idRole === Role.centerAdmin && currentPath === "/") {
+        navigate("/centerAdDashboard");
+      } else if (idRole === Role.teacher && currentPath === "/") {
+        navigate("/teacherHome");
+      } else if (idRole === Role.student && currentPath === "/") {
+        navigate("/studentHome");
+      }
     }
   }, [idRole, currentPath, navigate]);
   useEffect(() => {
@@ -73,7 +89,8 @@ const Header = () => {
       { title: "About Us", path: "/aboutUs" },
     ],
   };
-  const links = navLinks[idRole] || navLinks.default;
+  // const links = navLinks[idRole] || isPendingCenter ||  navLinks.default;
+  const links = isPendingCenter ? [] : navLinks[idRole] || navLinks.default;
 
   const renderNavLinksByRole = () => {
     return links.map(({ title, path }, index) => (
@@ -134,6 +151,15 @@ const Header = () => {
                     Register
                   </button>
                 </>
+              ) : isPendingCenter ? (
+                <>
+                  <button
+                    className="circle-buts"
+                    onClick={() => openSignoutModal()}
+                  >
+                    <LuLogOut className="header-icon" />
+                  </button>
+                </>
               ) : (
                 <>
                   {(idRole === Role.student || idRole === Role.teacher) && (
@@ -186,6 +212,14 @@ const Header = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      {isModalSignoutOpen && (
+        <div>
+          <DiagSignOutForm
+            isOpen={isModalSignoutOpen}
+            onClose={closeSignoutModal}
+          />
+        </div>
+      )}
     </>
   );
 };

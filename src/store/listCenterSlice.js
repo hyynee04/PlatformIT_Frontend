@@ -19,6 +19,7 @@ export const fetchCenters = createAsyncThunk(
     return response || [];
   }
 );
+
 export const approveCenter = createAsyncThunk(
   "centers/approveCenter",
   async ({ idCenterSelected, idUserUpdated }) => {
@@ -26,6 +27,7 @@ export const approveCenter = createAsyncThunk(
     return data;
   }
 );
+
 export const rejectCenter = createAsyncThunk(
   "centers/rejectCenter",
   async ({ idCenterSelected, reasonReject, idUserUpdated }) => {

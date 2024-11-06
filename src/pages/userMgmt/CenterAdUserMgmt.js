@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
   LuChevronLeft,
   LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
   LuUserPlus,
 } from "react-icons/lu";
 import { Role, UserStatus } from "../../constants/constants";

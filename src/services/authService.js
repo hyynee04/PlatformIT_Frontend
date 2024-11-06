@@ -38,12 +38,7 @@ const postVerifyOtp = (email, otp) => {
   });
 };
 
-const getFacebookLogin = () => {
-  return axios.get("api/Authen/login-facebook");
-};
-
 export {
-  getFacebookLogin,
   postCheckEmail,
   postLogin,
   postRegister,

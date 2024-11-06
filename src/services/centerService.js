@@ -250,6 +250,15 @@ const postUnlockCenter = async (idCenter) => {
     throw error;
   }
 };
+
+const getCenterDetail = (idCenter) => {
+  return axios.get("api/Center/GetCenterDetail", {
+    params: {
+      idCenter: idCenter,
+    },
+  });
+};
+
 export {
   getAllCenter,
   getPendingCenter,
@@ -270,4 +279,5 @@ export {
   postTransferMainAdmin,
   postLockCenter,
   postUnlockCenter,
+  getCenterDetail,
 };

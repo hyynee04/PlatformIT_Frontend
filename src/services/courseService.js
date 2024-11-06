@@ -6,4 +6,12 @@ const getAllCourseCards = () => {
 const getAllTags = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
-export { getAllCourseCards, getAllTags };
+const getCourseDetail = (idCourse) => {
+  return axios.get("api/Course/GetCourseDetail", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
+
+export { getAllCourseCards, getCourseDetail, getAllTags };

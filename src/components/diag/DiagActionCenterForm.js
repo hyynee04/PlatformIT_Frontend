@@ -7,9 +7,9 @@ import {
   approveCenter,
   fetchCenters,
   rejectCenter,
-} from "../store/listCenterSlice";
+} from "../../store/listCenterSlice";
 
-import "../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.scss";
 const DiagActionCenterForm = ({
   isOpen,
   onClose,

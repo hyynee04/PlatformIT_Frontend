@@ -3,7 +3,7 @@ import { postChangeAvatar } from "../services/userService";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../store/profileUserSlice";
 import { fetchCenterProfile } from "../store/profileCenterSlice";
-import DiagRemoveImgForm from "./DiagRemoveImgForm";
+import DiagRemoveImgForm from "./diag/DiagRemoveImgForm";
 
 const AvatarImageOption = ({ isAvatar }) => {
   const dispatch = useDispatch();

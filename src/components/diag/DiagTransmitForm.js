@@ -1,10 +1,10 @@
 import React from "react";
 import { LuUsers, LuX } from "react-icons/lu";
-import { postTransferMainAdmin } from "../services/centerService";
+import { postTransferMainAdmin } from "../../services/centerService";
 import { useDispatch } from "react-redux";
-import { fetchListUserOfCenter } from "../store/listUserOfCenter";
-import { Role } from "../constants/constants";
-import { fetchCenterProfile } from "../store/profileCenterSlice";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import { Role } from "../../constants/constants";
+import { fetchCenterProfile } from "../../store/profileCenterSlice";
 const DiagTransmitForm = ({ isOpen, onClose, idUserSelected }) => {
   const dispatch = useDispatch();
   const handleTransmit = async () => {

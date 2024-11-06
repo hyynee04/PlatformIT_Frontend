@@ -9,11 +9,8 @@ export const fetchAllUsers = createAsyncThunk("users/fetchAll", async () => {
 // Thunk để cập nhật trạng thái người dùng (inactive, active)
 export const updateUserStatus = createAsyncThunk(
   "users/updateStatus",
-  async ({ idUserSelected, idUserUpdatedBy }) => {
-    console.log("idUserSelected", idUserSelected);
-    console.log("idUserUpdatedBy", idUserUpdatedBy);
-
-    const data = await postInactiveUser(idUserSelected, idUserUpdatedBy);
+  async ({ idUserSelected }) => {
+    const data = await postInactiveUser(idUserSelected);
     return data;
   }
 );

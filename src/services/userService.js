@@ -216,6 +216,17 @@ const postInactiveUser = (idUserInactive) => {
     },
   });
 };
+const postReactiveUser = (idUserReactive) => {
+  const idUserUpdatedBy = +localStorage.getItem("idUser");
+  console.log(idUserReactive, idUserUpdatedBy);
+
+  return axios.post("api/User/ReactiveUser", null, {
+    params: {
+      idUserInactive: idUserReactive,
+      idUserUpdatedBy: idUserUpdatedBy,
+    },
+  });
+};
 const getPendingQualifications = () => {
   const idCenter = +localStorage.getItem("idCenter");
   return axios.get("api/User/GetPendingQualifications", {
@@ -270,7 +281,7 @@ const postRejectQualification = async (idUser, idQualification, reason) => {
 
 const getAllTeacherCards = () => {
   return axios.get("api/User/GetAllTeacherCards");
-}
+};
 
 export {
   getPI,
@@ -286,6 +297,7 @@ export {
   postRemoveAvatar,
   getAllUser,
   postInactiveUser,
+  postReactiveUser,
   postForgotPassword,
   getPendingQualifications,
   postApproveQualification,

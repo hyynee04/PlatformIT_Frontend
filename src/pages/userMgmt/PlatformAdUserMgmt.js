@@ -9,11 +9,12 @@ import {
 } from "react-icons/lu";
 import {
   CenterAdminLevel,
+  CenterStatus,
   Role,
-  Status,
+  UserStatus,
   UserGender,
 } from "../../constants/constants";
-import UserOption from "../../components/UserOption";
+import UserOption from "../../components/option/UserOption";
 import FilterUser from "../../components/FilterUser";
 import SortByUser from "../../components/SortByUser";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,6 +58,7 @@ const PlatformAdUserMgmt = () => {
     setLevel(null);
     setDateRange({ startDate: "", endDate: "" });
     setStatus(null);
+    setSearchTerm("");
   };
   const renderGender = (gender) => {
     switch (gender) {
@@ -81,19 +83,30 @@ const PlatformAdUserMgmt = () => {
   };
   const getStatusString = (status) => {
     switch (status) {
-      case Status.active:
+      case UserStatus.active:
         return "Active";
-      case Status.pending:
+      case UserStatus.pending:
         return "Pending";
-      case Status.inactive:
+      case UserStatus.inactive:
         return "Inactive";
       default:
         return "";
     }
   };
+  const getRoleDescription = (user) => {
+    return user.isMainCenterAdmin !== null
+      ? user.isMainCenterAdmin === 1
+        ? "Main"
+        : "Sub"
+      : user.status === UserStatus.inactive
+      ? "Rejected"
+      : "Pending";
+  };
+
   const filteredUser = listUser
     .filter((user) => {
       const searchTermLower = searchTerm.toLowerCase();
+      const roleDescription = String(getRoleDescription(user)).toLowerCase();
       const matchesSearchTerm =
         (user.fullName &&
           user.fullName.toLowerCase().includes(searchTermLower)) ||
@@ -110,9 +123,7 @@ const PlatformAdUserMgmt = () => {
         (user.centerName &&
           user.centerName.toLowerCase().includes(searchTermLower)) ||
         (activeRole === Role.centerAdmin &&
-          (user.isMainCenterAdmin ? "Main" : "Sub")
-            .toLowerCase()
-            .includes(searchTermLower)) ||
+          roleDescription.includes(searchTermLower)) ||
         (user.joinedDate &&
           new Date(user.joinedDate)
             .toLocaleDateString("en-US")
@@ -282,7 +293,15 @@ const PlatformAdUserMgmt = () => {
                   <td>{user.email}</td>
                   {activeRole !== Role.student && <td>{user.centerName}</td>}
                   {activeRole === Role.centerAdmin && (
-                    <td>{user.isMainCenterAdmin ? "Main" : "Sub"}</td>
+                    <td>
+                      {user.isMainCenterAdmin !== null
+                        ? user.isMainCenterAdmin === 1
+                          ? "Main"
+                          : "Sub"
+                        : user.status === UserStatus.inactive
+                        ? "Rejected"
+                        : "Pending"}
+                    </td>
                   )}
                   <td>
                     {user.joinedDate &&
@@ -301,21 +320,24 @@ const PlatformAdUserMgmt = () => {
                   <td>
                     <span
                       className={`status ${
-                        user.status === Status.active
+                        user.status === UserStatus.active
                           ? "active"
-                          : user.status === Status.pending
+                          : user.status === UserStatus.pending
                           ? "pending"
-                          : user.status === Status.inactive
+                          : user.status === UserStatus.inactive ||
+                            user.status === UserStatus.locked
                           ? "inactive"
                           : ""
                       }`}
                     >
-                      {user.status === Status.active
+                      {user.status === UserStatus.active
                         ? "Active"
-                        : user.status === Status.pending
+                        : user.status === UserStatus.pending
                         ? "Pending"
-                        : user.status === Status.inactive
+                        : user.status === UserStatus.inactive
                         ? "Inactive"
+                        : user.status === UserStatus.locked
+                        ? "Locked"
                         : ""}
                     </span>
                   </td>
@@ -331,6 +353,12 @@ const PlatformAdUserMgmt = () => {
                           ? { statusUserSelected: user.status }
                           : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
+                        {...(user.centerStatus === CenterStatus.active ||
+                        user.idRole === Role.student
+                          ? {
+                              isReactivatable: true,
+                            }
+                          : {})}
                       />
                     )}
                   </td>

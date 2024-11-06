@@ -20,8 +20,8 @@ import CenterAdAdminMgmt from "../userMgmt/CenterAdAdminMgmt";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/PI.css";
 import AvatarImageOption from "../../components/AvatarImageOption";
-import DiagWorkingHourForm from "../../components/DiagWorkingHourForm";
-import DiagLockCenterForm from "../../components/DiagLockCenterForm";
+import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
+import DiagLockCenterForm from "../../components/diag/DiagLockCenterForm";
 const CenterAdCenterMgmt = () => {
   //Center Infomation
   const dispatchInfo = useDispatch();

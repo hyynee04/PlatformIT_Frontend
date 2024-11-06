@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../constants/constants";
-import DiagSignOutForm from "./DiagSignOutForm";
+import DiagSignOutForm from "./diag/DiagSignOutForm";
 import "../assets/scss/card/OptionCard.css";
 
 const HeaderAvatarOption = () => {

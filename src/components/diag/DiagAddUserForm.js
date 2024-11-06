@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import { fetchListUserOfCenter } from "../store/listUserOfCenter";
-import { Role } from "../constants/constants";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import { Role } from "../../constants/constants";
 
-import "../assets/scss/card/DiagForm.scss";
-import { postAddCenterAmin, postAddTeacher } from "../services/centerService";
+import "../../assets/scss/card/DiagForm.scss";
+import {
+  postAddCenterAmin,
+  postAddTeacher,
+} from "../../services/centerService";
 const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const idCenter = +localStorage.getItem("idCenter");
   const idUserUpdatedBy = +localStorage.getItem("idUser");

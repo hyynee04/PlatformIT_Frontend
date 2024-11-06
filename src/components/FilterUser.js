@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/scss/card/FilterCard.css";
-import { CenterAdminLevel, Status, UserGender } from "../constants/constants";
+import {
+  CenterAdminLevel,
+  UserGender,
+  UserStatus,
+} from "../constants/constants";
 
 const FilterUser = ({ onFilterChange }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
@@ -122,8 +126,8 @@ const FilterUser = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="active"
-                checked={status === Status.active}
-                onChange={() => setStatus(Status.active)}
+                checked={status === UserStatus.active}
+                onChange={() => setStatus(UserStatus.active)}
               />
               Active
             </label>
@@ -131,8 +135,8 @@ const FilterUser = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="pending"
-                checked={status === Status.pending}
-                onChange={() => setStatus(Status.pending)}
+                checked={status === UserStatus.pending}
+                onChange={() => setStatus(UserStatus.pending)}
               />
               Pending
             </label>
@@ -140,8 +144,8 @@ const FilterUser = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="inactive"
-                checked={status === Status.inactive}
-                onChange={() => setStatus(Status.inactive)}
+                checked={status === UserStatus.inactive}
+                onChange={() => setStatus(UserStatus.inactive)}
               />
               Inactive
             </label>

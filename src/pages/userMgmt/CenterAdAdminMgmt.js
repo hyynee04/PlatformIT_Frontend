@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Role, Status } from "../../constants/constants";
+import { Role, UserStatus } from "../../constants/constants";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,8 +13,8 @@ import {
 } from "react-icons/lu";
 import SortByUserOfCenter from "../../components/SortByUserOfCenter";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
-import DiagAddUserForm from "../../components/DiagAddUserForm";
-import UserOption from "../../components/UserOption";
+import DiagAddUserForm from "../../components/diag/DiagAddUserForm";
+import UserOption from "../../components/option/UserOption";
 
 const CenterAdAdminMgmt = () => {
   const idUser = +localStorage.getItem("idUser");
@@ -42,11 +42,11 @@ const CenterAdAdminMgmt = () => {
 
   const getStatusString = (status) => {
     switch (status) {
-      case Status.active:
+      case UserStatus.active:
         return "Active";
-      case Status.pending:
+      case UserStatus.pending:
         return "Pending";
-      case Status.inactive:
+      case UserStatus.inactive:
         return "Inactive";
       default:
         return "";
@@ -251,20 +251,20 @@ const CenterAdAdminMgmt = () => {
                     <td>
                       <span
                         className={`status ${
-                          user.status === Status.active
+                          user.status === UserStatus.active
                             ? "active"
-                            : user.status === Status.pending
+                            : user.status === UserStatus.pending
                             ? "pending"
-                            : user.status === Status.inactive
+                            : user.status === UserStatus.inactive
                             ? "inactive"
                             : ""
                         }`}
                       >
-                        {user.status === Status.active
+                        {user.status === UserStatus.active
                           ? "Active"
-                          : user.status === Status.pending
+                          : user.status === UserStatus.pending
                           ? "Pending"
-                          : user.status === Status.inactive
+                          : user.status === UserStatus.inactive
                           ? "Inactive"
                           : ""}
                       </span>
@@ -284,6 +284,7 @@ const CenterAdAdminMgmt = () => {
                           // statusUserSelected={user.status}
                           {...(isCurrentUserMainAdmin && {
                             statusUserSelected: user.status,
+                            isReactivatable: true,
                           })}
                         />
                       )}

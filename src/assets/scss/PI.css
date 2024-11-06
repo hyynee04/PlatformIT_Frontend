@@ -216,7 +216,7 @@
 .container-info .info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   position: relative;
 }
 
@@ -224,6 +224,7 @@
   font-size: 16px;
   color: var(--text-gray);
 }
+
 .container-info .info .container-phone {
   display: flex;
   flex-direction: row;
@@ -335,13 +336,87 @@
   transform: translateY(-50%);
   pointer-events: none; /* Để không ảnh hưởng đến sự kiện chuột */
 }
+/* For Course */
+.container-info .info span .note-span {
+  font-size: 12px;
+  color: var(--black-color);
+}
+.container-info .info .tags-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+}
+.container-info .info .tags-container .tags {
+  display: flex;
+  gap: 8px;
+  padding: 4px 8px;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgba(20, 174, 92, 0.3);
+  color: var(--main-color);
+  border-radius: 8px;
+}
+.container-info .info .tags-container .tags .icon {
+  width: 20px;
+  height: 20px;
+  color: #02542d;
+}
+.container-info .info .check-container {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+.container-info .info .check-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--black-color);
+  margin: 5px;
+}
+.container-info .info .left-to-right {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.container-info .info .left-to-right .icon {
+  width: 64px;
+  height: auto;
+  color: var(--black-color);
+}
+.container-info .cover-course-img {
+  width: 600px;
+  height: 440px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 4px;
+  margin-left: auto;
+}
 .alert-option {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
 }
-
+.alert-option .circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 100rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--main-color);
+  border: 1px solid var(--main-color);
+  background-color: #ffffff;
+}
+.alert-option .circle-btn .icon {
+  color: var(--main-color);
+  width: 24px;
+  height: 24px;
+}
 .alert-option .container-button {
   margin-left: auto;
   padding: 12px 0;

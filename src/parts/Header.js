@@ -17,7 +17,7 @@ import "../assets/scss/Header.css";
 import { getAvaImg } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { setAvatar } from "../store/profileUserSlice";
-import DiagSignOutForm from "../components/DiagSignOutForm";
+import DiagSignOutForm from "../components/diag/DiagSignOutForm";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ const Header = () => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },
-      { title: "Course Management", path: "/centerAdCourse" },
+      { title: "Course Management", path: "/addNewCourse" }, //centerAdCourse
       { title: "User Management", path: "/centerAdUser" },
       { title: "Center Management", path: "/centerAdCenter" },
     ],

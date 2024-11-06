@@ -131,12 +131,11 @@
   flex: 1;
   width: 100%;
   border-collapse: collapse;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 .list-container > table tr:nth-child(odd) {
   background-color: #f2f2f2;
 }
-
 .list-container > table tr:nth-child(even) {
   background-color: var(--white-color);
 }
@@ -153,6 +152,7 @@ td {
   text-align: left;
   font-weight: 500px;
   color: var(--second-main-color);
+  max-width: 300px;
 }
 .list-container > table > tbody > tr > td > span {
   display: inline-block;
@@ -195,9 +195,94 @@ td {
   border-radius: 8px;
   border: 1px solid var(--main-color);
 }
+.list-container > table > tbody > tr > td > .btn-group {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
 .list-container > table > tbody > tr > td > .btn.approve {
   background-color: var(--main-color);
   color: var(--white-color);
+}
+.list-container > table > tbody > tr > td > .btn-group > .btn-task > .check {
+  width: 40px;
+  height: auto;
+  padding: 8px;
+  color: var(--green-color);
+  background-color: rgba(20, 174, 92, 0.3);
+  border-radius: 100rem;
+}
+.list-container > table > tbody > tr > td > .ava-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 100rem;
+  margin-right: 8px;
+}
+.list-container > table > tbody > tr > td > .btn-group > .btn-task > .x {
+  width: 40px;
+  height: auto;
+  padding: 8px;
+  color: var(--red-color);
+  background-color: rgba(192, 15, 12, 0.3);
+  border-radius: 100rem;
+}
+.list-container > table > tbody > tr.detail-row {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 2s ease;
+  background-color: #f4f4f4;
+}
+.detail-row .container-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.detail-row .container-field .container-left .quali-img {
+  width: 600px;
+  height: auto;
+  margin: 8px 24px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.detail-row .container-field .container-left .pdf-link {
+  height: 300px;
+  background-color: var(--border-gray);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.detail-row .container-field .container-right .info {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 24px 8px 0;
+}
+.detail-row .container-field .container-right .info > span {
+  font-size: 16px;
+  color: var(--text-gray);
+}
+.detail-row .container-field .container-right .info > .input-form-pi {
+  padding: 0 16px;
+  height: 40px;
+  width: 100%;
+  border-radius: 4px;
+  border: none;
+  color: var(--black-gray);
+  background-color: rgba(217, 217, 217, 0.3);
+  appearance: none; /* for select */
+  font-size: 14px;
+}
+.detail-row .container-field .container-right .info > .input-form-pi:focus {
+  outline: none;
+  box-shadow: rgba(14, 63, 126, 0.04) 0px 0px 0px 1px,
+    rgba(42, 51, 69, 0.04) 0px 1px 1px -0.5px,
+    rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px,
+    rgba(42, 51, 70, 0.04) 0px 6px 6px -3px,
+    rgba(14, 63, 126, 0.04) 0px 12px 12px -6px,
+    rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;
+  border: none;
 }
 .pagination-container {
   margin: 12px 72px;

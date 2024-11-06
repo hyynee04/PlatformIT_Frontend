@@ -24,29 +24,29 @@ export const fetchListUserOfCenter = createAsyncThunk(
   }
 );
 
-export const addTeacher = createAsyncThunk(
-  "usersOfCenter/addTeacher",
-  async ({ email, username, password, idCenter }) => {
-    const data = await postAddTeacher(email, username, password, idCenter);
-    console.log(data);
+// export const addTeacher = createAsyncThunk(
+//   "usersOfCenter/addTeacher",
+//   async ({ email, username, password, idCenter }) => {
+//     const data = await postAddTeacher(email, username, password, idCenter);
+//     console.log(data);
 
-    return data;
-  }
-);
+//     return data;
+//   }
+// );
 
-export const addAdminCenter = createAsyncThunk(
-  "usersOfCenter/addAdmin",
-  async ({ username, email, password, idCenter, idUserUpdatedBy }) => {
-    const data = await postAddCenterAmin(
-      username,
-      email,
-      password,
-      idCenter,
-      idUserUpdatedBy
-    );
-    return data;
-  }
-);
+// export const addAdminCenter = createAsyncThunk(
+//   "usersOfCenter/addAdmin",
+//   async ({ username, email, password, idCenter, idUserUpdatedBy }) => {
+//     const data = await postAddCenterAmin(
+//       username,
+//       email,
+//       password,
+//       idCenter,
+//       idUserUpdatedBy
+//     );
+//     return data;
+//   }
+// );
 const listUserOfCenterSlice = createSlice({
   name: "listUserOfCenter",
   initialState: {

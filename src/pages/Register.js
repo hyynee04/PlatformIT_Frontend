@@ -7,6 +7,7 @@ import {
   LuEyeOff,
   LuLock,
   LuMail,
+  LuPenLine,
   LuPenTool,
   LuUser
 } from "react-icons/lu";
@@ -29,25 +30,31 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [TIN, setTIN] = useState("");
   const [centerName, setCenterName] = useState("");
+  const [centerDescription, setCenterDescription] = useState("");
   const [OTP, setOTP] = useState("");
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [show, setShow] = useState(false);
+  const [isCheckedPolicy, setIsCheckedPolicy] = useState(false);
+  const [showVerifyEmail, setShowVerifyEmail] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   const [error, setError] = useState(0);
   const [coincidedInform, setCoincidedInform] = useState("");
 
   const [errorVerify, setErrorVerify] = useState("")
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-
+  const [fileContent, setFileContent] = useState('');
   useEffect(() => {
     setIsVisible(true);
-    localStorage.setItem("verifiedEmail", "");
+    localStorage.setItem("verifiedEmail", "email");
+
+    fetch('\policy.txt')
+      .then((response) => response.text())
+      .then((text) => setFileContent(text))
+      .catch((error) => console.error('Error loading text file:', error));
   }, []);
 
   const validateEmail = (email) => {
@@ -68,7 +75,8 @@ const Register = () => {
       password === "" ||
       confirmPassword === "" ||
       (isChecked && TIN === "") ||
-      (isChecked && centerName === "")
+      (isChecked && centerName === "") ||
+      (isChecked && centerDescription === "")
     ) {
       setError(1);
       return;
@@ -97,6 +105,12 @@ const Register = () => {
       return;
     }
 
+    //Agree with policy
+    if (isChecked && !isCheckedPolicy) {
+      setError(6);
+      return;
+    }
+
     setError(0);
     return true;
   }
@@ -108,7 +122,7 @@ const Register = () => {
     let checkEmail = await postCheckEmail(email)
     if (checkEmail !== "Email already exists.") {
       await postSendOTP(email);
-      handleShow();
+      setShowVerifyEmail(true);
       setErrorVerify("OTP has been sent to your email. It will expire in 2 minutes!");
     }
     else {
@@ -122,7 +136,7 @@ const Register = () => {
     let verifyOTP = await postVerifyOtp(email, OTP)
     if (verifyOTP === "OTP verified successfully! You can now proceed with the registration.") {
       localStorage.setItem('verifiedEmail', email);
-      handleClose();
+      setShowVerifyEmail(false);
       handleRegister();
     }
     else {
@@ -133,7 +147,7 @@ const Register = () => {
 
   const handleRegister = async () => {
     //submit api
-    let data = await postRegister(fullName, email, username, password, centerName, TIN);
+    let data = await postRegister(fullName, email, username, password, centerName, centerDescription, TIN);
     if (Number.isInteger(data)) {
       localStorage.removeItem('verifiedEmail');
       navigate("/login");
@@ -155,6 +169,8 @@ const Register = () => {
         return 'Confirm password is not right!';
       case 5:
         return 'TIN must be 10 or 13 characters!';
+      case 6:
+        return 'Agree with our policy to register!';
       default:
         return '';
     }
@@ -170,7 +186,7 @@ const Register = () => {
             </div>
             <div className="mainpart-content">
 
-              <div className="mb-3">
+              <div className="mb-3 ">
                 <LuPenTool color="#757575" className="icon-head rotate-icon" />
                 <input
                   type="text"
@@ -212,59 +228,60 @@ const Register = () => {
                   }}
                 />
               </div>
+              <div className="password-container">
+                <div className="mb-3 marginbottom-5px">
+                  <LuLock color="#757575" className="icon-head" />
+                  <input
+                    type={isShowedP ? "text" : "password"}
+                    placeholder="Password (*)"
+                    className="form-control"
+                    value={password}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError(0);
+                    }}
+                  />
+                  {isShowedP ? (
+                    <LuEye
+                      color="#757575"
+                      className="icon-eye"
+                      onClick={() => setIsShowedP(!isShowedP)}
+                    />
+                  ) : (
+                    <LuEyeOff
+                      color="#757575"
+                      className="icon-eye"
+                      onClick={() => setIsShowedP(!isShowedP)}
+                    />
+                  )}
+                </div>
 
-              <div className="mb-3">
-                <LuLock color="#757575" className="icon-head" />
-                <input
-                  type={isShowedP ? "text" : "password"}
-                  placeholder="Password (*)"
-                  className="form-control"
-                  value={password}
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setError(0);
-                  }}
-                />
-                {isShowedP ? (
-                  <LuEye
-                    color="#757575"
-                    className="icon-eye"
-                    onClick={() => setIsShowedP(!isShowedP)}
+                <div className="mb-3 marginbottom-5px">
+                  <LuLock color="#757575" className="icon-head" />
+                  <input
+                    type={isShowedCP ? "text" : "password"}
+                    placeholder="Confirm password (*)"
+                    className="form-control"
+                    value={confirmPassword}
+                    onChange={(event) => {
+                      setConfirmPassword(event.target.value);
+                      setError(0);
+                    }}
                   />
-                ) : (
-                  <LuEyeOff
-                    color="#757575"
-                    className="icon-eye"
-                    onClick={() => setIsShowedP(!isShowedP)}
-                  />
-                )}
-              </div>
-
-              <div className="mb-3 marginbottom-5px">
-                <LuLock color="#757575" className="icon-head" />
-                <input
-                  type={isShowedCP ? "text" : "password"}
-                  placeholder="Confirm password (*)"
-                  className="form-control"
-                  value={confirmPassword}
-                  onChange={(event) => {
-                    setConfirmPassword(event.target.value);
-                    setError(0);
-                  }}
-                />
-                {isShowedCP ? (
-                  <LuEye
-                    color="#757575"
-                    className="icon-eye"
-                    onClick={() => setIsShowedCP(!isShowedCP)}
-                  />
-                ) : (
-                  <LuEyeOff
-                    color="#757575"
-                    className="icon-eye"
-                    onClick={() => setIsShowedCP(!isShowedCP)}
-                  />
-                )}
+                  {isShowedCP ? (
+                    <LuEye
+                      color="#757575"
+                      className="icon-eye"
+                      onClick={() => setIsShowedCP(!isShowedCP)}
+                    />
+                  ) : (
+                    <LuEyeOff
+                      color="#757575"
+                      className="icon-eye"
+                      onClick={() => setIsShowedCP(!isShowedCP)}
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="mb-3 margintop-1rem">
@@ -295,7 +312,7 @@ const Register = () => {
                       }}
                     />
                   </div>
-                  <div className="mb-3 marginbottom-5px">
+                  <div className="mb-3">
                     <LuCreditCard color="#757575" className="icon-head" />
                     <input
                       type="number"
@@ -309,16 +326,47 @@ const Register = () => {
                       }}
                     />
                   </div>
+                  <div className="mb-3">
+                    <LuPenLine color="#757575" className="icon-head penline" />
+                    <textarea
+                      type="number"
+                      placeholder="Introduce your center (*)"
+                      className="introduce-center form-control"
+                      value={centerDescription}
+                      onChange={(event) => {
+                        setCenterDescription(event.target.value);
+                        setError(0);
+                        setCoincidedInform("");
+                      }}
+                    />
+                  </div>
+                  <div className="mb-3 margintop-1rem  marginbottom-5px">
+                    <input
+                      type="checkbox"
+                      className="AC-check"
+                      checked={isCheckedPolicy}
+                      onChange={(event) => {
+                        setIsCheckedPolicy(event.target.checked)
+                        setCoincidedInform("");
+                        setError(0);
+                      }}
+                    />
+                    I agree with&nbsp;
+                    <b
+                      className="style-text"
+                      onClick={() => setShowPolicy(true)}
+                    >Plait Policy</b>
+                  </div>
                 </>
               )}
 
               {error !== 0 && (
-                <div className="mb-3">
+                <div className="mb-3 marginbottom-5px">
                   <span className="error-noti">{getErrorMessage(error)}</span>
                 </div>
               )}
               {coincidedInform !== "" && (
-                <div className="mb-3">
+                <div className="mb-3 marginbottom-5px">
                   <span className="error-noti">{coincidedInform}</span>
                 </div>
               )}
@@ -362,12 +410,40 @@ const Register = () => {
         </div>
       </div>
 
-      <Modal show={show} onHide={handleClose}>
+      {/* Policy Popup */}
+      <Modal show={showPolicy} onHide={() => setShowPolicy(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Plait Policy</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="adjus-modal-body">
+          <div className="policy-content">
+            <pre>{fileContent}</pre>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="policy-btn not-agree"
+            onClick={() => {
+              setShowPolicy(false);
+              setIsCheckedPolicy(false);
+            }}
+          >Don't agree</button>
+          <button
+            className="policy-btn agree"
+            onClick={() => {
+              setShowPolicy(false);
+              setIsCheckedPolicy(true);
+            }}
+          >I agree</button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showVerifyEmail} onHide={() => setShowVerifyEmail(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Verify Email</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="mb-3 justify-margin">
+          <div className="mb-3 change-mb3 justify-margin">
             <LuMail color="#757575" className="icon-head" />
             <input
               type="number"
@@ -386,7 +462,7 @@ const Register = () => {
             />
           </div>
           {errorVerify && (
-            <div className="mb-3 justify-margin">
+            <div className="mb-3 change-mb3 justify-margin">
               <span className="error-noti">
                 {errorVerify}
               </span>

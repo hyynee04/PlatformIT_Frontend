@@ -1,11 +1,20 @@
 import { Route, Routes } from "react-router-dom";
 
 import App from "./App";
+import PrivateRoute from "./PrivateRoute";
+import GuestRoute from "./GuestRoute";
+
 import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import UserPI from "./pages/UserPI";
+import LoginResponse from "./pages/LoginResponse";
 import Register from "./pages/Register";
+
+import UserPI from "./pages/UserPI";
+import TeacherDetail from "./pages/detail/TeacherDetail";
+import CenterDetail from "./pages/detail/CenterDetail";
+import CourseDetail from "./pages/detail/CourseDetail";
+import StudentDetail from "./pages/detail/StudentDetail";
 
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
@@ -14,17 +23,15 @@ import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
+import CenterAdPendingTask from "./pages/CenterAdPendingTask";
+import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
-import PrivateRoute from "./PrivateRoute";
-import CenterAdPendingTask from "./pages/CenterAdPendingTask";
-import LoginResponse from "./pages/LoginResponse";
-import TeacherDetail from "./pages/detail/TeacherDetail";
-import CenterDetail from "./pages/detail/CenterDetail";
-import CourseDetail from "./pages/detail/CourseDetail";
-import StudentDetail from "./pages/detail/StudentDetail";
+
+import ViewAllTeacher from "./pages/viewAll/ViewAllTeacher";
+import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
 
 const Layout = (props) => {
   return (
@@ -32,15 +39,45 @@ const Layout = (props) => {
       <Routes>
         <Route path="/" element={<App />}>
           {/* Guest */}
-          <Route index element={<Home />} />
-          <Route path="/aboutUs" element={<AboutUs />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            index
+            element={
+              <GuestRoute>
+                <Home />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/aboutUs"
+            element={
+              <GuestRoute>
+                <AboutUs />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <GuestRoute>
+                <Register />
+              </GuestRoute>
+            }
+          />
 
           <Route path="/teacherDetail" element={<TeacherDetail />} />
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
+
+          <Route path="/teacherViewAll" element={<ViewAllTeacher />} />
 
           {/* Platform Admin */}
           <Route
@@ -101,6 +138,14 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/addNewCourse"
+            element={
+              <PrivateRoute>
+                <AddNewCourse />
+              </PrivateRoute>
+            }
+          />
           {/* Teacher */}
           <Route
             path="/teacherHome"
@@ -127,6 +172,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <UserPI />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pendingCenter"
+            element={
+              <PrivateRoute>
+                <PendingApproveCenter />
               </PrivateRoute>
             }
           />

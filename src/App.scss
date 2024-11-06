@@ -8,7 +8,7 @@
   --text-gray: #757575;
   --black-color: #1e1e1e;
   --red-color: #c00f0c;
-  --yellow-color: #ffcc00;
+  --yellow-color: #e2bb1b;
   --green-color: rgb(20, 174, 92);
 }
 
@@ -34,6 +34,7 @@
 
 .app-container {
   overflow: scroll; /* or auto */
+  overflow-x: hidden; /* or auto */
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
@@ -51,6 +52,7 @@
 }
 .main-container {
   flex: 1;
+  background-color: #fafafa;
 }
 
 .footer-container {

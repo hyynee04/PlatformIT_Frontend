@@ -10,7 +10,13 @@ import {
   LuCheck,
   LuTrash2,
 } from "react-icons/lu";
-import { FaChevronDown, FaUser, FaUserGraduate, FaLock } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaUser,
+  FaUserGraduate,
+  FaLock,
+  FaRegFilePdf,
+} from "react-icons/fa";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
 import "../assets/scss/PI.css";
@@ -25,7 +31,7 @@ import {
 } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
-import { Role, Status, UserGender } from "../constants/constants";
+import { Role, UserStatus, UserGender } from "../constants/constants";
 import AvatarImageOption from "../components/AvatarImageOption";
 
 const TeacherPI = () => {
@@ -70,11 +76,13 @@ const TeacherPI = () => {
     qualificationFile: null,
     qualificationUrl: "",
   });
+  const [qualiPDFCheck, setQualiPDFCheck] = useState(false);
   const [qualiWarning, setQualiWarning] = useState("");
   const [phoneNumWarning, setPhoneNumWarning] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState("");
   const [updatePITeacherSuccess, setUpdatePITeacherSuccess] = useState("");
   const [changePWSuccess, setChangePWSuccess] = useState("");
+  const [changePWError, setChangePWError] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -147,7 +155,7 @@ const TeacherPI = () => {
   const validatePhoneNum = (num) => /^\d{10}$/.test(num);
 
   const updateBasicInfo = async () => {
-    if (!validatePhoneNum(tempUserPI.phoneNum)) {
+    if (tempUserPI.phoneNum && !validatePhoneNum(tempUserPI.phoneNum)) {
       setPhoneNumWarning("Phone number must be exactly 10 digits.");
     } else {
       setPhoneNumWarning("");
@@ -215,7 +223,7 @@ const TeacherPI = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      await postAddProfileLink(idUser, newProfileLink.name, newProfileLink.url);
+      await postAddProfileLink(newProfileLink.name, newProfileLink.url);
       await dispatch(fetchUserProfile(idUser));
       setNewProfileLink({ name: "", url: "" });
     }
@@ -259,6 +267,9 @@ const TeacherPI = () => {
     const file = event.target.files[0];
 
     if (file) {
+      if (file.type === "application/pdf") {
+        setQualiPDFCheck(true);
+      }
       const formattedFile = formatFile(file);
       try {
         let blobFile;
@@ -283,13 +294,11 @@ const TeacherPI = () => {
         }));
         setQualiWarning("");
       } catch (error) {
-        console.error("Error changing avatar:", error);
+        throw error;
       }
     }
   };
   const AddQualification = async () => {
-    console.log(newQualification);
-
     if (
       newQualification.qualificationName &&
       newQualification.qualificationDescr &&
@@ -308,6 +317,7 @@ const TeacherPI = () => {
         qualificationFile: null,
         qualificationUrl: "",
       }));
+      await setQualiPDFCheck(false);
     } else {
       setQualiWarning(
         "Please enter all required fields for the qualification."
@@ -323,16 +333,33 @@ const TeacherPI = () => {
 
   const handleChangePassword = async () => {
     if (oldPassword && newPassword && confirmPassword) {
-      const idAccount = +localStorage.getItem("idAccount");
-      await postChangePassword(oldPassword, newPassword, idAccount, idUser);
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setChangePWSuccess("Your password has been changed successfully!");
-
-      setTimeout(() => {
-        setChangePWSuccess("");
-      }, 3000);
+      if (newPassword === confirmPassword) {
+        const idAccount = +localStorage.getItem("idAccount");
+        try {
+          const response = await postChangePassword(
+            oldPassword,
+            newPassword,
+            idAccount,
+            idUser
+          );
+          if (response === "Current Password is incorrect.") {
+            setChangePWError(response);
+          } else {
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setChangePWError("");
+            setChangePWSuccess("Your password has been changed successfully!");
+            setTimeout(() => {
+              setChangePWSuccess("");
+            }, 3000);
+          }
+        } catch (error) {
+          setChangePWError(error.message);
+        }
+      } else {
+        setChangePWError("New password and confirmation do not match.");
+      }
     }
   };
 
@@ -349,7 +376,7 @@ const TeacherPI = () => {
             <div className="container-icon" onClick={toggleVisibility}>
               <LuCamera className="icon" />
             </div>
-            {showAvatarImageOption && <AvatarImageOption />}
+            {showAvatarImageOption && <AvatarImageOption isAvatar={true} />}
           </div>
           <div className="sub-container-action">
             <span className="name-info">{name}</span>
@@ -481,11 +508,7 @@ const TeacherPI = () => {
               </div>
               <div className="alert-option">
                 {updateSuccess && (
-                  <Alert
-                    variant="success"
-                    onClose={() => setUpdateSuccess("")}
-                    dismissible
-                  >
+                  <Alert variant="success" onClose={() => setUpdateSuccess("")}>
                     {updateSuccess}
                   </Alert>
                 )}
@@ -543,7 +566,6 @@ const TeacherPI = () => {
                   <Alert
                     variant="success"
                     onClose={() => setUpdatePITeacherSuccess("")}
-                    dismissible
                   >
                     {updatePITeacherSuccess}
                   </Alert>
@@ -636,42 +658,44 @@ const TeacherPI = () => {
             <div className="container-info auto">
               <span className="title-span">Professional Qualifications</span>
               <div className="info">
-                {qualificationModels.map((profile, index) => (
+                {qualificationModels.map((qualification, index) => (
                   <div className="container-info-img" key={index}>
                     <div className="quali-content">
                       <input
                         type="text"
                         className="input-form-pi"
-                        value={profile.qualificationName || ""}
+                        value={qualification.qualificationName || ""}
                         disabled
                       />
                       <input
                         type="text"
                         className="input-form-pi"
-                        value={profile.description || ""}
+                        value={qualification.description || ""}
                         disabled
                       />
                       <div className="status-action">
                         <span
                           className={`span ${
-                            profile.status === Status.active
+                            qualification.status === UserStatus.active
                               ? "approved"
-                              : profile.status === Status.pending
+                              : qualification.status === UserStatus.pending
                               ? "pending"
                               : "rejected"
                           }`}
                         >
-                          {profile.status === Status.active
+                          {qualification.status === UserStatus.active
                             ? "Approved"
-                            : profile.status === Status.pending
+                            : qualification.status === UserStatus.pending
                             ? "Pending"
-                            : "Rejected"}
+                            : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
                             className="icon-button"
                             onClick={() => {
-                              removeQualification(profile.idQualification);
+                              removeQualification(
+                                qualification.idQualification
+                              );
                             }}
                           >
                             <LuTrash2 className="icon" />
@@ -680,11 +704,30 @@ const TeacherPI = () => {
                       </div>
                     </div>
                     <div className="quali-image">
-                      <img
-                        src={profile.path ? profile.path : default_image}
-                        alt=""
-                        className="main-ava-image"
-                      />
+                      {qualification.path &&
+                      qualification.path.endsWith(".pdf") ? (
+                        <div
+                          onClick={() =>
+                            window.open(qualification.path, "_blank")
+                          }
+                          className="main-ava-image pdf-link"
+                        >
+                          <FaRegFilePdf
+                            style={{ width: "40px", height: "40px" }}
+                          />
+                          <span>Click to view PDF</span>
+                        </div>
+                      ) : (
+                        <img
+                          src={
+                            qualification.path
+                              ? qualification.path
+                              : default_image
+                          }
+                          alt=""
+                          className="main-ava-image"
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -693,14 +736,14 @@ const TeacherPI = () => {
                     <input
                       type="text"
                       className="input-form-pi"
-                      placeholder="Title"
+                      placeholder="Title..."
                       value={newQualification.qualificationName || ""}
                       onChange={handleNameQualificationChange}
                     />
                     <input
                       type="text"
                       className="input-form-pi"
-                      placeholder="Discription"
+                      placeholder="Description..."
                       onChange={handleDescrQualificationChange}
                       value={newQualification.qualificationDescr || ""}
                     />
@@ -730,15 +773,32 @@ const TeacherPI = () => {
                     />
                   </div>
                   <div className="quali-image">
-                    <img
-                      src={
-                        newQualification.qualificationUrl
-                          ? newQualification.qualificationUrl
-                          : default_image
-                      }
-                      alt=""
-                      className="main-ava-image"
-                    />
+                    {qualiPDFCheck ? (
+                      <div
+                        onClick={() =>
+                          window.open(
+                            newQualification.qualificationUrl,
+                            "_blank"
+                          )
+                        }
+                        className="main-ava-image pdf-link"
+                      >
+                        <FaRegFilePdf
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                        <span>Click to view PDF</span>
+                      </div>
+                    ) : (
+                      <img
+                        src={
+                          newQualification.qualificationUrl
+                            ? newQualification.qualificationUrl
+                            : default_image
+                        }
+                        alt=""
+                        className="main-ava-image"
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -749,7 +809,7 @@ const TeacherPI = () => {
             <div className="container-info">
               <span className="title-span">Security</span>
               <div className="info">
-                <span>Old password</span>
+                <span>Current password</span>
                 <input
                   type={showOldPassword ? "text" : "password"}
                   className="input-form-pi"
@@ -803,9 +863,16 @@ const TeacherPI = () => {
                   <Alert
                     variant="success"
                     onClose={() => setChangePWSuccess("")}
-                    dismissible
                   >
                     {changePWSuccess}
+                  </Alert>
+                )}
+                {changePWError && (
+                  <Alert
+                    variant="danger"
+                    onClose={() => setChangePWSuccess("")}
+                  >
+                    {changePWError}
                   </Alert>
                 )}
                 <div className="container-button">

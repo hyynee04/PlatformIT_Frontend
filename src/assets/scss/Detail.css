@@ -1,8 +1,8 @@
 .detail-container {
     display: flex;
     flex-direction: row;
-    gap: 2.5rem;
-    padding: 32px 96px;
+    gap: 1.5rem;
+    padding: 32px 120px;
 
     background-color: #FAFAFA;
 }
@@ -10,7 +10,7 @@
 .detail-container > .left-container {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 1.5rem;
 
     width: 30%;
 }
@@ -18,7 +18,7 @@
 .detail-container > .right-container {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 1.5rem;
 
     width: 70%;
 }
@@ -35,7 +35,7 @@
     padding: 1.5rem;
     border: 1px solid var(--border-gray);
     border-radius: .5rem;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 15px 5px, rgba(0, 0, 0, 0.2) 0px 0px 10px;
 
     position: relative;
 }
@@ -49,6 +49,7 @@
 .detail-container .left-container .block-container > .biography-ava.teacher {
     border-radius: 90px;
     width: 8rem;
+    height: 8rem;
 }
 
 .detail-container .left-container .block-container > .biography-ava.center {
@@ -78,7 +79,7 @@
 .detail-container .left-container 
 .block-container .biography-block > .biography-name.center {
     display: flex;
-    text-align:left;
+    justify-content: flex-start;
 }
 
 .detail-container .left-container 
@@ -126,6 +127,19 @@
 
     font-size: 1rem;
     color: var(--text-gray);
+}
+
+.detail-container .left-container .block-container .biography-block .teacher-information span > svg {
+    width: 18px;
+    height: 18px;
+}
+
+.detail-container .left-container .block-container .biography-block .teacher-information > .teaching-major {
+    align-items: flex-start;
+}
+
+.detail-container .left-container .block-container .biography-block .teacher-information .teaching-major > svg {
+    margin-top: 3px;
 }
 
 .detail-container .left-container 
@@ -185,21 +199,39 @@
 
 .detail-container .left-container .block-container .block-container-row > img,
 .detail-container .right-container .block-container .block-container-col .qualification > img {
-    width: 8.5rem;
+    width: 8rem;
+    height: 6.2rem;
     object-fit: cover;
     border: 1px solid var(--border-gray);
-    border-radius: .5rem;
+    border-radius: .25rem;
 }
 
 .detail-container .left-container .block-container .block-container-col .qualification > img {
     width: 7.5rem;
 }
 
+.detail-container .right-container .block-container .block-container-col .qualification > svg,
+.detail-container .left-container .block-container .block-container-col .qualification > svg {
+    width: 7rem;
+    height: 5rem;
+}
+
+
 .detail-container .left-container 
 .block-container .block-container-row > .center-block {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.block-container-row.center {
+    padding: 5px;
+    border-radius: .5rem;
+}
+
+.block-container-row.center:hover {
+    background-color: #f4f4f4;
+    cursor: pointer;
 }
 
  
@@ -210,7 +242,7 @@
 .detail-container .right-container .block-container 
 .block-container-col .qualification .qualification-body > .qualification-name
  {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--black-color);
     font-weight: 700;
 }
@@ -222,6 +254,11 @@
     font-size: 1rem;
     color: var(--text-gray);
 
+}
+
+.block-container-col > .qualification:hover {
+    background-color: #f4f4f4;
+    cursor: pointer;
 }
 
 
@@ -252,6 +289,7 @@
 
 .detail-container .left-container .block-container .block-container-col > .link-transfer:hover {
     background-color: #f4f4f4;
+    cursor: pointer;
 }
 
 .detail-container .left-container 
@@ -287,7 +325,7 @@
 .detail-container .right-container .block-container .carousel-block  > .carousel {
     padding: 0 3rem;
     overflow: visible;
-    clip-path: inset(0 0 0 5px); /* Hides 50px from the left side */
+    clip-path: inset(0 0 -50px 5px); /* Hides 50px from the left side */
 }
 
 .detail-container .right-container .block-container 
@@ -420,25 +458,7 @@
     right: 0;
 }
 
-.detail-container .left-container .block-container .block-container-header  > .add-review-button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-
-    font-size: .8rem;
-    font-weight: 500;
-    color: var(--main-color);
-    background-color: rgba(57, 121, 121, 0.4);
-
-    border: none;
-    border-radius: .4rem;
-
-    width: fit-content;
-    height: fit-content;
-    padding: 4px 8px;
-}
+ 
 
 .detail-container .left-container .block-container .block-container-header > .add-review-button:hover {
     background-color: rgba(57, 121, 121, 0.3);
@@ -500,7 +520,7 @@
     font-size: 1.1rem;
     font-weight: 600;
 
-    background-color: rgba(57, 121, 121, 0.4);
+    background-color: rgba(57, 121, 121, 0.3);
     border-radius: .5rem .5rem 0 0;
 }
 
@@ -543,6 +563,7 @@
     border-top: 1px solid var(--border-gray);
 }
 
+
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content.remove-border {
     border: none;
@@ -562,7 +583,63 @@
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block .lecture-content .lecture-name > .lecture-title {
     font-size: 1.2rem;
+}
 
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content > .add-lecture-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > svg {
+    height: 1.1rem;
+    width: 1.1rem;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > .add-lecture {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block > .lecture-content:hover {
+    background-color: rgba(121, 121, 121, 0.1);
+}
+
+.detail-container .right-container .block-container > .add-section-btn,
+.detail-container .left-container .block-container .block-container-header  > .add-review-button {
+    background-color: rgba(121, 121, 121, 0.1);
+    color: var(--main-color);
+    font-size: .9rem;
+    font-weight: 500;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    
+    width: fit-content;
+    height: fit-content;
+    padding: .3rem .5rem;
+
+    border: none;
+    border-radius: .5rem;
+}
+
+.detail-container .right-container .block-container .add-section-btn > svg,
+.detail-container .left-container .block-container .block-container-header .add-review-button > svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.detail-container .right-container .block-container > .add-section-btn:hover,
+.detail-container .left-container .block-container .block-container-header  > .add-review-button:hover {
+    background-color: rgba(57, 121, 121, 0.3);
 }
 
 .detail-container .right-container .block-container 
@@ -591,6 +668,11 @@
     font-weight: 700;
     color: var(--black-color);
     width: 70%;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification .qualification-body .test-header > .test-name.teacher-view {
+    width: 90%;
 }
 
 .detail-container .right-container .block-container 
@@ -623,8 +705,48 @@
 
 .detail-container .right-container .block-container 
 .block-container-col .qualification .qualification-body > .test-description {
-        font-size: .9rem;
-        color: var(--text-gray);
+    display: flex;
+    flex-direction: row;
+    gap: 1.3rem;
+
+    margin-top: 10px;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification .qualification-body .test-description > span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    color: var(--text-gray);
+    font-size: .8rem;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification .qualification-body .test-description span > svg {
+    color: var(--main-color);
+    font-size: 1rem;
+
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification > .test-status {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification .test-status > .test-status-text {
+    padding: .3rem 1.8rem;
+    background-color: var(--border-gray);
+    color: var(--text-gray);
+    font-size: .8rem;
+
+    border: none;
+    border-radius: .5rem;
 }
 
 .detail-container .left-container .block-container 
@@ -638,6 +760,7 @@
 .detail-container .left-container .block-container 
 .block-container-col .info-line > span {
     width: 90%;
+    color: var(--text-gray);
 }
 
 .detail-container .left-container .block-container 
@@ -717,3 +840,352 @@ svg > .CircularProgressbar-text {
     color: var(--main-color);
     font-size: 1.7rem;
 } 
+
+.detail-container .right-container .block-container > table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.detail-container .right-container .block-container table tr > th {
+    background-color: rgba(217, 217, 217, 0.4);
+    padding: 10px;
+    color: var(--second-main-color);
+}
+
+.detail-container .right-container .block-container table tr > td {
+    text-align: center;
+    color: var(--main-color);
+    font-weight: 500;
+}
+
+.block-container-col > .pagination-controls {
+    display: flex;
+    justify-content: center;
+}
+
+.block-container-col .pagination-controls > button {
+    margin: 0 3px;
+    padding: 3px 10px;
+    font-size: .9rem;
+
+    border: none;
+    background-color: transparent;
+    color: var(--black-color);
+}
+
+.block-container-col .pagination-controls > button:hover {
+    background-color: rgba(121, 121, 121, 0.1);
+    border-radius: .3rem;
+}
+
+.block-container-col .pagination-controls > .active,
+.block-container-col .pagination-controls > .active:hover {
+    background-color: var(--main-color);
+    color: white;
+    border-radius: .3rem;
+}
+
+.block-container-col .pagination-controls > button[disabled] {
+    cursor: default;
+    color: gray;
+}
+
+.detail-container .right-container > .block-container.course-progress-container {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.detail-container .right-container .block-container.course-progress-container > .block-container-row {
+    justify-content: space-between;
+}
+
+.detail-container .right-container .block-container.course-progress-container .block-container-row > .progress-section {
+    width: 48%;
+    background-color: var(--white-color);
+    border-radius: .5rem;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 15px 5px, rgba(0, 0, 0, 0.4) 0px 0px 10px;
+    padding: 1rem;
+}
+
+.detail-container .right-container .block-container > .block-container-col.noti-size {
+    max-height: 25rem;
+    overflow-y: auto;
+    gap: .8rem;
+}
+
+.detail-container .right-container .block-container .block-container-col > .notification {
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification:hover .delete-button {
+    width: 20px;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification > .delete-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+
+    width: 0px; /* Initial collapsed width */
+    overflow: hidden;
+    transition: width 0.3s ease;
+
+    cursor: pointer;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .delete-button > button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    background-color: rgba(192, 15, 12, .8);
+
+    color: var(--black-color);
+    font-size: 1rem;
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    border-radius: 90px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .delete-button > button:hover {
+    background-color: var(--red-color)
+}
+
+.detail-container .right-container .block-container .block-container-col .notification > .delete-button:hover {
+    width: 60px;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .delete-button:hover button {
+    opacity: 1; /* Show the button when delete-button is fully expanded */
+}
+
+.detail-container .right-container .block-container .block-container-col .notification > .notification-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    padding-left: .5rem;
+    border-left: 3px solid var(--border-gray);
+
+    position: relative;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .notification-body > .notification-title {
+    color: var(--black-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .notification-body > .notification-content {
+    color: var(--text-gray);
+    font-size: 1rem;
+}
+
+.detail-container .right-container .block-container .block-container-col .notification .notification-body > .noti-time {
+    color: var(--text-gray);
+    font-size: 1rem;
+    font-weight: 600;
+
+    position: absolute;
+    top: .3rem;
+    right: 1rem;
+}
+
+.detail-container .right-container .block-container > .add-notification-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: none;
+    background-color: rgba(121, 121, 121, 0.1);
+
+    color: var(--main-color);
+    font-size: 1rem;
+
+    width: 2rem;
+    height: 2rem;
+
+    border-radius: 90px;
+    
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+}
+
+.detail-container .right-container .block-container > .add-notification-button:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+
+.detail-container .right-container .block-container .add-notification-button > svg,
+.detail-container .right-container .block-container .block-container-col .notification .delete-button button > svg {
+    stroke-width: 3px;
+    width: 1.3rem;
+    height: 1.3rem;
+}
+
+/* Custom scrollbar styling */
+.block-container-col.noti-size::-webkit-scrollbar  {
+  width: 10px;           /* Set the scrollbar width */
+}
+
+.block-container-col.noti-size::-webkit-scrollbar-track {
+  background: var(--border-gray);  /* Background color of the scrollbar track */
+}
+
+.block-container-col.noti-size::-webkit-scrollbar-thumb {
+  background-color: var(--text-gray); /* Scrollbar thumb color */
+  border-radius: 4px;     /* Rounded corners for a flatter look */
+  cursor: grab;
+}
+
+.block-container-col.noti-size::-webkit-scrollbar-thumb:active {
+  cursor: grabbing; /* Changes cursor when thumb is clicked and held */
+}
+
+.detail-container .right-container > .teacher-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: fit-content;
+}
+
+.detail-container .right-container .teacher-menu > .teacher-menu-btn {
+    padding: .6rem 5.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-gray);
+
+    border: none;
+    border-radius: .5rem;
+    background-color: transparent;
+}
+
+.detail-container .right-container .teacher-menu > .teacher-menu-btn:hover {
+    background-color: rgba(57, 121, 121, 0.1);
+    color: var(--black-color);
+}
+
+.detail-container .right-container .teacher-menu > .active,
+.detail-container .right-container .teacher-menu > .active:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+    color: var(--black-color);
+}
+
+.detail-container .right-container .block-container > .add-notification-popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+
+    width: 500px;
+    height: fit-content;
+
+    background-color: var(--white-color);
+    border-radius: .5rem;
+    border: 1px solid var(--border-gray);
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+    position: absolute;
+    top: 4rem;
+    right: 2rem;
+}
+
+.detail-container .right-container .block-container .add-notification-popup > span {
+    width: 100%;
+    text-align: left;
+
+    color: var(--main-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+
+}
+
+.detail-container .right-container .block-container .add-notification-popup > textarea {
+    width: 100%;
+    padding: 1rem;
+
+    height: 150px;           
+    resize: none;       
+    overflow-y: auto;  
+
+    border: 1px solid var(--border-gray);
+    border-radius: .25rem;
+    background-color: rgba(217, 217, 217, 0.3);
+    color: var(--black-color);
+
+    outline: none;
+}
+
+.detail-container .right-container .block-container .add-notification-popup > input {
+    width: 100%;
+    border-radius: .25rem;
+    color: var(--black-color);
+    font-weight: 500;
+
+    background-color: rgba(217, 217, 217, 0.3);
+    border: 1px solid var(--border-gray);
+    padding: .5rem 1rem;
+
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    outline: none;
+    scroll-behavior: none;
+}
+
+.detail-container .right-container .block-container .add-notification-popup > textarea:focus,
+.detail-container .right-container .block-container .add-notification-popup > input:focus {
+    border: 1px solid var(--border-gray);
+    background-color: #fafafa;
+    box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
+}
+
+.detail-container .right-container .block-container .add-notification-popup > .post-button-container {
+    display: flex;
+    justify-content: right;
+    gap: 10px;
+    width: 100%;
+
+}
+
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button {
+    padding: 4px 15px;
+    border: none;
+    border-radius: .5rem;
+    background-color: transparent;
+}
+
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.post {
+    background-color: var(--main-color);
+    color: var(--white-color);
+    font-weight: 500;
+}
+
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post:hover {
+    background-color: rgba(57, 121, 121, 0.8);
+}
+
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.cancel {
+    color: var(--text-gray);
+}
+
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .cancel:hover {
+    background-color: rgba(121, 121, 121, 0.2);
+    color: var(--black-color);
+}

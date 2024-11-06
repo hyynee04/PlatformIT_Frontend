@@ -2,15 +2,24 @@ import React, { useRef, useState } from "react";
 import { postChangeAvatar } from "../services/userService";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../store/profileUserSlice";
+import { fetchCenterProfile } from "../store/profileCenterSlice";
+import DiagRemoveImgForm from "./diag/DiagRemoveImgForm";
 
-const AvatarImageOption = () => {
+const AvatarImageOption = ({ isAvatar }) => {
   const dispatch = useDispatch();
   // const userPI = useSelector((state) => state.profileUser);
   const userId = +localStorage.getItem("idUser");
   const [isOptionVisible, setIsOptionVisible] = useState(true);
+  const [isModalRemoveAvaOpen, setIsModalRemoveAvaOpen] = useState(false);
+
+  const openRemoveAvaModal = () => {
+    setIsModalRemoveAvaOpen(true);
+    setIsOptionVisible(false);
+  };
+  const closeRemoveAvaModal = () => setIsModalRemoveAvaOpen(false);
 
   const inputFileRef = useRef(null);
-  const handleChangeAvatar = () => {
+  const handleChangeImg = () => {
     inputFileRef.current.click();
   };
   const formatFile = (file) => {
@@ -37,10 +46,14 @@ const AvatarImageOption = () => {
         } else {
           blobFile = file;
         }
+        if (isAvatar) {
+          await postChangeAvatar(true, blobFile);
+          await dispatch(fetchUserProfile(userId));
+        } else {
+          await postChangeAvatar(false, blobFile, userId);
+          await dispatch(fetchCenterProfile());
+        }
 
-        await postChangeAvatar(userId, blobFile, userId);
-
-        await dispatch(fetchUserProfile(userId));
         setIsOptionVisible(false);
       } catch (error) {
         console.error("Error changing avatar:", error);
@@ -48,21 +61,39 @@ const AvatarImageOption = () => {
     }
   };
   if (!isOptionVisible) {
-    return null;
+    <>
+      {isModalRemoveAvaOpen && (
+        <div>
+          <DiagRemoveImgForm
+            isOpen={isModalRemoveAvaOpen}
+            onClose={closeRemoveAvaModal}
+            isAvatar={isAvatar}
+          />
+        </div>
+      )}
+    </>;
   }
   return (
     <div>
       <div className="container-options avatarOption">
-        <button className="op-buts" onClick={handleChangeAvatar}>
-          <span>Change avatar</span>
+        <button className="op-buts" onClick={handleChangeImg}>
+          {isAvatar ? (
+            <span>Change avatar</span>
+          ) : (
+            <span>Change cover image</span>
+          )}
         </button>
         <button
           className="op-buts"
           onClick={() => {
-            setIsOptionVisible(false);
+            openRemoveAvaModal();
           }}
         >
-          <span>Remove avatar</span>
+          {isAvatar ? (
+            <span>Remove avatar</span>
+          ) : (
+            <span>Remove cover image</span>
+          )}
         </button>
       </div>
       <input
@@ -71,6 +102,11 @@ const AvatarImageOption = () => {
         style={{ display: "none" }} // Ẩn input file
         accept=".png, .jpg, .jpeg" // Chỉ cho phép chọn file ảnh
         onChange={handleFileChange}
+      />
+      <DiagRemoveImgForm
+        isOpen={isModalRemoveAvaOpen}
+        onClose={closeRemoveAvaModal}
+        isAvatar={isAvatar}
       />
     </div>
   );

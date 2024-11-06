@@ -5,11 +5,11 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .register-container {
-  width: 1000px;
-  height: 630px;
-  margin: 15px auto 15px;
+  width: 75.25rem;
+  height: 650px;
+  margin: 7px auto 10px;
   border-radius: 8px;
-  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.5);
   background: linear-gradient(
     to bottom,
     var(--second-main-color),
@@ -35,7 +35,7 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .mainpart-content {
@@ -51,11 +51,32 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .mb-3 {
-  width: 400px;
+  width: 500px;
   position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  margin: auto;
+  margin-bottom: .8rem !important;
+}
+
+.mb-3.change-mb3 {
+  width: fit-content;
+  justify-content: center;
+}
+
+.change-mb3 > input {
+  width: 400px;
+}
+
+.password-container {
+  width: 500px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
 
 .marginbottom-5px {
@@ -67,10 +88,10 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .mb-3 svg {
-  width: 24px;
-  height: 24px;
+  width: 1.3rem;
+  height: 1.3rem;
   position: absolute;
-  top: 23%;
+  top: 23.5%;
 }
 
 .icon-head {
@@ -82,15 +103,43 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .form-control {
-  height: 45px;
+  height: 43px;
   padding: 4px 40px;
-  border-radius: 90px;
-  border-color: var(--border-gray);
+  border-radius: .5rem;
+  border-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
+  background-color: rgba(217, 217, 217, 0.3);
 }
 
 .form-control:focus {
   box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-gray);
+  background-color: #fafafa;
+}
+
+.form-control.introduce-center {
+  padding: 8px 40px;
+
+  height: 70px;      
+  width: 100%;       
+  resize: none;       
+  overflow-y: auto;  
+}
+
+.icon-head.penline {
+  top: 11px;
+}
+
+.style-text {
+  color: var(--main-color);
+  font-weight: 800;
+
+  text-decoration: underline;
+}
+
+.style-text:hover {
+  color: var(--second-main-color);
+  cursor: pointer;
 }
 
 .icon-eye {
@@ -135,7 +184,7 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: rgba(0, 59, 87, 0.7);
 }
 
-.sep {
+/* .sep {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -165,7 +214,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .sep svg:hover {
   box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.2);
-}
+} */
 
 .sidepart-container {
   width: 30%;
@@ -224,4 +273,71 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .signin-button:hover {
   background-color: rgba(0, 59, 87, 0.7);
+}
+
+.modal-body.adjust-modal-body {
+  padding: 1.3rem;
+}
+
+.policy-content {
+  width: 100%;
+  height: 20rem;
+  overflow-x: auto;
+  border: 1px solid black;
+}
+
+.policy-content > pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+
+.policy-btn {
+  border-radius: .25rem;
+  padding: 4px 8px;
+  font-size: .8rem;
+}
+
+.policy-btn.agree {
+  color: var(--white-color);
+  background-color: var(--main-color);
+  border: 1px solid var(--main-color)
+}
+
+.policy-btn.agree:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
+
+.policy-btn.not-agree {
+  color: var(--main-color);
+  background-color: var(--white-color);
+  border: 1px solid var(--main-color)
+}
+
+.policy-btn.not-agree:hover {
+  background-color: rgba(121, 121, 121, 0.2);
+}
+
+
+/* Custom scrollbar styling */
+.policy-content::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: 6px;           /* Set the scrollbar width */
+}
+
+.policy-content::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  background: var(--border-gray);  /* Background color of the scrollbar track */
+}
+
+.policy-content::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background-color: var(--text-gray); /* Scrollbar thumb color */
+  border-radius: 4px;     /* Rounded corners for a flatter look */
+  cursor: grab;
+}
+
+.policy-content::-webkit-scrollbar-thumb:active,
+textarea::-webkit-scrollbar-thumb:active {
+  cursor: grabbing; /* Changes cursor when thumb is clicked and held */
 }

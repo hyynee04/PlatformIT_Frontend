@@ -1,12 +1,13 @@
 import axios from "../utils/axiosCustomize";
 
-const postRegister = (fullName, email, username, password, centername, tin) => {
+const postRegister = (fullName, email, username, password, centername, description, tin) => {
   return axios.post("api/Authen/signup", {
     fullName: fullName,
     email: email,
     username: username,
     password: password,
-    centername: centername,
+    centerName: centername,
+    description: description,
     tin: tin,
   });
 };
@@ -37,12 +38,7 @@ const postVerifyOtp = (email, otp) => {
   });
 };
 
-const getFacebookLogin = () => {
-  return axios.get("api/Authen/login-facebook");
-};
-
 export {
-  getFacebookLogin,
   postCheckEmail,
   postLogin,
   postRegister,

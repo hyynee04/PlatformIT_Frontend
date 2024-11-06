@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/scss/card/FilterCard.css";
-import { Status } from "../constants/constants";
+import { UserStatus } from "../constants/constants";
 const FilterUserOfCenter = ({ onFilterChange }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
@@ -46,8 +46,8 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="active"
-                checked={status === Status.active}
-                onChange={() => setStatus(Status.active)}
+                checked={status === UserStatus.active}
+                onChange={() => setStatus(UserStatus.active)}
               />
               Active
             </label>
@@ -55,8 +55,8 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="inactive"
-                checked={status === Status.inactive}
-                onChange={() => setStatus(Status.inactive)}
+                checked={status === UserStatus.inactive}
+                onChange={() => setStatus(UserStatus.inactive)}
               />
               Inactive
             </label>

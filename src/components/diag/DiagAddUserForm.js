@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import {
-  addAdminCenter,
-  addTeacher,
-  fetchListUserOfCenter,
-} from "../store/listUserOfCenter";
-import { Role } from "../constants/constants";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import { Role } from "../../constants/constants";
 
-import "../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.scss";
+import {
+  postAddCenterAmin,
+  postAddTeacher,
+} from "../../services/centerService";
 const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const idCenter = +localStorage.getItem("idCenter");
   const idUserUpdatedBy = +localStorage.getItem("idUser");
@@ -20,37 +20,34 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
-        const resultAction = await dispatch(
-          addTeacher({ email, username, password, idCenter })
-        ).unwrap();
-        // const result = await dispatch(
-        //   addTeacher({ email, username, password, idCenter })
-        // ).unwrap();
-        console.log(resultAction.message);
-        // if (addTeacher.fulfilled.match(resultAction)) {
-        //   console.log("Add teacher successfully");
-        //   dispatch(fetchListUserOfCenter(Role.teacher));
-        // }
+        const data = await postAddTeacher(email, username, password, idCenter);
+        if (!data.accountId) {
+          setErrorString(data.message);
+        } else {
+          onClose();
+          dispatch(fetchListUserOfCenter(Role.teacher));
+        }
       } catch (error) {
         console.error("Error while add teacher center: ", error);
       }
     } else if (roleAdded === Role.centerAdmin) {
       try {
-        const resultAction = await dispatch(
-          addAdminCenter({
-            username,
-            email,
-            password,
-            idCenter,
-            idUserUpdatedBy,
-          })
+        const data = await postAddCenterAmin(
+          username,
+          email,
+          password,
+          idCenter,
+          idUserUpdatedBy
         );
-        console.log(resultAction);
-
-        // if (addAdminCenter.fulfilled.match(resultAction)) {
-        //   console.log("Add center admin successfully");
-        //   dispatch(fetchListUserOfCenter(Role.centerAdmin));
-        // }
+        if (
+          data.message !==
+          "Center Admin is created and notification email sent."
+        ) {
+          setErrorString(data.message);
+        } else {
+          onClose();
+          dispatch(fetchListUserOfCenter(Role.centerAdmin));
+        }
       } catch (error) {
         console.error("Error while approving center: ", error);
       }
@@ -113,7 +110,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
                 className="btn diag-btn signout"
                 onClick={async () => {
                   await handleAddUser();
-                  onClose();
+                  // onClose();
                 }}
               >
                 Submit

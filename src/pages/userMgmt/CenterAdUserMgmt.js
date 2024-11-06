@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
   LuChevronLeft,
   LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
   LuUserPlus,
 } from "react-icons/lu";
-import { Role, Status } from "../../constants/constants";
 import { useDispatch, useSelector } from "react-redux";
+import DiagAddUserForm from "../../components/DiagAddUserForm";
+import FilterUserOfCenter from "../../components/FilterUserOfCenter";
+import SortByUserOfCenter from "../../components/SortByUserOfCenter";
+import UserOption from "../../components/UserOption";
+import { Role, Status } from "../../constants/constants";
 import {
   fetchListUserOfCenter,
   setActiveRoleUserOfCenter,
 } from "../../store/listUserOfCenter";
-import UserOption from "../../components/UserOption";
-import FilterUserOfCenter from "../../components/FilterUserOfCenter";
-import SortByUserOfCenter from "../../components/SortByUserOfCenter";
-import DiagAddUserForm from "../../components/DiagAddUserForm";
 
 import "../../assets/scss/UserMgmt.css";
 
@@ -128,8 +128,8 @@ const CenterAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -158,17 +158,15 @@ const CenterAdUserMgmt = () => {
       <div className="page-user-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeRole === Role.teacher ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.student ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.student ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -267,23 +265,22 @@ const CenterAdUserMgmt = () => {
                   {activeRole === Role.teacher && (
                     <td>
                       <span
-                        className={`status ${
-                          user.status === Status.active
-                            ? "active"
-                            : user.status === Status.pending
+                        className={`status ${user.status === Status.active
+                          ? "active"
+                          : user.status === Status.pending
                             ? "pending"
                             : user.status === Status.inactive
-                            ? "inactive"
-                            : ""
-                        }`}
+                              ? "inactive"
+                              : ""
+                          }`}
                       >
                         {user.status === Status.active
                           ? "Active"
                           : user.status === Status.pending
-                          ? "Pending"
-                          : user.status === Status.inactive
-                          ? "Inactive"
-                          : ""}
+                            ? "Pending"
+                            : user.status === Status.inactive
+                              ? "Inactive"
+                              : ""}
                       </span>
                     </td>
                   )}

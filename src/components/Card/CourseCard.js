@@ -6,10 +6,12 @@ import {
     LuStar
 } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/card/Card.css";
 
 const CourseCard = (props) => {
+    const navigate = useNavigate()
     const { course } = props;
     const [isHover, setIsHover] = useState(false);
 
@@ -114,7 +116,7 @@ const CourseCard = (props) => {
                             </div>
                             <div className="course-card-info-container">
                                 <div className='course-card-info'> <LuBuilding2 color='#757575' /> {course.centerName}</div>
-                                {course.courseStartDate !== null ?
+                                {course.courseStartDate ?
                                     <div className='course-card-info'> <LuClock color='#757575' />
                                         {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}</div>
                                     :
@@ -134,7 +136,18 @@ const CourseCard = (props) => {
                                 <span className='discount-price'>{course.price}</span>
                                 {/* <span className='initial-price'>300</span> */}
                             </div>
-                            <button className="view-detail-btn">View Detail</button>
+                            <button
+                                className="view-detail-btn"
+                                onClick={() => {
+                                    navigate('/courseDetail', {
+                                        state: {
+                                            idCourse: course.idCourse,
+                                            idUser: localStorage.getItem("idUser"),
+                                            idRole: localStorage.getItem("idRole"),
+                                        },
+                                    });
+                                }}
+                            >View Detail</button>
                         </div>
                     </div>
                 </div>

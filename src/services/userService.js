@@ -272,6 +272,14 @@ const getAllTeacherCards = () => {
   return axios.get("api/User/GetAllTeacherCards");
 }
 
+const getTeacherDetail = (idUser) => {
+  return axios.get("api/User/GetDetailTeacher", {
+    params: {
+      idTeacher: idUser
+    }
+  });
+}
+
 export {
   getPI,
   getAvaImg,
@@ -291,4 +299,5 @@ export {
   postApproveQualification,
   postRejectQualification,
   getAllTeacherCards,
+  getTeacherDetail,
 };

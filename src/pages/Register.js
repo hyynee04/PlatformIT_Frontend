@@ -106,7 +106,7 @@ const Register = () => {
     }
 
     //Agree with policy
-    if (!isCheckedPolicy) {
+    if (isChecked && !isCheckedPolicy) {
       setError(6);
       return;
     }

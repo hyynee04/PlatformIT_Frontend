@@ -223,6 +223,15 @@ const postTransferMainAdmin = async (idNewAdmin) => {
     throw error;
   }
 };
+
+const getCenterDetail = (idCenter) => {
+  return axios.get("api/Center/GetCenterDetail", {
+    params: {
+      idCenter: idCenter
+    }
+  });
+}
+
 export {
   getAllCenter,
   getPendingCenter,
@@ -241,4 +250,5 @@ export {
   postAddOrUpdateWorkingHours,
   getWorkingHours,
   postTransferMainAdmin,
+  getCenterDetail,
 };

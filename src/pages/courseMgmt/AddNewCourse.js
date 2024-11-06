@@ -1,31 +1,82 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { LuX, LuMoveRight } from "react-icons/lu";
 import { FiSettings } from "react-icons/fi";
+import Select from "react-select";
 import TeacherCard from "../../components/Card/TeacherCard";
 import default_image from "../../assets/img/default_image.png";
+import { getAllTags } from "../../services/courseService";
 const AddNewCourse = () => {
-  const [tagOptions, setTagOptions] = useState([
-    "Web Developer",
-    "Software",
-    "Design",
-    "Other",
-  ]);
+  const [tagOptions, setTagOptions] = useState([]);
+  const [searchTagQuery, setSearchTagQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
   const [isTimeLimited, setIsTimeLimited] = useState(false);
   const [isPremiumCourse, setIsPremiumCourse] = useState(false);
   const [isAttendLimited, setIsAttendLimited] = useState(false);
 
-  const handleTagSelect = (event) => {
-    const selectedTag = event.target.value;
-    if (selectedTag && !selectedTags.includes(selectedTag)) {
-      setSelectedTags([...selectedTags, selectedTag]);
+  //TAG
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await getAllTags();
+        setTagOptions(response);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+
+    fetchTags();
+  }, []);
+  const handleInputChange = (event) => {
+    setSearchTagQuery(event.target.value);
+  };
+
+  const addNewTag = (newTag) => {
+    const newTagObject = { idTag: Date.now(), tagName: newTag }; // Create a new tag with a unique ID
+    setTagOptions((prevOptions) => [...prevOptions, newTagObject]); // Add new tag to the list of available tags
+    setSelectedTags((prevTags) => [...prevTags, newTagObject]); // Add the tag to the selected tags
+    setSearchTagQuery(""); // Clear search input after adding tag
+  };
+
+  const handleInputKeyDown = (event) => {
+    if (
+      event.key === "Enter" &&
+      searchTagQuery &&
+      !tagOptions.some((tag) => tag.tagName === searchTagQuery)
+    ) {
+      addNewTag(searchTagQuery); // Thêm tag mới nếu nó chưa có
     }
-    event.target.value = "";
   };
-  const removeTag = (tag) => {
-    setSelectedTags(selectedTags.filter((t) => t !== tag));
+
+  const handleTagSelect = (event) => {
+    const selectedTagName = event.target.value;
+
+    // Kiểm tra nếu tag đã chọn có trong tagOptions
+    const selectedTag = tagOptions.find(
+      (tag) => tag.tagName === selectedTagName
+    );
+
+    // Nếu tag đã chọn và chưa có trong selectedTags, thêm vào selectedTags
+    if (
+      selectedTag &&
+      !selectedTags.some((tag) => tag.idTag === selectedTag.idTag)
+    ) {
+      setSelectedTags((prevTags) => [
+        ...prevTags,
+        { idTag: selectedTag.idTag, tagName: selectedTag.tagName },
+      ]);
+    }
+
+    // Reset lại input text và placeholder sau khi chọn tag
+    // setSearchTagQuery(""); // Đặt giá trị input về trống sau khi chọn tag
   };
+
+  const removeTag = (tagToRemove) => {
+    setSelectedTags(
+      selectedTags.filter((tag) => tag.idTag !== tagToRemove.idTag)
+    );
+  };
+
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
     if (name === "time-limited") setIsTimeLimited(checked);
@@ -58,7 +109,7 @@ const AddNewCourse = () => {
                     </span>
                   </span>
                   <div className="select-container">
-                    <select
+                    {/* <select
                       className="input-form-pi"
                       onChange={handleTagSelect}
                       defaultValue=""
@@ -67,17 +118,32 @@ const AddNewCourse = () => {
                         Choose a tag
                       </option>
                       {tagOptions.map((tag, index) => (
-                        <option key={index} value={tag}>
-                          {tag}
+                        <option key={index} value={tag.tagName}>
+                          {tag.tagName}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
+                    <input
+                      className="input-form-pi"
+                      type="text"
+                      list="tagOptions"
+                      value={searchTagQuery} // Liên kết giá trị của input với state searchTagQuery
+                      onChange={handleInputChange}
+                      onSelect={handleTagSelect} // Cập nhật khi thay đổi giá trị trong input
+                      onKeyDown={handleInputKeyDown} // Thêm tag khi nhấn Enter
+                      placeholder="Search or create a new tag" // Placeholder sẽ hiển thị khi input trống
+                    />
+                    <datalist id="tagOptions">
+                      {tagOptions.map((tag, index) => (
+                        <option key={index} value={tag.tagName} />
+                      ))}
+                    </datalist>
                     <FaChevronDown className="arrow-icon" />
                   </div>
                   <div className="tags-container">
-                    {selectedTags.map((tag, index) => (
-                      <span key={index} className="tags">
-                        {tag}
+                    {selectedTags.map((tag) => (
+                      <span key={tag.idTag} className="tags">
+                        {tag.tagName}
                         <LuX className="icon" onClick={() => removeTag(tag)} />
                       </span>
                     ))}

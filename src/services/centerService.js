@@ -244,7 +244,6 @@ const postUnlockCenter = async (idCenter) => {
       params: {
         idCenter: idCenter,
         idUserUpdated: idUserUpdated,
-        mode: 3,
       },
     });
   } catch (error) {

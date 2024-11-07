@@ -331,6 +331,7 @@ const PlatformAdUserMgmt = () => {
                           ? { statusUserSelected: user.status }
                           : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
+                        roleUserSelected={user.idRole}
                       />
                     )}
                   </td>

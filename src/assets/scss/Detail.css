@@ -224,13 +224,15 @@
     justify-content: center;
 }
 
-.block-container-row.center {
+.block-container-row.center,
+.block-container-col.teacher{
     padding: 5px;
     border-radius: .5rem;
 }
 
-.block-container-row.center:hover {
-    background-color: #f4f4f4;
+.block-container-row.center:hover,
+.block-container-col.teacher:hover {
+    background-color: rgba(121, 121, 121, .1);
     cursor: pointer;
 }
 
@@ -1101,10 +1103,18 @@ svg > .CircularProgressbar-text {
     border: 1px solid var(--border-gray);
     padding: 1rem;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    opacity: 0;
+    transition: opacity 0.1s linear;
 
     position: absolute;
     top: 4rem;
     right: 2rem;
+}
+
+.detail-container .right-container .block-container > .add-notification-popup.active {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 0.1s linear;
 }
 
 .detail-container .right-container .block-container .add-notification-popup > span {

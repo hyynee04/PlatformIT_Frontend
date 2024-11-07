@@ -4,6 +4,7 @@ import "../assets/scss/card/OptionCard.css";
 import DiagInactiveForm from "./DiagInactiveForm";
 import { Role } from "../constants/constants";
 import DiagTransmitForm from "./DiagTransmitForm";
+import { useNavigate } from "react-router-dom";
 
 const UserOption = ({
   idUserSelected,
@@ -11,6 +12,7 @@ const UserOption = ({
   onUserInactivated,
   roleUserSelected,
 }) => {
+  const navigate = useNavigate();
   const [isOptionVisible, setIsOptionVisible] = useState(true);
 
   const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
@@ -29,6 +31,8 @@ const UserOption = ({
     setIsOptionVisible(false);
     openTransmitModal();
   };
+  console.log(idUserSelected, roleUserSelected)
+
   if (!isOptionVisible)
     return (
       <>
@@ -63,7 +67,20 @@ const UserOption = ({
             <span>Set as Main Admin</span>
           </button>
         )}
-        <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
+        <button 
+          className="op-buts" 
+          onClick={() => {
+            if(roleUserSelected === Role.teacher) {
+              navigate('/teacherDetail', {
+                state: { 
+                    idTeacher: idUserSelected, 
+                    idRole: localStorage.getItem("idRole"),
+                    idUser: localStorage.getItem("idUser")
+                },
+            });
+            }
+            setIsOptionVisible(false)
+          }}>
           <span>View detail</span>
         </button>
       </div>

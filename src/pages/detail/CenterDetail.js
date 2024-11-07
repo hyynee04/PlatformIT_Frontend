@@ -24,6 +24,7 @@ const CenterDetail = (props) => {
     const [totalCourseTracks, setTotalCourseTracks] = useState(0)
 
     const [idRole, setIDRole] = useState("")
+    const [idUser, setIDUser] = useState("")
     const [centerInfo, setCenterInfo] = useState({})
 
     const fetchCenterDetail = async (idCenter) => {
@@ -55,6 +56,7 @@ const CenterDetail = (props) => {
         const state = location.state;
         if (state) {
             setIDRole(state.idRole);
+            setIDUser(state.idUSer);
             fetchCenterDetail(state.idCenter);
         }
 
@@ -120,76 +122,84 @@ const CenterDetail = (props) => {
                     </div>
                 </div>
 
-                <div className="block-container">
-                    <span className="block-container-title">Professional Qualification</span>
-                    <div className="block-container-col">
-                        {centerInfo.qualifications && centerInfo.qualifications.map((qualification) => (
-                            <div
-                                key={qualification.idQualification}
-                                className="qualification"
-                                onClick={() => window.open(qualification.path)}
-                            >
-                                {qualification.path.endsWith(".pdf") ?
-                                    <BsFiletypePdf color="#757575" />
-                                    :
-                                    <img src={qualification.path || default_image} />
-                                }
-                                <div className="qualification-body">
-                                    <span className="qualification-name">{qualification.qualificationName}</span>
-                                    <span className="qualification-description">{qualification.description}</span>
+                {centerInfo.qualifications && centerInfo.qualifications.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Professional Qualification</span>
+                        <div className="block-container-col">
+                            {centerInfo.qualifications.map((qualification) => (
+                                <div
+                                    key={qualification.idQualification}
+                                    className="qualification"
+                                    onClick={() => window.open(qualification.path)}
+                                >
+                                    {qualification.path.endsWith(".pdf") ?
+                                        <BsFiletypePdf color="#757575" />
+                                        :
+                                        <img src={qualification.path || default_image} />
+                                    }
+                                    <div className="qualification-body">
+                                        <span className="qualification-name">{qualification.qualificationName}</span>
+                                        <span className="qualification-description">{qualification.description}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <div className="block-container">
-                    <span className="block-container-title">Social/Profile Link</span>
-                    <div className="block-container-col">
-                        {centerInfo.profileLinks && centerInfo.profileLinks.map((link) => (
-                            <div
-                                key={link.idProfileLink}
-                                className="link-transfer"
-                                onClick={() => window.open(link.url)}
-                            >
-                                <span>{link.name}</span>
-                                <IoMdOpen color="#757575" />
-                            </div>
-                        ))}
+                {centerInfo.profileLinks && centerInfo.profileLinks.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Social/Profile Link</span>
+                        <div className="block-container-col">
+                            {centerInfo.profileLinks.map((link) => (
+                                <div
+                                    key={link.idProfileLink}
+                                    className="link-transfer"
+                                    onClick={() => window.open(link.url)}
+                                >
+                                    <span>{link.name}</span>
+                                    <IoMdOpen color="#757575" />
+                                </div>
+                            ))}
 
+                        </div>
                     </div>
-                </div>
+                )}
+
             </div>
 
             <div className="right-container">
-                <div className="block-container">
-                    <span className="block-container-title">Working hours</span>
-                    <table>
-                        <tr>
-                            {centerInfo.workingHourModel && centerInfo.workingHourModel.map((day) => (
-                                <th key={day.day}>{day.day}</th>
-                            ))}
-                        </tr>
-                        <tr>
-                            {centerInfo.workingHourModel && centerInfo.workingHourModel.map((day) => (
-                                <td key={day.day}>
-                                    {day.isOpen ? (
-                                        <>
-                                            {day.startTime}
-                                            <br />-<br />
-                                            {day.closeTime}
-                                        </>
-                                    ) : (
-                                        "Closed"
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    </table>
-                </div>
+                {centerInfo.workingHourModel && centerInfo.workingHourModel.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Working hours</span>
+                        <table>
+                            <tr>
+                                {centerInfo.workingHourModel.map((day) => (
+                                    <th key={day.day}>{day.day}</th>
+                                ))}
+                            </tr>
+                            <tr>
+                                {centerInfo.workingHourModel.map((day) => (
+                                    <td key={day.day}>
+                                        {day.isOpen ? (
+                                            <>
+                                                {day.startTime}
+                                                <br />-<br />
+                                                {day.closeTime}
+                                            </>
+                                        ) : (
+                                            "Closed"
+                                        )}
+                                    </td>
+                                ))}
+                            </tr>
+                        </table>
+                    </div>
+                )}
 
-                <div className="block-container">
-                    {centerInfo.courseCards && centerInfo.courseCards.length !== 0 ? (
+                {centerInfo.courseCards && centerInfo.courseCards.length !== 0 && (
+                    <div className="block-container">
+
                         <div className="carousel-block">
                             <Carousel
                                 object={1} //course
@@ -199,15 +209,13 @@ const CenterDetail = (props) => {
                                 listInfo={listCourse}
                             />
                         </div>
-                    )
-                        :
-                        <span className="block-container-title">Courses</span>
-                    }
+                    </div>
+                )}
 
-                </div>
 
-                <div className="block-container">
-                    {centerInfo.teacherCards && centerInfo.teacherCards.length !== 0 ? (
+                {centerInfo.teacherCards && centerInfo.teacherCards.length !== 0 && (
+                    <div className="block-container">
+
                         <div className="carousel-block">
                             <Carousel
                                 object={2} //teacher
@@ -217,12 +225,8 @@ const CenterDetail = (props) => {
                                 listInfo={listTeacher}
                             />
                         </div>
-                    )
-                        :
-                        <span className="block-container-title">Teachers</span>
-                    }
-
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -12,7 +12,11 @@ const TeacherCard = (props) => {
             className='card-container hover'
             onClick={() => {
                 navigate('/teacherDetail', {
-                    state: { idTeacher: teacher.idUser, idRole: localStorage.getItem("idRole") },
+                    state: { 
+                        idTeacher: teacher.idUser, 
+                        idRole: localStorage.getItem("idRole"),
+                        idUser: localStorage.getItem("idUser")
+                    },
                 });
             }}
         >

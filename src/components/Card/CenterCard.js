@@ -1,8 +1,8 @@
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/card/Card.css";
-import { useNavigate } from "react-router-dom";
 
 const CenterCard = (props) => {
     const navigate = useNavigate();
@@ -16,11 +16,15 @@ const CenterCard = (props) => {
     const remain_tag_number = center.listTagCourses ? center.listTagCourses.length - 1 : 0;
 
     return (
-        <div 
+        <div
             className='card-container hover'
             onClick={() => {
                 navigate('/centerDetail', {
-                    state: { idCenter: center.idCenter, idRole: localStorage.getItem("idRole") },
+                    state: {
+                        idCenter: center.idCenter,
+                        idUser: localStorage.getItem("idUser"),
+                        idRole: localStorage.getItem("idRole")
+                    }
                 });
             }}
         >

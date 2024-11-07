@@ -28,3 +28,6 @@ export const CarouselObject = {
   teacher: 2,
   center: 3,
 }
+export const assigmentType = {
+
+}

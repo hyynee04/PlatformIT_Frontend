@@ -14,7 +14,7 @@ import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
-import { Role, Status } from "../constants/constants";
+import { Role, UserStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
@@ -97,32 +97,42 @@ const Login = () => {
 
   const handleLogin = async () => {
     let data = await postLogin(username, password);
-    if (data && data.idUser > Status.inactive) {
-      localStorage.setItem("idRole", data.idRole);
-      localStorage.setItem("idUser", data.idUser);
-      localStorage.setItem("idCenter", data.idCenter);
-      localStorage.setItem("idAccount", data.idAccount);
-      let roleBasesPath = "/";
-      switch (data.idRole) {
-        case Role.platformAdmin:
-          roleBasesPath = "/platformAdDashboard";
-          break;
-        case Role.centerAdmin:
-          roleBasesPath = "/centerAdDashboard";
-          break;
-        case Role.teacher:
-          roleBasesPath = "/teacherHome";
-          break;
-        case Role.student:
-          roleBasesPath = "/studentHome";
-          break;
-        default:
-          break;
+    if (data && data.idUser) {
+      if (data.status === UserStatus.active) {
+        localStorage.setItem("idRole", data.idRole);
+        localStorage.setItem("idUser", data.idUser);
+        localStorage.setItem("idAccount", data.idAccount);
+        let roleBasesPath = "/";
+        switch (data.idRole) {
+          case Role.platformAdmin:
+            roleBasesPath = "/platformAdDashboard";
+            break;
+          case Role.centerAdmin:
+            localStorage.setItem("idCenter", data.idCenter);
+            roleBasesPath = "/centerAdDashboard";
+            break;
+          case Role.teacher:
+            localStorage.setItem("idCenter", data.idCenter);
+            roleBasesPath = "/teacherHome";
+            break;
+          case Role.student:
+            roleBasesPath = "/studentHome";
+            break;
+          default:
+            break;
+        }
+        navigate(roleBasesPath, {
+          state: { idUser: data.idUser, idRole: data.idRole },
+        });
+      } else if (
+        data.status === UserStatus.pending &&
+        data.idRole === Role.centerAdmin
+      ) {
+        localStorage.setItem("idUser", data.idUser);
+        localStorage.setItem("idRole", data.idRole);
+        localStorage.setItem("isPendingCenter", data.status);
+        navigate("/pendingCenter");
       }
-
-      navigate(roleBasesPath, {
-        state: { idUser: data.idUser, idRole: data.idRole },
-      });
     } else {
       setIsFailed(true);
     }

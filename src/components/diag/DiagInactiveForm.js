@@ -1,11 +1,11 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
 
-import "../assets/scss/card/DiagForm.scss";
-import { fetchAllUsers, updateUserStatus } from "../store/userSlice";
+import "../../assets/scss/card/DiagForm.scss";
+import { fetchAllUsers, updateUserStatus } from "../../store/userSlice";
 import { useDispatch } from "react-redux";
-import { fetchListUserOfCenter } from "../store/listUserOfCenter";
-import { Role } from "../constants/constants";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import { Role } from "../../constants/constants";
 
 const DiagInactiveForm = ({
   isOpen,
@@ -17,11 +17,8 @@ const DiagInactiveForm = ({
   const dispatch = useDispatch();
   const idRole = +localStorage.getItem("idRole");
   const handleInactiverUser = async () => {
-    const idUserUpdatedBy = +localStorage.getItem("idUser");
     try {
-      const resultAction = await dispatch(
-        updateUserStatus({ idUserSelected, idUserUpdatedBy })
-      );
+      const resultAction = await dispatch(updateUserStatus({ idUserSelected }));
       if (updateUserStatus.fulfilled.match(resultAction)) {
         if (idRole === Role.platformAdmin) {
           dispatch(fetchAllUsers());
@@ -33,7 +30,7 @@ const DiagInactiveForm = ({
           }
         }
 
-        onUserInactivated();
+        onUserInactivated(); //To not show option
       } else {
         console.error("Failed to set user inactive.");
       }
@@ -53,7 +50,14 @@ const DiagInactiveForm = ({
           <LuX className="diag-icon" onClick={onClose} />
         </div>
         <div className="diag-body">
-          <span>Are you sure you want to inactive this user!</span>
+          <span>
+            Are you sure you want to deactivate this user?
+            <br />
+            <br />
+            <strong>Note:</strong> Deactivated users cannot log in until
+            reactivated.
+          </span>
+
           <div className="str-btns">
             <div className="act-btns">
               <button className="btn diag-btn cancle" onClick={onClose}>

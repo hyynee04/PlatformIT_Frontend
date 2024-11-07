@@ -7,9 +7,9 @@ import {
   approveCenter,
   fetchCenters,
   rejectCenter,
-} from "../store/listCenterSlice";
+} from "../../store/listCenterSlice";
 
-import "../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.scss";
 const DiagActionCenterForm = ({
   isOpen,
   onClose,
@@ -37,10 +37,7 @@ const DiagActionCenterForm = ({
   };
 
   const handleRejectCenter = async () => {
-    console.log("idCenterSelected: ", idCenterSelected);
-    console.log(reasonReject);
-
-    if (reasonReject) {
+    if (reasonReject.trim()) {
       try {
         const resultAction = await dispatch(
           rejectCenter({ idCenterSelected, reasonReject, idUserUpdated })
@@ -53,6 +50,9 @@ const DiagActionCenterForm = ({
       }
     } else {
       setErrorRejectString("Please enter reason for rejection");
+      setTimeout(() => {
+        setErrorRejectString("");
+      }, 3000);
     }
   };
 
@@ -111,9 +111,9 @@ const DiagActionCenterForm = ({
             <div className="str-btns">
               {errorRejectString && (
                 <Alert
-                  variant="success"
+                  variant="danger"
                   onClose={() => setErrorRejectString("")}
-                  dismissible
+                  className="error-str"
                 >
                   {errorRejectString}
                 </Alert>

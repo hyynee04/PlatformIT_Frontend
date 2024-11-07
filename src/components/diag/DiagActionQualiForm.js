@@ -7,7 +7,7 @@ import {
   approveQualification,
   fetchTaskOfCenterAd,
   rejectQualification,
-} from "../store/listTaskOfCenterAd";
+} from "../../store/listTaskOfCenterAd";
 
 const DiagActionQualiForm = ({
   isOpen,

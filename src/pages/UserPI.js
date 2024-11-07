@@ -31,7 +31,7 @@ import {
 } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
-import { Role, Status, UserGender } from "../constants/constants";
+import { Role, UserStatus, UserGender } from "../constants/constants";
 import AvatarImageOption from "../components/AvatarImageOption";
 
 const TeacherPI = () => {
@@ -676,16 +676,16 @@ const TeacherPI = () => {
                       <div className="status-action">
                         <span
                           className={`span ${
-                            qualification.status === Status.active
+                            qualification.status === UserStatus.active
                               ? "approved"
-                              : qualification.status === Status.pending
+                              : qualification.status === UserStatus.pending
                               ? "pending"
                               : "rejected"
                           }`}
                         >
-                          {qualification.status === Status.active
+                          {qualification.status === UserStatus.active
                             ? "Approved"
-                            : qualification.status === Status.pending
+                            : qualification.status === UserStatus.pending
                             ? "Pending"
                             : `Rejected. Reason: ${qualification.reason}`}
                         </span>

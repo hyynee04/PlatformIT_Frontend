@@ -1,22 +1,18 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
-import "../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.scss";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { resetUserPI } from "../store/profileUserSlice";
-import { resetCenterPI } from "../store/profileCenterSlice";
+import { resetUserPI } from "../../store/profileUserSlice";
+import { resetCenterPI } from "../../store/profileCenterSlice";
 
 const DiagSignOutForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSignout = () => {
-    localStorage.removeItem("idRole");
-    localStorage.removeItem("idUser");
-    localStorage.removeItem("idCenter");
-    localStorage.removeItem("idAccount");
+    localStorage.clear();
     dispatch(resetUserPI());
     dispatch(resetCenterPI());
-
     navigate("/");
   };
   if (!isOpen) return null;

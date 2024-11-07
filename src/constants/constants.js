@@ -13,21 +13,20 @@ export const CenterAdminLevel = {
   main: 1,
   mem: 0,
 };
-export const Status = {
+export const UserStatus = {
   active: 1,
   inactive: 0,
   pending: 2,
+  locked: 3,
 };
 export const CenterStatus = {
   inactive: 0,
   active: 1,
   pending: 2,
+  locked: 3,
 };
 export const CarouselObject = {
   course: 1,
   teacher: 2,
   center: 3,
-}
-export const assigmentType = {
-
-}
+};

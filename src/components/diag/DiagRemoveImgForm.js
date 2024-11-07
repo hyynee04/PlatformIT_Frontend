@@ -1,10 +1,10 @@
 import React from "react";
 import { LuImageOff, LuX } from "react-icons/lu";
-import { postRemoveAvatar } from "../services/userService";
-import { fetchUserProfile } from "../store/profileUserSlice";
+import { postRemoveAvatar } from "../../services/userService";
+import { fetchUserProfile } from "../../store/profileUserSlice";
 import { useDispatch } from "react-redux";
-import "../assets/scss/card/DiagForm.scss";
-import { fetchCenterProfile } from "../store/profileCenterSlice";
+import "../../assets/scss/card/DiagForm.scss";
+import { fetchCenterProfile } from "../../store/profileCenterSlice";
 
 const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
   const dispatch = useDispatch();

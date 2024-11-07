@@ -7,9 +7,9 @@ import {
   LuChevronLeft,
   LuChevronRight,
 } from "react-icons/lu";
-import { CenterStatus, Status } from "../../constants/constants";
-import UserOption from "../../components/UserOption";
-import DiagActionCenterForm from "../../components/DiagActionCenterForm";
+import { CenterStatus } from "../../constants/constants";
+import CenterOption from "../../components/option/CenterOption";
+import DiagActionCenterForm from "../../components/diag/DiagActionCenterForm";
 import FilterCenter from "../../components/FilterCenter";
 import SortByCenter from "../../components/SortByCenter";
 
@@ -323,8 +323,11 @@ const PlatformAdCenterMgmt = () => {
                   <th>Center Email</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
-                  <th>Date Created</th>
-                  <th>Status</th>
+                  <th>Established Date</th>
+                  {/* <th>Status</th> */}
+                  {activeStatusCenter === CenterStatus.inactive && (
+                    <th>Reason Inactive</th>
+                  )}
                   <th></th>
                 </tr>
               </thead>
@@ -332,7 +335,13 @@ const PlatformAdCenterMgmt = () => {
                 {(() => {
                   let count = 0; // Khởi tạo biến đếm bên ngoài map
                   return records.map((center, index) => {
-                    if (center.centerStatus === activeStatusCenter) {
+                    const shouldDisplay =
+                      (activeStatusCenter === CenterStatus.active &&
+                        center.centerStatus === CenterStatus.active) ||
+                      (activeStatusCenter === CenterStatus.inactive &&
+                        (center.centerStatus === CenterStatus.inactive ||
+                          center.centerStatus === CenterStatus.locked));
+                    if (shouldDisplay) {
                       count++; // Tăng biến đếm khi hiển thị dòng
                       return (
                         <React.Fragment key={index}>
@@ -357,30 +366,25 @@ const PlatformAdCenterMgmt = () => {
                                   return `${month}/${day}/${year}`;
                                 })()}
                             </td>
-                            <td>
-                              <span
-                                className={`status ${
-                                  center.centerStatus === Status.active
-                                    ? "active"
-                                    : center.centerStatus === Status.pending
-                                    ? "pending"
-                                    : center.centerStatus === Status.inactive
-                                    ? "inactive"
-                                    : ""
-                                }`}
+                            {activeStatusCenter === CenterStatus.inactive && (
+                              <td
+                                style={{
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                                title={center.reason}
                               >
-                                {center.centerStatus === Status.active
-                                  ? "Active"
-                                  : center.centerStatus === Status.pending
-                                  ? "Pending"
-                                  : center.centerStatus === Status.inactive
-                                  ? "Inactive"
+                                {center.reason
+                                  ? center.reason
+                                  : center.centerStatus === CenterStatus.locked
+                                  ? "Locked"
                                   : ""}
-                              </span>
-                            </td>
+                              </td>
+                            )}
                             <td
                               className={`table-cell ${
-                                activeStatusCenter === CenterStatus.pending
+                                center.centerStatus === CenterStatus.pending
                                   ? "pending"
                                   : ""
                               }`}
@@ -392,9 +396,17 @@ const PlatformAdCenterMgmt = () => {
                                 }
                               />
                               {selectedCenterId === center.idCenter && (
-                                <UserOption
+                                <CenterOption
                                   className="user-option"
-                                  idUserSelected={center.idCenter}
+                                  idCenterSelected={center.idCenter}
+                                  statusCenterSelected={center.centerStatus}
+                                  {...(center.centerStatus ===
+                                    CenterStatus.locked && {
+                                    isReactivatable: true,
+                                  })}
+                                  onCenterOption={() =>
+                                    setSelectedCenterId(null)
+                                  }
                                 />
                               )}
                             </td>

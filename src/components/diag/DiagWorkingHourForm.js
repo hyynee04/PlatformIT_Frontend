@@ -3,7 +3,7 @@ import { LuClock7, LuX } from "react-icons/lu";
 import {
   getWorkingHours,
   postAddOrUpdateWorkingHours,
-} from "../services/centerService";
+} from "../../services/centerService";
 const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   const daysOfWeek = [
     "Monday",

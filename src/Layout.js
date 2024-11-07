@@ -24,12 +24,14 @@ import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
+import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 
 import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
 
 import ViewAllTeacher from "./pages/viewAll/ViewAllTeacher";
+import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
 
 const Layout = (props) => {
   return (
@@ -136,6 +138,14 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/addNewCourse"
+            element={
+              <PrivateRoute>
+                <AddNewCourse />
+              </PrivateRoute>
+            }
+          />
           {/* Teacher */}
           <Route
             path="/teacherHome"
@@ -162,6 +172,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <UserPI />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pendingCenter"
+            element={
+              <PrivateRoute>
+                <PendingApproveCenter />
               </PrivateRoute>
             }
           />

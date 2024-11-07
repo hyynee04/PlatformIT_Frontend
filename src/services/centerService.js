@@ -107,7 +107,7 @@ const postAddTeacher = async (email, username, password, idCenter) => {
 
 const getAllCenterCards = () => {
   return axios.get("api/Center/GetAllCenterCards");
-}
+};
 const getCenterInfo = async () => {
   const idCenter = +localStorage.getItem("idCenter");
 
@@ -223,14 +223,41 @@ const postTransferMainAdmin = async (idNewAdmin) => {
     throw error;
   }
 };
+const postLockCenter = async (idCenter) => {
+  // const idCenter = +localStorage.getItem("idCenter");
+  const idUserUpdated = +localStorage.getItem("idUser");
+  try {
+    return await axios.post("api/Center/LockCenter", null, {
+      params: {
+        idCenter: idCenter,
+        idUserUpdated: idUserUpdated,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+const postUnlockCenter = async (idCenter) => {
+  const idUserUpdated = +localStorage.getItem("idUser");
+  try {
+    return await axios.post("api/Center/ReactiveCenter", null, {
+      params: {
+        idCenter: idCenter,
+        idUserUpdated: idUserUpdated,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 const getCenterDetail = (idCenter) => {
   return axios.get("api/Center/GetCenterDetail", {
     params: {
-      idCenter: idCenter
-    }
+      idCenter: idCenter,
+    },
   });
-}
+};
 
 export {
   getAllCenter,
@@ -250,5 +277,7 @@ export {
   postAddOrUpdateWorkingHours,
   getWorkingHours,
   postTransferMainAdmin,
+  postLockCenter,
+  postUnlockCenter,
   getCenterDetail,
 };

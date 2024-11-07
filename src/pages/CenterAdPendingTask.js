@@ -14,12 +14,11 @@ import {
   setActiveTypeOfTask,
 } from "../store/listTaskOfCenterAd";
 import default_ava from "../assets/img/default_ava.png";
-import DiagActionQualiForm from "../components/DiagActionQualiForm";
+import DiagActionQualiForm from "../components/diag/DiagActionQualiForm";
 
 const CenterAdPendingTask = () => {
   const dispatch = useDispatch();
 
-  // Sử dụng destructuring mà không gán giá trị mặc định cho `listTaskOfCenterAd`
   const { taskOfCenterAd, status, error, activeTypeOfTask } = useSelector(
     (state) => state.taskOfCenterAd || {}
   );

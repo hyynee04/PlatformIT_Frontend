@@ -453,7 +453,7 @@ const TeacherPI = () => {
                     </div>
                   </div>
                   <div className="info">
-                    <div className="container-phone">
+                    <div className="container-validate">
                       <span>Phone Number</span>
                       {phoneNumWarning && (
                         <span

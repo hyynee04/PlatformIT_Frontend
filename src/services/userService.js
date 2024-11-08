@@ -218,11 +218,9 @@ const postInactiveUser = (idUserInactive) => {
 };
 const postReactiveUser = (idUserReactive) => {
   const idUserUpdatedBy = +localStorage.getItem("idUser");
-  console.log(idUserReactive, idUserUpdatedBy);
-
   return axios.post("api/User/ReactiveUser", null, {
     params: {
-      idUserInactive: idUserReactive,
+      idUser: idUserReactive,
       idUserUpdatedBy: idUserUpdatedBy,
     },
   });
@@ -286,10 +284,10 @@ const getAllTeacherCards = () => {
 const getTeacherDetail = (idUser) => {
   return axios.get("api/User/GetDetailTeacher", {
     params: {
-      idTeacher: idUser
-    }
+      idTeacher: idUser,
+    },
   });
-}
+};
 
 export {
   getPI,

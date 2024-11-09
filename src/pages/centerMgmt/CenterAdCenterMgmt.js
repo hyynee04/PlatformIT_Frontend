@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LuTrash2, LuCheck, LuFile, LuLock } from "react-icons/lu";
-import { FaInfoCircle, FaGlobe, FaRegFilePdf } from "react-icons/fa";
+import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Alert } from "react-bootstrap";
+import { FaGlobe, FaInfoCircle, FaRegFilePdf } from "react-icons/fa";
+import { LuCheck, LuFile, LuLock, LuTrash2 } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCenterProfile } from "../../store/profileCenterSlice";
 import {
   postAddCenterLink,
   postAddCenterQualification,
@@ -15,13 +14,15 @@ import {
   deleteProfileLink,
   deleteQualification,
 } from "../../services/userService";
+import { fetchCenterProfile } from "../../store/profileCenterSlice";
 import CenterAdAdminMgmt from "../userMgmt/CenterAdAdminMgmt";
 
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/PI.css";
 import AvatarImageOption from "../../components/AvatarImageOption";
-import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
 import DiagLockCenterForm from "../../components/diag/DiagLockCenterForm";
+import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
+import { APIStatus } from "../../constants/constants";
 const CenterAdCenterMgmt = () => {
   //Center Infomation
   const dispatchInfo = useDispatch();
@@ -161,8 +162,11 @@ const CenterAdCenterMgmt = () => {
 
   //LINKS
   const removeProfileLink = async (idProfileLink) => {
-    await deleteProfileLink(idProfileLink);
-    await dispatchInfo(fetchCenterProfile());
+    const response = await deleteProfileLink(idProfileLink);
+    if (response.status === APIStatus.success) {
+      await dispatchInfo(fetchCenterProfile());
+    }
+
   };
   const handleNameProfileLinkChange = (e) => {
     setNewProfileLink({ ...newProfileLink, name: e.target.value });
@@ -172,16 +176,22 @@ const CenterAdCenterMgmt = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      await postAddCenterLink(newProfileLink.name, newProfileLink.url);
-      await dispatchInfo(fetchCenterProfile());
-      setNewProfileLink({ name: "", url: "" });
+      const response = await postAddCenterLink(newProfileLink.name, newProfileLink.url);
+      if (response.status === APIStatus.success) {
+        await dispatchInfo(fetchCenterProfile());
+        setNewProfileLink({ name: "", url: "" });
+      }
+
     }
   };
 
   //QUALIFICATIONS
   const removeQualification = async (idQualification) => {
-    await deleteQualification(idQualification);
-    await dispatchInfo(fetchCenterProfile());
+    const response = await deleteQualification(idQualification);
+    if (response.status === APIStatus.success) {
+      await dispatchInfo(fetchCenterProfile());
+    }
+
   };
   const handleNameQualificationChange = (e) => {
     setNewQualification({
@@ -248,19 +258,22 @@ const CenterAdCenterMgmt = () => {
       newQualification.qualificationDescr &&
       newQualification.qualificationFile
     ) {
-      await postAddCenterQualification(
+      const response = await postAddCenterQualification(
         newQualification.qualificationName,
         newQualification.qualificationDescr,
         newQualification.qualificationFile
       );
-      await setNewQualification((prev) => ({
-        ...prev,
-        qualificationName: "",
-        qualificationDescr: "",
-        qualificationFile: null,
-        qualificationUrl: "",
-      }));
-      await setQualiPDFCheck(false);
+      if (response.status === APIStatus.success) {
+        await setNewQualification((prev) => ({
+          ...prev,
+          qualificationName: "",
+          qualificationDescr: "",
+          qualificationFile: null,
+          qualificationUrl: "",
+        }));
+        await setQualiPDFCheck(false);
+      }
+
     } else {
       setQualiWarning(
         "Please enter all required fields for the qualification."
@@ -308,18 +321,16 @@ const CenterAdCenterMgmt = () => {
             <div className="sub-container-action">
               <div className="action-btn">
                 <div
-                  className={`btn ${
-                    activeAction === "basicInfo" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "basicInfo" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("basicInfo")}
                 >
                   <FaInfoCircle className="icon" />
                   Basic Infomation
                 </div>
                 <div
-                  className={`btn ${
-                    activeAction === "link_quali" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "link_quali" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("link_quali")}
                 >
                   <FaGlobe className="icon" />
@@ -583,7 +594,7 @@ const CenterAdCenterMgmt = () => {
                       </div>
                       <div className="quali-image">
                         {qualification.path &&
-                        qualification.path.endsWith(".pdf") ? (
+                          qualification.path.endsWith(".pdf") ? (
                           <div
                             onClick={() =>
                               window.open(qualification.path, "_blank")

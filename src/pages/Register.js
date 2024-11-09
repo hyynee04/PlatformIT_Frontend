@@ -19,6 +19,7 @@ import {
   postSendOTP,
   postVerifyOtp,
 } from "../services/authService";
+import { APIStatus } from "../constants/constants";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -119,8 +120,9 @@ const Register = () => {
     const isValid = checkInput()
     if (!isValid) return;
 
-    let checkEmail = await postCheckEmail(email)
-    if (checkEmail !== "Email already exists.") {
+    let response = await postCheckEmail(email);
+    let checkEmail = response.data;
+    if (response.status === APIStatus.success) {
       await postSendOTP(email);
       setShowVerifyEmail(true);
       setErrorVerify("OTP has been sent to your email. It will expire in 2 minutes!");
@@ -133,8 +135,9 @@ const Register = () => {
   };
 
   const handleVerify = async () => {
-    let verifyOTP = await postVerifyOtp(email, OTP)
-    if (verifyOTP === "OTP verified successfully! You can now proceed with the registration.") {
+    let response = await postVerifyOtp(email, OTP);
+    let verifyOTP = response.data;
+    if (response.status === APIStatus.success) {
       localStorage.setItem('verifiedEmail', email);
       setShowVerifyEmail(false);
       handleRegister();
@@ -147,8 +150,9 @@ const Register = () => {
 
   const handleRegister = async () => {
     //submit api
-    let data = await postRegister(fullName, email, username, password, centerName, centerDescription, TIN);
-    if (Number.isInteger(data)) {
+    let response = await postRegister(fullName, email, username, password, centerName, centerDescription, TIN);
+    let data = response.data;
+    if (response.status === APIStatus.success) {
       localStorage.removeItem('verifiedEmail');
       navigate("/login");
     } else {

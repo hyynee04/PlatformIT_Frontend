@@ -54,7 +54,7 @@ const postAddCourse = async (dataToSubmit) => {
       formData.append("Tags", tag);
     });
     formData.append("IdTeacher", dataToSubmit.idTeacher);
-    await axios.post(
+    return await axios.post(
       `api/Course/AddCourse?idCreatedBy=${idCreatedBy}`,
       formData,
       {

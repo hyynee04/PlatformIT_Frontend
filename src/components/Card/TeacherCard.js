@@ -21,7 +21,7 @@ const TeacherCard = (props) => {
     >
       <div className="teacher-card-container">
         <img
-          src={teacher.avatarPath !== "" ? teacher.avatarPath : default_ava}
+          src={teacher.avatarPath || default_ava}
           alt="teacher avatar"
         />
         <div className="teacher-card-body">

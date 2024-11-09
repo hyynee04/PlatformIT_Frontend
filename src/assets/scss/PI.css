@@ -189,7 +189,7 @@
 }
 
 .icon {
-  width: 28px;
+  width: 24px;
   height: auto;
   color: var(--text-gray);
 }
@@ -250,19 +250,23 @@
 .container-info .info .container-link .mb-3 {
   height: 40px;
   width: 90%;
-  border-radius: 100rem;
-  color: var(--text-gray);
   font-size: 14px;
   display: flex;
+  border-radius: 4px;
+  border: none;
+  color: var(--black-gray);
+  background-color: rgba(217, 217, 217, 0.3);
+  margin: 0 ;
 }
 
 .container-info .info .container-link .mb-3 .title-link {
   z-index: 1;
   height: 40px;
   width: 140px;
-  border-top-left-radius: 100rem;
-  border-bottom-left-radius: 100rem;
-  border: 1px solid var(--border-gray);
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border: none;
+  border-right: 1px solid var(--border-gray);
   background-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
   box-sizing: border-box;
@@ -274,12 +278,13 @@
   height: 40px;
   box-sizing: border-box;
   padding: 0 12px;
-  border-top-right-radius: 100rem;
-  border-bottom-right-radius: 100rem;
-  border: 1px solid var(--border-gray);
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border: none;
   font-size: 14px;
   color: #0d6efd;
   text-decoration: underline;
+  background-color: rgba(217, 217, 217, 0.3);;
 }
 .container-info .info .container-link .mb-3 .main-link::placeholder {
   font-size: 14px;

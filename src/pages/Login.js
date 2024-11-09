@@ -14,7 +14,7 @@ import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
-import { Role, UserStatus } from "../constants/constants";
+import { Role, UserStatus, APIStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
@@ -96,7 +96,8 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
-    let data = await postLogin(username, password);
+    let response = await postLogin(username, password);
+    let data = response.data;
     if (data && data.idUser) {
       if (data.status === UserStatus.active) {
         localStorage.setItem("idRole", data.idRole);
@@ -147,9 +148,10 @@ const Login = () => {
     }
 
     // submit email
-    let data = await postForgotPassword(email);
+    let response = await postForgotPassword(email);
+    let data = response.data;
     console.log(">>> Check register: ", data);
-    if (data === "Internal Server Error.") {
+    if (response.status !== APIStatus.success) {
       setIsValid(false);
       return;
     } else {

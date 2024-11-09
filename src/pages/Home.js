@@ -21,7 +21,8 @@ const Home = () => {
   const [totalCourseTracks, setTotalCourseTracks] = useState(0)
 
   const getTeacherCards = async () => {
-    let teachers = await getAllTeacherCards();
+    let response = await getAllTeacherCards();
+    let teachers = response.data;
     teachers.sort((a, b) => b.coursesCount - a.coursesCount);
     if(teachers.length > 12) {
       setTotalTeacherTracks(3);
@@ -32,7 +33,8 @@ const Home = () => {
   };
 
   const getCenterCards = async () => {
-    let centers = await getAllCenterCards();
+    let response = await getAllCenterCards();
+    let centers = response.data;
     centers.sort((a, b) => b.studentsCount - a.studentsCount);
     if(centers.length > 12) {
       setTotalCenterTracks(3);
@@ -43,7 +45,8 @@ const Home = () => {
   };
 
   const getCourseCards = async () => {
-    let courses = await getAllCourseCards();
+    let response = await getAllCourseCards();
+    let courses = response.data;
     //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
     if(courses.length > 12) {
       setTotalCourseTracks(3);

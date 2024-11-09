@@ -19,6 +19,7 @@ import FilterUser from "../../components/FilterUser";
 import SortByUser from "../../components/SortByUser";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../../store/userSlice";
+import Spinner from "react-bootstrap/Spinner";
 
 import "../../assets/scss/UserMgmt.css";
 
@@ -194,9 +195,14 @@ const PlatformAdUserMgmt = () => {
     setFilterVisble(false);
     setSortByVisible(false);
   };
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   // return <div>Loading...</div>;
+  //   return (
+  //     <div className="loading-container">
+  //       <Spinner animation="border" />;
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return <div>Error: {error}</div>;

@@ -4,6 +4,13 @@
   display: flex;
   flex-direction: column;
 }
+.loading-container {
+  width: 100vh;
+  height: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .filter-search {
   padding: 16px 72px;

@@ -14,6 +14,7 @@ const TeacherCard = (props) => {
           state: {
             idTeacher: teacher.idUser,
             idRole: localStorage.getItem("idRole"),
+            idUser: localStorage.getItem("idUser")
           },
         });
       }}
@@ -25,17 +26,17 @@ const TeacherCard = (props) => {
         />
         <div className="teacher-card-body">
           <span className="teacher-card-title add-min-height">
-            {teacher.name || teacher.fullName || "(unknown)"}
+            {teacher.name || teacher.fullName || ""}
           </span>
           <div className="teacher-card-info">
-            <FaGraduationCap color="#757575" />{" "}
+            <FaGraduationCap color="#757575" />
             {teacher.teachingMajor !== null
               ? teacher.teachingMajor
-              : "(unknown)"}
+              : ""}
           </div>
           <div className="teacher-card-info">
             <FaRegFile color="#757575" />
-            {teacher.coursesCount}
+            {`${teacher.coursesCount || teacher.courseCount || 0} ${(teacher.coursesCount > 1 || teacher.courseCount > 1) ? "courses" : "course"}`} 
           </div>
         </div>
       </div>

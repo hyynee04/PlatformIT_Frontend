@@ -1,8 +1,8 @@
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/card/Card.css";
-import { useNavigate } from "react-router-dom";
 
 const CenterCard = (props) => {
     const navigate = useNavigate();
@@ -12,32 +12,36 @@ const CenterCard = (props) => {
         ? center.listTagCourses.reduce((longest, current) =>
             current.tagName.length > longest.tagName.length ? current : longest
         ).tagName
-        : "(no tag)";
+        : "";
     const remain_tag_number = center.listTagCourses ? center.listTagCourses.length - 1 : 0;
 
     return (
-        <div 
+        <div
             className='card-container hover'
             onClick={() => {
                 navigate('/centerDetail', {
-                    state: { idCenter: center.idCenter, idRole: localStorage.getItem("idRole") },
+                    state: {
+                        idCenter: center.idCenter,
+                        idUser: localStorage.getItem("idUser"),
+                        idRole: localStorage.getItem("idRole")
+                    }
                 });
             }}
         >
             <div className='center-card-container'>
                 <img src={center.avatarPath !== "" ? center.avatarPath : default_image} alt="center image" />
                 <div className='center-card-body'>
-                    <span className="center-card-title">{center.centerName !== null ? center.centerName : "(unknown)"}</span>
+                    <span className="center-card-title">{center.centerName !== null ? center.centerName : ""}</span>
                     <span className="center-card-quote">
-                        {center.description !== null ? center.description : "(no description)"}
+                        {center.description !== null ? center.description : ""}
                     </span>
                     <div className="center-card-tag-container">
-                        <div className='tag-content'>{longest_tag}</div>
+                        {longest_tag && (
+                            <div className='tag-content'>{longest_tag}</div>
+                        )}
                         {remain_tag_number > 0 && (
                             <div className='tag-content-more'>+{remain_tag_number}</div>
                         )}
-
-
                     </div>
                 </div>
                 <div className='center-card-footer'>

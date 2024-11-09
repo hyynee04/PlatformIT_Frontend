@@ -30,8 +30,8 @@ import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
 
-import ViewAllTeacher from "./pages/viewAll/ViewAllTeacher";
 import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
+import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {
   return (
@@ -77,7 +77,7 @@ const Layout = (props) => {
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
 
-          <Route path="/teacherViewAll" element={<ViewAllTeacher />} />
+          <Route path="/viewAll" element={<ViewAll />} />
 
           {/* Platform Admin */}
           <Route

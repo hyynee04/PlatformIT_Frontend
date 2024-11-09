@@ -24,6 +24,7 @@ const CenterDetail = (props) => {
     const [totalCourseTracks, setTotalCourseTracks] = useState(0)
 
     const [idRole, setIDRole] = useState("")
+    const [idUser, setIDUser] = useState("")
     const [centerInfo, setCenterInfo] = useState({})
 
     const fetchCenterDetail = async (idCenter) => {
@@ -31,22 +32,22 @@ const CenterDetail = (props) => {
         setCenterInfo(data);
 
         // Set center's Courses Carousel
-        data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-        if (data.courseCards.length > 6) {
-            setTotalCourseTracks(3);
+        if (data.courseCards && data.courseCards.length) {
+            data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+            setTotalCourseTracks(data.courseCards.length > 6 ? 3 : Math.ceil(data.courseCards.length / 2));
+            setListCourse(data.courseCards);
+        } else {
+            console.warn("No courseCards data available");
         }
-        else
-            setTotalCourseTracks(Math.ceil(data.courses.length / 2))
-        setListCourse(data.courseCards)
 
         // Set center's Teachers Carousel
-        data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
-        if (data.courseCards.length > 6) {
-            setTotalTeacherTracks(3);
+        if (data.teacherCards && data.teacherCards.length) {
+            data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
+            setTotalTeacherTracks(data.teacherCards.length > 6 ? 3 : Math.ceil(data.teacherCards.length / 2));
+            setListTeacher(data.teacherCards);
+        } else {
+            console.warn("No teacherCards data available");
         }
-        else
-            setTotalTeacherTracks(Math.ceil(data.teacherCards.length / 2))
-        setListTeacher(data.teacherCards)
     };
 
     useEffect(() => {
@@ -55,6 +56,7 @@ const CenterDetail = (props) => {
         const state = location.state;
         if (state) {
             setIDRole(state.idRole);
+            setIDUser(state.idUSer);
             fetchCenterDetail(state.idCenter);
         }
 
@@ -73,17 +75,24 @@ const CenterDetail = (props) => {
                     <img className="biography-ava center" src={centerInfo.avatarPath ? centerInfo.avatarPath : default_image} alt="center background" />
                     <div className="biography-block">
                         <span className="biography-name center">{centerInfo.centerName}</span>
-                        <div className="tag-container">
-                            {centerInfo.listTagCourses && centerInfo.listTagCourses.map((tag) => (
-                                <div
-                                    key={tag.idTag}
-                                    className='tag-content'
-                                >{tag.tagName}</div>
-                            ))}
-                        </div>
+                        {centerInfo.listTagCourses && centerInfo.listTagCourses.length !== 0 && (
+                            <div className="tag-container">
+                                {centerInfo.listTagCourses.map((tag) => (
+                                    <div
+                                        key={tag.idTag}
+                                        className='tag-content'
+                                    >{tag.tagName}</div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="center-information">
-                            <span className="number-course"><LuFile color="#757575" /> {centerInfo.courseCount} courses</span>
-                            <span className=""><RiGroupLine color="#757575" /> {centerInfo.studentCount} students</span>
+                            <span className="number-course">
+                                <LuFile color="#757575" /> {`${centerInfo.courseCount} ${centerInfo.courseCount > 1 ? "courses" : "course"}` }
+                            </span>
+                            <span className="">
+                                <RiGroupLine color="#757575" /> {`${centerInfo.studentCount} ${centerInfo.studentCount > 1 ? "students" : "student"}`}
+                            </span>
                             {centerInfo.description && (
                                 <span>{centerInfo.description}</span>
                             )}
@@ -120,76 +129,84 @@ const CenterDetail = (props) => {
                     </div>
                 </div>
 
-                <div className="block-container">
-                    <span className="block-container-title">Professional Qualification</span>
-                    <div className="block-container-col">
-                        {centerInfo.qualifications && centerInfo.qualifications.map((qualification) => (
-                            <div
-                                key={qualification.idQualification}
-                                className="qualification"
-                                onClick={() => window.open(qualification.path)}
-                            >
-                                {qualification.path.endsWith(".pdf") ?
-                                    <BsFiletypePdf color="#757575" />
-                                    :
-                                    <img src={qualification.path || default_image} />
-                                }
-                                <div className="qualification-body">
-                                    <span className="qualification-name">{qualification.qualificationName}</span>
-                                    <span className="qualification-description">{qualification.description}</span>
+                {centerInfo.qualifications && centerInfo.qualifications.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Professional Qualification</span>
+                        <div className="block-container-col">
+                            {centerInfo.qualifications.map((qualification) => (
+                                <div
+                                    key={qualification.idQualification}
+                                    className="qualification"
+                                    onClick={() => window.open(qualification.path)}
+                                >
+                                    {qualification.path.endsWith(".pdf") ?
+                                        <BsFiletypePdf color="#757575" />
+                                        :
+                                        <img src={qualification.path || default_image} />
+                                    }
+                                    <div className="qualification-body">
+                                        <span className="qualification-name">{qualification.qualificationName}</span>
+                                        <span className="qualification-description">{qualification.description}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
-                <div className="block-container">
-                    <span className="block-container-title">Social/Profile Link</span>
-                    <div className="block-container-col">
-                        {centerInfo.profileLinks && centerInfo.profileLinks.map((link) => (
-                            <div
-                                key={link.idProfileLink}
-                                className="link-transfer"
-                                onClick={() => window.open(link.url)}
-                            >
-                                <span>{link.name}</span>
-                                <IoMdOpen color="#757575" />
-                            </div>
-                        ))}
+                {centerInfo.profileLinks && centerInfo.profileLinks.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Social/Profile Link</span>
+                        <div className="block-container-col">
+                            {centerInfo.profileLinks.map((link) => (
+                                <div
+                                    key={link.idProfileLink}
+                                    className="link-transfer"
+                                    onClick={() => window.open(link.url)}
+                                >
+                                    <span>{link.name}</span>
+                                    <IoMdOpen color="#757575" />
+                                </div>
+                            ))}
 
+                        </div>
                     </div>
-                </div>
+                )}
+
             </div>
 
             <div className="right-container">
-                <div className="block-container">
-                    <span className="block-container-title">Working hours</span>
-                    <table>
-                        <tr>
-                            {centerInfo.workingHourModel && centerInfo.workingHourModel.map((day) => (
-                                <th key={day.day}>{day.day}</th>
-                            ))}
-                        </tr>
-                        <tr>
-                            {centerInfo.workingHourModel && centerInfo.workingHourModel.map((day) => (
-                                <td key={day.day}>
-                                    {day.isOpen ? (
-                                        <>
-                                            {day.startTime}
-                                            <br />-<br />
-                                            {day.closeTime}
-                                        </>
-                                    ) : (
-                                        "Closed"
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                    </table>
-                </div>
+                {centerInfo.workingHourModel && centerInfo.workingHourModel.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Working hours</span>
+                        <table>
+                            <tr>
+                                {centerInfo.workingHourModel.map((day) => (
+                                    <th key={day.day}>{day.day}</th>
+                                ))}
+                            </tr>
+                            <tr>
+                                {centerInfo.workingHourModel.map((day) => (
+                                    <td key={day.day}>
+                                        {day.isOpen ? (
+                                            <>
+                                                {day.startTime}
+                                                <br />-<br />
+                                                {day.closeTime}
+                                            </>
+                                        ) : (
+                                            "Closed"
+                                        )}
+                                    </td>
+                                ))}
+                            </tr>
+                        </table>
+                    </div>
+                )}
 
-                <div className="block-container">
-                    {centerInfo.courseCards && centerInfo.courseCards.length !== 0 ? (
+                {centerInfo.courseCards && centerInfo.courseCards.length !== 0 && (
+                    <div className="block-container">
+
                         <div className="carousel-block">
                             <Carousel
                                 object={1} //course
@@ -199,15 +216,13 @@ const CenterDetail = (props) => {
                                 listInfo={listCourse}
                             />
                         </div>
-                    )
-                        :
-                        <span className="block-container-title">Courses</span>
-                    }
+                    </div>
+                )}
 
-                </div>
 
-                <div className="block-container">
-                    {centerInfo.teacherCards && centerInfo.teacherCards.length !== 0 ? (
+                {centerInfo.teacherCards && centerInfo.teacherCards.length !== 0 && (
+                    <div className="block-container">
+
                         <div className="carousel-block">
                             <Carousel
                                 object={2} //teacher
@@ -217,12 +232,8 @@ const CenterDetail = (props) => {
                                 listInfo={listTeacher}
                             />
                         </div>
-                    )
-                        :
-                        <span className="block-container-title">Teachers</span>
-                    }
-
-                </div>
+                    </div>
+                )}
             </div>
         </div>
     )

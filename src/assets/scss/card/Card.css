@@ -239,7 +239,7 @@
 .card-container .teacher-card-container > img {
     width: 7rem;
     height: 7rem;
-    object-fit: contain;
+    object-fit: cover;
     margin: 0 auto;
 
     border: 1px solid var(--border-gray);

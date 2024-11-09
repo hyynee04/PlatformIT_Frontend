@@ -54,14 +54,14 @@ const TeacherDetail = (props) => {
                     <img className="biography-ava teacher" src={teacherInfo.teacherAvatar !== null ? teacherInfo.teacherAvatar : default_ava} alt="teacher avatar" />
                     <div className="biography-block">
                         <span className="biography-name">
-                            {teacherInfo.name !== null ? teacherInfo.name : "(unknown)"}
+                            {teacherInfo.name !== null ? teacherInfo.name : ""}
                         </span>
                         <div className="teacher-information">
                             {teacherInfo.teacherDescription && (
                                 <span>{teacherInfo.teacherDescription}</span>
                             )}
                             <span className="teaching-major"><FaGraduationCap color="#757575" />
-                                {teacherInfo.teachingMajor || "(unknown)"}
+                                {teacherInfo.teachingMajor || ""}
                             </span>
                             <span className="number-course"><FaRegFile color="#757575" /> 
                                 {`${teacherInfo.coursesCount} ${teacherInfo.coursesCount > 1 ? "courses" : "course"}`}

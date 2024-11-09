@@ -75,17 +75,24 @@ const CenterDetail = (props) => {
                     <img className="biography-ava center" src={centerInfo.avatarPath ? centerInfo.avatarPath : default_image} alt="center background" />
                     <div className="biography-block">
                         <span className="biography-name center">{centerInfo.centerName}</span>
-                        <div className="tag-container">
-                            {centerInfo.listTagCourses && centerInfo.listTagCourses.map((tag) => (
-                                <div
-                                    key={tag.idTag}
-                                    className='tag-content'
-                                >{tag.tagName}</div>
-                            ))}
-                        </div>
+                        {centerInfo.listTagCourses && centerInfo.listTagCourses.length !== 0 && (
+                            <div className="tag-container">
+                                {centerInfo.listTagCourses.map((tag) => (
+                                    <div
+                                        key={tag.idTag}
+                                        className='tag-content'
+                                    >{tag.tagName}</div>
+                                ))}
+                            </div>
+                        )}
+
                         <div className="center-information">
-                            <span className="number-course"><LuFile color="#757575" /> {centerInfo.courseCount} courses</span>
-                            <span className=""><RiGroupLine color="#757575" /> {centerInfo.studentCount} students</span>
+                            <span className="number-course">
+                                <LuFile color="#757575" /> {`${centerInfo.courseCount} ${centerInfo.courseCount > 1 ? "courses" : "course"}` }
+                            </span>
+                            <span className="">
+                                <RiGroupLine color="#757575" /> {`${centerInfo.studentCount} ${centerInfo.studentCount > 1 ? "students" : "student"}`}
+                            </span>
                             {centerInfo.description && (
                                 <span>{centerInfo.description}</span>
                             )}

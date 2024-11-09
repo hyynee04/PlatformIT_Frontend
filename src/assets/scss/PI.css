@@ -225,12 +225,12 @@
   color: var(--text-gray);
 }
 
-.container-info .info .container-phone {
+.container-info .info .container-validate {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
-.container-info .info .container-phone > .warning-error {
+.container-info .info .container-validate > .warning-error {
   color: var(--red-color);
   font-size: 12px;
   font-weight: 700;
@@ -347,6 +347,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .container-info .info .tags-container .tags {
   display: flex;
@@ -417,6 +418,18 @@
   width: 24px;
   height: 24px;
 }
+.alert-option .main-action {
+  width: 160px;
+  height: 32px;
+  border-radius: 8px;
+  padding: 4px;
+  background-color: var(--main-color);
+  border: none;
+  font-size: 14px;
+  border: 2px solid var(--main-color);
+  color: var(--white-color);
+  width: 12rem;
+}
 .alert-option .container-button {
   margin-left: auto;
   padding: 12px 0;
@@ -446,7 +459,10 @@
   background-color: var(--main-color);
   color: var(--white-color);
 }
-
+.alert-option .container-button .create-course:disabled {
+  background-color: var(--border-gray);
+  color: var(--white-color);
+}
 .container-info-img {
   display: flex;
   flex-direction: row;
@@ -532,4 +548,74 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+.teacher-list-dropdown {
+  display: flex;
+
+  flex-direction: column;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+.teacher-list-dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  padding: 10px 0;
+}
+
+.teacher-list-dropdown .teacher-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  gap: 8px;
+}
+.teacher-list-dropdown .teacher-item:last-child {
+  border-bottom: none;
+}
+
+.teacher-list-dropdown .teacher-item:hover {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.teacher-list-dropdown .teacher-item .teacher-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 100rem;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.teacher-list-dropdown .teacher-item .teacher-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+.teacher-list-dropdown .teacher-item .teacher-info .teacher-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.teacher-list-dropdown .teacher-item .teacher-info .teacher-major {
+  font-size: 12px;
+  color: #777;
+}
+
+.teacher-list-dropdown .teacher-item .teacher-info .teacher-course-count {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
 }

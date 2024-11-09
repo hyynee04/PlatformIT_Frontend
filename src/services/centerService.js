@@ -13,6 +13,13 @@ const getAllTeacherByIdCenter = (idCenter) => {
     },
   });
 };
+const getAllActiveTeacherCardsOfCenter = async (idCenter) => {
+  return await axios.get("api/User/GetAllActiveTeacherCardsOfCenter", {
+    params: {
+      idCenter: idCenter,
+    },
+  });
+};
 const getAllStudentByIdCenter = (idCenter) => {
   return axios.get("/api/Center/GetAllStudentByIdCenter", {
     params: {
@@ -263,6 +270,7 @@ export {
   getAllCenter,
   getPendingCenter,
   getAllTeacherByIdCenter,
+  getAllActiveTeacherCardsOfCenter,
   getAllStudentByIdCenter,
   getAllAdminOfCenter,
   postApproveCenter,

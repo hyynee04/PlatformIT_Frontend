@@ -345,7 +345,7 @@ const CenterAdCenterMgmt = () => {
                       />
                     </div>
                     <div className="info">
-                      <div className="container-phone">
+                      <div className="container-validate">
                         <span>Contact Number</span>
                         {phoneNumWarning && (
                           <span
@@ -398,7 +398,7 @@ const CenterAdCenterMgmt = () => {
                       />
                     </div>
                     <div className="info">
-                      <div className="container-phone">
+                      <div className="container-validate">
                         <span>Email</span>
                         {emailWarning && (
                           <span

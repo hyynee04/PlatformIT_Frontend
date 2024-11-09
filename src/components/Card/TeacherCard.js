@@ -12,13 +12,10 @@ const TeacherCard = (props) => {
       onClick={() => {
         navigate("/teacherDetail", {
           state: {
-            
-                        idTeacher: teacher.idUser,
-            
-                        idRole: localStorage.getItem("idRole"),
-         
-                        idUser: localStorage.getItem("idUser")
-                    },
+            idTeacher: teacher.idUser,
+            idRole: localStorage.getItem("idRole"),
+            idUser: localStorage.getItem("idUser")
+          },
         });
       }}
     >
@@ -39,7 +36,7 @@ const TeacherCard = (props) => {
           </div>
           <div className="teacher-card-info">
             <FaRegFile color="#757575" />
-            {teacher.coursesCount}
+            {`${teacher.coursesCount || teacher.courseCount || 0} ${(teacher.coursesCount > 1 || teacher.courseCount > 1) ? "courses" : "course"}`} 
           </div>
         </div>
       </div>

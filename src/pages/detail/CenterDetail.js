@@ -32,22 +32,22 @@ const CenterDetail = (props) => {
         setCenterInfo(data);
 
         // Set center's Courses Carousel
-        data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-        if (data.courseCards.length > 6) {
-            setTotalCourseTracks(3);
+        if (data.courseCards && data.courseCards.length) {
+            data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+            setTotalCourseTracks(data.courseCards.length > 6 ? 3 : Math.ceil(data.courseCards.length / 2));
+            setListCourse(data.courseCards);
+        } else {
+            console.warn("No courseCards data available");
         }
-        else
-            setTotalCourseTracks(Math.ceil(data.courses.length / 2))
-        setListCourse(data.courseCards)
 
         // Set center's Teachers Carousel
-        data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
-        if (data.courseCards.length > 6) {
-            setTotalTeacherTracks(3);
+        if (data.teacherCards && data.teacherCards.length) {
+            data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
+            setTotalTeacherTracks(data.teacherCards.length > 6 ? 3 : Math.ceil(data.teacherCards.length / 2));
+            setListTeacher(data.teacherCards);
+        } else {
+            console.warn("No teacherCards data available");
         }
-        else
-            setTotalTeacherTracks(Math.ceil(data.teacherCards.length / 2))
-        setListTeacher(data.teacherCards)
     };
 
     useEffect(() => {

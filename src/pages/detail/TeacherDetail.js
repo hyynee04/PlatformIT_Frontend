@@ -63,7 +63,9 @@ const TeacherDetail = (props) => {
                             <span className="teaching-major"><FaGraduationCap color="#757575" />
                                 {teacherInfo.teachingMajor || "(unknown)"}
                             </span>
-                            <span className="number-course"><FaRegFile color="#757575" /> {teacherInfo.coursesCount} courses</span>
+                            <span className="number-course"><FaRegFile color="#757575" /> 
+                                {`${teacherInfo.coursesCount} ${teacherInfo.coursesCount > 1 ? "courses" : "course"}`}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -88,7 +90,7 @@ const TeacherDetail = (props) => {
                             });
                         }}
                     >
-                        <img src={default_image} alt="center background" />
+                        <img src={teacherInfo.centerAvatar || default_image} alt="center background" />
                         <div className="center-block">
                             <span className="name-center">
                                 {teacherInfo.centerName}

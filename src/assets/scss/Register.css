@@ -315,7 +315,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .policy-btn.not-agree:hover {
-  background-color: rgba(121, 121, 121, 0.2);
+  background-color: rgba(217, 217, 217, 0.3);
 }
 
 

@@ -184,9 +184,9 @@
 .viewall-container .filter-search-section .filter-sort-box .main-box .field > .select-sortby {
     width: 110px;
     padding: 4px 20px 4px 12px;
-    border-radius: .5rem;
+    border-radius: .25rem;
     border: 1px solid var(--border-gray);
-    background-color: rgba(217, 217, 217, 0.3);
+    background-color: var(--white-color);
     outline: none;
 }
 
@@ -268,7 +268,6 @@
     gap: 5px;
 
     position: relative;
-    z-index: 1;
 }
 
 .viewall-container .filter-search-section .filter-sort-box .main-box .field .tag-field > input {
@@ -318,7 +317,7 @@
     gap: 5px;
 
     padding: .25rem .5rem;
-    z-index: 2;
+    z-index: 1;
 
     border-radius: .25rem;
     background-color: rgba(20, 174, 92, 0.3);
@@ -361,8 +360,8 @@
     transition: opacity 0.05s linear;
     opacity: 0;
 
+    z-index: -1;
     position: absolute;
-    z-index: 0;
     top: 2rem;
     right: 0;
 }
@@ -405,24 +404,17 @@
     cursor: grabbing; /* Changes cursor when thumb is clicked and held */
 }
 
-.viewall-container .filter-search-section .filter-sort-box .main-box .field > .course-type-container {
+.viewall-container .filter-search-section .filter-sort-box .main-box .field > .course-type {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-
-    width: 100%;
-}
-
-.viewall-container .filter-search-section .filter-sort-box .main-box .field .course-type-container > .course-type {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
+    gap: .5rem;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    /* z-index: 1; */
 }
 
-.viewall-container .filter-search-section .filter-sort-box .main-box .field .course-type-container .course-type > input {
+.viewall-container .filter-search-section .filter-sort-box .main-box .field .course-type > input {
     accent-color: var(--main-color);
+    width: 20px;
+    height: 20px;
 }

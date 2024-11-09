@@ -164,23 +164,19 @@ const ViewAll = () => {
                                         <LuDollarSign color="#757575" />
                                     </div>
                                 </div>
-                                
+
                                 <div className="field">
                                     <label className="field-name">Course type</label>
-                                    <div className="course-type-container">
-                                        <div className="course-type">
-                                            <input name="course-type" type="radio" />
-                                            <label>All</label>
-                                        </div>
-                                        <div className="course-type">
-                                            <input name="course-type" type="radio" />
-                                            <label>Limit</label>
-                                        </div>
-                                        <div className="course-type">
-                                            <input name="course-type" type="radio" />
-                                            <label>Unlimit</label>
-                                        </div>
+                                    <div className="course-type">
+                                        <input name="course-type" type="radio" /> All
                                     </div>
+                                    <div className="course-type">
+                                        <input name="course-type" type="radio" /> Limit
+                                    </div>
+                                    <div className="course-type">
+                                        <input name="course-type" type="radio" /> Unlimit
+                                    </div>
+
                                 </div>
 
                                 <div className="field">

@@ -277,7 +277,7 @@ const PlatformAdUserMgmt = () => {
                 <th>Full Name</th>
                 <th>Gender</th>
                 <th>Email</th>
-                {activeRole !== Role.student && <th>Affiliated Center</th>}
+                {activeRole !== Role.student && <th>Center</th>}
                 {activeRole === Role.centerAdmin && <th>Level</th>}
                 <th>Date Joined</th>
                 <th>Status</th>

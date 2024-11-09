@@ -24,7 +24,7 @@
   align-items: center;
 }
 .role-users-group > .role-btn {
-  background-color: var(--white-color);
+  background-color: #fafafa;
   border: none;
   padding: 6px;
   font-weight: 580;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
-import { Role } from "../../constants/constants";
+import { APIStatus, Role } from "../../constants/constants";
 
 import "../../assets/scss/card/DiagForm.scss";
 import {
@@ -20,8 +20,11 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
-        const data = await postAddTeacher(email, username, password, idCenter);
-        if (!data.accountId) {
+        const response = await postAddTeacher(email, username, password, idCenter);
+        const data = response.data
+        console.log(response);
+        
+        if (response.status !== APIStatus.success) {
           setErrorString(data.message);
         } else {
           onClose();
@@ -32,16 +35,16 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
       }
     } else if (roleAdded === Role.centerAdmin) {
       try {
-        const data = await postAddCenterAmin(
+        const response = await postAddCenterAmin(
           username,
           email,
           password,
           idCenter,
           idUserUpdatedBy
         );
+        const data = response.data;
         if (
-          data.message !==
-          "Center Admin is created and notification email sent."
+          response.status !== APIStatus.success
         ) {
           setErrorString(data.message);
         } else {
@@ -110,7 +113,6 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
                 className="btn diag-btn signout"
                 onClick={async () => {
                   await handleAddUser();
-                  // onClose();
                 }}
               >
                 Submit

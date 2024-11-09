@@ -16,13 +16,12 @@ const getPI = (idUser) => {
   });
 };
 const getAvaImg = async (idUser) => {
-  const response = await axios.get("api/User/GetAvaImg", {
+  return await axios.get("api/User/GetAvaImg", {
     params: {
       id: idUser,
     },
     responseType: "text",
   });
-  return response;
 };
 
 const postChangePassword = async (
@@ -32,7 +31,7 @@ const postChangePassword = async (
   idUserUpdatedBy
 ) => {
   try {
-    const response = await axios.post(
+    return await axios.post(
       "api/User/ChangePassword",
       {
         currentPW: currentPW,
@@ -46,7 +45,6 @@ const postChangePassword = async (
         },
       }
     );
-    return response;
   } catch (error) {
     console.error("Error object:", error);
   }
@@ -69,7 +67,7 @@ const postUpdateUserBasicPI = async (
     nationality: nationality,
   };
   try {
-    await axios.post("api/User/UpdateUserBasicPI", model, {
+    return await axios.post("api/User/UpdateUserBasicPI", model, {
       params: {
         idUpdatedBy: idUser,
       },
@@ -98,7 +96,6 @@ const postUpdateTeacherSpecializedPI = async (
         },
       }
     );
-    console.log(response);
   } catch (error) {
     console.error("Error updating teacher info: ", error);
   }
@@ -111,31 +108,29 @@ const postAddProfileLink = async (name, url) => {
     url: url,
   };
   try {
-    await axios.post("api/User/AddProfileLink", model);
+    return await axios.post("api/User/AddProfileLink", model);
   } catch (error) {
     throw error;
   }
 };
 const deleteProfileLink = async (idProfileLink) => {
   try {
-    const response = await axios.delete("api/User/DeleteProfileLink", {
+    return await axios.delete("api/User/DeleteProfileLink", {
       params: {
         id: idProfileLink,
       },
     });
-    console.log(response);
   } catch (error) {
     console.error("Error delete profile link: ", error);
   }
 };
 const deleteQualification = async (idQualification) => {
   try {
-    const response = await axios.delete("api/User/DeleteQualification", {
+    return await axios.delete("api/User/DeleteQualification", {
       params: {
         id: idQualification,
       },
     });
-    console.log(response);
   } catch (error) {
     console.error("Error delete qualification: ", error);
   }
@@ -152,7 +147,7 @@ const postAddQualification = async (
     formData.append("QualificationName", qualificationName);
     formData.append("Description", description);
     formData.append("QualificationFile", qualificationFile);
-    await axios.post(`api/User/AddQualification`, formData, {
+    return await axios.post(`api/User/AddQualification`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -176,7 +171,7 @@ const postChangeAvatar = async (isChangeAva, avatarFile) => {
       formData.append("IdCenter", idCenter);
     }
     formData.append("AvatarFile", avatarFile);
-    await axios.post(`api/User/ChangeAvatar?idUpdatedBy=${idUser}`, formData, {
+    return await axios.post(`api/User/ChangeAvatar?idUpdatedBy=${idUser}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -195,7 +190,7 @@ const postRemoveAvatar = async (isAvatar) => {
   const model = isAvatar ? { idUser } : { idCenter };
 
   try {
-    await axios.post("api/User/RemoveAvatar", model, {
+    return await axios.post("api/User/RemoveAvatar", model, {
       params: {
         idUpdatedBy: idUser,
       },
@@ -240,7 +235,7 @@ const postApproveQualification = async (idUser, idQualification) => {
     idQualification: idQualification,
   };
   try {
-    const response = await axios.post(
+    return await axios.post(
       "api/User/ApproveQualification",
       approveQuaModel,
       {
@@ -249,7 +244,6 @@ const postApproveQualification = async (idUser, idQualification) => {
         },
       }
     );
-    return response;
   } catch (error) {
     console.log("Error approve qualification: ", error);
   }
@@ -262,7 +256,7 @@ const postRejectQualification = async (idUser, idQualification, reason) => {
     reason: reason,
   };
   try {
-    const response = await axios.post(
+    return await axios.post(
       "api/User/RejectQualification",
       rejectQuaModel,
       {
@@ -271,7 +265,6 @@ const postRejectQualification = async (idUser, idQualification, reason) => {
         },
       }
     );
-    return response;
   } catch (error) {
     console.log("Error reject qualification: ", error);
   }

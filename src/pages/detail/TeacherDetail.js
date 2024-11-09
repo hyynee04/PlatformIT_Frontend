@@ -23,10 +23,10 @@ const TeacherDetail = (props) => {
     const [idUser, setIDUser] = useState("")
     const [teacherInfo, setTeacherInfo] = useState({})
 
-    console.log(teacherInfo.courses)
 
     const fetchTeacherDetail = async (idTeacher) => {
-        let data = await getTeacherDetail(idTeacher);
+        let response = await getTeacherDetail(idTeacher);
+        let data = response.data;
         setTeacherInfo(data);
         data.courses.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
         if (data.courses.length > 6) {

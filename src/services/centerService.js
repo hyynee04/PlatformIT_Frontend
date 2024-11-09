@@ -52,12 +52,11 @@ const postRejectCenter = async (
     reason: reasonReject,
   };
   try {
-    const response = await axios.post("api/Center/RejectCenter", rejectModel, {
+    return await axios.post("api/Center/RejectCenter", rejectModel, {
       params: {
         idUserUpdated: idUserUpdated,
       },
     });
-    console.log(response);
   } catch (error) {
     console.error("Error updating basic info: ", error);
   }
@@ -70,7 +69,7 @@ const postAddCenterAmin = async (
   idUserUpdatedBy
 ) => {
   try {
-    const response = await axios.post(
+    return await axios.post(
       "api/Center/AddCenterAdmin",
       {
         username: username,
@@ -81,18 +80,17 @@ const postAddCenterAmin = async (
       },
       {
         headers: {
-          "Content-Type": "application/json", // Đảm bảo server nhận dữ liệu dưới dạng JSON
+          "Content-Type": "application/json",
         },
       }
     );
-    return response;
   } catch (error) {
     console.error("Error adding admin center:", error);
   }
 };
 const postAddTeacher = async (email, username, password, idCenter) => {
   try {
-    const response = await axios.post(
+    return await axios.post(
       "api/Authen/AddTeacher",
       {
         email: email,
@@ -102,11 +100,10 @@ const postAddTeacher = async (email, username, password, idCenter) => {
       },
       {
         headers: {
-          "Content-Type": "application/json", // Đảm bảo server nhận dữ liệu dưới dạng JSON
+          "Content-Type": "application/json", 
         },
       }
     );
-    return response;
   } catch (error) {
     console.error("Error adding teacher:", error);
   }
@@ -118,12 +115,11 @@ const getAllCenterCards = () => {
 const getCenterInfo = async () => {
   const idCenter = +localStorage.getItem("idCenter");
 
-  const data = await axios.get("api/Center/GetCenterInfo", {
+  return await axios.get("api/Center/GetCenterInfo", {
     params: {
       idCenter: idCenter,
     },
   });
-  return data;
 };
 const postUpdateCenterBasicInfo = async (
   centerName,
@@ -145,7 +141,7 @@ const postUpdateCenterBasicInfo = async (
     establishedDate: establishedDate,
   };
   try {
-    await axios.post("api/Center/UpdateCenterInfo", model, {
+    return await axios.post("api/Center/UpdateCenterInfo", model, {
       params: {
         idUpdatedBy: idUpdatedBy,
       },
@@ -162,7 +158,7 @@ const postAddCenterLink = async (name, url) => {
     url: url,
   };
   try {
-    await axios.post("api/User/AddProfileLink", model);
+    return await axios.post("api/User/AddProfileLink", model);
   } catch (error) {
     throw error;
   }
@@ -179,7 +175,7 @@ const postAddCenterQualification = async (
     formData.append("QualificationName", qualificationName);
     formData.append("Description", description);
     formData.append("QualificationFile", qualificationFile);
-    await axios.post(`api/User/AddQualification`, formData, {
+    return await axios.post(`api/User/AddQualification`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -220,7 +216,7 @@ const postAddOrUpdateWorkingHours = async (hoursModel) => {
 const postTransferMainAdmin = async (idNewAdmin) => {
   const idUpdated = +localStorage.getItem("idUser");
   try {
-    return axios.post("api/Center/TransferMainAdmin", null, {
+    return await axios.post("api/Center/TransferMainAdmin", null, {
       params: {
         IdNewAdmin: idNewAdmin,
         idUpdated: idUpdated,

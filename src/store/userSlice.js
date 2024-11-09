@@ -3,15 +3,15 @@ import { getAllUser, postInactiveUser } from "../services/userService";
 
 // Thunk để lấy danh sách người dùng
 export const fetchAllUsers = createAsyncThunk("users/fetchAll", async () => {
-  const data = await getAllUser();
-  return data;
+  const response = await getAllUser();
+  return response.data;
 });
 // Thunk để cập nhật trạng thái người dùng (inactive, active)
 export const updateUserStatus = createAsyncThunk(
   "users/updateStatus",
   async ({ idUserSelected }) => {
-    const data = await postInactiveUser(idUserSelected);
-    return data;
+    const response = await postInactiveUser(idUserSelected);
+    return response.data;
   }
 );
 

@@ -14,6 +14,7 @@ const UserOption = ({
   roleUserSelected,
   isReactivatable,
 }) => {
+  const idRole = +localStorage.getItem("idRole");
   const navigate = useNavigate();
   const [isOptionVisible, setIsOptionVisible] = useState(true);
 
@@ -83,8 +84,8 @@ const UserOption = ({
                 <span>Reactive user</span>
               </button>
             )}
-            {roleUserSelected === Role.centerAdmin &&
-              statusUserSelected > UserStatus.inactive && (
+            {idRole === Role.centerAdmin && roleUserSelected === Role.centerAdmin &&
+              statusUserSelected === UserStatus.active &&  (
                 <button className="op-buts" onClick={handleTransmitMainAdmin}>
                   <span>Set as Main Admin</span>
                 </button>

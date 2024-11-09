@@ -28,7 +28,8 @@ const CenterDetail = (props) => {
     const [centerInfo, setCenterInfo] = useState({})
 
     const fetchCenterDetail = async (idCenter) => {
-        let data = await getCenterDetail(idCenter);
+        let response = await getCenterDetail(idCenter);
+        let data = response.data;
         setCenterInfo(data);
 
         // Set center's Courses Carousel

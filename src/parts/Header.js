@@ -8,7 +8,7 @@ import {
   LuClipboardCheck,
   LuLogOut,
 } from "react-icons/lu";
-import { Role } from "../constants/constants";
+import { APIStatus, Role } from "../constants/constants";
 import { useEffect, useState } from "react";
 import HeaderAvatarOption from "../components/HeaderAvatarOption";
 import default_ava from "../assets/img/default_ava.png";
@@ -54,8 +54,9 @@ const Header = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       if (idUser) {
-        const response = await getAvaImg(idUser);
-        if (response !== "This user has not set up avatar yet!")
+        const data = await getAvaImg(idUser);
+        let response = data.data;
+        if (response !== APIStatus.success)
           dispatch(setAvatar(response));
       }
     };

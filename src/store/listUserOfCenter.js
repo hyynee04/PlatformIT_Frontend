@@ -3,9 +3,7 @@ import { Role } from "../constants/constants";
 import {
   getAllAdminOfCenter,
   getAllStudentByIdCenter,
-  getAllTeacherByIdCenter,
-  postAddCenterAmin,
-  postAddTeacher,
+  getAllTeacherByIdCenter
 } from "../services/centerService";
 
 export const fetchListUserOfCenter = createAsyncThunk(
@@ -20,33 +18,9 @@ export const fetchListUserOfCenter = createAsyncThunk(
     } else if (role === Role.centerAdmin) {
       response = await getAllAdminOfCenter(idCenter);
     }
-    return response || [];
+    return response.data || [];
   }
 );
-
-// export const addTeacher = createAsyncThunk(
-//   "usersOfCenter/addTeacher",
-//   async ({ email, username, password, idCenter }) => {
-//     const data = await postAddTeacher(email, username, password, idCenter);
-//     console.log(data);
-
-//     return data;
-//   }
-// );
-
-// export const addAdminCenter = createAsyncThunk(
-//   "usersOfCenter/addAdmin",
-//   async ({ username, email, password, idCenter, idUserUpdatedBy }) => {
-//     const data = await postAddCenterAmin(
-//       username,
-//       email,
-//       password,
-//       idCenter,
-//       idUserUpdatedBy
-//     );
-//     return data;
-//   }
-// );
 const listUserOfCenterSlice = createSlice({
   name: "listUserOfCenter",
   initialState: {
@@ -71,7 +45,7 @@ const listUserOfCenterSlice = createSlice({
       })
       .addCase(fetchListUserOfCenter.rejected, (state, action) => {
         state.status = "failed";
-        console.error("Fetch centers failed:", action.error.message);
+        console.error("Fetch centers failed:", action.error);
       });
   },
 });

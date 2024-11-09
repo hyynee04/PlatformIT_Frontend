@@ -41,8 +41,8 @@ const CourseDetail = (props) => {
     const [menuIndex, setMenuIndex] = useState(1)
 
     const fetchCourseDetail = async (idCourse) => {
-        let data = await getCourseDetail(idCourse);
-        setCourseInfo(data);
+        let response = await getCourseDetail(idCourse);
+        setCourseInfo(response.data);
     }
 
     const handleIsShowed = () => {

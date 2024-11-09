@@ -53,7 +53,7 @@ const AddNewCourse = () => {
     const fetchTags = async () => {
       try {
         const response = await getAllTags();
-        setTagOptions(response);
+        setTagOptions(response.data);
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
@@ -215,7 +215,8 @@ const AddNewCourse = () => {
       try {
         const idCenter = +localStorage.getItem("idCenter");
         const response = await getAllActiveTeacherCardsOfCenter(idCenter);
-        const sortedTeachers = response.sort((a, b) => {
+        const data = response.data;
+        const sortedTeachers = data.sort((a, b) => {
           if (a.name && !b.name) return -1;
           if (!a.name && b.name) return 1;
           if (a.name && b.name) {

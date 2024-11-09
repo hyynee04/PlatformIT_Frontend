@@ -5,6 +5,7 @@ import DiagInactiveForm from "../diag/DiagInactiveForm";
 import { Role, UserStatus } from "../../constants/constants";
 import DiagTransmitForm from "../diag/DiagTransmitForm";
 import DiagReactiveForm from "../diag/DiagReactiveForm";
+import { useNavigate } from "react-router-dom";
 
 const UserOption = ({
   idUserSelected,
@@ -13,6 +14,8 @@ const UserOption = ({
   roleUserSelected,
   isReactivatable,
 }) => {
+  const idRole = +localStorage.getItem("idRole");
+  const navigate = useNavigate();
   const [isOptionVisible, setIsOptionVisible] = useState(true);
 
   const [isModalInactiveOpen, setIsModalInactiveOpen] = useState(false);
@@ -81,15 +84,25 @@ const UserOption = ({
                 <span>Reactive user</span>
               </button>
             )}
-            {roleUserSelected === Role.centerAdmin &&
-              statusUserSelected > UserStatus.inactive && (
+            {idRole === Role.centerAdmin && roleUserSelected === Role.centerAdmin &&
+              statusUserSelected === UserStatus.active &&  (
                 <button className="op-buts" onClick={handleTransmitMainAdmin}>
                   <span>Set as Main Admin</span>
                 </button>
               )}
             <button
               className="op-buts"
-              onClick={() => setIsOptionVisible(false)}
+              onClick={() => {
+                if(roleUserSelected === Role.teacher) 
+                  navigate("/teacherDetail", {
+                    state: {
+                      idTeacher: idUserSelected,
+                      idRole: localStorage.getItem("idRole"),
+                      idUser: localStorage.getItem("idUser")
+                    },
+                  });
+                setIsOptionVisible(false)}
+              }
             >
               <span>View detail</span>
             </button>

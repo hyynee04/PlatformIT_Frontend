@@ -19,7 +19,8 @@ const initialState = {
 export const fetchCenterProfile = createAsyncThunk(
   "profileCenter/fetchCenterProfile",
   async (_, { dispatch }) => {
-    const data = await getCenterInfo();
+    const response = await getCenterInfo();
+    const data = response.data
     dispatch(
       setCenterInfo({
         avatarPath: data.avatarPath,

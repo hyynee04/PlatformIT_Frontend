@@ -359,6 +359,7 @@ const PlatformAdUserMgmt = () => {
                               isReactivatable: true,
                             }
                           : {})}
+                        roleUserSelected={user.idRole}
                       />
                     )}
                   </td>

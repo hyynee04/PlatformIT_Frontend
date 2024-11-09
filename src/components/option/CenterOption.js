@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../assets/scss/card/OptionCard.css";
 import DiagLockCenterForm from "../diag/DiagLockCenterForm";
 import { CenterStatus } from "../../constants/constants";
@@ -9,6 +10,7 @@ const CenterOption = ({
   onCenterOption,
   isReactivatable,
 }) => {
+  const navigate = useNavigate();
   const [isOptionVisible, setIsOptionVisible] = useState(true);
 
   const [isModalLockCenter, setIsModalLockCenter] = useState(false);
@@ -58,7 +60,19 @@ const CenterOption = ({
               <span>Unlock center</span>
             </button>
           )}
-          <button className="op-buts" onClick={() => setIsOptionVisible(false)}>
+          <button
+            className="op-buts"
+            onClick={() => {
+              navigate('/centerDetail', {
+                state: {
+                  idCenter: idCenterSelected,
+                  idUser: localStorage.getItem("idUser"),
+                  idRole: localStorage.getItem("idRole")
+                }
+              });
+              setIsOptionVisible(false)
+            }}
+          >
             <span>View detail</span>
           </button>
         </div>

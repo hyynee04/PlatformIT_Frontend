@@ -16,7 +16,7 @@ export const fetchCenters = createAsyncThunk(
     } else {
       response = await getAllCenter();
     }
-    return response || [];
+    return response.data || [];
   }
 );
 
@@ -31,8 +31,6 @@ export const approveCenter = createAsyncThunk(
 export const rejectCenter = createAsyncThunk(
   "centers/rejectCenter",
   async ({ idCenterSelected, reasonReject, idUserUpdated }) => {
-    console.log(idCenterSelected, reasonReject);
-
     const data = await postRejectCenter(
       idCenterSelected,
       reasonReject,

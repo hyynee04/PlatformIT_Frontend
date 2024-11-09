@@ -16,7 +16,7 @@
 }
 
 .card-container.hover:hover {
-    background-color: rgba(121, 121, 121, 0.1);
+    background-color: rgba(217, 217, 217, 0.2);
 }
 
 /* Course Card */
@@ -125,10 +125,15 @@
 }
 
 .card-container .course-card-container .course-card-body .course-card-info-container .course-card-info > svg,
-.card-container .teacher-card-container .teacher-card-body .teacher-card-info > svg,
 .card-container .center-card-container .center-card-footer .center-card-info > svg {
     width: 1rem;
     height: 1rem;
+}
+
+.card-container .teacher-card-container .teacher-card-body .teacher-card-info > svg {
+    width: 1rem;
+    height: 1rem;
+    margin: 0 5px 3px 0;
 }
 
 .card-container .course-card-container > .course-card-footer,
@@ -234,7 +239,7 @@
 .card-container .teacher-card-container > img {
     width: 7rem;
     height: 7rem;
-    object-fit: contain;
+    object-fit: cover;
     margin: 0 auto;
 
     border: 1px solid var(--border-gray);
@@ -255,7 +260,7 @@
 .card-container .center-card-container .center-card-footer > .center-card-info  {
     color: var(--text-gray);
     font-size: .9rem;
-    display: flex;
+    display: flow-root;
     flex-direction: row;
 
     display: -webkit-box;

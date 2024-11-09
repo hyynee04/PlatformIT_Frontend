@@ -224,13 +224,15 @@
     justify-content: center;
 }
 
-.block-container-row.center {
+.block-container-row.center,
+.block-container-col.teacher{
     padding: 5px;
     border-radius: .5rem;
 }
 
-.block-container-row.center:hover {
-    background-color: #f4f4f4;
+.block-container-row.center:hover,
+.block-container-col.teacher:hover {
+    background-color: rgba(217, 217, 217, 0.2);
     cursor: pointer;
 }
 
@@ -608,12 +610,12 @@
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content:hover {
-    background-color: rgba(121, 121, 121, 0.1);
+    background-color: rgba(217, 217, 217, 0.2);
 }
 
 .detail-container .right-container .block-container > .add-section-btn,
 .detail-container .left-container .block-container .block-container-header  > .add-review-button {
-    background-color: rgba(121, 121, 121, 0.1);
+    background-color: rgba(217, 217, 217, 0.2);
     color: var(--main-color);
     font-size: .9rem;
     font-weight: 500;
@@ -875,7 +877,7 @@ svg > .CircularProgressbar-text {
 }
 
 .block-container-col .pagination-controls > button:hover {
-    background-color: rgba(121, 121, 121, 0.1);
+    background-color: rgba(217, 217, 217, 0.2);
     border-radius: .3rem;
 }
 
@@ -1012,7 +1014,7 @@ svg > .CircularProgressbar-text {
     align-items: center;
 
     border: none;
-    background-color: rgba(121, 121, 121, 0.1);
+    background-color: rgba(217, 217, 217, 0.2);
 
     color: var(--main-color);
     font-size: 1rem;
@@ -1101,10 +1103,18 @@ svg > .CircularProgressbar-text {
     border: 1px solid var(--border-gray);
     padding: 1rem;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    opacity: 0;
+    transition: opacity 0.1s linear;
 
     position: absolute;
     top: 4rem;
     right: 2rem;
+}
+
+.detail-container .right-container .block-container > .add-notification-popup.active {
+    z-index: 1;
+    opacity: 1;
+    transition: opacity 0.1s linear;
 }
 
 .detail-container .right-container .block-container .add-notification-popup > span {
@@ -1186,6 +1196,6 @@ svg > .CircularProgressbar-text {
 }
 
 .detail-container .right-container .block-container .add-notification-popup .post-button-container > .cancel:hover {
-    background-color: rgba(121, 121, 121, 0.2);
+    background-color: rgba(217, 217, 217, 0.3);
     color: var(--black-color);
 }

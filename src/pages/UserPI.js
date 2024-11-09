@@ -1,25 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import {
-  LuCamera,
-  LuEyeOff,
-  LuEye,
-  LuFile,
-  LuCheck,
-  LuTrash2,
-} from "react-icons/lu";
-import {
   FaChevronDown,
-  FaUser,
-  FaUserGraduate,
   FaLock,
   FaRegFilePdf,
+  FaUser,
+  FaUserGraduate,
 } from "react-icons/fa";
+import {
+  LuCamera,
+  LuCheck,
+  LuEye,
+  LuEyeOff,
+  LuFile,
+  LuTrash2,
+} from "react-icons/lu";
+import { useDispatch, useSelector } from "react-redux";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
 import "../assets/scss/PI.css";
+import AvatarImageOption from "../components/AvatarImageOption";
+import { APIStatus, Role, UserGender, UserStatus } from "../constants/constants";
 import {
   deleteProfileLink,
   deleteQualification,
@@ -29,10 +32,7 @@ import {
   postUpdateTeacherSpecializedPI,
   postUpdateUserBasicPI,
 } from "../services/userService";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
-import { Role, UserStatus, UserGender } from "../constants/constants";
-import AvatarImageOption from "../components/AvatarImageOption";
 
 const TeacherPI = () => {
   const idUser = +localStorage.getItem("idUser");
@@ -160,7 +160,7 @@ const TeacherPI = () => {
     } else {
       setPhoneNumWarning("");
       try {
-        await postUpdateUserBasicPI(
+        const response = await postUpdateUserBasicPI(
           idUser,
           tempUserPI.name,
           tempUserPI.phoneNum,
@@ -168,13 +168,15 @@ const TeacherPI = () => {
           tempUserPI.dob,
           tempUserPI.nationality
         );
-        // dispatch(updateUserPI({ name, phoneNum, gender, dob, nationality }));
-        await dispatch(fetchUserProfile(idUser));
-        setUpdateSuccess("Your profile has been updated successfully!");
+        if (response.status === APIStatus.success) {
+          await dispatch(fetchUserProfile(idUser));
+          setUpdateSuccess("Your profile has been updated successfully!");
 
-        setTimeout(() => {
-          setUpdateSuccess("");
-        }, 3000);
+          setTimeout(() => {
+            setUpdateSuccess("");
+          }, 3000);
+        }
+
       } catch (error) {
         console.error("Error updating profile:", error);
         setUpdateSuccess("There was an error updating your profile.");
@@ -202,20 +204,21 @@ const TeacherPI = () => {
     updateBasicInfo();
   };
   const updateTeacherSpecializedPI = async () => {
-    await postUpdateTeacherSpecializedPI(
+    const response = await postUpdateTeacherSpecializedPI(
       idUser,
       tempUserPI.teachingMajor,
       tempUserPI.description
     );
-    dispatch(updateUserPI({ teachingMajor, description }));
-    await dispatch(fetchUserProfile(idUser));
-    setUpdatePITeacherSuccess(
-      "Your specialized infomation has been updated successfully!"
-    );
-
-    setTimeout(() => {
-      setUpdatePITeacherSuccess("");
-    }, 3000);
+    if (response.status === APIStatus.success) {
+      dispatch(updateUserPI({ teachingMajor, description }));
+      await dispatch(fetchUserProfile(idUser));
+      setUpdatePITeacherSuccess(
+        "Your specialized infomation has been updated successfully!"
+      );
+      setTimeout(() => {
+        setUpdatePITeacherSuccess("");
+      }, 3000);
+    }
   };
 
   const handleActionClick = (action) => {
@@ -223,14 +226,19 @@ const TeacherPI = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      await postAddProfileLink(newProfileLink.name, newProfileLink.url);
-      await dispatch(fetchUserProfile(idUser));
-      setNewProfileLink({ name: "", url: "" });
+      const response = await postAddProfileLink(newProfileLink.name, newProfileLink.url);
+      if (response.status === APIStatus.success) {
+        await dispatch(fetchUserProfile(idUser));
+        setNewProfileLink({ name: "", url: "" });
+      }
     }
   };
   const removeProfileLink = async (idProfileLink) => {
-    await deleteProfileLink(idProfileLink);
-    await dispatch(fetchUserProfile(idUser));
+    const response = await deleteProfileLink(idProfileLink);
+    if (response.status === APIStatus.success) {
+      await dispatch(fetchUserProfile(idUser));
+    }
+
   };
   const handleURLProfileLinkChange = (e) => {
     setNewProfileLink({ ...newProfileLink, url: e.target.value });
@@ -304,20 +312,22 @@ const TeacherPI = () => {
       newQualification.qualificationDescr &&
       newQualification.qualificationFile
     ) {
-      await postAddQualification(
+      const response = await postAddQualification(
         idUser,
         newQualification.qualificationName,
         newQualification.qualificationDescr,
         newQualification.qualificationFile
       );
-      await setNewQualification((prev) => ({
-        ...prev,
-        qualificationName: "",
-        qualificationDescr: "",
-        qualificationFile: null,
-        qualificationUrl: "",
-      }));
-      await setQualiPDFCheck(false);
+      if (response.status === APIStatus.success) {
+        await setNewQualification((prev) => ({
+          ...prev,
+          qualificationName: "",
+          qualificationDescr: "",
+          qualificationFile: null,
+          qualificationUrl: "",
+        }));
+        await setQualiPDFCheck(false);        
+      }
     } else {
       setQualiWarning(
         "Please enter all required fields for the qualification."
@@ -327,8 +337,11 @@ const TeacherPI = () => {
     await dispatch(fetchUserProfile(idUser));
   };
   const removeQualification = async (idQualification) => {
-    await deleteQualification(idQualification);
-    await dispatch(fetchUserProfile(idUser));
+    const response = await deleteQualification(idQualification);
+    if (response.status === APIStatus.success) {
+      await dispatch(fetchUserProfile(idUser));      
+    }
+
   };
 
   const handleChangePassword = async () => {
@@ -342,8 +355,8 @@ const TeacherPI = () => {
             idAccount,
             idUser
           );
-          if (response === "Current Password is incorrect.") {
-            setChangePWError(response);
+          if (response.status !== APIStatus.success) {
+            setChangePWError(response.data);
           } else {
             setOldPassword("");
             setNewPassword("");
@@ -392,9 +405,8 @@ const TeacherPI = () => {
               </div>
               {idRole === Role.teacher && (
                 <div
-                  className={`btn ${
-                    activeAction === "specializedPI" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "specializedPI" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("specializedPI")}
                 >
                   <FaUserGraduate className="icon" />
@@ -453,7 +465,7 @@ const TeacherPI = () => {
                     </div>
                   </div>
                   <div className="info">
-                    <div className="container-phone">
+                    <div className="container-validate">
                       <span>Phone Number</span>
                       {phoneNumWarning && (
                         <span
@@ -675,19 +687,18 @@ const TeacherPI = () => {
                       />
                       <div className="status-action">
                         <span
-                          className={`span ${
-                            qualification.status === UserStatus.active
+                          className={`span ${qualification.status === UserStatus.active
                               ? "approved"
                               : qualification.status === UserStatus.pending
-                              ? "pending"
-                              : "rejected"
-                          }`}
+                                ? "pending"
+                                : "rejected"
+                            }`}
                         >
                           {qualification.status === UserStatus.active
                             ? "Approved"
                             : qualification.status === UserStatus.pending
-                            ? "Pending"
-                            : `Rejected. Reason: ${qualification.reason}`}
+                              ? "Pending"
+                              : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
@@ -705,7 +716,7 @@ const TeacherPI = () => {
                     </div>
                     <div className="quali-image">
                       {qualification.path &&
-                      qualification.path.endsWith(".pdf") ? (
+                        qualification.path.endsWith(".pdf") ? (
                         <div
                           onClick={() =>
                             window.open(qualification.path, "_blank")

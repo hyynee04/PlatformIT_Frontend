@@ -18,12 +18,14 @@ const initialState = {
 export const fetchUserProfile = createAsyncThunk(
   "profileUser/fetchUserProfile",
   async (idUser, { dispatch }) => {
-    const data = await getPI(idUser);
+
+    const response = await getPI(idUser);
+    const data = response.data;
     const today = new Date().toISOString().split("T")[0];
-    const respone = await fetch(
+    const responseCountries = await fetch(
       "https://valid.layercode.workers.dev/list/countries?format=select&flags=true&value=code"
     );
-    const countryData = await respone.json();
+    const countryData = await responseCountries.json();
     const countriesData = countryData.countries.map((country) => ({
       label: country.label.split(" ")[1],
     }));

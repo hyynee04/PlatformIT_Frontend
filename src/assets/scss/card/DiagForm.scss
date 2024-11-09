@@ -168,6 +168,27 @@
               rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;
             border: none;
           }
+          .custom-switch {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            color: var(--text-gray);
+          }
+          .form-check-input {
+            width: 3.5em;
+            height: 2em;
+          }
+          // .form-check-input:checked {
+          //   background-color: #1e1e1e;
+          //   border-color: #1e1e1e;
+          // }
+          // .form-check-input:focus {
+          //   border-color: #1e1e1e;
+          //   outline: 0;
+          //   box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+          // }
         }
       }
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/scss/Detail.css";
 
 import {
@@ -30,17 +30,19 @@ import { getCourseDetail } from "../../services/courseService";
 
 const CourseDetail = (props) => {
     const location = useLocation();
+    const navigate = useNavigate();
+
     const [isShowed, setIsShowed] = useState(false);
     const [popupAdd, setPopupAdd] = useState(false)
 
     const [idRole, setIDRole] = useState("");
     const [idUser, setIDUser] = useState("");
     const [courseInfo, setCourseInfo] = useState({});
-    const [menuIndex, setMenuIndex] = useState(2)
+    const [menuIndex, setMenuIndex] = useState(1)
 
     const fetchCourseDetail = async (idCourse) => {
-        let data = await getCourseDetail(idCourse);
-        setCourseInfo(data);
+        let response = await getCourseDetail(idCourse);
+        setCourseInfo(response.data);
     }
 
     const handleIsShowed = () => {
@@ -164,7 +166,9 @@ const CourseDetail = (props) => {
                                 <span className="number-course"><LuClock color="#757575" /> Create on: {formatDate(courseInfo.createdDate)}</span>
                             }
 
-                            <span className=""><RiGroupLine color="#757575" /> {courseInfo.studentCount} students</span>
+                            <span className=""><RiGroupLine color="#757575" />
+                                {`${courseInfo.studentCount} ${courseInfo.studentCount > 1 ? 'students' : 'student'}`}
+                            </span>
                             <span>{courseInfo.introduction}</span>
                         </div>
                         <button>Buy Now</button>
@@ -173,7 +177,18 @@ const CourseDetail = (props) => {
 
                 <div className="block-container">
                     <span className="block-container-title">Center</span>
-                    <div className="block-container-row">
+                    <div
+                        className="block-container-row center"
+                        onClick={() => {
+                            navigate('/centerDetail', {
+                                state: {
+                                    idCenter: courseInfo.idCenter,
+                                    idUser: localStorage.getItem("idUser"),
+                                    idRole: localStorage.getItem("idRole")
+                                }
+                            });
+                        }}
+                    >
                         <img src={courseInfo.centerAvatarPath || default_image} alt="center background" />
                         <div className="center-block">
                             <span className="name-center">{courseInfo.centerName}</span>
@@ -184,96 +199,116 @@ const CourseDetail = (props) => {
 
                 <div className="block-container">
                     <span className="block-container-title">Teacher</span>
-                    <div className="block-container-col">
+                    <div
+                        className="block-container-col teacher"
+                        onClick={() => {
+                            navigate('/teacherDetail', {
+                                state: {
+                                    idTeacher: courseInfo.idTeacher,
+                                    idRole: localStorage.getItem("idRole"),
+                                    idUser: localStorage.getItem("idUser")
+                                },
+                            });
+                        }}
+                    >
                         <div className="teacher-header">
                             <img className="small-ava" src={courseInfo.teacherAvatarPath || default_ava} />
                             <span className="teacher-name">{courseInfo.teacherName || "(unknown)"}</span>
                         </div>
-                    </div>
-                    <div className="biography-block">
-                        <div className="teacher-information">
-                            <span className="biography-brand">{courseInfo.teacherDescription || "(no description)"}</span>
-                            <span className="teaching-major"><FaGraduationCap color="#757575" /> {courseInfo.teachingMajor || "(unknown)"}</span>
-                            <span className="number-course"><FaRegFile color="#757575" /> {courseInfo.teacherCourseCount} courses</span>
+                        <div className="biography-block">
+                            <div className="teacher-information">
+                                {courseInfo.teacherDescription && (
+                                    <span className="biography-brand">{courseInfo.teacherDescription}</span>
+                                )}
+
+                                <span className="teaching-major"><FaGraduationCap color="#757575" /> {courseInfo.teachingMajor || "(no major)"}</span>
+                                <span className="number-course"><FaRegFile color="#757575" />
+                                    {`${courseInfo.teacherCourseCount} ${courseInfo.teacherCourseCount > 1 ? 'courses' : 'course'}`}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     {idUser && idRole === Role.student && (
-                        <button className="chat-button">Chat <RiChat3Line /></button>
+                        <><button className="chat-button">Chat <RiChat3Line /></button></>
                     )}
 
                 </div>
 
-                <div className="block-container">
-                    <div className="block-container-header">
-                        <span className="block-container-title">Review</span>
-                        {idUser && idRole === Role.student && (
-                            <button className="add-review-button"><LuPlus /> Add review</button>
-                        )}
+                {reviews && reviews.length !== 0 && (
+                    <div className="block-container">
+                        <div className="block-container-header">
+                            <span className="block-container-title">Review</span>
+                            {idUser && idRole === Role.student && (
+                                <button className="add-review-button"><LuPlus /> Add review</button>
+                            )}
 
-                    </div>
-                    <div className="block-container-col">
-                        {currentReviews.map((review, index) => (
-                            <div key={index} className="review-content">
-                                <img className="small-ava" src={review.raterAvatarPath || default_image} alt="Rater Avatar" />
-                                <div className="review-body">
-                                    <span className="review-name">{review.raterName}</span>
-                                    <StarRatings
-                                        rating={review.ratePoint}
-                                        starRatedColor="rgb(255, 204, 0)"
-                                        starDimension="1.3rem"
-                                        starSpacing="2px"
-                                        numberOfStars={5}
-                                        name="rating"
-                                    />
-                                    <span className="review-title">{review.rateContent}</span>
-                                    <span className="review-date">date</span>
+                        </div>
+                        <div className="block-container-col">
+                            {currentReviews.map((review, index) => (
+                                <div key={index} className="review-content">
+                                    <img className="small-ava" src={review.raterAvatarPath || default_image} alt="Rater Avatar" />
+                                    <div className="review-body">
+                                        <span className="review-name">{review.raterName}</span>
+                                        <StarRatings
+                                            rating={review.ratePoint}
+                                            starRatedColor="rgb(255, 204, 0)"
+                                            starDimension="1.3rem"
+                                            starSpacing="2px"
+                                            numberOfStars={5}
+                                            name="rating"
+                                        />
+                                        <span className="review-title">{review.rateContent}</span>
+                                        <span className="review-date">03/03/2024</span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                        <div className="pagination-controls">
-                            {paginationNumbers.map((number, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => typeof number === 'number' && setCurrentPage(number)}
-                                    className={number === currentPage ? 'active' : ''}
-                                    disabled={number === '...'}
-                                >
-                                    {number}
-                                </button>
                             ))}
+                            <div className="pagination-controls">
+                                {paginationNumbers.map((number, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => typeof number === 'number' && setCurrentPage(number)}
+                                        className={number === currentPage ? 'active' : ''}
+                                        disabled={number === '...'}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="total-rating">
+                            {courseInfo.totalRatePoint}/5
+                            <StarRatings
+                                rating={1}
+                                starRatedColor='rgb(255, 204, 0)'
+                                // changeRating={this.changeRating}
+                                starDimension="1.5rem"
+                                numberOfStars={1}
+                                name='rating'
+                            />
                         </div>
                     </div>
-                    <div className="total-rating">
-                        {courseInfo.totalRatePoint}/5
-                        <StarRatings
-                            rating={1}
-                            starRatedColor='rgb(255, 204, 0)'
-                            // changeRating={this.changeRating}
-                            starDimension="1.5rem"
-                            numberOfStars={1}
-                            name='rating'
-                        />
-                    </div>
-                </div>
+                )}
             </div>
 
 
             <div className="right-container">
+                {idUser && idRole && idRole === Role.teacher && (
+                    <div className="teacher-menu">
+                        <button
+                            className={`teacher-menu-btn ${menuIndex === 1 ? 'active' : ''}`}
+                            onClick={() => setMenuIndex(1)}
+                        >Main content</button>
+                        <button
+                            className={`teacher-menu-btn ${menuIndex === 2 ? 'active' : ''}`}
+                            onClick={() => setMenuIndex(2)}
+                        >Notification</button>
+                        <button
+                            className={`teacher-menu-btn ${menuIndex === 3 ? 'active' : ''}`}
+                            onClick={() => setMenuIndex(3)}
+                        >Attendance</button>
+                    </div>
+                )}
 
-                <div className="teacher-menu">
-                    <button
-                        className={`teacher-menu-btn ${menuIndex === 1 ? 'active' : ''}`}
-                        onClick={() => setMenuIndex(1)}
-                    >Main content</button>
-                    <button
-                        className={`teacher-menu-btn ${menuIndex === 2 ? 'active' : ''}`}
-                        onClick={() => setMenuIndex(2)}
-                    >Notification</button>
-                    <button
-                        className={`teacher-menu-btn ${menuIndex === 3 ? 'active' : ''}`}
-                        onClick={() => setMenuIndex(3)}
-                    >Attendance</button>
-                </div>
 
                 {/* Student View */}
                 {idUser && idRole === Role.student && (
@@ -340,7 +375,7 @@ const CourseDetail = (props) => {
                                     className="lecture"
                                 >
                                     <div className={`lecture-header ${isShowed ? "" : "change-border-radius"} `}>
-                                        <span className="section-name">Section 1</span>
+                                        <span className="section-name">{section.sectionName}</span>
                                         <div className="section-info">
                                             <span className="section-name">
                                                 {section.lectures ? `${section.lectures.length} ${section.lectures.length === 1 ? "lecture" : "lectures"}` : "0 lecture"}
@@ -380,15 +415,11 @@ const CourseDetail = (props) => {
                             ))}
                         </div>
                     )}
-
-
-                    {/*  */}
-
                 </div>
 
-                <div className="block-container">
-                    <span className="block-container-title">Test</span>
-                    {courseInfo.tests && (
+                {courseInfo.tests && courseInfo.tests.length !== 0 && (
+                    <div className="block-container">
+                        <span className="block-container-title">Test</span>
                         <div className="block-container-col">
                             {courseInfo.tests.map((test, index) => (
                                 <div
@@ -407,19 +438,22 @@ const CourseDetail = (props) => {
 
                                         <div className="test-description">
                                             <span><LuFileEdit /> Manual</span>
-                                            <span><LuClock /> 45 mins</span>
-                                            <span><LuCheckSquare /> 40 marks</span>
-                                            <span><LuCalendar />Due date: 11/20/2025</span>
+                                            {test.duration && (
+                                                <span><LuClock /> {test.duration} mins</span>
+                                            )}
+                                            <span><LuCheckSquare /> {test.maxScore} marks</span>
+                                            <span><LuCalendar />Due date: 11/20/2024</span>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
 
                 {/* Teacher View: Main Content */}
-                {menuIndex && menuIndex === 1 && (
+                {idRole === Role.teacher && menuIndex && menuIndex === 1 && (
                     <>
                         <div className="block-container">
                             <div className="block-container-header">
@@ -496,7 +530,7 @@ const CourseDetail = (props) => {
 
 
                 {/* Teacher View: Notification */}
-                {menuIndex && menuIndex === 2 && (
+                {idRole === Role.teacher && menuIndex && menuIndex === 2 && (
                     <div className="block-container">
                         <span className="block-container-title">Notification Board</span>
                         <div className="block-container-col noti-size">
@@ -517,28 +551,26 @@ const CourseDetail = (props) => {
                             </div>
 
                         </div>
-                        <button 
+                        <button
                             className="add-notification-button"
                             onClick={() => setPopupAdd(!popupAdd)}
                         ><LuPlus /></button>
-                        {popupAdd && (
-                            <div className="add-notification-popup">
-                                <span className="popup-title">Add new notification</span>
-                                <input
-                                    className="notification-title-enter"
-                                    type="text"
-                                    placeholder="Notification Title"
-                                />
-                                <textarea placeholder="Write your notification content here..."></textarea>
-                                <div className="post-button-container">
-                                    <button 
-                                        className="post-noification-button cancel"
-                                        onClick={() => setPopupAdd(!popupAdd)}
-                                    >Cancel</button>
-                                    <button className="post-noification-button post">Post</button>
-                                </div>
+                        <div className={`add-notification-popup ${popupAdd ? 'active' : ''}`}>
+                            <span className="popup-title">Add new notification</span>
+                            <input
+                                className="notification-title-enter"
+                                type="text"
+                                placeholder="Notification Title"
+                            />
+                            <textarea placeholder="Write your notification content here..."></textarea>
+                            <div className="post-button-container">
+                                <button
+                                    className="post-noification-button cancel"
+                                    onClick={() => setPopupAdd(!popupAdd)}
+                                >Cancel</button>
+                                <button className="post-noification-button post">Post</button>
                             </div>
-                        )}
+                        </div>
 
                     </div>
                 )}

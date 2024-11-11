@@ -543,7 +543,7 @@ const TeacherPI = () => {
             <div className="container-info">
               <span className="title-span">Specialized Infomation</span>
               <div className="info">
-                <span>Affiliated Center</span>
+                <span>Center</span>
                 <input
                   type="text"
                   className="input-form-pi"

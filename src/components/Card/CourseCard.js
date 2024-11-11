@@ -76,7 +76,7 @@ const CourseCard = (props) => {
                                 <div className='course-card-info'> <LuClock color='#757575' />
                                     {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}</div>
                                 :
-                                <div className='course-time'> <LuClock color='#757575' /> Created on {formatDate(course.createdDate)}</div>
+                                <div className='course-card-info'> <LuClock color='#757575' /> Created on {formatDate(course.createdDate)}</div>
                             }
                         </div>
 
@@ -85,7 +85,7 @@ const CourseCard = (props) => {
                     <div className="course-card-footer">
                         <div className='course-card-price'>
                             <LuDollarSign color='#757575' />
-                            <span className='discount-price'>{course.price}</span>
+                            <span className='discount-price'>{course.price || "Free"}</span>
                             {/* <span className='initial-price'>300</span> */}
                         </div>
                         <div className='course-card-period'>{status}</div>
@@ -120,7 +120,7 @@ const CourseCard = (props) => {
                                     <div className='course-card-info'> <LuClock color='#757575' />
                                         {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}</div>
                                     :
-                                    <div className='course-time'> <LuClock color='#757575' /> Created on {formatDate(course.createdDate)}</div>
+                                    <div className='course-card-info'> <LuClock color='#757575' /> Created on {formatDate(course.createdDate)}</div>
                                 }
                                 <div className='course-card-info'>
                                     <RiGroupLine color='#757575' /> {course.studentCount} &nbsp;
@@ -133,7 +133,7 @@ const CourseCard = (props) => {
                         <div className="course-card-footer">
                             <div className='course-card-price'>
                                 <LuDollarSign color='#757575' />
-                                <span className='discount-price'>{course.price}</span>
+                                <span className='discount-price'>{course.price || "Free"}</span>
                                 {/* <span className='initial-price'>300</span> */}
                             </div>
                             <button

@@ -72,8 +72,6 @@ const CourseDetail = (props) => {
 
         if (currentDate >= registStart && currentDate <= registEnd) {
             return `Registrating (${formatDate(course.registStartDate)} - ${formatDate(course.registEndDate)})`;
-        } else if (currentDate >= registEnd && currentDate <= courseStart) {
-            return "Registration end"
         } else if (currentDate >= courseStart && currentDate <= courseEnd) {
             return "On going";
         } else if (currentDate > courseEnd) {
@@ -136,7 +134,7 @@ const CourseDetail = (props) => {
                         <span className="biography-name center">{courseInfo.courseTitle}</span>
                         <div className='course-card-price'>
                             <FaDollarSign color='#003B57' />
-                            <span className='discount-price'>{courseInfo.price}</span>
+                            <span className='discount-price'>{courseInfo.price || "Free"}</span>
                             {/* <span className='initial-price'>300</span> */}
                         </div>
                         {courseInfo.tags && courseInfo.tags.length > 0 && (

@@ -69,6 +69,10 @@
     color: var(--second-main-color);
 }
 
+.card-container .course-card-container .course-card-body > .course-card-title {
+    -webkit-line-clamp: 1 !important;
+}
+
 .card-container .course-card-container 
 .course-card-body > .course-card-tag-container,
 .card-container .center-card-container 

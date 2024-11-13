@@ -1,7 +1,7 @@
 .viewall-container {
     width: 100%;
     height: fit-content;
-    height: 100vh;
+    height: fit-content;
 
     background-color: #fafafa;
 }
@@ -126,7 +126,7 @@
     justify-content: flex-start;
     gap: .5rem;
 
-    z-index: 0;
+    z-index: -1;
     background-color: var(--white-color);
     color: var(--black-color);
     border: none;
@@ -351,6 +351,7 @@
     flex-direction: column;
 
     width: 12.5rem;
+    min-height: 1.8rem;
     max-height: 10rem;
     overflow-y: auto;
 
@@ -417,4 +418,74 @@
     accent-color: var(--main-color);
     width: 20px;
     height: 20px;
+}
+
+.viewall-container > .viewall-main-section {
+    width: 100%;
+    height: fit-content;
+    padding: 1rem 4.5rem;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.viewall-container .viewall-main-section > .all-cards-container {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start; 
+}
+
+.viewall-container .viewall-main-section > .all-cards-container.course {
+    padding: 0 1.3rem;
+    gap: 8rem;
+    row-gap: 3rem;
+}
+
+.viewall-container .viewall-main-section > .all-cards-container.teacher {
+    padding: 0 1.25rem;
+    gap: 6rem;
+    row-gap: 3rem;
+}
+
+.viewall-container .viewall-main-section > .all-cards-container.center {
+    padding: 0 3.3rem;
+    gap: 8rem;
+    row-gap: 3rem;
+}
+
+.viewall-container .viewall-main-section > .pagination {
+    display: flex;
+    justify-content: center;
+
+    padding: 2.5rem 4.5rem 1rem;
+}
+
+.viewall-container .viewall-main-section .pagination > button {
+    margin: 0 3px;
+    padding: 3px 10px;
+    font-size: .9rem;
+
+    border: none;
+    background-color: transparent;
+    color: var(--black-color);
+}
+
+.viewall-container .viewall-main-section .pagination > button:hover {
+    background-color: rgba(217, 217, 217, 0.2);
+    border-radius: .3rem;
+}
+
+.viewall-container .viewall-main-section .pagination > .active,
+.viewall-container .viewall-main-section .pagination > .active:hover {
+    background-color: var(--main-color);
+    color: white;
+    border-radius: .3rem;
+}
+
+.viewall-container .viewall-main-section .pagination > button[disabled] {
+    cursor: default;
+    color: gray;
 }

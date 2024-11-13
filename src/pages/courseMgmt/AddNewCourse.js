@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
-import { LuX, LuMoveRight } from "react-icons/lu";
-import { FiSettings } from "react-icons/fi";
-import { FaRegFile } from "react-icons/fa6";
 import Form from "react-bootstrap/Form";
+import { FaChevronDown } from "react-icons/fa";
+import { FaRegFile } from "react-icons/fa6";
+import { FiSettings } from "react-icons/fi";
+import { LuMoveRight, LuX } from "react-icons/lu";
 import TeacherCard from "../../components/Card/TeacherCard";
 
-import { getAllTags, postAddCourse } from "../../services/courseService";
-import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
+import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
+import { getAllTagModel, postAddCourse } from "../../services/courseService";
 const AddNewCourse = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -52,7 +52,7 @@ const AddNewCourse = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getAllTags();
+        const response = await getAllTagModel();
         setTagOptions(response.data);
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -423,14 +423,14 @@ const AddNewCourse = () => {
                       <span>Price</span>
                       {(formValues.priceValidate ||
                         formValues.discountedPriceValidate) && (
-                        <span
-                          className={"warning-error"}
-                          style={{ color: "var(--red-color)" }}
-                        >
-                          {formValues.priceValidate ||
-                            formValues.discountedPriceValidate}
-                        </span>
-                      )}
+                          <span
+                            className={"warning-error"}
+                            style={{ color: "var(--red-color)" }}
+                          >
+                            {formValues.priceValidate ||
+                              formValues.discountedPriceValidate}
+                          </span>
+                        )}
                     </div>
 
                     <div className="left-to-right">

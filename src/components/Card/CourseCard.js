@@ -19,7 +19,7 @@ const CourseCard = (props) => {
         ? course.tags.reduce((longest, current) =>
             current.length > longest.length ? current : longest
         )
-        : "(no tag)";
+        : "";
     const remain_tag_number = course.tags ? course.tags.length - 1 : 0;
 
     // format date
@@ -65,14 +65,16 @@ const CourseCard = (props) => {
                         <span className="course-card-title">
                             {course.courseTitle}
                         </span>
-                        <div className="course-card-tag-container">
-                            <div className='tag-content'>{longest_tag}</div>
-                            {remain_tag_number > 0 && (
-                                <div className='tag-content-more'>+{remain_tag_number}</div>
-                            )}
-                        </div>
+                        {course.tags && course.tags.length > 0 && (
+                            <div className="course-card-tag-container">
+                                <div className="tag-content">{longest_tag}</div>
+                                {remain_tag_number > 0 && (
+                                    <div className="tag-content-more">+{remain_tag_number}</div>
+                                )}
+                            </div>
+                        )}
                         <div className="course-card-info-container">
-                            {course.courseStartDate !== null ?
+                            {course.isLimitedTime === 1 ?
                                 <div className='course-card-info'> <LuClock color='#757575' />
                                     {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}</div>
                                 :
@@ -101,22 +103,26 @@ const CourseCard = (props) => {
                     <div className="course-card-container course-card-hover">
                         <img src={course.pathImg !== null ? course.pathImg : default_image} alt="course image" />
 
-                        <div className="course-card-body">
+                        <div className="course-card-body course-card-body-hover">
                             <span className="course-card-title title-hover">
                                 {course.courseTitle}
                             </span>
                             <span className="course-card-quote">
                                 {course.introduction !== "" ? course.introduction : "(no introduction"}
                             </span>
-                            <div className="course-card-tag-container">
-                                <div className='tag-content'>{longest_tag}</div>
-                                {remain_tag_number > 0 && (
-                                    <div className='tag-content-more'>+{remain_tag_number}</div>
-                                )}
-                            </div>
+
+                            {course.tags && course.tags.length > 0 && (
+                                <div className="course-card-tag-container">
+                                    <div className="tag-content">{longest_tag}</div>
+                                    {remain_tag_number > 0 && (
+                                        <div className="tag-content-more">+{remain_tag_number}</div>
+                                    )}
+                                </div>
+                            )}
+
                             <div className="course-card-info-container">
                                 <div className='course-card-info'> <LuBuilding2 color='#757575' /> {course.centerName}</div>
-                                {course.courseStartDate ?
+                                {course.isLimitedTime === 1 ?
                                     <div className='course-card-info'> <LuClock color='#757575' />
                                         {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}</div>
                                     :
@@ -151,8 +157,9 @@ const CourseCard = (props) => {
                         </div>
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     )
 }
 

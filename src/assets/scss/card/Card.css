@@ -52,6 +52,14 @@
     gap: .25rem;
 }
 
+.card-container .course-card-container > .course-card-body {
+    height: 4.8rem;
+}
+
+.card-container .course-card-container > .course-card-body.course-card-body-hover {
+    height: 8.6rem;
+}
+
 .card-container .course-card-container .course-card-body > .course-card-title,
 .card-container .teacher-card-container .teacher-card-body > .teacher-card-title,
 .card-container .center-card-container .center-card-body > .center-card-title {

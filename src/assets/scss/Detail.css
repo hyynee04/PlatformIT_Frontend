@@ -321,7 +321,48 @@
 
 .detail-container .right-container .block-container > .carousel-block {
     width: 100%;
+    display: flex;
+    flex-direction: column;
     height: fit-content;
+}
+
+.detail-container .right-container .block-container .carousel-block > .carousel-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > span {
+    font-size: 1.3rem;
+    color: var(--main-color);
+    font-weight: 600;
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+
+    padding: 8px 12px;
+    border: none;
+    border-radius: .5rem;
+    background-color: rgba(217, 217, 217, 0.3);
+
+    color: var(--main-color);
+    font-size: .8rem;
+    font-weight: 700;
+    
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > button:hover {
+    background-color: var(--border-gray);
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header button > svg {
+    width: .9rem;
+    height: .9rem;
 }
 
 .detail-container .right-container .block-container .carousel-block  > .carousel {

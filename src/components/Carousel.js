@@ -1,13 +1,13 @@
 import { React, useEffect, useRef, useState } from 'react';
-import { IoMdOpen } from "react-icons/io";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 import '../assets/scss/Carousel.css'; // Import your CSS file for styling
+import { Object } from '../constants/constants';
 import CenterCard from './Card/CenterCard';
 import CourseCard from './Card/CourseCard';
 import TeacherCard from './Card/TeacherCard';
 
 const Carousel = (props) => {
-    const { object, totalTracks, itemsPerTrack, header, listInfo } = props;
+    const { object, totalTracks, itemsPerTrack, listInfo } = props;
     const [currentTrack, setCurrentTrack] = useState(0);
     const autoSlideRef = useRef(null);
 
@@ -46,28 +46,28 @@ const Carousel = (props) => {
         const endIndex = startIndex + itemsPerTrack;
 
         switch (object) {
-            case 1: // Courses
-            const coursesToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
-            return coursesToShow.map((course) => (
-                <CourseCard 
-                    key={course.idCourse} 
-                    course={course} 
-                />
-            ));
-            case 2: // Teachers
-                const teachersToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
-                return teachersToShow.map((teacher) => (
-                    <TeacherCard 
-                        key={teacher.idUser} 
-                        teacher={teacher} 
+            case Object.course: // Courses
+                const coursesToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
+                return coursesToShow.map((course) => (
+                    <CourseCard
+                        key={course.idCourse}
+                        course={course}
                     />
                 ));
-            case 3: // Centers
+            case Object.teacher: // Teachers
+                const teachersToShow = listInfo.slice(startIndex, endIndex); // Lấy phần tử cần hiển thị
+                return teachersToShow.map((teacher) => (
+                    <TeacherCard
+                        key={teacher.idUser}
+                        teacher={teacher}
+                    />
+                ));
+            case Object.center: // Centers
                 const centersToShow = listInfo.slice(startIndex, endIndex); // Slice the centers to show
                 return centersToShow.map((center, i) => (
-                    <CenterCard 
-                        key={center.idCenter} 
-                        center={center} 
+                    <CenterCard
+                        key={center.idCenter}
+                        center={center}
                     />
                 ));
             default:
@@ -89,10 +89,6 @@ const Carousel = (props) => {
             onMouseEnter={stopAutoSlide}  // Stop auto-slide on hover
             onMouseLeave={startAutoSlide} // Restart auto-slide on mouse leave
         >
-            <div className='carousel-header'>
-                <span>{header}</span>
-                <button>View more <IoMdOpen /></button>
-            </div>
             <div className="carousel-wrapper">
                 {Array.from({ length: totalTracks }).map((_, index) => (
                     <div

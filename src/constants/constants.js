@@ -25,7 +25,7 @@ export const CenterStatus = {
   pending: 2,
   locked: 3,
 };
-export const CarouselObject = {
+export const Object = {
   course: 1,
   teacher: 2,
   center: 3,

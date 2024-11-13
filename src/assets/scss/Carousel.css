@@ -9,45 +9,6 @@
     padding: 0 0;
 }
 
-.carousel > .carousel-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-}
-
-.carousel .carousel-header > span {
-    font-size: 1.3rem;
-    color: var(--main-color);
-    font-weight: 600;
-}
-
-.carousel .carousel-header > button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 3px;
-
-    padding: 8px 12px;
-    border: none;
-    border-radius: .5rem;
-    background-color: rgba(217, 217, 217, 0.3);
-
-    color: var(--main-color);
-    font-size: .8rem;
-    font-weight: 700;
-    
-}
-
-.carousel .carousel-header > button:hover {
-    background-color: var(--border-gray);
-}
-
-.carousel .carousel-header button > svg {
-    width: .9rem;
-    height: .9rem;
-}
-
 .carousel > .carousel-wrapper {
     display: flex;
     width: 100%; /* Ensures the wrapper takes full width */

@@ -3,7 +3,7 @@ import axios from "../utils/axiosCustomize";
 const getAllCourseCards = () => {
   return axios.get("api/Course/GetAllCourseCards");
 };
-const getAllTags = async () => {
+const getAllTagModel = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
 const getCourseDetail = (idCourse) => {
@@ -67,4 +67,6 @@ const postAddCourse = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
-export { getAllCourseCards, getCourseDetail, getAllTags, postAddCourse };
+
+export { getAllCourseCards, getAllTagModel, getCourseDetail, postAddCourse };
+

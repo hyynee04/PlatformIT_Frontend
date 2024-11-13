@@ -9,7 +9,7 @@ import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
-import { Role } from "../../constants/constants";
+import { Object, Role } from "../../constants/constants";
 
 import { getTeacherDetail } from "../../services/userService";
 
@@ -63,7 +63,7 @@ const TeacherDetail = (props) => {
                             <span className="teaching-major"><FaGraduationCap color="#757575" />
                                 {teacherInfo.teachingMajor || ""}
                             </span>
-                            <span className="number-course"><FaRegFile color="#757575" /> 
+                            <span className="number-course"><FaRegFile color="#757575" />
                                 {`${teacherInfo.coursesCount} ${teacherInfo.coursesCount > 1 ? "courses" : "course"}`}
                             </span>
                         </div>
@@ -153,13 +153,24 @@ const TeacherDetail = (props) => {
 
                 {teacherInfo.courses && teacherInfo.courses.length !== 0 && (
                     <div className="block-container">
-
                         <div className="carousel-block">
+                            <div className='carousel-header'>
+                                <span>Courses</span>
+                                <button
+                                    onClick={() =>
+                                        navigate('/viewAll', {
+                                            state: {
+                                                object: Object.course,
+                                                listContent: listCourse,
+                                            }
+                                        })
+                                    }
+                                >View more <IoMdOpen /></button>
+                            </div>
                             <Carousel
                                 object={1} //course
                                 totalTracks={totalCourseTracks}
                                 itemsPerTrack={2}
-                                header={"Courses"}
                                 listInfo={listCourse}
                             />
                         </div>

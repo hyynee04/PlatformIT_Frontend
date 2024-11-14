@@ -22,7 +22,12 @@ import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
 import "../assets/scss/PI.css";
 import AvatarImageOption from "../components/AvatarImageOption";
-import { APIStatus, Role, UserGender, UserStatus } from "../constants/constants";
+import {
+  APIStatus,
+  Role,
+  UserGender,
+  UserStatus,
+} from "../constants/constants";
 import {
   deleteProfileLink,
   deleteQualification,
@@ -176,7 +181,6 @@ const TeacherPI = () => {
             setUpdateSuccess("");
           }, 3000);
         }
-
       } catch (error) {
         console.error("Error updating profile:", error);
         setUpdateSuccess("There was an error updating your profile.");
@@ -226,7 +230,10 @@ const TeacherPI = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      const response = await postAddProfileLink(newProfileLink.name, newProfileLink.url);
+      const response = await postAddProfileLink(
+        newProfileLink.name,
+        newProfileLink.url
+      );
       if (response.status === APIStatus.success) {
         await dispatch(fetchUserProfile(idUser));
         setNewProfileLink({ name: "", url: "" });
@@ -238,7 +245,6 @@ const TeacherPI = () => {
     if (response.status === APIStatus.success) {
       await dispatch(fetchUserProfile(idUser));
     }
-
   };
   const handleURLProfileLinkChange = (e) => {
     setNewProfileLink({ ...newProfileLink, url: e.target.value });
@@ -326,7 +332,7 @@ const TeacherPI = () => {
           qualificationFile: null,
           qualificationUrl: "",
         }));
-        await setQualiPDFCheck(false);        
+        await setQualiPDFCheck(false);
       }
     } else {
       setQualiWarning(
@@ -339,9 +345,8 @@ const TeacherPI = () => {
   const removeQualification = async (idQualification) => {
     const response = await deleteQualification(idQualification);
     if (response.status === APIStatus.success) {
-      await dispatch(fetchUserProfile(idUser));      
+      await dispatch(fetchUserProfile(idUser));
     }
-
   };
 
   const handleChangePassword = async () => {
@@ -405,8 +410,9 @@ const TeacherPI = () => {
               </div>
               {idRole === Role.teacher && (
                 <div
-                  className={`btn ${activeAction === "specializedPI" ? "active" : ""
-                    }`}
+                  className={`btn ${
+                    activeAction === "specializedPI" ? "active" : ""
+                  }`}
                   onClick={() => handleActionClick("specializedPI")}
                 >
                   <FaUserGraduate className="icon" />
@@ -615,6 +621,8 @@ const TeacherPI = () => {
                       <Form.Control
                         className="main-link"
                         value={profile.url || ""}
+                        onClick={() => window.open(profile.url)}
+                        style={{ cursor: "pointer" }}
                         readOnly
                       />
                     </InputGroup>
@@ -687,18 +695,19 @@ const TeacherPI = () => {
                       />
                       <div className="status-action">
                         <span
-                          className={`span ${qualification.status === UserStatus.active
+                          className={`span ${
+                            qualification.status === UserStatus.active
                               ? "approved"
                               : qualification.status === UserStatus.pending
-                                ? "pending"
-                                : "rejected"
-                            }`}
+                              ? "pending"
+                              : "rejected"
+                          }`}
                         >
                           {qualification.status === UserStatus.active
                             ? "Approved"
                             : qualification.status === UserStatus.pending
-                              ? "Pending"
-                              : `Rejected. Reason: ${qualification.reason}`}
+                            ? "Pending"
+                            : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
@@ -716,7 +725,7 @@ const TeacherPI = () => {
                     </div>
                     <div className="quali-image">
                       {qualification.path &&
-                        qualification.path.endsWith(".pdf") ? (
+                      qualification.path.endsWith(".pdf") ? (
                         <div
                           onClick={() =>
                             window.open(qualification.path, "_blank")

@@ -11,7 +11,10 @@ import default_image from "../../assets/img/default_image.png";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
 import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import { getAllTagModel, postAddCourse } from "../../services/courseService";
+import { APIStatus } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
 const AddNewCourse = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   // const [formValues, setFormValues] = useState({
@@ -300,7 +303,10 @@ const AddNewCourse = () => {
     };
     console.log(dataToSubmit);
     try {
-      await postAddCourse(dataToSubmit);
+      const response = await postAddCourse(dataToSubmit);
+      if (response.status === APIStatus.success) {
+        navigate("/centerAdCourse");
+      }
       // await dispatchInfo(fetchCenterProfile());
       // setUpdateStr("Center information has been updated successfully!");
 
@@ -321,7 +327,9 @@ const AddNewCourse = () => {
             <div className="container-field">
               <div className="container-left">
                 <div className="info">
-                  <span>Course Name*</span>
+                  <span>
+                    Course Name <span class="required">*</span>
+                  </span>
                   <input
                     type="text"
                     className="input-form-pi"
@@ -340,7 +348,7 @@ const AddNewCourse = () => {
                 </div>
                 <div className="info">
                   <span>
-                    Tag of Course
+                    Tag of Course <span class="required">*</span>
                     <br />
                     <span className="note-span">
                       You can add a new tag if you can't find the tag you need
@@ -423,14 +431,14 @@ const AddNewCourse = () => {
                       <span>Price</span>
                       {(formValues.priceValidate ||
                         formValues.discountedPriceValidate) && (
-                          <span
-                            className={"warning-error"}
-                            style={{ color: "var(--red-color)" }}
-                          >
-                            {formValues.priceValidate ||
-                              formValues.discountedPriceValidate}
-                          </span>
-                        )}
+                        <span
+                          className={"warning-error"}
+                          style={{ color: "var(--red-color)" }}
+                        >
+                          {formValues.priceValidate ||
+                            formValues.discountedPriceValidate}
+                        </span>
+                      )}
                     </div>
 
                     <div className="left-to-right">
@@ -548,7 +556,14 @@ const AddNewCourse = () => {
                 <FiSettings className="icon" />
               </button>
               <div className="container-button">
-                <button className="discard-changes">Cancel</button>
+                <button
+                  className="discard-changes"
+                  onClick={() => {
+                    navigate("/centerAdCourse");
+                  }}
+                >
+                  Cancel
+                </button>
                 <button
                   className="save-change create-course"
                   disabled={!isFormValid()}
@@ -560,7 +575,9 @@ const AddNewCourse = () => {
             </div>
           </div>
           <div className="container-info auto">
-            <span className="title-span">Teacher</span>
+            <span className="title-span">
+              Teacher <span class="required">*</span>
+            </span>
             {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
             {!showTeacherList && (
               <div className="alert-option">

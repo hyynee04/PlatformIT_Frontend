@@ -19,6 +19,7 @@ import FilterUser from "../../components/FilterUser";
 import SortByUser from "../../components/SortByUser";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../../store/userSlice";
+import Spinner from "react-bootstrap/Spinner";
 
 import "../../assets/scss/UserMgmt.css";
 
@@ -105,7 +106,7 @@ const PlatformAdUserMgmt = () => {
 
   const filteredUser = listUser
     .filter((user) => {
-      const searchTermLower = searchTerm.toLowerCase();
+      const searchTermLower = searchTerm.trim().toLowerCase();
       const roleDescription = String(getRoleDescription(user)).toLowerCase();
       const matchesSearchTerm =
         (user.fullName &&
@@ -194,9 +195,14 @@ const PlatformAdUserMgmt = () => {
     setFilterVisble(false);
     setSortByVisible(false);
   };
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   // return <div>Loading...</div>;
+  //   return (
+  //     <div className="loading-container">
+  //       <Spinner animation="border" />;
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -242,7 +248,12 @@ const PlatformAdUserMgmt = () => {
               <LuFilter className="icon" />
               <span>Filter</span>
             </div>
-            {filterVisble && <FilterUser onFilterChange={handleFilterChange} />}
+            {filterVisble && (
+              <FilterUser
+                onFilterChange={handleFilterChange}
+                onClose={() => setFilterVisble(false)}
+              />
+            )}
             <div
               className="btn"
               onClick={() => {
@@ -276,8 +287,9 @@ const PlatformAdUserMgmt = () => {
                 <th style={{ textAlign: "center" }}>No.</th>
                 <th>Full Name</th>
                 <th>Gender</th>
+                <th>Username</th>
                 <th>Email</th>
-                {activeRole !== Role.student && <th>Center</th>}
+                {activeRole !== Role.student && <th>Affiliated Center</th>}
                 {activeRole === Role.centerAdmin && <th>Level</th>}
                 <th>Date Joined</th>
                 <th>Status</th>
@@ -290,6 +302,7 @@ const PlatformAdUserMgmt = () => {
                   <td style={{ textAlign: "center" }}>{index + 1}</td>
                   <td>{user.fullName}</td>
                   <td>{renderGender(user.gender)}</td>
+                  <td>{user.username ? user.username : ""}</td>
                   <td>{user.email}</td>
                   {activeRole !== Role.student && <td>{user.centerName}</td>}
                   {activeRole === Role.centerAdmin && (

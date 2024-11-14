@@ -23,13 +23,15 @@ import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
+import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
+import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
+import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 
 import StudentHome from "./pages/home/StudentHome";
 
-import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
 import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {
@@ -138,7 +140,15 @@ const Layout = (props) => {
             }
           />
           <Route
-            path="/addNewCourse"
+            path="/centerAdCourse"
+            element={
+              <PrivateRoute>
+                <CenterAdCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/addCourse"
             element={
               <PrivateRoute>
                 <AddNewCourse />
@@ -151,6 +161,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teacherAssignment"
+            element={
+              <PrivateRoute>
+                <AddNewAssign />
               </PrivateRoute>
             }
           />

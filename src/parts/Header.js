@@ -54,10 +54,12 @@ const Header = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       if (idUser) {
-        const data = await getAvaImg(idUser);
-        let response = data.data;
-        if (response !== APIStatus.success)
-          dispatch(setAvatar(response));
+        const response = await getAvaImg(idUser);
+        if (response.status === APIStatus.success) {
+          dispatch(setAvatar(response.data));
+        } else {
+          dispatch(setAvatar(null));
+        }
       }
     };
     fetchAvatar();
@@ -71,14 +73,14 @@ const Header = () => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },
-      { title: "Course Management", path: "/addNewCourse" }, //centerAdCourse
+      { title: "Course Management", path: "/centerAdCourse" }, //centerAdCourse
       { title: "User Management", path: "/centerAdUser" },
       { title: "Center Management", path: "/centerAdCenter" },
     ],
     [Role.teacher]: [
       { title: "Home", path: "/teacherHome" },
       { title: "Course Management", path: "/teacherCourse" },
-      { title: "Lecture Management", path: "/teacherLecture" },
+      { title: "Assignment Management", path: "/teacherAssignment" },
     ],
     [Role.student]: [
       { title: "Home", path: "/studentHome" },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/scss/card/FilterCard.css";
 import {
@@ -7,12 +7,13 @@ import {
   UserStatus,
 } from "../constants/constants";
 
-const FilterUser = ({ onFilterChange }) => {
+const FilterUser = ({ onFilterChange, onClose }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
   const [gender, setGender] = useState("all");
   const [level, setLevel] = useState("all");
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState("all");
+  const filterRef = useRef(null);
 
   const handleFilterChange = () => {
     onFilterChange({
@@ -22,10 +23,26 @@ const FilterUser = ({ onFilterChange }) => {
       status: status === "all" ? null : status,
     });
   };
+  useEffect(() => {
+    console.log("useEffect triggered"); // Kiểm tra xem useEffect có được gọi không
+    const handleClickOutside = (event) => {
+      console.log("mousedown event triggered"); // Kiểm tra xem sự kiện mousedown có được kích hoạt không
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        onClose(); // Gọi hàm onClose khi click bên ngoài component
+        console.log("close"); // Kiểm tra xem onClose có được gọi không
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   if (!isFilterFormVisible) return null;
   return (
     <>
-      <div className="filter-container user">
+      <div ref={filterRef} className="filter-container user">
         <div className="title-filter">
           <span>Filter</span>
         </div>

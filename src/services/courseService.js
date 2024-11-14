@@ -67,4 +67,18 @@ const postAddCourse = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
-export { getAllCourseCards, getCourseDetail, getAllTags, postAddCourse };
+const getAllActiveCourseOfTeacher = async () => {
+  const idTeacher = +localStorage.getItem("idUser");
+  return await axios.get("api/Course/GetAllActiveCourseOfTeacher", {
+    params: {
+      idTeacher: idTeacher,
+    },
+  });
+};
+export {
+  getAllCourseCards,
+  getCourseDetail,
+  getAllTags,
+  postAddCourse,
+  getAllActiveCourseOfTeacher,
+};

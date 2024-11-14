@@ -321,7 +321,9 @@ const AddNewCourse = () => {
             <div className="container-field">
               <div className="container-left">
                 <div className="info">
-                  <span>Course Name*</span>
+                  <span>
+                    Course Name <span class="required">*</span>
+                  </span>
                   <input
                     type="text"
                     className="input-form-pi"
@@ -340,7 +342,7 @@ const AddNewCourse = () => {
                 </div>
                 <div className="info">
                   <span>
-                    Tag of Course
+                    Tag of Course <span class="required">*</span>
                     <br />
                     <span className="note-span">
                       You can add a new tag if you can't find the tag you need
@@ -560,7 +562,9 @@ const AddNewCourse = () => {
             </div>
           </div>
           <div className="container-info auto">
-            <span className="title-span">Teacher</span>
+            <span className="title-span">
+              Teacher <span class="required">*</span>
+            </span>
             {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
             {!showTeacherList && (
               <div className="alert-option">

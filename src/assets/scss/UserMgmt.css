@@ -85,6 +85,16 @@
 .filter-sort-btns .save-filter {
   color: var(--white-color);
 }
+.filter-sort-btns > .filter-sort-box {
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+.filter-sort-btns > .filter-sort-box.active {
+  opacity: 1;
+  z-index: 1;
+  transition: opacity 0.1s linear;
+}
 .add-btn {
   margin: 12px 72px;
 }

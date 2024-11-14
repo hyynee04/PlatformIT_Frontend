@@ -32,5 +32,13 @@ export const CarouselObject = {
 };
 export const APIStatus = {
   success: 200,
-
-}
+};
+export const AssignmentType = {
+  manual: 1,
+  quiz: 2,
+  code: 3,
+};
+export const AssignmentItemAnswerType = {
+  text: 1,
+  attached_file: 2,
+};

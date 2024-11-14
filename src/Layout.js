@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 
 import App from "./App";
-import PrivateRoute from "./PrivateRoute";
 import GuestRoute from "./GuestRoute";
+import PrivateRoute from "./PrivateRoute";
 
 import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
@@ -10,23 +10,22 @@ import Login from "./pages/Login";
 import LoginResponse from "./pages/LoginResponse";
 import Register from "./pages/Register";
 
-import UserPI from "./pages/UserPI";
-import TeacherDetail from "./pages/detail/TeacherDetail";
 import CenterDetail from "./pages/detail/CenterDetail";
 import CourseDetail from "./pages/detail/CourseDetail";
 import StudentDetail from "./pages/detail/StudentDetail";
+import TeacherDetail from "./pages/detail/TeacherDetail";
+import UserPI from "./pages/UserPI";
 
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
 
+import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
+import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
-import CenterAdPendingTask from "./pages/CenterAdPendingTask";
-import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 
-import TeacherHome from "./pages/home/TeacherHome";
 
 import StudentHome from "./pages/home/StudentHome";
 
@@ -151,7 +150,7 @@ const Layout = (props) => {
             path="/teacherHome"
             element={
               <PrivateRoute>
-                <TeacherHome />
+                <Home />
               </PrivateRoute>
             }
           />

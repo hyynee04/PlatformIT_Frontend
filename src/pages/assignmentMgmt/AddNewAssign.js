@@ -7,7 +7,10 @@ import {
   AssignmentType,
 } from "../../constants/constants";
 import "../../assets/scss/Assignment.css";
-import { getAllActiveCourseOfTeacher } from "../../services/courseService";
+import {
+  getAllActiveCourseOfTeacher,
+  postAddManualAssignment,
+} from "../../services/courseService";
 import NewManualQuestion from "../../components/assigment/NewManualQuestion";
 
 const AddNewAssign = () => {
@@ -98,7 +101,7 @@ const AddNewAssign = () => {
   };
   const validateForm = (startDate, endDate, duration, courseEndDate) => {
     if (startDate && !endDate) {
-      setErrorMessage("Please fill in 'Due date' fields.");
+      setErrorMessage("Please fill in 'Due date' field.");
       return false;
     }
 
@@ -132,6 +135,10 @@ const AddNewAssign = () => {
     setDuration(value);
     setIsValid(validateForm(startDate, endDate, value, selectedCourse.endDate));
   };
+
+  //ISSHUFFLINGQUESTION
+  const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
+
   //QUESTION
   const [questions, setQuestions] = useState([]);
   const inputFileRef = useRef([]);
@@ -142,10 +149,10 @@ const AddNewAssign = () => {
       setQuestions([
         ...questions,
         {
-          text: "",
-          mark: "",
-          answerType: AssignmentItemAnswerType.text,
-          referenceFile: null,
+          question: "", //Question
+          mark: "", //Mark
+          assignmentItemAnswerType: AssignmentItemAnswerType.text, //AssignmentItemAnswerType
+          attachedFile: null, //AttachedFile
         },
       ]);
     }
@@ -166,10 +173,40 @@ const AddNewAssign = () => {
     if (!typeAssignment) return false;
     if (errorMessage !== "") return false;
     if (questions.length <= 0) return false;
-
+    for (const question of questions) {
+      if (!question.question || question.question.trim() === "") return false;
+      if (!question.mark || question.mark <= 0) return false;
+    }
+    if (!isTest && (!selectedSection || !selectedLecture)) return false;
     return true;
   };
+  const handleAddAssignment = async (isPublish) => {
+    const dataToSubmit = {
+      title: title,
+      idCourse: selectedCourse.idCourse,
+      isTest: isTest,
+      startDate: startDate,
+      endDate: endDate,
+      duration: duration,
+      assignmentType: Number(typeAssignment),
+      isPublish: isPublish,
+      isShufflingQuestion: isShufflingQuestion,
+      questions: questions,
+    };
+    console.log(dataToSubmit);
+    try {
+      await postAddManualAssignment(dataToSubmit);
+      // await dispatchInfo(fetchCenterProfile());
+      // setUpdateStr("Center information has been updated successfully!");
 
+      // setTimeout(() => {
+      //   setUpdateStr("");
+      // }, 3000);
+    } catch (error) {
+      // setUpdateStr("There was an error updating center information.");
+      throw error;
+    }
+  };
   return (
     <div>
       <div className="container-pi">
@@ -218,11 +255,11 @@ const AddNewAssign = () => {
                     <input
                       type="checkbox"
                       name="isAttendLimited"
-                      checked={!isLimitedTimeCourse || isTest} // Đặt trạng thái checked theo isLimitedTimeCourse và isTest
-                      disabled={!isLimitedTimeCourse} // Vô hiệu hóa checkbox nếu isLimitedTimeCourse là true
+                      checked={!isLimitedTimeCourse || !isTest} // Nếu không phải limitedTimeCourse thì luôn checked, nếu có thì dựa vào !isTest
+                      disabled={!isLimitedTimeCourse} // Vô hiệu hóa checkbox nếu không phải limitedTimeCourse
                       onChange={(e) => {
                         if (isLimitedTimeCourse) {
-                          setIsTest(e.target.checked); // Cập nhật trạng thái isTest chỉ khi checkbox có thể thay đổi
+                          setIsTest(!e.target.checked); // Cập nhật isTest ngược lại với trạng thái checked của checkbox
                         }
                       }}
                     />
@@ -353,14 +390,14 @@ const AddNewAssign = () => {
               <button
                 className="btn publish"
                 disabled={!isFormValid()}
-                // onClick={handleAddCourse}
+                onClick={() => handleAddAssignment(true)}
               >
                 Publish
               </button>
               <button
                 className="btn save"
                 disabled={!isFormValid()}
-                // onClick={handleAddCourse}
+                onClick={() => handleAddAssignment(false)}
               >
                 Save
               </button>
@@ -381,7 +418,13 @@ const AddNewAssign = () => {
             <div className="info">
               <span>Question shuffling</span>
               <label class="switch">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={isShufflingQuestion}
+                  onChange={(e) => {
+                    setIsShufflingQuestion(e.target.checked);
+                  }}
+                />
                 <span class="slider"></span>
               </label>
             </div>

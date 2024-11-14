@@ -7,14 +7,16 @@ import { MdOutlineHandshake } from "react-icons/md";
 import { RiGroupLine } from "react-icons/ri";
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/Detail.css";
 
 import Carousel from "../../components/Carousel";
+import { Object } from "../../constants/constants";
 import { getCenterDetail } from "../../services/centerService";
 
 const CenterDetail = (props) => {
+    const navigate = useNavigate();
     const location = useLocation();
 
     const [listTeacher, setListTeacher] = useState([])
@@ -89,7 +91,7 @@ const CenterDetail = (props) => {
 
                         <div className="center-information">
                             <span className="number-course">
-                                <LuFile color="#757575" /> {`${centerInfo.courseCount} ${centerInfo.courseCount > 1 ? "courses" : "course"}` }
+                                <LuFile color="#757575" /> {`${centerInfo.courseCount} ${centerInfo.courseCount > 1 ? "courses" : "course"}`}
                             </span>
                             <span className="">
                                 <RiGroupLine color="#757575" /> {`${centerInfo.studentCount} ${centerInfo.studentCount > 1 ? "students" : "student"}`}
@@ -207,13 +209,24 @@ const CenterDetail = (props) => {
 
                 {centerInfo.courseCards && centerInfo.courseCards.length !== 0 && (
                     <div className="block-container">
-
                         <div className="carousel-block">
+                            <div className='carousel-header'>
+                                <span>Courses</span>
+                                <button
+                                    onClick={() =>
+                                        navigate('/viewAll', {
+                                            state: {
+                                                object: Object.course,
+                                                listContent: listCourse,
+                                            }
+                                        })
+                                    }
+                                >View more <IoMdOpen /></button>
+                            </div>
                             <Carousel
                                 object={1} //course
                                 totalTracks={totalCourseTracks}
                                 itemsPerTrack={2}
-                                header={"Courses"}
                                 listInfo={listCourse}
                             />
                         </div>
@@ -223,13 +236,24 @@ const CenterDetail = (props) => {
 
                 {centerInfo.teacherCards && centerInfo.teacherCards.length !== 0 && (
                     <div className="block-container">
-
                         <div className="carousel-block">
+                            <div className='carousel-header'>
+                                <span>Teachers</span>
+                                <button
+                                    onClick={() =>
+                                        navigate('/viewAll', {
+                                            state: {
+                                                object: Object.teacher,
+                                                listContent: listTeacher,
+                                            }
+                                        })
+                                    }
+                                >View more <IoMdOpen /></button>
+                            </div>
                             <Carousel
                                 object={2} //teacher
                                 totalTracks={totalTeacherTracks}
                                 itemsPerTrack={2}
-                                header={"Teachers"}
                                 listInfo={listTeacher}
                             />
                         </div>

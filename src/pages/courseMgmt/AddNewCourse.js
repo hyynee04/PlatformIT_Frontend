@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
-import { LuX, LuMoveRight } from "react-icons/lu";
-import { FiSettings } from "react-icons/fi";
-import { FaRegFile } from "react-icons/fa6";
 import Form from "react-bootstrap/Form";
+import { FaChevronDown } from "react-icons/fa";
+import { FaRegFile } from "react-icons/fa6";
+import { FiSettings } from "react-icons/fi";
+import { LuMoveRight, LuX } from "react-icons/lu";
 import TeacherCard from "../../components/Card/TeacherCard";
 
-import { getAllTags, postAddCourse } from "../../services/courseService";
-import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
+import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
+import { getAllTagModel, postAddCourse } from "../../services/courseService";
+import { APIStatus } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
 const AddNewCourse = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   // const [formValues, setFormValues] = useState({
@@ -52,7 +55,7 @@ const AddNewCourse = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getAllTags();
+        const response = await getAllTagModel();
         setTagOptions(response.data);
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -300,7 +303,10 @@ const AddNewCourse = () => {
     };
     console.log(dataToSubmit);
     try {
-      await postAddCourse(dataToSubmit);
+      const response = await postAddCourse(dataToSubmit);
+      if (response.status === APIStatus.success) {
+        navigate("/centerAdCourse");
+      }
       // await dispatchInfo(fetchCenterProfile());
       // setUpdateStr("Center information has been updated successfully!");
 
@@ -550,7 +556,14 @@ const AddNewCourse = () => {
                 <FiSettings className="icon" />
               </button>
               <div className="container-button">
-                <button className="discard-changes">Cancel</button>
+                <button
+                  className="discard-changes"
+                  onClick={() => {
+                    navigate("/centerAdCourse");
+                  }}
+                >
+                  Cancel
+                </button>
                 <button
                   className="save-change create-course"
                   disabled={!isFormValid()}

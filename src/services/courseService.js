@@ -3,7 +3,7 @@ import axios from "../utils/axiosCustomize";
 const getAllCourseCards = () => {
   return axios.get("api/Course/GetAllCourseCards");
 };
-const getAllTags = async () => {
+const getAllTagModel = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
 const getCourseDetail = (idCourse) => {
@@ -75,10 +75,63 @@ const getAllActiveCourseOfTeacher = async () => {
     },
   });
 };
+const postAddManualAssignment = async (dataToSubmit) => {
+  const idCreatedBy = +localStorage.getItem("idUser");
+  try {
+    const formData = new FormData();
+    formData.append("Title", dataToSubmit.title);
+    formData.append("IdCourse", dataToSubmit.idCourse);
+
+    if (!dataToSubmit.isTest) {
+      formData.append("IsExam", 0);
+      // formData.append("IdLecture", dataToSubmit.idLecture);
+      // formData.append("IdLecture", 13);
+    } else {
+      formData.append("IsExam", 1);
+    }
+
+    formData.append("StartDate", dataToSubmit.startDate);
+    formData.append("EndDate", dataToSubmit.endDate);
+    formData.append("Duration", dataToSubmit.duration);
+    formData.append("AssignmentType", dataToSubmit.assignmentType);
+
+    formData.append("IsPublish", dataToSubmit.isPublish ? 1 : 0);
+    formData.append(
+      "IsShufflingQuestion",
+      dataToSubmit.isShufflingQuestion ? 1 : 0
+    );
+    // Duyệt qua từng câu hỏi trong mảng questions
+    dataToSubmit.questions.forEach((question, index) => {
+      formData.append(`AssignmentItems[${index}].Question`, question.question);
+      formData.append(`AssignmentItems[${index}].Mark`, question.mark);
+      formData.append(
+        `AssignmentItems[${index}].AssignmentItemAnswerType`,
+        question.assignmentItemAnswerType
+      );
+
+      // Nếu có file đính kèm
+      if (question.attachedFile) {
+        formData.append(
+          `AssignmentItems[${index}].AttachedFile`,
+          question.attachedFile
+        );
+      }
+    });
+    formData.append("CreatedBy", idCreatedBy);
+    return await axios.post("api/Assignment/CreateManualAssignment", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.error("Error add course:", error.response?.data || error.message);
+  }
+};
 export {
   getAllCourseCards,
+  getAllTagModel,
   getCourseDetail,
-  getAllTags,
   postAddCourse,
   getAllActiveCourseOfTeacher,
+  postAddManualAssignment,
 };

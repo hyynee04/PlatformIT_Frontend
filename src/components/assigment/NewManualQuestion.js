@@ -12,7 +12,7 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
 
   const handleDeleteFile = (idx) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[idx].referenceFile = null;
+    updatedQuestions[idx].attachedFile = null;
     setQuestions(updatedQuestions);
   };
 
@@ -22,7 +22,7 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
 
   const handleReferenceFileChange = (e, idx) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[idx].referenceFile = e.target.files[0];
+    updatedQuestions[idx].attachedFile = e.target.files[0];
     setQuestions(updatedQuestions);
   };
 
@@ -47,27 +47,40 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
           <div className="question-info">
             <div className="left-question-info">
               <div className="info">
-                <span style={{ fontWeight: "bold", color: "#1e1e1e" }}>
-                  Question {idx + 1}
-                </span>
+                <div className="container-validate">
+                  <span style={{ fontWeight: "bold", color: "#1e1e1e" }}>
+                    Question {idx + 1}
+                  </span>
+                  {(question.question === "" || question.mark <= 0) && (
+                    <span
+                      className={"warning-error"}
+                      style={{
+                        color: "var(--red-color)",
+                        marginLeft: "auto",
+                      }}
+                    >
+                      Please enter question text and mark.
+                    </span>
+                  )}
+                </div>
                 <Form.Control
                   as="textarea"
                   className="input-area-form-pi"
                   placeholder="Question text"
-                  value={question.text}
+                  value={question.question}
                   onChange={(e) =>
-                    handleQuestionChange(idx, "text", e.target.value)
+                    handleQuestionChange(idx, "question", e.target.value)
                   }
                 />
               </div>
               <div className="info">
                 <span>Reference material (maximum 1 file)</span>
-                {question.referenceFile ? (
+                {question.attachedFile ? (
                   <div className="select-container">
                     <input
                       type="text"
                       className="input-form-pi"
-                      value={question.referenceFile.name}
+                      value={question.attachedFile.name}
                       disabled
                     />
                     <FaTrashAlt
@@ -111,9 +124,13 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
                 <div className="select-container">
                   <select
                     className="input-form-pi"
-                    value={question.answerType}
+                    value={question.assignmentItemAnswerType}
                     onChange={(e) =>
-                      handleQuestionChange(idx, "answerType", e.target.value)
+                      handleQuestionChange(
+                        idx,
+                        "assignmentItemAnswerType",
+                        e.target.value
+                      )
                     }
                   >
                     <option value={AssignmentItemAnswerType.text}>Text</option>

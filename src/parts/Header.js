@@ -73,7 +73,7 @@ const Header = () => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },
-      { title: "Course Management", path: "/addNewCourse" }, //centerAdCourse
+      { title: "Course Management", path: "/centerAdCourse" }, //centerAdCourse
       { title: "User Management", path: "/centerAdUser" },
       { title: "Center Management", path: "/centerAdCenter" },
     ],

@@ -25,6 +25,7 @@ import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
+import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
 
 import TeacherHome from "./pages/home/TeacherHome";
@@ -140,7 +141,15 @@ const Layout = (props) => {
             }
           />
           <Route
-            path="/addNewCourse"
+            path="/centerAdCourse"
+            element={
+              <PrivateRoute>
+                <CenterAdCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/addCourse"
             element={
               <PrivateRoute>
                 <AddNewCourse />

@@ -32,6 +32,7 @@ import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 
 import StudentHome from "./pages/home/StudentHome";
 
+import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {
@@ -102,6 +103,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <PlatformAdCenterMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/platformAdCourse"
+            element={
+              <PrivateRoute>
+                <PlatformAdCourseMgmt />
               </PrivateRoute>
             }
           />

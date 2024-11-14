@@ -62,7 +62,7 @@
     gap: 12px;
 }
 
-.viewall-container .filter-search-section .filter-sort-btns > .btn {
+.viewall-container .filter-search-section .filter-sort-btns > .button {
     padding: 6px;
     display: flex;
     flex-direction: row;
@@ -75,7 +75,17 @@
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
         rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 
+    border-radius: .25rem;
+    cursor: pointer;
     position: relative;
+}
+
+.viewall-container .filter-search-section .filter-sort-btns > .button:hover {
+    background-color: rgba(217, 217, 217, 0.2);
+}
+
+.viewall-container .filter-search-section .filter-sort-btns > .button.add {
+    width: fit-content;
 }
 
 .viewall-container .filter-search-section .filter-sort-btns .btn > svg {

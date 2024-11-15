@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { FiEdit } from "react-icons/fi";
 import {
     LuArrowRight,
     LuChevronDown,
@@ -470,10 +471,17 @@ const CourseMgmt = (props) => {
             <div className="viewall-main-section">
                 <div className="all-cards-container course">
                     {currentCourses.length !== 0 && currentItemsPage.map((course) => (
-                        <CourseCard
-                            key={"course" + course.idCourse}
-                            course={course}
-                        />
+                        <div className="one-card-container">
+                            <CourseCard
+                                key={"course" + course.idCourse}
+                                course={course}
+                            />
+                            {idCenter && (
+                                <div className="edit-course-btn">
+                                    <button><FiEdit /> Edit</button>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
                 <div className="pagination">

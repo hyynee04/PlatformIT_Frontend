@@ -454,6 +454,46 @@
     row-gap: 3rem;
 }
 
+.viewall-container .viewall-main-section .course > .one-card-container {
+    width: fit-content;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.viewall-container .viewall-main-section .course .one-card-container > .edit-course-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viewall-container .viewall-main-section .course .one-card-container .edit-course-btn > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    background-color: rgba(57, 121, 121, 0.3);
+    padding: 2px 14px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+        rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+
+    color: var(--main-color);
+    font-size: .9rem;
+    font-weight: 500;
+    border: none;
+    border-radius: .25rem;
+    cursor: pointer;
+}
+
+.viewall-container .viewall-main-section .course .one-card-container .edit-course-btn > button:hover {
+    background-color: rgba(57, 121, 121, 0.5);
+}
+
 .viewall-container .viewall-main-section > .all-cards-container.teacher {
     padding: 0 1.25rem;
     gap: 6rem;

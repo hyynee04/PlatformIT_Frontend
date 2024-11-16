@@ -1,5 +1,5 @@
 import { LuAlertTriangle, LuX } from "react-icons/lu";
-import "../../assets/scss/card/DiagForm.css";
+import "../../assets/scss/card/DiagForm.scss";
 
 const DiagLoginMessageForm = (props) => {
     const { message, isOpen, onClose } = props;

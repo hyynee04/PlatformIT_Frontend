@@ -543,12 +543,17 @@
 
     overflow: hidden;
     height: auto;
+    transition: opacity 0.2s ease-out;
+
+    opacity: 1;
 }
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture > .lecture-block.adjust-lecture-block {
     height: 0;
     border: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 .detail-container .right-container .block-container 

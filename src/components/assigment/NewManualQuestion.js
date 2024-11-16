@@ -47,22 +47,13 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
           <div className="question-info">
             <div className="left-question-info">
               <div className="info">
-                <div className="container-validate">
+                <span>
                   <span style={{ fontWeight: "bold", color: "#1e1e1e" }}>
                     Question {idx + 1}
                   </span>
-                  {(question.question === "" || question.mark <= 0) && (
-                    <span
-                      className={"warning-error"}
-                      style={{
-                        color: "var(--red-color)",
-                        marginLeft: "auto",
-                      }}
-                    >
-                      Please enter question text and mark.
-                    </span>
-                  )}
-                </div>
+                  <span class="required">*</span>
+                </span>
+
                 <Form.Control
                   as="textarea"
                   className="input-area-form-pi"
@@ -109,7 +100,9 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
             </div>
             <div className="right-question-info">
               <div className="info">
-                <span>Mark</span>
+                <span>
+                  Mark<span class="required">*</span>
+                </span>
                 <input
                   type="number"
                   className="input-form-pi"

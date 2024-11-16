@@ -215,7 +215,7 @@ const AddNewAssign = () => {
           <div className="assign-info">
             <div className="info">
               <span>
-                Title <span class="required">*</span>
+                Title<span class="required">*</span>
               </span>
               <input
                 type="text"
@@ -226,7 +226,7 @@ const AddNewAssign = () => {
             </div>
             <div className="info">
               <span>
-                Add to course <span class="required">*</span>
+                Add to course<span class="required">*</span>
               </span>
               <div className="select-container">
                 <select className="input-form-pi" onChange={handleCourseChange}>
@@ -264,7 +264,7 @@ const AddNewAssign = () => {
                       }}
                     />
                     <span style={{ color: "var(--black-color)" }}>
-                      This is an exercise of a lecture.{" "}
+                      This is an exercise of a lecture.
                       {!isLimitedTimeCourse && <span class="required">*</span>}
                     </span>
                   </div>
@@ -289,7 +289,7 @@ const AddNewAssign = () => {
                   <div className="container-left">
                     <div className="info">
                       <span>
-                        Type <span class="required">*</span>
+                        Type<span class="required">*</span>
                       </span>
                       <div className="select-container">
                         <select

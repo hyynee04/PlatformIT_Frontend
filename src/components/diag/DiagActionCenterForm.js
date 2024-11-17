@@ -73,7 +73,7 @@ const DiagActionCenterForm = ({
             <span>Are you sure to Approve this center?</span>
             <div className="str-btns">
               <div className="act-btns">
-                <button className="btn diag-btn cancle" onClick={onClose}>
+                <button className="btn diag-btn cancel" onClick={onClose}>
                   No
                 </button>
                 <button
@@ -119,7 +119,7 @@ const DiagActionCenterForm = ({
                 </Alert>
               )}
               <div className="act-btns">
-                <button className="btn diag-btn cancle" onClick={onClose}>
+                <button className="btn diag-btn cancel" onClick={onClose}>
                   Cancel
                 </button>
                 <button

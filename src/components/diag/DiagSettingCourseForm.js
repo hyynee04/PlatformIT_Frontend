@@ -59,7 +59,7 @@ const DiagSettingCourseForm = ({
 
           <div className="str-btns">
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
+              <button className="btn diag-btn cancel" onClick={onClose}>
                 Cancel
               </button>
               <button

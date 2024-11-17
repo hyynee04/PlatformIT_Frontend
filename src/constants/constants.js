@@ -42,3 +42,8 @@ export const AssignmentItemAnswerType = {
   text: 1,
   attached_file: 2,
 };
+export const AssignmentStatus = {
+  publish: 1,
+  unpublish: 0,
+  pastDue: 2,
+};

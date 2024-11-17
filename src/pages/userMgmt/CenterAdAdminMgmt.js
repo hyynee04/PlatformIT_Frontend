@@ -154,7 +154,7 @@ const CenterAdAdminMgmt = () => {
         <div className="title-info">
           <b>Admin Management</b>
         </div>
-        <div className="page-user-container">
+        <div className="page-list-container">
           <div className="filter-search">
             <div className="filter-sort-btns">
               <div

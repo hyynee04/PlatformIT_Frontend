@@ -934,7 +934,8 @@ svg > .CircularProgressbar-text {
     color: gray;
 }
 
-.detail-container .right-container > .block-container.course-progress-container {
+.detail-container .right-container > .block-container.course-progress-container,
+.detail-container .right-container > .block-container.course-teacher-attendance {
     background-color: transparent;
     border: none;
     box-shadow: none;
@@ -1239,4 +1240,116 @@ svg > .CircularProgressbar-text {
 .detail-container .right-container .block-container .add-notification-popup .post-button-container > .cancel:hover {
     background-color: rgba(217, 217, 217, 0.3);
     color: var(--black-color);
+}
+
+/* .detail-container .right-container > .course-teacher-attendance {
+    overflow-y: scroll;
+} */
+
+.detail-container .right-container .course-teacher-attendance > .attendance-progress-container {
+    width: 100%;
+    height: fit-content;
+    padding: .5rem;
+
+    background-color: var(--white-color);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px;
+    border-radius: .5rem;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container > .attendance-progress-content {
+    width: 100%;
+    height: fit-content;
+    padding: .5rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    border: none;
+    border-radius: .5rem;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container > .attendance-progress-content:hover {
+    background-color: rgba(217, 217, 217, 0.2);
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content > .attendance-ava {
+    width: 5rem;
+    display: flex;
+    align-items: center;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-ava > img {
+    width: 4.5rem;
+    height: 4.5rem;
+
+    border: none;
+    border-radius: 50%;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content > .attendance-progress-body {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: fit-content;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-name {
+    font-weight: 600;
+    color: var(--second-main-color);
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-mail {
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-progress {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > label {
+    width: 100px;
+    font-size: .9rem;
+    font-weight: 500;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > .progress-line {
+    width: 90%;
+    height: 8px;
+
+    border: none;
+    background-color: rgba(217, 217, 217, 0.4);
+    border-radius: 10px;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress .progress-line > .progress-line-inner {
+    height: 100%;
+
+    border: none;
+    background-color: var(--second-main-color);
+    border-radius: 10px;
+    transition: width 0.6s ease;;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > span {
+    font-size: .9rem;
+    font-weight: 500;
 }

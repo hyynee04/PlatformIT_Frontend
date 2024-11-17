@@ -90,7 +90,10 @@ const CourseCard = (props) => {
                             <span className='discount-price'>{course.price || "Free"}</span>
                             {/* <span className='initial-price'>300</span> */}
                         </div>
-                        <div className='course-card-period'>{status}</div>
+                        {course.isLimitedTime === 1 && (
+                            <div className='course-card-period'>{status}</div>
+                        )}
+
                     </div>
                 </div>
             </div>

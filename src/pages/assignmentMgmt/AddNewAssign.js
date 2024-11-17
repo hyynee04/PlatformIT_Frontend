@@ -209,9 +209,13 @@ const AddNewAssign = () => {
   };
   return (
     <div>
-      <div className="container-pi">
+      <div className="assign-span">
+        <span>Create new assignment</span>
+      </div>
+
+      <div className="container-assign">
         <div className="container-left-assign">
-          <span className="title-span">Create new assignment</span>
+          <span className="title-span">Detail assignment</span>
           <div className="assign-info">
             <div className="info">
               <span>
@@ -235,7 +239,10 @@ const AddNewAssign = () => {
                   </option>
                   {listCourse.map((course, index) => (
                     <option value={course.title} key={index}>
-                      {course.title}
+                      {course.title}{" "}
+                      {/* <span className="time-label">
+                        {course.isLimitedTime ? "Limit Time" : "Unlimit Time"}
+                      </span> */}
                     </option>
                   ))}
                 </select>

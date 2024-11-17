@@ -3,18 +3,17 @@ import Modal from "react-bootstrap/Modal";
 
 import { FaGooglePlusG } from "react-icons/fa";
 import {
-  LuAlertTriangle,
   LuEye,
   LuEyeOff,
   LuLock,
   LuMail,
-  LuUser,
+  LuUser
 } from "react-icons/lu";
-import { RiFacebookFill } from "react-icons/ri";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/scss/Login.css";
-import { Role, UserStatus, APIStatus } from "../constants/constants";
+import DiagLoginMessageForm from "../components/diag/DiagLoginMessageForm";
+import { APIStatus, Role, UserStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 
@@ -32,6 +31,11 @@ const Login = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const closeLoginNotification = () => {
+    setShowAlert(false);
+    navigate('/login');
+  }
+
   const [message, setMessage] = useState("");
 
   const handleClose = () => setShow(false);
@@ -293,32 +297,13 @@ const Login = () => {
         </div>
       </div>
 
-      <Modal
-        show={showAlert}
-        onHide={() => {
-          setShowAlert(false);
-          navigate("/login");
-        }}
-      >
-        <Modal.Header closeButton>
-          <LuAlertTriangle color="#c00f0c" />
-          <Modal.Title className="red-color">Alert</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="mb-3 justify-margin">{message}</div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="footer-btn send-btn"
-            onClick={() => {
-              setShowAlert(false);
-              navigate("/login");
-            }}
-          >
-            Got it
-          </button>
-        </Modal.Footer>
-      </Modal>
+      {showAlert && (
+        <DiagLoginMessageForm
+          isOpen={showAlert}
+          onClose={closeLoginNotification}
+          message={message}
+        />
+      )}
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>

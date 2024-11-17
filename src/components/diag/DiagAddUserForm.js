@@ -20,10 +20,15 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
-        const response = await postAddTeacher(email, username, password, idCenter);
-        const data = response.data
+        const response = await postAddTeacher(
+          email,
+          username,
+          password,
+          idCenter
+        );
+        const data = response.data;
         console.log(response);
-        
+
         if (response.status !== APIStatus.success) {
           setErrorString(data.message);
         } else {
@@ -43,9 +48,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
           idUserUpdatedBy
         );
         const data = response.data;
-        if (
-          response.status !== APIStatus.success
-        ) {
+        if (response.status !== APIStatus.success) {
           setErrorString(data.message);
         } else {
           onClose();
@@ -106,8 +109,8 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
           <div className="str-btns">
             {errorString && <span className="error-str">{errorString}</span>}
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                Cancle
+              <button className="btn diag-btn cancel" onClick={onClose}>
+                cancel
               </button>
               <button
                 className="btn diag-btn signout"

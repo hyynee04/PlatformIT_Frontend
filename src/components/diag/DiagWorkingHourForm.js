@@ -126,8 +126,8 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
           <div className="str-btns">
             {errorString && <span className="error-str">{errorString}</span>}
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                Cancle
+              <button className="btn diag-btn cancel" onClick={onClose}>
+                cancel
               </button>
               <button
                 className="btn diag-btn signout"

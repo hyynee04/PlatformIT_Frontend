@@ -324,73 +324,8 @@ const ViewAll = () => {
             fetchAllCourseCards();
             fetchAllTeacherCards();
             fetchAllCenterCards();
-        } else if (localStorage.getItem("menuIndex")) {
-            setMenuIndex(localStorage.getItem("menuIndex"));
-
-            fetchAllCourseCards();
-            fetchAllTeacherCards();
-            fetchAllCenterCards();
         }
     }, [])
-
-    // useEffect(() => {
-    //     window.scrollTo(0, 0);
-    //     fetchAllTagModels();
-
-    //     // Check if there is a saved menuIndex in localStorage first
-    //     const savedMenuIndex = localStorage.getItem("menuIndex");
-
-    //     if (savedMenuIndex) {
-    //         // Use the saved menuIndex from localStorage if it exists
-    //         setMenuIndex(Number(savedMenuIndex));
-    //         setStatusPage(1); // Adjust status page if necessary
-    //         fetchAllCourseCards();
-    //         fetchAllTeacherCards();
-    //         fetchAllCenterCards();
-    //     } else {
-    //         // If no saved menuIndex, then check location.state
-    //         const state = location.state;
-
-    //         if (state && state.listContent && state.object) {
-    //             setStatusPage(2);
-    //             if (state.object === Object.course) {
-    //                 setMenuIndex(1);
-    //                 setCourseList(state.listContent);
-    //                 setCurrentCourses(state.listContent);
-    //                 localStorage.setItem("menuIndex", 1); // Save to localStorage
-    //             }
-    //             else if (state.object === Object.teacher) {
-    //                 setMenuIndex(2);
-    //                 setTeacherList(state.listContent);
-    //                 setCurrentTeachers(state.listContent);
-    //                 localStorage.setItem("menuIndex", 2); // Save to localStorage
-    //             }
-    //             else {
-    //                 setMenuIndex(3);
-    //                 setCenterList(state.listContent);
-    //                 setCurrentCenters(state.listContent);
-    //                 localStorage.setItem("menuIndex", 3); // Save to localStorage
-    //             }
-    //         } else if (state && state.object) {
-    //             setStatusPage(1);
-    //             if (state.object === Object.course) {
-    //                 setMenuIndex(1);
-    //                 localStorage.setItem("menuIndex", 1);
-    //             }
-    //             else if (state.object === Object.teacher) {
-    //                 setMenuIndex(2);
-    //                 localStorage.setItem("menuIndex", 2);
-    //             }
-    //             else {
-    //                 setMenuIndex(3);
-    //                 localStorage.setItem("menuIndex", 3);
-    //             }
-    //             fetchAllCourseCards();
-    //             fetchAllTeacherCards();
-    //             fetchAllCenterCards();
-    //         }
-    //     }
-    // }, [location.state]);
 
     useEffect(() => {
         const handleClickOutsideTagBox = (event) => {
@@ -475,7 +410,7 @@ const ViewAll = () => {
                     {menuIndex && menuIndex !== 2 && (
                         <div
                             ref={filterButtonRef}
-                            className="btn"
+                            className="button"
                             onClick={() => {
                                 setActiveFilter(!activeFilter);
                                 setActiveSortby(false);
@@ -488,7 +423,7 @@ const ViewAll = () => {
 
                     <div
                         ref={sortButtonRef}
-                        className="btn"
+                        className="button"
                         onClick={() => {
                             setActiveSortby(!activeSortby);
                             setActiveFilter(false);

@@ -29,7 +29,7 @@ const CenterCard = (props) => {
             }}
         >
             <div className='center-card-container'>
-                <img src={center.avatarPath !== "" ? center.avatarPath : default_image} alt="center image" />
+                <img src={center.avatarPath || default_image} alt="center image" />
                 <div className='center-card-body'>
                     <span className="center-card-title">{center.centerName !== null ? center.centerName : ""}</span>
                     <span className="center-card-quote">

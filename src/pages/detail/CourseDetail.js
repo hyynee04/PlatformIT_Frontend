@@ -16,6 +16,7 @@ import {
     LuCheckSquare,
     LuClock,
     LuFileEdit,
+    LuMail,
     LuMinus,
     LuPlus
 } from "react-icons/lu";
@@ -35,7 +36,7 @@ const CourseDetail = (props) => {
     const [isShowed, setIsShowed] = useState(false);
     const [popupAdd, setPopupAdd] = useState(false)
 
-    const [idRole, setIDRole] = useState("");
+    const [idRole, setIDRole] = useState(4);
     const [idUser, setIDUser] = useState("");
     const [courseInfo, setCourseInfo] = useState({});
     const [menuIndex, setMenuIndex] = useState(1)
@@ -86,8 +87,8 @@ const CourseDetail = (props) => {
 
         const state = location.state;
         if (state) {
-            setIDUser(state.idUser);
-            setIDRole(state.idRole);
+            setIDUser(parseInt(state.idUser));
+            setIDRole(parseInt(state.idRole));
             fetchCourseDetail(state.idCourse);
         }
     }, []);
@@ -122,8 +123,6 @@ const CourseDetail = (props) => {
     };
 
     const paginationNumbers = getPagination();
-
-
 
     return (
         <div className="detail-container">
@@ -354,101 +353,103 @@ const CourseDetail = (props) => {
                     </>
                 )}
 
-
-                <div className="block-container">
-                    <div className="block-container-header">
-                        <span className="block-container-title">Course Content</span>
-                        <span className="block-container-sub-title">
-                            {courseInfo.sectionsWithCourses
-                                ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1 ? "section" : "sections"}`
-                                : "0 section"
-                            } - {`${numberOfLectures} ${numberOfLectures >= 1 ? 'lecture' : 'lectures'}`}
-                        </span>
-                    </div>
-                    {courseInfo.sectionsWithCourses && (
-                        <div className="block-container-col">
-                            {courseInfo.sectionsWithCourses.map((section, index) => (
-                                <div
-                                    key={index}
-                                    className="lecture"
-                                >
-                                    <div className={`lecture-header ${isShowed ? "" : "change-border-radius"} `}>
-                                        <span className="section-name">{section.sectionName}</span>
-                                        <div className="section-info">
-                                            <span className="section-name">
-                                                {section.lectures ? `${section.lectures.length} ${section.lectures.length === 1 ? "lecture" : "lectures"}` : "0 lecture"}
-                                            </span>
-                                            <button
-                                                className="showhide-button"
-                                                onClick={() => handleIsShowed()}
-                                                disabled={section.lectures.length === 0}
-                                            >
-                                                {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {section.lectures && (
+                {idRole !== Role.teacher && (
+                    <>
+                        <div className="block-container">
+                            <div className="block-container-header">
+                                <span className="block-container-title">Course Content</span>
+                                <span className="block-container-sub-title">
+                                    {courseInfo.sectionsWithCourses
+                                        ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1 ? "section" : "sections"}`
+                                        : "0 section"
+                                    } - {`${numberOfLectures} ${numberOfLectures >= 1 ? 'lecture' : 'lectures'}`}
+                                </span>
+                            </div>
+                            {courseInfo.sectionsWithCourses && (
+                                <div className="block-container-col">
+                                    {courseInfo.sectionsWithCourses.map((section, index) => (
                                         <div
-                                            className={`lecture-block ${isShowed ? "" : "adjust-lecture-block"}`}
+                                            key={index}
+                                            className="lecture"
                                         >
-                                            {section.lectures.map((lecture, index) => (
-                                                <div
-                                                    key={index}
-                                                    className={`lecture-content ${isShowed ? "" : "remove-border"} `}
-                                                >
-                                                    <div className="lecture-name">
-                                                        <span className="lecture-title">{lecture.lectureTitle}</span>
-                                                        <span className="lecture-exercise-num">
-                                                            {`${lecture.exerciseCount} ${lecture.exerciseCount > 1 ? 'exercises' : 'exercise'}`}
-                                                        </span>
-                                                    </div>
-                                                    <span className="lecture-description">
-                                                        {lecture.lectureIntroduction}
+                                            <div className={`lecture-header ${isShowed ? "" : "change-border-radius"} `}>
+                                                <span className="section-name">{section.sectionName}</span>
+                                                <div className="section-info">
+                                                    <span className="section-name">
+                                                        {section.lectures ? `${section.lectures.length} ${section.lectures.length === 1 ? "lecture" : "lectures"}` : "0 lecture"}
                                                     </span>
+                                                    <button
+                                                        className="showhide-button"
+                                                        onClick={() => handleIsShowed()}
+                                                        disabled={section.lectures.length === 0}
+                                                    >
+                                                        {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                                                    </button>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {courseInfo.tests && courseInfo.tests.length !== 0 && (
-                    <div className="block-container">
-                        <span className="block-container-title">Test</span>
-                        <div className="block-container-col">
-                            {courseInfo.tests.map((test, index) => (
-                                <div
-                                    key={index}
-                                    className="qualification"
-                                >
-                                    <div className="qualification-body">
-                                        <div className="test-header">
-                                            <span className="test-name">{test.assignmentTitle}</span>
-                                            {idUser && idRole === Role.student && (
-                                                <div className="test-info">Due: 09/15/2024, 23:59</div>
-                                                // <div className="test-info">Submitted <FiCheckSquare /></div>
-                                                // <div className="test-info past-due">Past Due</div>
+                                            </div>
+                                            {section.lectures && (
+                                                <div
+                                                    className={`lecture-block ${isShowed ? "" : "adjust-lecture-block"}`}
+                                                >
+                                                    {section.lectures.map((lecture, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className={`lecture-content ${isShowed ? "" : "remove-border"} `}
+                                                        >
+                                                            <div className="lecture-name">
+                                                                <span className="lecture-title">{lecture.lectureTitle}</span>
+                                                                <span className="lecture-exercise-num">
+                                                                    {`${lecture.exerciseCount} ${lecture.exerciseCount > 1 ? 'exercises' : 'exercise'}`}
+                                                                </span>
+                                                            </div>
+                                                            <span className="lecture-description">
+                                                                {lecture.lectureIntroduction}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
-
-                                        <div className="test-description">
-                                            <span><LuFileEdit /> Manual</span>
-                                            {test.duration && (
-                                                <span><LuClock /> {test.duration} mins</span>
-                                            )}
-                                            <span><LuCheckSquare /> {test.maxScore} marks</span>
-                                            <span><LuCalendar />Due date: 11/20/2024</span>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
-                            ))}
+                            )}
                         </div>
-                    </div>
+
+                        {courseInfo.tests && courseInfo.tests.length !== 0 && (
+                            <div className="block-container">
+                                <span className="block-container-title">Test</span>
+                                <div className="block-container-col">
+                                    {courseInfo.tests.map((test, index) => (
+                                        <div
+                                            key={index}
+                                            className="qualification"
+                                        >
+                                            <div className="qualification-body">
+                                                <div className="test-header">
+                                                    <span className="test-name">{test.assignmentTitle}</span>
+                                                    {idUser && idRole === Role.student && (
+                                                        <div className="test-info">Due: 09/15/2024, 23:59</div>
+                                                        // <div className="test-info">Submitted <FiCheckSquare /></div>
+                                                        // <div className="test-info past-due">Past Due</div>
+                                                    )}
+                                                </div>
+
+                                                <div className="test-description">
+                                                    <span><LuFileEdit /> Manual</span>
+                                                    {test.duration && (
+                                                        <span><LuClock /> {test.duration} mins</span>
+                                                    )}
+                                                    <span><LuCheckSquare /> {test.maxScore} marks</span>
+                                                    <span><LuCalendar />Due date: 11/20/2024</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
-
 
                 {/* Teacher View: Main Content */}
                 {idRole === Role.teacher && menuIndex && menuIndex === 1 && (
@@ -567,6 +568,63 @@ const CourseDetail = (props) => {
                                     onClick={() => setPopupAdd(!popupAdd)}
                                 >Cancel</button>
                                 <button className="post-noification-button post">Post</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Teacher View: Attendace */}
+                {idRole && idRole === Role.teacher && menuIndex && menuIndex === 3 && (
+                    <div className="block-container course-teacher-attendance">
+                        <div className="attendance-progress-container">
+                            <div className="attendance-progress-content">
+                                <div className="attendance-ava">
+                                    <img src={default_ava} />
+                                </div>
+                                <div className="attendance-progress-body">
+                                    <span className="attendance-name">Tian</span>
+                                    <span className="attendance-mail"><LuMail color="#003B57" /> tiannait@snapmail.cc</span>
+                                    <div className="attendance-progress">
+                                        <label>Lectures</label>
+                                        <div className="progress-line">
+                                            <div className="progress-line-inner"></div>
+                                        </div>
+                                        <span className="proportion-number" style={{ width: "20s%" }}>3/15</span>
+                                    </div>
+                                    <div className="attendance-progress">
+                                        <label>Assignments</label>
+                                        <div className="progress-line">
+                                            <div className="progress-line-inner" style={{ width: "53.33%" }}></div>
+                                        </div>
+                                        <span className="proportion-number">8/15</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="attendance-progress-container">
+                            <div className="attendance-progress-content">
+                                <div className="attendance-ava">
+                                    <img src={default_ava} />
+                                </div>
+                                <div className="attendance-progress-body">
+                                    <span className="attendance-name">Ruan</span>
+                                    <span className="attendance-mail"><LuMail color="#003B57" /> tiannait@snapmail.cc</span>
+                                    <div className="attendance-progress">
+                                        <label>Lectures</label>
+                                        <div className="progress-line">
+                                            <div className="progress-line-inner"></div>
+                                        </div>
+                                        <span className="proportion-number" style={{ width: "20s%" }}>3/15</span>
+                                    </div>
+                                    <div className="attendance-progress">
+                                        <label>Assignments</label>
+                                        <div className="progress-line">
+                                            <div className="progress-line-inner" style={{ width: "53.33%" }}></div>
+                                        </div>
+                                        <span className="proportion-number">8/15</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

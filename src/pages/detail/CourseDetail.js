@@ -26,6 +26,7 @@ import StarRatings from 'react-star-ratings';
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
+import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
 import { Role } from "../../constants/constants";
 import { getCourseDetail } from "../../services/courseService";
 
@@ -34,7 +35,11 @@ const CourseDetail = (props) => {
     const navigate = useNavigate();
 
     const [isShowed, setIsShowed] = useState(false);
-    const [popupAdd, setPopupAdd] = useState(false)
+    const [popupAdd, setPopupAdd] = useState(false);
+    const [addSection, setAddSection] = useState(false);
+    const handleOpenAddSection = () => setAddSection(false);
+
+    console.log(">> Course Detail:", addSection)
 
     const [idRole, setIDRole] = useState(4);
     const [idUser, setIDUser] = useState("");
@@ -495,9 +500,20 @@ const CourseDetail = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <button className="add-section-btn">
+                            <button
+                                className="add-section-btn"
+                                onClick={() => setAddSection(true)}
+                            >
                                 <LuPlus /> Add new section
                             </button>
+                            {addSection && (
+                                <DiagAddSectionForm
+                                    isOpen={addSection}
+                                    onClose={() => setAddSection(false)}
+                                    idCourse={courseInfo.idCourse}
+                                    idTeacher={idUser}
+                                />
+                            )}
                         </div>
 
                         <div className="block-container">

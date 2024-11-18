@@ -281,16 +281,16 @@
 }
 
 .modal-container.float-in {
-    animation: slideIn 0.3s ease-in forwards;
+    animation: slideIn 0.3s linear forwards;
 }
 
 @keyframes slideIn {
     0% {
-        transform: translateY(-75%); /* Start off-screen above */
+        transform: translateY(-50%); /* Start off-screen above */
         opacity: 0; /* Fully transparent */
     }
-    80% {
-        transform: translateY(-20%); /* Partially down */
+    90% {
+        transform: translateY(-10%); /* Partially down */
         opacity: 0.5; /* Partially visible */
     }
     100% {

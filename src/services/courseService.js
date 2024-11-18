@@ -3,6 +3,20 @@ import axios from "../utils/axiosCustomize";
 const getAllCourseCards = () => {
   return axios.get("api/Course/GetAllCourseCards");
 };
+const getAllCourseCardsByIdCenter = (idCenter) => {
+  return axios.get("api/Course/GetAllCourseCardsByIdCenter", {
+    params: {
+      idCenter: idCenter,
+    }
+  });
+};
+const getAllCourseCardsByIdTeacher = (idTeacher) => {
+  return axios.get("api/Course/GetAllCourseCardsByIdTeacher", {
+    params: {
+      idTeacher: idTeacher
+    }
+  });
+};
 const getAllTagModel = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
@@ -128,10 +142,9 @@ const postAddManualAssignment = async (dataToSubmit) => {
   }
 };
 export {
-  getAllCourseCards,
+  getAllActiveCourseOfTeacher, getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdTeacher,
   getAllTagModel,
   getCourseDetail,
-  postAddCourse,
-  getAllActiveCourseOfTeacher,
-  postAddManualAssignment,
+  postAddCourse, postAddManualAssignment
 };
+

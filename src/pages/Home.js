@@ -5,12 +5,13 @@ import logoPlait from "../assets/img/logoPlait.png";
 import "../assets/scss/Home.css";
 
 import Carousel from "../components/Carousel";
-import { Object } from "../constants/constants";
+import { Object, Role } from "../constants/constants";
 import { getAllCenterCards } from "../services/centerService";
 import { getAllCourseCards } from "../services/courseService";
 import { getAllTeacherCards } from "../services/userService";
 
-const Home = () => {
+const Home = (props) => {
+  const { role } = props;
   const navigate = useNavigate();
 
   const [listTeacher, setListTeacher] = useState([])
@@ -67,21 +68,25 @@ const Home = () => {
   return (
     <div>
       <div className="home-main-container">
-        <div className="introduction-container">
-          <div className="left-introduction">
-            <span className="introduction-brand-title">WELCOME TO <b>PLAIT</b></span>
-            <span className="introduction-brand-name">Platform for IT Learning</span>
-            <div className="introduction-register">
-              <span>Join us now</span>
-              <button
-                onClick={() => navigate('/register')}
-              >Register</button>
+        {role && (role === Role.guest || role === Role.student) && (
+          <div className="introduction-container">
+            <div className="left-introduction">
+              <span className="introduction-brand-title">WELCOME TO <b>PLAIT</b></span>
+              <span className="introduction-brand-name">Platform for IT Learning</span>
+              {role === Role.guest && (
+                <div className="introduction-register">
+                  <span>Join us now</span>
+                  <button
+                    onClick={() => navigate('/register')}
+                  >Register</button>
+                </div>
+              )}
+            </div>
+            <div className="right-introduction">
+              <img className="rotate " src={logoPlait} alt="logo Plait" />
             </div>
           </div>
-          <div className="right-introduction">
-            <img className="rotate " src={logoPlait} alt="logo Plait" />
-          </div>
-        </div>
+        )}
         <div className="carousel-container">
           <div className='carousel-header'>
             <span>Newest Courses</span>

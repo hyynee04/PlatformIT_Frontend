@@ -37,11 +37,8 @@ const CourseDetail = (props) => {
     const [isShowed, setIsShowed] = useState(false);
     const [popupAdd, setPopupAdd] = useState(false);
     const [addSection, setAddSection] = useState(false);
-    const handleOpenAddSection = () => setAddSection(false);
 
-    console.log(">> Course Detail:", addSection)
-
-    const [idRole, setIDRole] = useState(4);
+    const [idRole, setIDRole] = useState(0);
     const [idUser, setIDUser] = useState("");
     const [courseInfo, setCourseInfo] = useState({});
     const [menuIndex, setMenuIndex] = useState(1)
@@ -78,6 +75,8 @@ const CourseDetail = (props) => {
 
         if (currentDate >= registStart && currentDate <= registEnd) {
             return `Registrating (${formatDate(course.registStartDate)} - ${formatDate(course.registEndDate)})`;
+        } else if (currentDate > registEnd && currentDate < courseStart) {
+            return "End registration"
         } else if (currentDate >= courseStart && currentDate <= courseEnd) {
             return "On going";
         } else if (currentDate > courseEnd) {
@@ -173,7 +172,12 @@ const CourseDetail = (props) => {
                             </span>
                             <span>{courseInfo.introduction}</span>
                         </div>
-                        <button>Buy Now</button>
+                        {new Date() >= new Date(courseInfo.registStartDate) && new Date() <= new Date(courseInfo.registEndDate) ?
+                            <button>Buy Now</button>
+                            :
+                            <button disabled>Can't buy now</button>
+                        }
+
                     </div>
                 </div>
 
@@ -294,7 +298,7 @@ const CourseDetail = (props) => {
 
 
             <div className="right-container">
-                {idUser && idRole && idRole === Role.teacher && (
+                {(idUser && idRole === Role.teacher) ? (
                     <div className="teacher-menu">
                         <button
                             className={`teacher-menu-btn ${menuIndex === 1 ? 'active' : ''}`}
@@ -309,11 +313,11 @@ const CourseDetail = (props) => {
                             onClick={() => setMenuIndex(3)}
                         >Attendance</button>
                     </div>
-                )}
+                ) : null}
 
 
                 {/* Student View */}
-                {idUser && idRole === Role.student && (
+                {(idUser && idRole === Role.student) ? (
                     <>
                         <div className="block-container course-progress-container">
                             <div className="block-container-row">
@@ -345,20 +349,22 @@ const CourseDetail = (props) => {
                             <span className="block-container-title">Notification Board</span>
                             <div className="block-container-col noti-size">
                                 <div className="notification">
-                                    <span className="notification-title">Title</span>
-                                    <span className="notification-content">
-                                        Body text for whatever you’d like to say.
-                                        Add main takeaway points, quotes, anecdotes, or even a very very short story.
-                                    </span>
+                                    <div className="notification-body">
+                                        <span className="notification-title">Title</span>
+                                        <span className="notification-content">
+                                            Body text for whatever you’d like to say.
+                                            Add main takeaway points, quotes, anecdotes, or even a very very short story.
+                                        </span>
 
-                                    <span className="noti-time">13.hr</span>
+                                        <span className="noti-time">13.hr</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </>
-                )}
+                ) : null}
 
-                {idRole !== Role.teacher && (
+                {(idRole !== Role.teacher) ? (
                     <>
                         <div className="block-container">
                             <div className="block-container-header">
@@ -381,7 +387,7 @@ const CourseDetail = (props) => {
                                                 <span className="section-name">{section.sectionName}</span>
                                                 <div className="section-info">
                                                     <span className="section-name">
-                                                        {section.lectures ? `${section.lectures.length} ${section.lectures.length === 1 ? "lecture" : "lectures"}` : "0 lecture"}
+                                                        {section.lectures ? `${section.lectures.length} ${section.lectures.length > 1 ? "lectures" : "lecture"}` : "0 lecture"}
                                                     </span>
                                                     <button
                                                         className="showhide-button"
@@ -454,10 +460,10 @@ const CourseDetail = (props) => {
                             </div>
                         )}
                     </>
-                )}
+                ) : null}
 
                 {/* Teacher View: Main Content */}
-                {idRole === Role.teacher && menuIndex && menuIndex === 1 && (
+                {(idRole === Role.teacher && menuIndex === 1) ? (
                     <>
                         <div className="block-container">
                             <div className="block-container-header">
@@ -541,11 +547,11 @@ const CourseDetail = (props) => {
                             </div>
                         </div>
                     </>
-                )}
+                ) : null}
 
 
                 {/* Teacher View: Notification */}
-                {idRole === Role.teacher && menuIndex && menuIndex === 2 && (
+                {(idRole === Role.teacher && menuIndex === 2) ? (
                     <div className="block-container">
                         <span className="block-container-title">Notification Board</span>
                         <div className="block-container-col noti-size">
@@ -554,7 +560,6 @@ const CourseDetail = (props) => {
                                     <button><LuMinus /></button>
                                 </div>
                                 <div className="notification-body">
-
                                     <span className="notification-title">Title</span>
                                     <span className="notification-content">
                                         Body text for whatever you’d like to say.
@@ -587,10 +592,10 @@ const CourseDetail = (props) => {
                             </div>
                         </div>
                     </div>
-                )}
+                ) : null}
 
-                {/* Teacher View: Attendace */}
-                {idRole && idRole === Role.teacher && menuIndex && menuIndex === 3 && (
+                {/* Teacher View: Attendance */}
+                {(idRole && idRole === Role.teacher && menuIndex && menuIndex === 3) ? (
                     <div className="block-container course-teacher-attendance">
                         <div className="attendance-progress-container">
                             <div className="attendance-progress-content">
@@ -645,7 +650,7 @@ const CourseDetail = (props) => {
                         </div>
 
                     </div>
-                )}
+                ) : null}
 
 
             </div>

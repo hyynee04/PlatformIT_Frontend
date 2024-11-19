@@ -32,7 +32,7 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
           <div className="str-btns">
             <div className="act-btns">
               <button className="btn diag-btn cancel" onClick={onClose}>
-                cancel
+                Cancel
               </button>
               <button
                 className="btn diag-btn signout"

@@ -155,17 +155,43 @@ const AddNewCourse = () => {
   const validateDates = (values) => {
     let registTimeValidate = "";
     let durationValidate = "";
+    const today = new Date().setHours(0, 0, 0, 0);
+    // Kiểm tra không được trước ngày hôm nay
+    if (new Date(values.registStartDate) < today) {
+      registTimeValidate = "Registration start date cannot be before today";
+    }
+    if (new Date(values.registEndDate) < today) {
+      registTimeValidate = "Registration end date cannot be before today";
+    }
+    if (new Date(values.startDate) < today) {
+      durationValidate = "Course start date cannot be before today";
+    }
+    if (new Date(values.endDate) < today) {
+      durationValidate = "Course end date cannot be before today";
+    }
+
     if (new Date(values.registEndDate) < new Date(values.registStartDate)) {
       registTimeValidate =
         "Registration end date cannot be earlier than registration start date";
     }
-    if (new Date(values.registEndDate) > new Date(values.startDate)) {
+    if (
+      new Date(values.registEndDate) > new Date(values.startDate) ||
+      new Date(values.registStartDate) > new Date(values.startDate)
+    ) {
       registTimeValidate =
-        "Registration end date must be before the course start date";
+        "Course start date must be after the registration period";
     }
     if (new Date(values.endDate) < new Date(values.startDate)) {
       durationValidate = "End date cannot be earlier than start date";
     }
+
+    // if (values.startDate && !values.endDate) {
+    //   durationValidate = "Please enter an end date for the course";
+    // }
+    // if (values.endDate && !values.startDate) {
+    //   durationValidate = "Please enter a start date for the course";
+    // }
+
     setFormValues((prev) => ({
       ...prev,
       registTimeValidate,
@@ -267,10 +293,10 @@ const AddNewCourse = () => {
       return false;
     if (
       formValues.isTimeLimited &&
-      (formValues.startDate === null ||
-        formValues.endDate === null ||
-        formValues.registStartDate === null ||
-        formValues.registEndDate === null ||
+      (formValues.startDate === "" ||
+        formValues.endDate === "" ||
+        formValues.registStartDate === "" ||
+        formValues.registEndDate === "" ||
         formValues.registTimeValidate !== "" ||
         formValues.durationValidate !== "")
     )
@@ -301,7 +327,6 @@ const AddNewCourse = () => {
       tags: selectedTags,
       idTeacher: selectedTeacher.idUser,
     };
-    console.log(dataToSubmit);
     try {
       const response = await postAddCourse(dataToSubmit);
       if (response.status === APIStatus.success) {
@@ -328,7 +353,7 @@ const AddNewCourse = () => {
               <div className="container-left">
                 <div className="info">
                   <span>
-                    Course Name <span class="required">*</span>
+                    Course Name <span className="required">*</span>
                   </span>
                   <input
                     type="text"
@@ -348,7 +373,7 @@ const AddNewCourse = () => {
                 </div>
                 <div className="info">
                   <span>
-                    Tag of Course <span class="required">*</span>
+                    Tag of Course <span className="required">*</span>
                     <br />
                     <span className="note-span">
                       You can add a new tag if you can't find the tag you need
@@ -576,7 +601,7 @@ const AddNewCourse = () => {
           </div>
           <div className="container-info auto">
             <span className="title-span">
-              Teacher <span class="required">*</span>
+              Teacher <span className="required">*</span>
             </span>
             {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
             {!showTeacherList && (

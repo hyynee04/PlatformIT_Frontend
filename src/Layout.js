@@ -184,7 +184,7 @@ const Layout = (props) => {
             }
           />
           <Route
-            path="/teacherAssignment"
+            path="/addAssignment"
             element={
               <PrivateRoute>
                 <AddNewAssign />

@@ -9,11 +9,16 @@ import {
 import "../../assets/scss/Assignment.css";
 import {
   getAllActiveCourseOfTeacher,
+  getAllActiveLecturesOfCoure,
+  getAllActiveSectionOfCourse,
   postAddManualAssignment,
 } from "../../services/courseService";
 import NewManualQuestion from "../../components/assigment/NewManualQuestion";
+import { useNavigate } from "react-router-dom";
+import NewQuizQuestion from "../../components/assigment/NewQuizQuestion";
 
 const AddNewAssign = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   //COURSE
   const [listCourse, setListCourse] = useState([]);
@@ -38,27 +43,75 @@ const AddNewAssign = () => {
     setSelectedCourse(course);
   };
 
-  useEffect(() => {
-    if (selectedCourse) {
-      //get all lecture of course
+  const [listSection, setListSection] = useState([]);
+  const [selectedSection, setSelectedSection] = useState({});
 
-      //unlimited course setting: không có manual assignment, bắc buộc phải thuộc 1 lecture nào đó
-      if (selectedCourse.isLimitedTime === 1) {
-        setIsLimitedTimeCourse(true);
-      } else {
-        setIsLimitedTimeCourse(false);
+  useEffect(() => {
+    const fectchSection = async () => {
+      if (selectedCourse && selectedCourse.idCourse) {
+        const response = await getAllActiveSectionOfCourse(
+          selectedCourse.idCourse
+        );
+        if (response.status === APIStatus.success) {
+          const sortedSection = response.data.sort((a, b) =>
+            a.title.localeCompare(b.title)
+          );
+          setListSection(sortedSection);
+        }
+        //unlimited course setting: không có manual assignment, bắc buộc phải thuộc 1 lecture nào đó
+        if (selectedCourse.isLimitedTime === 1) {
+          setIsLimitedTimeCourse(true);
+        } else {
+          setIsLimitedTimeCourse(false);
+        }
       }
-    }
+    };
+    fectchSection();
   }, [selectedCourse]);
+  const handleSectionChange = (event) => {
+    const selectedSectionTitle = event.target.value;
+    const section = listSection.find((c) => c.title === selectedSectionTitle);
+    setSelectedSection(section);
+  };
+
   //IS TEST
   const [isTest, setIsTest] = useState(false);
 
-  //SECTION
-  const [selectedSection, setSelectedSection] = useState(null);
-
   //LECTURE
-  const [selectedLecture, setSelectedLecture] = useState(null);
+  const [listLecture, setListLecture] = useState([]);
+  const [selectedLecture, setSelectedLecture] = useState({});
+  useEffect(() => {
+    const fetchLectures = async () => {
+      if (selectedCourse && selectedCourse.idCourse) {
+        const response = await getAllActiveLecturesOfCoure(
+          selectedCourse.idCourse
+        );
 
+        if (response.status === APIStatus.success) {
+          const selectiveLecture = response.data
+            .sort((a, b) => a.titleLecture.localeCompare(b.titleLecture))
+            .filter(
+              (lecture) => lecture.idSection === selectedSection.idSection
+            );
+          setListLecture(selectiveLecture);
+        }
+        //unlimited course setting: không có manual assignment, bắc buộc phải thuộc 1 lecture nào đó
+        if (selectedCourse.isLimitedTime === 1) {
+          setIsLimitedTimeCourse(true);
+        } else {
+          setIsLimitedTimeCourse(false);
+        }
+      }
+    };
+    fetchLectures();
+  }, [selectedCourse, selectedSection]);
+  const handleLectureChange = (event) => {
+    const selectedLectureTitle = event.target.value;
+    const lecture = listLecture.find(
+      (c) => c.titleLecture === selectedLectureTitle
+    );
+    setSelectedLecture(lecture);
+  };
   //TYPE ASSIGNMENT
   const [typeAssignment, setTypeAssignment] = useState(null);
 
@@ -149,14 +202,23 @@ const AddNewAssign = () => {
       setQuestions([
         ...questions,
         {
-          question: "", //Question
-          mark: "", //Mark
-          assignmentItemAnswerType: AssignmentItemAnswerType.text, //AssignmentItemAnswerType
-          attachedFile: null, //AttachedFile
+          question: "",
+          mark: "",
+          assignmentItemAnswerType: AssignmentItemAnswerType.text,
+          attachedFile: null,
+        },
+      ]);
+    } else if (+typeAssignment === AssignmentType.quiz) {
+      setQuestions([
+        ...questions,
+        {
+          question: "",
+          mark: "",
+          assignmentItemAnswerType: AssignmentItemAnswerType.text,
+          attachedFile: null,
         },
       ]);
     }
-    console.log("Question added:", questions);
   };
   const totalQuestions = questions.length;
 
@@ -185,6 +247,7 @@ const AddNewAssign = () => {
       title: title,
       idCourse: selectedCourse.idCourse,
       isTest: isTest,
+      idLecture: selectedLecture.idLecture,
       startDate: startDate,
       endDate: endDate,
       duration: duration,
@@ -193,9 +256,11 @@ const AddNewAssign = () => {
       isShufflingQuestion: isShufflingQuestion,
       questions: questions,
     };
-    console.log(dataToSubmit);
     try {
-      await postAddManualAssignment(dataToSubmit);
+      const response = await postAddManualAssignment(dataToSubmit);
+      if (response.status === APIStatus.success) {
+        navigate("/teacherAssignment");
+      }
       // await dispatchInfo(fetchCenterProfile());
       // setUpdateStr("Center information has been updated successfully!");
 
@@ -207,6 +272,7 @@ const AddNewAssign = () => {
       throw error;
     }
   };
+
   return (
     <div>
       <div className="assign-span">
@@ -219,7 +285,7 @@ const AddNewAssign = () => {
           <div className="assign-info">
             <div className="info">
               <span>
-                Title<span class="required">*</span>
+                Title<span className="required">*</span>
               </span>
               <input
                 type="text"
@@ -230,7 +296,7 @@ const AddNewAssign = () => {
             </div>
             <div className="info">
               <span>
-                Add to course<span class="required">*</span>
+                Add to course<span className="required">*</span>
               </span>
               <div className="select-container">
                 <select className="input-form-pi" onChange={handleCourseChange}>
@@ -238,8 +304,12 @@ const AddNewAssign = () => {
                     Select a course
                   </option>
                   {listCourse.map((course, index) => (
-                    <option value={course.title} key={index}>
-                      {course.title}{" "}
+                    <option
+                      value={course.title}
+                      key={index}
+                      className="option-container"
+                    >
+                      {course.title}
                       {/* <span className="time-label">
                         {course.isLimitedTime ? "Limit Time" : "Unlimit Time"}
                       </span> */}
@@ -272,22 +342,48 @@ const AddNewAssign = () => {
                     />
                     <span style={{ color: "var(--black-color)" }}>
                       This is an exercise of a lecture.
-                      {!isLimitedTimeCourse && <span class="required">*</span>}
+                      {!isLimitedTimeCourse && (
+                        <span className="required">*</span>
+                      )}
                     </span>
                   </div>
                   <div className="select-container">
-                    <select className="input-form-pi">
+                    <select
+                      className="input-form-pi"
+                      onChange={handleSectionChange}
+                    >
                       <option value="" disabled selected hidden>
                         Section
                       </option>
+                      {listSection.map((section, index) => (
+                        <option
+                          value={section.title}
+                          key={index}
+                          className="option-container"
+                        >
+                          {section.title}
+                        </option>
+                      ))}
                     </select>
                     <FaChevronDown className="arrow-icon" />
                   </div>
                   <div className="select-container">
-                    <select className="input-form-pi">
+                    <select
+                      className="input-form-pi"
+                      onChange={handleLectureChange}
+                    >
                       <option value="" disabled selected hidden>
                         Lecture
                       </option>
+                      {listLecture.map((lecture, index) => (
+                        <option
+                          value={lecture.titleLecture}
+                          key={index}
+                          className="option-container"
+                        >
+                          {lecture.titleLecture}
+                        </option>
+                      ))}
                     </select>
                     <FaChevronDown className="arrow-icon" />
                   </div>
@@ -296,14 +392,16 @@ const AddNewAssign = () => {
                   <div className="container-left">
                     <div className="info">
                       <span>
-                        Type<span class="required">*</span>
+                        Type<span className="required">*</span>
                       </span>
                       <div className="select-container">
                         <select
                           className="input-form-pi"
                           onChange={(e) => setTypeAssignment(e.target.value)}
                         >
-                          <option value="" disabled selected hidden></option>
+                          <option value="" disabled selected hidden>
+                            Select a type
+                          </option>
                           {isLimitedTimeCourse && (
                             <option value={AssignmentType.manual}>
                               Manual
@@ -337,7 +435,7 @@ const AddNewAssign = () => {
                         <input
                           type="number"
                           id="duration"
-                          class="input-form-pi"
+                          className="input-form-pi"
                           min="1"
                           step="1"
                           value={duration}
@@ -410,10 +508,7 @@ const AddNewAssign = () => {
               </button>
             </div>
             <div className="container-button">
-              <button
-                className="btn delete"
-                // onClick={handleDiscardChanges}
-              >
+              <button className="btn delete" onClick={() => navigate(-1)}>
                 Cancel
               </button>
             </div>
@@ -424,7 +519,7 @@ const AddNewAssign = () => {
             Questions{" "}
             <div className="info">
               <span>Question shuffling</span>
-              <label class="switch">
+              <label className="switch">
                 <input
                   type="checkbox"
                   checked={isShufflingQuestion}
@@ -432,12 +527,19 @@ const AddNewAssign = () => {
                     setIsShufflingQuestion(e.target.checked);
                   }}
                 />
-                <span class="slider"></span>
+                <span className="slider"></span>
               </label>
             </div>
           </span>
           {+typeAssignment === AssignmentType.manual && (
             <NewManualQuestion
+              questions={questions}
+              setQuestions={setQuestions}
+              inputFileRef={inputFileRef}
+            />
+          )}
+          {+typeAssignment === AssignmentType.quiz && (
+            <NewQuizQuestion
               questions={questions}
               setQuestions={setQuestions}
               inputFileRef={inputFileRef}

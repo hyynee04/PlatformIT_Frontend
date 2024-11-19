@@ -38,7 +38,7 @@
   padding: 0px;
   font-size: 18px;
   font-weight: 500;
-  border-bottom: 3px solid var(--white-color);
+  /* border-bottom: 3px solid var(--white-color); */
   color: var(--white-color) !important;
   height: fit-content;
 }

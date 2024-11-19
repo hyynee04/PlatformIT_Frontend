@@ -16,18 +16,19 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [errorString, setErrorString] = useState("");
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
       try {
         const response = await postAddTeacher(
+          fullName,
           email,
           username,
           password,
           idCenter
         );
         const data = response.data;
-        console.log(response);
 
         if (response.status !== APIStatus.success) {
           setErrorString(data.message);
@@ -41,6 +42,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
     } else if (roleAdded === Role.centerAdmin) {
       try {
         const response = await postAddCenterAmin(
+          fullName,
           username,
           email,
           password,
@@ -79,25 +81,41 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
           <div className="container-diag-field">
             <div className="left-diag-container">
               <div className="info">
-                <span>Username</span>
-                <input
-                  type="text"
-                  className="input-form-diag"
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div className="info">
-                <span>Email</span>
+                <span>
+                  Email<span className="required">*</span>
+                </span>
                 <input
                   type="text"
                   className="input-form-diag"
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
+              <div className="info">
+                <span>
+                  Username<span className="required">*</span>
+                </span>
+                <input
+                  type="text"
+                  className="input-form-diag"
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
             </div>
             <div className="right-diag-container">
               <div className="info">
-                <span>Password</span>
+                <span>
+                  Fullname<span className="required">*</span>
+                </span>
+                <input
+                  type="text"
+                  className="input-form-diag"
+                  onChange={(e) => setFullName(e.target.value)}
+                />
+              </div>
+              <div className="info">
+                <span>
+                  Password<span className="required">*</span>
+                </span>
                 <input
                   type="text"
                   className="input-form-diag"
@@ -110,10 +128,11 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
             {errorString && <span className="error-str">{errorString}</span>}
             <div className="act-btns">
               <button className="btn diag-btn cancel" onClick={onClose}>
-                cancel
+                Cancel
               </button>
               <button
                 className="btn diag-btn signout"
+                disabled={!email || !fullName || !username || !password}
                 onClick={async () => {
                   await handleAddUser();
                 }}

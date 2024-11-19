@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import "../../assets/scss/card/OptionCard.css";
 import DiagInactiveForm from "../diag/DiagInactiveForm";
@@ -42,6 +42,22 @@ const UserOption = ({
     setIsOptionVisible(false);
     openTransmitModal();
   };
+  // const optionRef = useRef(null);
+  // useEffect(() => {
+  //   console.log("useEffect triggered"); // Kiểm tra xem useEffect có được gọi không
+  //   const handleClickOutside = (event) => {
+  //     console.log("mousedown event triggered"); // Kiểm tra xem sự kiện mousedown có được kích hoạt không
+  //     if (optionRef.current && !optionRef.current.contains(event.target)) {
+  //       onClose(); // Gọi hàm onClose khi click bên ngoài component
+  //     }
+  //   };
+
+  //   document.addEventListener("mousedown", handleClickOutside);
+
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [onClose]);
   return (
     <>
       {isModalInactiveOpen && (
@@ -84,8 +100,9 @@ const UserOption = ({
                 <span>Reactive user</span>
               </button>
             )}
-            {idRole === Role.centerAdmin && roleUserSelected === Role.centerAdmin &&
-              statusUserSelected === UserStatus.active &&  (
+            {idRole === Role.centerAdmin &&
+              roleUserSelected === Role.centerAdmin &&
+              statusUserSelected === UserStatus.active && (
                 <button className="op-buts" onClick={handleTransmitMainAdmin}>
                   <span>Set as Main Admin</span>
                 </button>
@@ -93,16 +110,16 @@ const UserOption = ({
             <button
               className="op-buts"
               onClick={() => {
-                if(roleUserSelected === Role.teacher) 
+                if (roleUserSelected === Role.teacher)
                   navigate("/teacherDetail", {
                     state: {
                       idTeacher: idUserSelected,
                       idRole: localStorage.getItem("idRole"),
-                      idUser: localStorage.getItem("idUser")
+                      idUser: localStorage.getItem("idUser"),
                     },
                   });
-                setIsOptionVisible(false)}
-              }
+                setIsOptionVisible(false);
+              }}
             >
               <span>View detail</span>
             </button>

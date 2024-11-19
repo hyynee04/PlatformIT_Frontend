@@ -75,6 +75,20 @@ const getAllActiveCourseOfTeacher = async () => {
     },
   });
 };
+const getAllActiveSectionOfCourse = async (idCourse) => {
+  return await axios.get("api/Course/GetAllActiveSectionOfCourse", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
+const getAllActiveLecturesOfCoure = async (idCourse) => {
+  return await axios.get("api/Lecture/GetAllActiveLecturesOfCourse", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -84,8 +98,7 @@ const postAddManualAssignment = async (dataToSubmit) => {
 
     if (!dataToSubmit.isTest) {
       formData.append("IsExam", 0);
-      // formData.append("IdLecture", dataToSubmit.idLecture);
-      // formData.append("IdLecture", 13);
+      formData.append("IdLecture", dataToSubmit.idLecture);
     } else {
       formData.append("IsExam", 1);
     }
@@ -130,8 +143,10 @@ const postAddManualAssignment = async (dataToSubmit) => {
 export {
   getAllCourseCards,
   getAllTagModel,
+  getAllActiveSectionOfCourse,
   getCourseDetail,
   postAddCourse,
   getAllActiveCourseOfTeacher,
+  getAllActiveLecturesOfCoure,
   postAddManualAssignment,
 };

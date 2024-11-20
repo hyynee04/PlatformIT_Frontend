@@ -118,16 +118,161 @@
     flex-direction: column;
     gap: 1.5rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part > .part-item {
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part > .part-item,
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display > .exercise-body,
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display > .exercise-sideinfo {
     display: flex;
     flex-direction: column;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .item-title {
-    font-size: 1rem;
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .item-title,
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-body > .item-title {
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--black-color);
 }
 .lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .intro-content {
     font-size: .8rem;
     color: var(--text-gray);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display > .exercise-body {
+    max-width: 75%;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .exercise-display {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-body > .exercise-description {
+    width: 100%;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+    align-items: center;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-description > span {
+    width: fit-content;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: .3rem;
+
+    color: var(--text-gray);
+    font-size: .8rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display > .exercise-sideinfo {
+    justify-content: end;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-sideinfo > span {
+    font-size: .8rem;
+    padding: 2px 8px;
+    border-radius: .25rem;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-sideinfo > span.inform {
+    color: var(--text-gray);
+    background-color: rgba(217 , 217, 217, 0.5);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-sideinfo > span.complete {
+    color: var(--green-color);
+    background-color: rgba(20, 174, 92, 0.3);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.exercise-display .exercise-sideinfo > span.pastdue {
+    color: var(--red-color);
+    background-color: rgba(192, 15, 12, 0.3);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .comment-display {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display > .ava-holder {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .ava-holder > img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display > .comment-content {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content > .comment-entering {
+    width: 100%;
+    /* height: 25px; */
+    font-size: .8rem;
+
+    border: none;
+    border-bottom: 1px solid var(--border-gray);
+    outline: none;
+
+    line-height: 25px;
+    max-height: 150px; 
+    overflow-y: auto; 
+    box-sizing: border-box;
+    resize: none; 
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content > .button-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    gap: 10px;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content .button-container > button {
+    font-size: .8rem;
+    padding: 2px 8px;
+    border: none;
+    border-radius: .25rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content .button-container > button.comment {
+    background-color: var(--main-color);
+    color: var(--white-color);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content .button-container > button.comment:hover {
+    background-color: rgba(57, 121, 121, 0.8);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content .button-container > button.cancel {
+    background-color: transparent;
+    color: var(--text-gray);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-display .comment-content .button-container > button.cancel:hover {
+    background-color: rgba(217 , 217, 217, 0.5);
 }

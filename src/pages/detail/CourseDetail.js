@@ -5,10 +5,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/scss/Detail.css";
 
 import {
-    FaCircle,
     FaDollarSign,
     FaGraduationCap,
-    FaRegFile,
+    FaRegFile
 } from "react-icons/fa6";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
@@ -527,8 +526,8 @@ const CourseDetail = (props) => {
                                                                 </span>
                                                                 <span className="lecture-exercise-num">
                                                                     {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                                                            ? "exercises"
-                                                                            : "exercise"
+                                                                        ? "exercises"
+                                                                        : "exercise"
                                                                         }`}
                                                                 </span>
                                                             </div>
@@ -625,12 +624,6 @@ const CourseDetail = (props) => {
                                                 Body text for whatever you’d like to say.
                                                 Add main takeaway points, quotes, anecdotes, or even a very very short story.
                                             </span>
-                                            <div className="add-exercise">
-                                                <button>
-                                                    <LuPlus />
-                                                    <span className="add-lecture">Add new exercise</span>
-                                                </button>
-                                            </div>
 
                                         </div>
                                         <div className={`lecture-content nohover ${isShowed ? "" : "remove-border"} `}>
@@ -688,7 +681,6 @@ const CourseDetail = (props) => {
                                     </div>
 
                                     <div className="test-status">
-                                        <FaCircle color="#FFCC00" />
                                         <div className="test-status-text">Unpublish</div>
                                     </div>
                                 </div>

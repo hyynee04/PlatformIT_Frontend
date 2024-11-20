@@ -396,7 +396,6 @@ const ViewAll = () => {
                             className={`menu-button ${menuIndex === item.index ? "active" : ""}`}
                             onClick={() => {
                                 setMenuIndex(item.index)
-                                localStorage.setItem("menuIndex", item.index);
                             }}
                         >
                             {item.label}

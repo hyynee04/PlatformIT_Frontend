@@ -5,10 +5,10 @@ import {
   LuMoreHorizontal,
   LuClock4,
   LuFileEdit,
+  LuCheckSquare,
   LuCalendar,
 } from "react-icons/lu";
 import { TiPlus } from "react-icons/ti";
-import { FaRegQuestionCircle } from "react-icons/fa";
 import {
   APIStatus,
   AssignmentStatus,
@@ -173,8 +173,13 @@ const TeacherAssignMgmt = () => {
                   </div>
                 )}
                 <div className="attribute-item">
-                  <FaRegQuestionCircle className="icon-attribute-assign" />
-                  <label htmlFor="">{assignment.questionQuantity}</label>
+                  <LuCheckSquare className="icon-attribute-assign" />
+                  <label htmlFor="">
+                    {assignment.questionQuantity}{" "}
+                    {assignment.questionQuantity > 1
+                      ? " questions"
+                      : "question"}
+                  </label>
                 </div>
               </div>
               <div className="row-item">

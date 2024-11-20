@@ -210,7 +210,19 @@ const AddNewAssign = () => {
   const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
   const [isShowAnswer, setIsShowAnswer] = useState(false);
   const [showOptionQuiz, setShowOptionQuiz] = useState(false);
+  const optionQuizRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (optionQuizRef.current && !optionQuizRef.current.contains(e.target)) {
+        setShowOptionQuiz(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   //QUESTION
   const [questions, setQuestions] = useState([]);
   const inputFileRef = useRef([]);
@@ -576,7 +588,10 @@ const AddNewAssign = () => {
               </div>
             )}
             {showOptionQuiz && (
-              <div className="container-options assign-option">
+              <div
+                className="container-options assign-option"
+                ref={optionQuizRef}
+              >
                 <div className="item">
                   <span>Question shuffling</span>
                   <label className="switch">

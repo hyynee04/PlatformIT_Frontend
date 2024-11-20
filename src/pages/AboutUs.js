@@ -1,12 +1,12 @@
 import React from "react";
 import { PiBuildingOffice, PiStudentFill } from "react-icons/pi";
+import { useNavigate } from "react-router-dom";
 import diverse_courses from "../assets/img/diverse_courses.png";
 import flexible_learning from "../assets/img/flexible_learning.png";
 import interaction from "../assets/img/interaction.png";
 import logoPlait from "../assets/img/logoPlait.png";
 import logoPlait2 from "../assets/img/logoPlait2.png";
 import '../assets/scss/AboutUs.css';
-import { useNavigate } from "react-router-dom";
 
 
 const AboutUs = () => {
@@ -75,7 +75,7 @@ const AboutUs = () => {
             <img src={flexible_learning} />
             <span className="header-content-text">Flexible Learning</span>
             <span className="feature-card-content">
-              Learn anytime and anywhere on your mobile device, 
+              Learn anytime and anywhere on your mobile device,
               giving you convenient access to educational resources and courses.
             </span>
           </div>
@@ -89,11 +89,11 @@ const AboutUs = () => {
           </div>
         </div>
       </div>
-      <div className="join-now">
+      {/* <div className="join-now">
         <span
           onClick={() => navigate('/register')}
         >JOIN US NOW</span>
-      </div>
+      </div> */}
     </>
   );
 };

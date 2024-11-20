@@ -24,12 +24,10 @@ const FilterUser = ({ onFilterChange, onClose }) => {
     });
   };
   useEffect(() => {
-    console.log("useEffect triggered"); // Kiểm tra xem useEffect có được gọi không
     const handleClickOutside = (event) => {
       console.log("mousedown event triggered"); // Kiểm tra xem sự kiện mousedown có được kích hoạt không
       if (filterRef.current && !filterRef.current.contains(event.target)) {
         onClose(); // Gọi hàm onClose khi click bên ngoài component
-        console.log("close"); // Kiểm tra xem onClose có được gọi không
       }
     };
 

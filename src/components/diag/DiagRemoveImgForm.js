@@ -3,7 +3,7 @@ import { LuImageOff, LuX } from "react-icons/lu";
 import { postRemoveAvatar } from "../../services/userService";
 import { fetchUserProfile } from "../../store/profileUserSlice";
 import { useDispatch } from "react-redux";
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 import { fetchCenterProfile } from "../../store/profileCenterSlice";
 
 const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
@@ -49,7 +49,7 @@ const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
 
           <div className="str-btns">
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
+              <button className="btn diag-btn cancel" onClick={onClose}>
                 No
               </button>
               <button

@@ -62,6 +62,7 @@ const postRejectCenter = async (
   }
 };
 const postAddCenterAmin = async (
+  fullName,
   username,
   email,
   password,
@@ -73,6 +74,7 @@ const postAddCenterAmin = async (
       "api/Center/AddCenterAdmin",
       {
         username: username,
+        fullName: fullName,
         email: email,
         password: password,
         idCenter: idCenter,
@@ -88,11 +90,18 @@ const postAddCenterAmin = async (
     console.error("Error adding admin center:", error);
   }
 };
-const postAddTeacher = async (email, username, password, idCenter) => {
+const postAddTeacher = async (
+  fullName,
+  email,
+  username,
+  password,
+  idCenter
+) => {
   try {
     return await axios.post(
       "api/Authen/AddTeacher",
       {
+        fullName: fullName,
         email: email,
         username: username,
         password: password,
@@ -100,7 +109,7 @@ const postAddTeacher = async (email, username, password, idCenter) => {
       },
       {
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
         },
       }
     );

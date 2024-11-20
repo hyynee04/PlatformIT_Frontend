@@ -164,7 +164,7 @@ const PlatformAdCenterMgmt = () => {
 
   return (
     <>
-      <div className="page-user-container">
+      <div className="page-list-container">
         <div className="role-users-group">
           <button
             className={`role-btn ${
@@ -321,6 +321,7 @@ const PlatformAdCenterMgmt = () => {
                   <th style={{ textAlign: "center" }}>No.</th>
                   <th>Center Name</th>
                   <th>Center Email</th>
+                  {/* <th>Center Admin Name</th> */}
                   <th>Center Admin Email</th>
                   <th>TIN</th>
                   <th>Established Date</th>
@@ -349,6 +350,7 @@ const PlatformAdCenterMgmt = () => {
                             <td style={{ textAlign: "center" }}>{count}</td>
                             <td>{center.centerName}</td>
                             <td>{center.centerEmail}</td>
+                            {/* <td>{center.centerAdminName}</td> */}
                             <td>{center.centerAdminEmail}</td>
                             <td>{center.tin}</td>
                             <td>

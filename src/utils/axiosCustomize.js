@@ -2,6 +2,7 @@ import axios from "axios";
 
 const instance = axios.create({
   baseURL: "http://localhost:5000/",
+  // baseURL: "https://localhost:5001/",
 });
 
 // Add a request interceptor
@@ -28,9 +29,7 @@ instance.interceptors.response.use(
     // console.log(">>> error:", error.response);
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    return error && error.response
-      ? error.response
-      : Promise.reject(error);
+    return error && error.response ? error.response : Promise.reject(error);
   }
 );
 

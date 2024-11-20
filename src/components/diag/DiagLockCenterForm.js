@@ -168,7 +168,7 @@ const DiagLockCenterForm = ({
           <div className="str-btns">
             <div className="act-btns">
               <button
-                className="btn diag-btn cancle"
+                className="btn diag-btn cancel"
                 style={{
                   color: "var(--red-color)",
                   border: "1px solid var(--red-color)",

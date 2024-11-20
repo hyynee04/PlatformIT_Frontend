@@ -1,7 +1,7 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
 
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 import { fetchAllUsers, updateUserStatus } from "../../store/userSlice";
 import { useDispatch } from "react-redux";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
@@ -60,7 +60,7 @@ const DiagInactiveForm = ({
 
           <div className="str-btns">
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
+              <button className="btn diag-btn cancel" onClick={onClose}>
                 No
               </button>
               <button

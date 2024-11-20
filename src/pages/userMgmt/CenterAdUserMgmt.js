@@ -155,7 +155,7 @@ const CenterAdUserMgmt = () => {
   }
   return (
     <>
-      <div className="page-user-container">
+      <div className="page-list-container">
         <div className="role-users-group">
           <button
             className={`role-btn ${

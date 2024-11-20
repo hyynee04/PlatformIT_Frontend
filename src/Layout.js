@@ -30,11 +30,11 @@ import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 
-import LectureView from "./components/LectureView";
 import { Role } from "./constants/constants";
 import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
 import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
+import LectureView from "./pages/lectureMgmt/LectureView";
 import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {

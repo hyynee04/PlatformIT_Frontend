@@ -30,11 +30,10 @@ import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 
-
-import LectureView from "./components/LectureView";
 import { Role } from "./constants/constants";
 import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
+import LectureView from "./pages/lectureMgmt/LectureView";
 import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {
@@ -80,7 +79,7 @@ const Layout = (props) => {
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
-          <Route path="/lecture" element={<LectureView />} />
+          <Route path="/viewLecture" element={<LectureView />} />
 
           <Route path="/viewAll" element={<ViewAll />} />
 

@@ -6,8 +6,8 @@ const DiagAddSectionForm = (props) => {
     const { isOpen, onClose, idCourse, idTeacher } = props;
 
     const [sectionTitle, setSectiontitle] = useState("")
-    const [errorString, setErrorString] = useState("This can't work");
-    console.log(">> DiagAddSectionForm:", isOpen)
+    const [errorString, setErrorString] = useState("");
+
     if (!isOpen) return null;
     return (
         <>

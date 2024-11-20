@@ -284,6 +284,10 @@
     animation: slideIn 0.3s linear forwards;
 }
 
+.modal-container.float-out {
+    animation: slideOut 0.3s linear forwards;
+} 
+
 @keyframes slideIn {
     0% {
         transform: translateY(-50%); /* Start off-screen above */
@@ -296,5 +300,20 @@
     100% {
         transform: translateY(0); /* Final position */
         opacity: 1; /* Fully visible */
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateY(0); /* Start in its current position */
+        opacity: 1; /* Fully visible */
+    }
+    10% {
+        transform: translateY(-40%); /* Partially down */
+        opacity: 0.5; /* Partially visible */
+    }
+    100% {
+        transform: translateY(-50%); /* Move off-screen above */
+        opacity: 0; /* Fully transparent */
     }
 }

@@ -30,6 +30,7 @@
     flex-direction: column;
     gap: 1rem;
 
+    background-color: var(--white-color);
     width: 100%;
     min-height: 9rem;
     padding: 1.5rem;
@@ -79,6 +80,7 @@
 .detail-container .left-container 
 .block-container .biography-block > .biography-name.center {
     display: flex;
+    text-align: left;
     justify-content: flex-start;
 }
 
@@ -623,6 +625,11 @@
 }
 
 .detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block > .lecture-content.nohover:hover {
+    background-color: var(--white-color);
+}
+
+.detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block .lecture-content > .lecture-name {
     display: flex;
     flex-direction: row;
@@ -637,27 +644,51 @@
 .block-container-col .lecture .lecture-block .lecture-content .lecture-name > .lecture-title {
     font-size: 1.2rem;
 }
-
 .detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content > .add-lecture-container {
+.block-container-col .lecture .lecture-block .lecture-content > .option-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button {
     display: flex;
     flex-direction: row;
     gap: 5px;
     justify-content: flex-start;
     align-items: center;
+    border: none;
+    border-radius: .25rem;
+    font-size: .8rem;
+    padding: 4px 6px;
 }
 
 .detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > svg {
+.block-container-col .lecture .lecture-block .lecture-content .option-container button > svg {
     height: 1.1rem;
     width: 1.1rem;
 }
 
 .detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > .add-lecture {
-    font-size: 1rem;
-    font-weight: 600;
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.add-lecture {
+    color: var(--main-color);
 }
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.remove-section {
+    color: var(--red-color);
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.add-lecture:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.remove-section:hover {
+    background-color: rgba(192, 15, 12, 0.3);
+} 
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content:hover {
@@ -681,7 +712,7 @@
     padding: .3rem .5rem;
 
     border: none;
-    border-radius: .5rem;
+    border-radius: .25rem;
 }
 
 .detail-container .right-container .block-container .add-section-btn > svg,
@@ -707,6 +738,37 @@
     font-size: .8rem;
     color: var(--text-gray);
 }
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content > .add-exercise {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .add-exercise > button {
+    border: none;
+    border-radius: .25rem;
+    background-color: rgba(217, 217, 217, 0.2);
+    font-size: .8rem;
+    padding: 2px 4px;
+    margin-top: 10px;
+    color: var(--main-color);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .add-exercise > button:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+
 
 .detail-container .right-container .block-container 
 .block-container-col .qualification .qualification-body > .test-header {

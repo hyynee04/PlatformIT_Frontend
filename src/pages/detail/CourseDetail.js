@@ -18,7 +18,8 @@ import {
     LuFileEdit,
     LuMail,
     LuMinus,
-    LuPlus
+    LuPlus,
+    LuTrash2
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
 
@@ -496,11 +497,22 @@ const CourseDetail = (props) => {
                                                 Body text for whatever you’d like to say.
                                                 Add main takeaway points, quotes, anecdotes, or even a very very short story.
                                             </span>
+                                            <div className="add-exercise">
+                                                <button>
+                                                    <LuPlus />
+                                                    <span className="add-lecture">Add new exercise</span>
+                                                </button>
+                                            </div>
+
                                         </div>
-                                        <div className={`lecture-content ${isShowed ? "" : "remove-border"} `}>
-                                            <div className="add-lecture-container">
-                                                <LuPlus />
-                                                <span className="add-lecture">Add new lecture</span>
+                                        <div className={`lecture-content nohover ${isShowed ? "" : "remove-border"} `}>
+                                            <div className="option-container">
+                                                <button className="add-lecture">
+                                                    <LuPlus /> Add new lecture
+                                                </button>
+                                                <button className="remove-section">
+                                                    <LuTrash2 /> Remove this section
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -512,14 +524,13 @@ const CourseDetail = (props) => {
                             >
                                 <LuPlus /> Add new section
                             </button>
-                            {addSection && (
-                                <DiagAddSectionForm
-                                    isOpen={addSection}
-                                    onClose={() => setAddSection(false)}
-                                    idCourse={courseInfo.idCourse}
-                                    idTeacher={idUser}
-                                />
-                            )}
+                            <DiagAddSectionForm
+                                isOpen={addSection}
+                                onClose={() => setAddSection(false)}
+                                idCourse={courseInfo.idCourse}
+                                idTeacher={idUser}
+                            />
+
                         </div>
 
                         <div className="block-container">
@@ -545,6 +556,11 @@ const CourseDetail = (props) => {
                                     </div>
                                 </div>
                             </div>
+                            <button
+                                className="add-section-btn"
+                            >
+                                <LuPlus /> Add new test
+                            </button>
                         </div>
                     </>
                 ) : null}

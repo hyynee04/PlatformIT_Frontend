@@ -585,10 +585,10 @@ const CourseDetail = (props) => {
                             <textarea placeholder="Write your notification content here..."></textarea>
                             <div className="post-button-container">
                                 <button
-                                    className="post-noification-button cancel"
+                                    className="post-notification-button cancel"
                                     onClick={() => setPopupAdd(!popupAdd)}
                                 >Cancel</button>
-                                <button className="post-noification-button post">Post</button>
+                                <button className="post-notification-button post">Post</button>
                             </div>
                         </div>
                     </div>

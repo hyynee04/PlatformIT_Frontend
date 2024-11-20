@@ -1226,14 +1226,14 @@ svg > .CircularProgressbar-text {
 
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button {
     padding: 4px 15px;
     border: none;
     border-radius: .5rem;
     background-color: transparent;
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.post {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button.post {
     background-color: var(--main-color);
     color: var(--white-color);
     font-weight: 500;
@@ -1243,7 +1243,7 @@ svg > .CircularProgressbar-text {
     background-color: rgba(57, 121, 121, 0.8);
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.cancel {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button.cancel {
     color: var(--text-gray);
 }
 

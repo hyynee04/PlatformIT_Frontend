@@ -267,6 +267,13 @@
       margin-top: 5%;
   }
 }
+.modal-dialog > .modal-content {
+  width: fit-content;
+}
+.modal-dialog > .modal-content > .modal-header {
+  background-color: var(--main-color);
+  color: var(--white-color);
+}
 .btn-close:focus {
   box-shadow: none;
 }

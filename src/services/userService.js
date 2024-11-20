@@ -87,15 +87,11 @@ const postUpdateTeacherSpecializedPI = async (
     description: description,
   };
   try {
-    const response = await axios.post(
-      "api/User/UpdateTeacherSpecializedPI",
-      model,
-      {
-        params: {
-          idUpdatedBy: idUser,
-        },
-      }
-    );
+    return await axios.post("api/User/UpdateTeacherSpecializedPI", model, {
+      params: {
+        idUpdatedBy: idUser,
+      },
+    });
   } catch (error) {
     console.error("Error updating teacher info: ", error);
   }
@@ -171,11 +167,15 @@ const postChangeAvatar = async (isChangeAva, avatarFile) => {
       formData.append("IdCenter", idCenter);
     }
     formData.append("AvatarFile", avatarFile);
-    return await axios.post(`api/User/ChangeAvatar?idUpdatedBy=${idUser}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return await axios.post(
+      `api/User/ChangeAvatar?idUpdatedBy=${idUser}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
   } catch (error) {
     console.error(
       "Error changing avatar:",
@@ -235,15 +235,11 @@ const postApproveQualification = async (idUser, idQualification) => {
     idQualification: idQualification,
   };
   try {
-    return await axios.post(
-      "api/User/ApproveQualification",
-      approveQuaModel,
-      {
-        params: {
-          idUpdatedBy: idUpdatedBy,
-        },
-      }
-    );
+    return await axios.post("api/User/ApproveQualification", approveQuaModel, {
+      params: {
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
   } catch (error) {
     console.log("Error approve qualification: ", error);
   }
@@ -256,15 +252,11 @@ const postRejectQualification = async (idUser, idQualification, reason) => {
     reason: reason,
   };
   try {
-    return await axios.post(
-      "api/User/RejectQualification",
-      rejectQuaModel,
-      {
-        params: {
-          idUpdatedBy: idUpdatedBy,
-        },
-      }
-    );
+    return await axios.post("api/User/RejectQualification", rejectQuaModel, {
+      params: {
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
   } catch (error) {
     console.log("Error reject qualification: ", error);
   }

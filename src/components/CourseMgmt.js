@@ -12,11 +12,13 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import "../assets/scss/ViewAll.css";
-import { getAllCourseCards, getAllTagModel } from "../services/courseService";
+import { Role } from "../constants/constants";
+import { getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdTeacher, getAllTagModel } from "../services/courseService";
 import CourseCard from "./Card/CourseCard";
 
 const CourseMgmt = (props) => {
-    const { idCenter } = props;
+    const { role, id } = props;
+    console.log(id)
     const navigate = useNavigate();
 
     const filterButtonRef = useRef(null);
@@ -56,17 +58,18 @@ const CourseMgmt = (props) => {
         setTagList(response.data)
     }
 
-    const fetchAllCourseCardsofCenter = async () => {
-        let response = await getAllCourseCards();
-        if (idCenter) {
-            let list = response.data.filter(course => course.idCenter.toString() === idCenter)
-            setCourseList(list);
-            setCurrentCourses(list)
+    const fetchAllCourseCards = async () => {
+        let response;
+        if (id && role === Role.centerAdmin) {
+            response = await getAllCourseCardsByIdCenter(id);
+        } else if (id && role === Role.teacher) {
+            response = await getAllCourseCardsByIdTeacher(id);
         }
         else {
-            setCourseList(response.data);
-            setCurrentCourses(response.data)
+            response = await getAllCourseCards();
         }
+        setCourseList(response.data);
+        setCurrentCourses(response.data);
     }
 
     const handleSelectTag = (tag) => {
@@ -148,7 +151,7 @@ const CourseMgmt = (props) => {
 
     useEffect(() => {
         fetchAllTagModels();
-        fetchAllCourseCardsofCenter();
+        fetchAllCourseCards();
     }, [])
 
     useEffect(() => {
@@ -218,7 +221,7 @@ const CourseMgmt = (props) => {
                         <span>Sort by</span>
                         <LuChevronDown color="#397979" />
                     </div>
-                    {idCenter && (
+                    {role && role === Role.centerAdmin && (
                         <div
                             className="button add"
                             onClick={() => navigate("/addCourse")}
@@ -476,7 +479,7 @@ const CourseMgmt = (props) => {
                                 key={"course" + course.idCourse}
                                 course={course}
                             />
-                            {idCenter && (
+                            {role === Role.centerAdmin && (
                                 <div className="edit-course-btn">
                                     <button><FiEdit /> Edit</button>
                                 </div>

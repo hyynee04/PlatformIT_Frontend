@@ -160,6 +160,11 @@
     background-color: rgba(57, 121, 121, 0.8);
 }
 
+.detail-container .left-container 
+.block-container .biography-block > button:disabled {
+    background-color: var(--border-gray);
+}
+
 .detail-container .left-container .block-container > .block-container-header,
 .detail-container .right-container .block-container > .block-container-header {
     display: flex;

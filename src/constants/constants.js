@@ -3,6 +3,7 @@ export const Role = {
   centerAdmin: 2,
   student: 3,
   teacher: 4,
+  guest: 5,
 };
 export const UserGender = {
   male: 0,

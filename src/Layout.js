@@ -31,9 +31,10 @@ import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 import TeacherHome from "./pages/home/TeacherHome";
 
-import StudentHome from "./pages/home/StudentHome";
-
+import LectureView from "./components/LectureView";
+import { Role } from "./constants/constants";
 import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
+import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import ViewAll from "./pages/ViewAll";
 import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
 
@@ -47,7 +48,7 @@ const Layout = (props) => {
             index
             element={
               <GuestRoute>
-                <Home />
+                <Home role={Role.guest} />
               </GuestRoute>
             }
           />
@@ -80,6 +81,7 @@ const Layout = (props) => {
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
+          <Route path="/lecture" element={<LectureView />} />
 
           <Route path="/viewAll" element={<ViewAll />} />
 
@@ -171,7 +173,7 @@ const Layout = (props) => {
             path="/teacherHome"
             element={
               <PrivateRoute>
-                <TeacherHome />
+                <Home role={Role.teacher} />
               </PrivateRoute>
             }
           />
@@ -191,13 +193,21 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/teacherCourse"
+            element={
+              <PrivateRoute>
+                <TeacherCourseMgmt />
+              </PrivateRoute>
+            }
+          />
 
           {/* Student */}
           <Route
             path="/studentHome"
             element={
               <PrivateRoute>
-                <StudentHome />
+                <Home role={Role.student} />
               </PrivateRoute>
             }
           />

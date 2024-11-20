@@ -1,6 +1,6 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { resetUserPI } from "../../store/profileUserSlice";

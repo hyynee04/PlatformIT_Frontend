@@ -1,10 +1,14 @@
 import React from "react";
 import CourseMgmt from "../../components/CourseMgmt";
+import { Role } from "../../constants/constants";
 
 const CenterAdCourseMgmt = () => {
   return (
     <>
-      <CourseMgmt idCenter={localStorage.getItem("idCenter")} />
+      <CourseMgmt
+        role={Role.centerAdmin}
+        id={localStorage.getItem("idCenter")}
+      />
     </>
   );
 };

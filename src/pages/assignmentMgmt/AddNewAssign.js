@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { TiPlus } from "react-icons/ti";
+import { LuAlignJustify } from "react-icons/lu";
 import {
   APIStatus,
   AssignmentItemAnswerType,
@@ -12,6 +13,7 @@ import {
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   postAddManualAssignment,
+  postAddQuizAssignment,
 } from "../../services/courseService";
 import NewManualQuestion from "../../components/assigment/NewManualQuestion";
 import { useNavigate } from "react-router-dom";
@@ -44,7 +46,7 @@ const AddNewAssign = () => {
   };
 
   const [listSection, setListSection] = useState([]);
-  const [selectedSection, setSelectedSection] = useState({});
+  const [selectedSection, setSelectedSection] = useState(null);
 
   useEffect(() => {
     const fectchSection = async () => {
@@ -79,7 +81,7 @@ const AddNewAssign = () => {
 
   //LECTURE
   const [listLecture, setListLecture] = useState([]);
-  const [selectedLecture, setSelectedLecture] = useState({});
+  const [selectedLecture, setSelectedLecture] = useState(null);
   useEffect(() => {
     const fetchLectures = async () => {
       if (selectedCourse && selectedCourse.idCourse) {
@@ -122,7 +124,18 @@ const AddNewAssign = () => {
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Hàm kiểm tra endDate không được sớm hơn startDate cộng duration
+  const isStartDateAfterNow = (startDate) => {
+    const currentDate = new Date();
+    const selectedDate = new Date(startDate);
+
+    if (selectedDate <= currentDate) {
+      setErrorMessage("Start date must be in the future.");
+      return false;
+    }
+
+    return true;
+  };
+
   const isEndDateAfterStartDateAndDuration = (startDate, endDate, duration) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -153,6 +166,9 @@ const AddNewAssign = () => {
     return true;
   };
   const validateForm = (startDate, endDate, duration, courseEndDate) => {
+    if (!isStartDateAfterNow(startDate)) {
+      return false;
+    }
     if (startDate && !endDate) {
       setErrorMessage("Please fill in 'Due date' field.");
       return false;
@@ -191,6 +207,9 @@ const AddNewAssign = () => {
 
   //ISSHUFFLINGQUESTION
   const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
+  const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
+  const [isShowAnswer, setIsShowAnswer] = useState(false);
+  const [showOptionQuiz, setShowOptionQuiz] = useState(false);
 
   //QUESTION
   const [questions, setQuestions] = useState([]);
@@ -214,8 +233,15 @@ const AddNewAssign = () => {
         {
           question: "",
           mark: "",
-          assignmentItemAnswerType: AssignmentItemAnswerType.text,
+          explanation: "",
+          isMultipleAnswer: false,
           attachedFile: null,
+          items: [
+            {
+              content: "",
+              isCorrect: false,
+            },
+          ],
         },
       ]);
     }
@@ -238,6 +264,14 @@ const AddNewAssign = () => {
     for (const question of questions) {
       if (!question.question || question.question.trim() === "") return false;
       if (!question.mark || question.mark <= 0) return false;
+      if (+typeAssignment === AssignmentType.quiz) {
+        if (question.items.length < 2) return false;
+        const hasCorrectAnswer = question.items.some((item) => item.isCorrect);
+        if (!hasCorrectAnswer) return false;
+        for (const item of question.items) {
+          if (!item.content || item.content.trim() === "") return false; // Kiểm tra content của từng item
+        }
+      }
     }
     if (!isTest && (!selectedSection || !selectedLecture)) return false;
     return true;
@@ -247,29 +281,33 @@ const AddNewAssign = () => {
       title: title,
       idCourse: selectedCourse.idCourse,
       isTest: isTest,
-      idLecture: selectedLecture.idLecture,
+      idLecture: !isTest ? selectedLecture?.idLecture : null,
       startDate: startDate,
       endDate: endDate,
       duration: duration,
       assignmentType: Number(typeAssignment),
       isPublish: isPublish,
       isShufflingQuestion: isShufflingQuestion,
+      isShufflingAnswer: isShufflingAnswer,
+      isShowAnswer: isShowAnswer,
       questions: questions,
     };
     try {
-      const response = await postAddManualAssignment(dataToSubmit);
-      if (response.status === APIStatus.success) {
-        navigate("/teacherAssignment");
-      }
-      // await dispatchInfo(fetchCenterProfile());
-      // setUpdateStr("Center information has been updated successfully!");
+      let response;
 
-      // setTimeout(() => {
-      //   setUpdateStr("");
-      // }, 3000);
+      if (+typeAssignment === AssignmentType.manual) {
+        response = await postAddManualAssignment(dataToSubmit);
+      } else if (+typeAssignment === AssignmentType.quiz) {
+        response = await postAddQuizAssignment(dataToSubmit);
+      }
+
+      if (response?.status === APIStatus.success) {
+        navigate("/teacherAssignment");
+      } else {
+        console.error("Error adding assignment:", response?.message);
+      }
     } catch (error) {
-      // setUpdateStr("There was an error updating center information.");
-      throw error;
+      console.error("Failed to add assignment:", error);
     }
   };
 
@@ -516,20 +554,70 @@ const AddNewAssign = () => {
         </div>
         <div className="container-right-assign">
           <span className="title-span">
-            Questions{" "}
-            <div className="info">
-              <span>Question shuffling</span>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={isShufflingQuestion}
-                  onChange={(e) => {
-                    setIsShufflingQuestion(e.target.checked);
-                  }}
-                />
-                <span className="slider"></span>
-              </label>
-            </div>
+            Questions
+            {+typeAssignment === AssignmentType.quiz ? (
+              <LuAlignJustify
+                style={{ cursor: "pointer" }}
+                onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+              />
+            ) : (
+              <div className="info">
+                <span>Question shuffling</span>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={isShufflingQuestion}
+                    onChange={(e) => {
+                      setIsShufflingQuestion(e.target.checked);
+                    }}
+                  />
+                  <span className="slider"></span>
+                </label>
+              </div>
+            )}
+            {showOptionQuiz && (
+              <div className="container-options assign-option">
+                <div className="item">
+                  <span>Question shuffling</span>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={isShufflingQuestion}
+                      onChange={(e) => {
+                        setIsShufflingQuestion(e.target.checked);
+                      }}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+                <div className="item">
+                  <span>Answer shuffling</span>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={isShufflingAnswer}
+                      onChange={(e) => {
+                        setIsShufflingAnswer(e.target.checked);
+                      }}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+                <div className="item">
+                  <span>Show answer on submission</span>
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={isShowAnswer}
+                      onChange={(e) => {
+                        setIsShowAnswer(e.target.checked);
+                      }}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+              </div>
+            )}
           </span>
           {+typeAssignment === AssignmentType.manual && (
             <NewManualQuestion

@@ -1,7 +1,7 @@
 import React from "react";
-import { FaChevronDown, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { RiAttachment2 } from "react-icons/ri";
-import { AssignmentItemAnswerType } from "../../constants/constants";
+import { BiPlus } from "react-icons/bi";
 import Form from "react-bootstrap/Form";
 import default_image from "../../assets/img/default_image.png";
 
@@ -40,6 +40,28 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
   const handleQuestionChange = (idx, field, value) => {
     const updatedQuestions = [...questions];
     updatedQuestions[idx][field] = value;
+    setQuestions(updatedQuestions);
+  };
+  const handleAddChoice = (idx) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[idx].items = [
+      ...updatedQuestions[idx].items,
+      { content: "", isCorrect: false },
+    ];
+    setQuestions(updatedQuestions);
+  };
+
+  const handleDeleteChoice = (questionIdx, choiceIdx) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIdx].items = updatedQuestions[
+      questionIdx
+    ].items.filter((_, index) => index !== choiceIdx);
+    setQuestions(updatedQuestions);
+  };
+
+  const handleChoiceChange = (questionIdx, choiceIdx, field, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[questionIdx].items[choiceIdx][field] = value;
     setQuestions(updatedQuestions);
   };
   return (
@@ -119,36 +141,66 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
                       type="checkbox"
                       checked={question.isMultipleAnswer}
                       onChange={(e) => {
-                        //   setIsShufflingQuestion(e.target.checked);
+                        handleQuestionChange(
+                          idx,
+                          "isMultipleAnswer",
+                          e.target.checked
+                        );
                       }}
                     />
                     <span className="slider-mul-anw"></span>
                   </label>
                 </span>
-                <div className="info-in-row">
-                  <label className="radio-choice">
-                    <input type="radio" value="male" />
-                  </label>
-                  <div className="info" style={{ flex: "1" }}>
-                    <input
-                      type="number"
-                      className="input-form-pi"
-                      placeholder="Type a choice"
-                      //   value={question.mark}
-                      //   onChange={(e) =>
-                      //     handleQuestionChange(idx, "mark", e.target.value)
-                      //   }
-                    />
+                {question.items.map((choice, choiceIdx) => (
+                  <div className="info-in-row">
+                    <label className="radio-choice">
+                      <input
+                        type={question.isMultipleAnswer ? "checkbox" : "radio"}
+                        name={`question_${idx}`}
+                        checked={choice.isCorrect}
+                        onChange={(e) =>
+                          handleChoiceChange(
+                            idx,
+                            choiceIdx,
+                            "isCorrect",
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </label>
+                    <div className="info" style={{ flex: "1" }}>
+                      <input
+                        type="text"
+                        className="input-form-pi"
+                        placeholder="Type a choice"
+                        value={choice.content}
+                        onChange={(e) =>
+                          handleChoiceChange(
+                            idx,
+                            choiceIdx,
+                            "content",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                    <button
+                      className="btn del-question"
+                      onClick={() => handleDeleteChoice(idx, choiceIdx)}
+                    >
+                      <FaTrashAlt />
+                    </button>
                   </div>
-                  <button
-                    className="btn del-question"
-                    //   onClick={() => handleDeleteQuestion(idx)}
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
+                ))}
+
                 <div>
-                  <button className="btn">Add new choice</button>
+                  <button
+                    className="btn add-new-choice"
+                    onClick={() => handleAddChoice(idx)}
+                  >
+                    <BiPlus />
+                    Add new choice
+                  </button>
                 </div>
               </div>
             </div>
@@ -168,9 +220,9 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
                     as="textarea"
                     className="input-area-form-pi"
                     placeholder="Explanation"
-                    value={question.question}
+                    value={question.explanation}
                     onChange={(e) =>
-                      handleQuestionChange(idx, "question", e.target.value)
+                      handleQuestionChange(idx, "explanation", e.target.value)
                     }
                   />
                 </div>

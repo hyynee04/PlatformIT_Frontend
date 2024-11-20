@@ -66,7 +66,7 @@ const AddNewCourse = () => {
   }, []);
   const capitalizeWords = (str) =>
     str
-      .toLowerCase()
+      // .toLowerCase()
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
@@ -157,18 +157,18 @@ const AddNewCourse = () => {
     let durationValidate = "";
     const today = new Date().setHours(0, 0, 0, 0);
     // Kiểm tra không được trước ngày hôm nay
-    if (new Date(values.registStartDate) < today) {
-      registTimeValidate = "Registration start date cannot be before today";
-    }
-    if (new Date(values.registEndDate) < today) {
-      registTimeValidate = "Registration end date cannot be before today";
-    }
-    if (new Date(values.startDate) < today) {
-      durationValidate = "Course start date cannot be before today";
-    }
-    if (new Date(values.endDate) < today) {
-      durationValidate = "Course end date cannot be before today";
-    }
+    // if (new Date(values.registStartDate) < today) {
+    //   registTimeValidate = "Registration start date cannot be before today";
+    // }
+    // if (new Date(values.registEndDate) < today) {
+    //   registTimeValidate = "Registration end date cannot be before today";
+    // }
+    // if (new Date(values.startDate) < today) {
+    //   durationValidate = "Course start date cannot be before today";
+    // }
+    // if (new Date(values.endDate) < today) {
+    //   durationValidate = "Course end date cannot be before today";
+    // }
 
     if (new Date(values.registEndDate) < new Date(values.registStartDate)) {
       registTimeValidate =

@@ -27,8 +27,12 @@ import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
 import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
-import { Role } from "../../constants/constants";
-import { getCourseDetail } from "../../services/courseService";
+import { APIStatus, Role } from "../../constants/constants";
+import {
+  getCourseDetail,
+  getIsEnRolledCourse,
+  postEnrollCourse,
+} from "../../services/courseService";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -37,18 +41,25 @@ const CourseDetail = (props) => {
   const [isShowed, setIsShowed] = useState(false);
   const [popupAdd, setPopupAdd] = useState(false);
   const [addSection, setAddSection] = useState(false);
-  const handleOpenAddSection = () => setAddSection(false);
 
-  console.log(">> Course Detail:", addSection);
+  // console.log(">> Course Detail:", addSection);
 
   const [idRole, setIDRole] = useState(4);
   const [idUser, setIDUser] = useState("");
   const [courseInfo, setCourseInfo] = useState({});
   const [menuIndex, setMenuIndex] = useState(1);
 
+  const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const fetchCourseDetail = async (idCourse) => {
     let response = await getCourseDetail(idCourse);
     setCourseInfo(response.data);
+
+    const responseIsEnroll = await getIsEnRolledCourse(idCourse);
+    if (responseIsEnroll.data === true) {
+      setIsEnrolledCourse(true);
+    } else {
+      setIsEnrolledCourse(false);
+    }
   };
 
   const handleIsShowed = () => {
@@ -80,6 +91,8 @@ const CourseDetail = (props) => {
       return `Registrating (${formatDate(
         course.registStartDate
       )} - ${formatDate(course.registEndDate)})`;
+    } else if (currentDate > registEnd && currentDate < courseStart) {
+      return "End registration";
     } else if (currentDate >= courseStart && currentDate <= courseEnd) {
       return "On going";
     } else if (currentDate > courseEnd) {
@@ -147,9 +160,14 @@ const CourseDetail = (props) => {
   const paginationNumbers = getPagination();
 
   //REGIST COURSE
-  const handleRegistCourse = async () => {
+  const handleBuyCourse = async () => {
     let idUser = +localStorage.getItem("idUser");
     if (idUser) {
+      const response = await postEnrollCourse(courseInfo.idCourse);
+      if (response.status === APIStatus.success) {
+        console.log("registed");
+        setIsEnrolledCourse(true);
+      }
     } else {
       navigate("/login");
     }
@@ -211,7 +229,22 @@ const CourseDetail = (props) => {
               </span>
               <span>{courseInfo.introduction}</span>
             </div>
-            <button onClick={handleRegistCourse}>Buy Now</button>
+            {/* {new Date() >= new Date(courseInfo.registStartDate) &&
+            new Date() <= new Date(courseInfo.registEndDate) ? (
+              <button onClick={handleBuyCourse}>Buy Now</button>
+            ) : (
+              <button disabled>Can't buy now</button>
+            )} */}
+
+            {!isEnrolledCourse &&
+              (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
+                <button onClick={handleBuyCourse}>Buy Now</button>
+              ) : new Date() >= new Date(courseInfo.registStartDate) &&
+                new Date() <= new Date(courseInfo.registEndDate) ? (
+                <button onClick={handleBuyCourse}>Buy Now</button>
+              ) : (
+                <button disabled>Can't buy now</button>
+              ))}
           </div>
         </div>
 
@@ -287,7 +320,7 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-          {idUser && idRole === Role.student && (
+          {idUser && idRole === Role.student && isEnrolledCourse && (
             <>
               <button className="chat-button">
                 Chat <RiChat3Line />
@@ -300,7 +333,7 @@ const CourseDetail = (props) => {
           <div className="block-container">
             <div className="block-container-header">
               <span className="block-container-title">Review</span>
-              {idUser && idRole === Role.student && (
+              {idUser && idRole === Role.student && isEnrolledCourse && (
                 <button className="add-review-button">
                   <LuPlus /> Add review
                 </button>
@@ -360,7 +393,7 @@ const CourseDetail = (props) => {
       </div>
 
       <div className="right-container">
-        {idUser && idRole && idRole === Role.teacher && (
+        {idUser && idRole === Role.teacher ? (
           <div className="teacher-menu">
             <button
               className={`teacher-menu-btn ${menuIndex === 1 ? "active" : ""}`}
@@ -381,10 +414,10 @@ const CourseDetail = (props) => {
               Attendance
             </button>
           </div>
-        )}
+        ) : null}
 
         {/* Student View */}
-        {idUser && idRole === Role.student && (
+        {idUser && idRole === Role.student && isEnrolledCourse ? (
           <>
             <div className="block-container course-progress-container">
               <div className="block-container-row">
@@ -416,20 +449,23 @@ const CourseDetail = (props) => {
               <span className="block-container-title">Notification Board</span>
               <div className="block-container-col noti-size">
                 <div className="notification">
-                  <span className="notification-title">Title</span>
-                  <span className="notification-content">
-                    Body text for whatever you’d like to say. Add main takeaway
-                    points, quotes, anecdotes, or even a very very short story.
-                  </span>
+                  <div className="notification-body">
+                    <span className="notification-title">Title</span>
+                    <span className="notification-content">
+                      Body text for whatever you’d like to say. Add main
+                      takeaway points, quotes, anecdotes, or even a very very
+                      short story.
+                    </span>
 
-                  <span className="noti-time">13.hr</span>
+                    <span className="noti-time">13.hr</span>
+                  </div>
                 </div>
               </div>
             </div>
           </>
-        )}
+        ) : null}
 
-        {idRole !== Role.teacher && (
+        {idRole !== Role.teacher ? (
           <>
             <div className="block-container">
               <div className="block-container-header">
@@ -464,9 +500,9 @@ const CourseDetail = (props) => {
                           <span className="section-name">
                             {section.lectures
                               ? `${section.lectures.length} ${
-                                  section.lectures.length === 1
-                                    ? "lecture"
-                                    : "lectures"
+                                  section.lectures.length > 1
+                                    ? "lectures"
+                                    : "lecture"
                                 }`
                               : "0 lecture"}
                           </span>
@@ -561,10 +597,10 @@ const CourseDetail = (props) => {
               </div>
             )}
           </>
-        )}
+        ) : null}
 
         {/* Teacher View: Main Content */}
-        {idRole === Role.teacher && menuIndex && menuIndex === 1 && (
+        {idRole === Role.teacher && menuIndex === 1 ? (
           <>
             <div className="block-container">
               <div className="block-container-header">
@@ -676,10 +712,10 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </>
-        )}
+        ) : null}
 
         {/* Teacher View: Notification */}
-        {idRole === Role.teacher && menuIndex && menuIndex === 2 && (
+        {idRole === Role.teacher && menuIndex === 2 ? (
           <div className="block-container">
             <span className="block-container-title">Notification Board</span>
             <div className="block-container-col noti-size">
@@ -727,10 +763,10 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Teacher View: Attendace */}
-        {idRole && idRole === Role.teacher && menuIndex && menuIndex === 3 && (
+        {/* Teacher View: Attendance */}
+        {idRole && idRole === Role.teacher && menuIndex && menuIndex === 3 ? (
           <div className="block-container course-teacher-attendance">
             <div className="attendance-progress-container">
               <div className="attendance-progress-content">
@@ -804,7 +840,7 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

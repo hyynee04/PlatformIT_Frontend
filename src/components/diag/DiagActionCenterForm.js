@@ -9,7 +9,7 @@ import {
   rejectCenter,
 } from "../../store/listCenterSlice";
 
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 const DiagActionCenterForm = ({
   isOpen,
   onClose,

@@ -16,7 +16,7 @@
   font-family: "Inter", sans-serif;
 }
 
-@keyframes slideIn {
+@keyframes slideToLeft {
   from {
     transform: translateX(25%);
     opacity: 0;
@@ -29,7 +29,7 @@
 
 /* Slide-in CSS class */
 .slide-in {
-  animation: slideIn 0.75s ease-in-out forwards;
+  animation: slideToLeft 0.75s ease-in-out forwards;
 }
 
 .app-container {

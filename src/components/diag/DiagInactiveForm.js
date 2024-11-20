@@ -1,7 +1,7 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
 
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 import { fetchAllUsers, updateUserStatus } from "../../store/userSlice";
 import { useDispatch } from "react-redux";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";

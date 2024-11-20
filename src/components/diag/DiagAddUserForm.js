@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
 import { APIStatus, Role } from "../../constants/constants";
 
-import "../../assets/scss/card/DiagForm.scss";
+import "../../assets/scss/card/DiagForm.css";
 import {
   postAddCenterAmin,
   postAddTeacher,

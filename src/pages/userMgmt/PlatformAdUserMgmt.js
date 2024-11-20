@@ -287,7 +287,6 @@ const PlatformAdUserMgmt = () => {
                 <th style={{ textAlign: "center" }}>No.</th>
                 <th>Full Name</th>
                 <th>Gender</th>
-                <th>Username</th>
                 <th>Email</th>
                 {activeRole !== Role.student && <th>Affiliated Center</th>}
                 {activeRole === Role.centerAdmin && <th>Level</th>}
@@ -302,7 +301,6 @@ const PlatformAdUserMgmt = () => {
                   <td style={{ textAlign: "center" }}>{index + 1}</td>
                   <td>{user.fullName}</td>
                   <td>{renderGender(user.gender)}</td>
-                  <td>{user.username ? user.username : ""}</td>
                   <td>{user.email}</td>
                   {activeRole !== Role.student && <td>{user.centerName}</td>}
                   {activeRole === Role.centerAdmin && (

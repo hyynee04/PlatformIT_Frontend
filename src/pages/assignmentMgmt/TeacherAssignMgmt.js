@@ -1,10 +1,23 @@
-import React, { useState } from "react";
-import { LuChevronDown, LuFilter } from "react-icons/lu";
+import React, { useEffect, useState } from "react";
+import {
+  LuChevronDown,
+  LuFilter,
+  LuMoreHorizontal,
+  LuClock4,
+  LuFileEdit,
+  LuCalendar,
+} from "react-icons/lu";
 import { TiPlus } from "react-icons/ti";
-import { AssignmentStatus } from "../../constants/constants";
+import { FaRegQuestionCircle } from "react-icons/fa";
+import {
+  APIStatus,
+  AssignmentStatus,
+  AssignmentType,
+} from "../../constants/constants";
 import FilterUser from "../../components/FilterUser";
 import SortByUser from "../../components/SortByUser";
 import { useNavigate } from "react-router-dom";
+import { getAllAssignmentCardOfTeacher } from "../../services/courseService";
 
 const TeacherAssignMgmt = () => {
   const [activeStatus, setActiveStatus] = useState(AssignmentStatus.publish);
@@ -14,7 +27,29 @@ const TeacherAssignMgmt = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterVisble, setFilterVisble] = useState(false);
   const [sortByVisible, setSortByVisible] = useState(false);
+  const [listAssignment, setListAssigment] = useState([]);
   const navigate = useNavigate();
+  const fetchAssignment = async () => {
+    const response = await getAllAssignmentCardOfTeacher();
+    if (response.status === APIStatus.success) {
+      setListAssigment(response.data);
+    }
+  };
+  useEffect(() => {
+    fetchAssignment();
+  }, []);
+  const filteredAssignments = listAssignment.filter((assignment) => {
+    if (activeStatus === AssignmentStatus.publish) {
+      return assignment.isPublish === 1;
+    }
+    if (activeStatus === AssignmentStatus.unpublish) {
+      return assignment.isPublish === 0;
+    }
+    if (activeStatus === AssignmentStatus.pastDue) {
+      return assignment.endDate && new Date(assignment.endDate) < new Date();
+    }
+    return true;
+  });
   return (
     <div>
       <div className="page-list-container">
@@ -96,6 +131,68 @@ const TeacherAssignMgmt = () => {
               />
             </button>
           </div>
+        </div>
+        <div className="list-assign-container">
+          {filteredAssignments.map((assignment, index) => (
+            <div className="assign-item" key={index}>
+              <div className="row-item">
+                <span className="title-assign" style={{ fontWeight: "bold" }}>
+                  {assignment.title}
+                </span>
+                <button className="btn">
+                  <LuMoreHorizontal />
+                </button>
+              </div>
+              <div className="attribute-container">
+                <div className="attribute-item">
+                  <LuFileEdit className="icon-attribute-assign" />
+                  <label htmlFor="">
+                    {assignment.assignmentType === AssignmentType.code
+                      ? "Code"
+                      : assignment.assignmentType === AssignmentType.quiz
+                      ? "Quiz"
+                      : "Manual"}
+                  </label>
+                </div>
+                {assignment.duration > 0 && (
+                  <div className="attribute-item">
+                    <LuClock4 className="icon-attribute-assign" />
+                    <label htmlFor="">{assignment.duration} minutes</label>
+                  </div>
+                )}
+                {assignment.startDate && (
+                  <div className="attribute-item">
+                    <LuCalendar className="icon-attribute-assign" />
+                    <label htmlFor="">Due date: {assignment.startDate}</label>
+                  </div>
+                )}
+                {assignment.dueDate && (
+                  <div className="attribute-item">
+                    <LuCalendar className="icon-attribute-assign" />
+                    <label htmlFor="">Due date: {assignment.dueDate}</label>
+                  </div>
+                )}
+                <div className="attribute-item">
+                  <FaRegQuestionCircle className="icon-attribute-assign" />
+                  <label htmlFor="">{assignment.questionQuantity}</label>
+                </div>
+              </div>
+              <div className="row-item">
+                <span
+                  style={{
+                    fontWeight: "400",
+                    color: "var(--text-gray)",
+                    fontSize: "15px",
+                  }}
+                >
+                  Course: {assignment.nameCourse}
+                </span>
+                <span className="isExam-label">
+                  {assignment.isExam ? "Test" : "Exercise"}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

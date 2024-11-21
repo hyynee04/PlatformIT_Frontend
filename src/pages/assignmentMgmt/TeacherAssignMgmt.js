@@ -50,6 +50,17 @@ const TeacherAssignMgmt = () => {
     }
     return true;
   });
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false, // Hiển thị giờ theo định dạng 24h
+    });
+  };
   return (
     <div>
       <div className="page-list-container">
@@ -160,18 +171,6 @@ const TeacherAssignMgmt = () => {
                     <label htmlFor="">{assignment.duration} minutes</label>
                   </div>
                 )}
-                {assignment.startDate && (
-                  <div className="attribute-item">
-                    <LuCalendar className="icon-attribute-assign" />
-                    <label htmlFor="">Due date: {assignment.startDate}</label>
-                  </div>
-                )}
-                {assignment.dueDate && (
-                  <div className="attribute-item">
-                    <LuCalendar className="icon-attribute-assign" />
-                    <label htmlFor="">Due date: {assignment.dueDate}</label>
-                  </div>
-                )}
                 <div className="attribute-item">
                   <LuCheckSquare className="icon-attribute-assign" />
                   <label htmlFor="">
@@ -181,6 +180,22 @@ const TeacherAssignMgmt = () => {
                       : "question"}
                   </label>
                 </div>
+                {assignment.startDate && (
+                  <div className="attribute-item">
+                    <LuCalendar className="icon-attribute-assign" />
+                    <label htmlFor="">
+                      Start date: {formatDateTime(assignment.startDate)}
+                    </label>
+                  </div>
+                )}
+                {assignment.dueDate && (
+                  <div className="attribute-item">
+                    <LuCalendar className="icon-attribute-assign" />
+                    <label htmlFor="">
+                      Due date: {formatDateTime(assignment.dueDate)}
+                    </label>
+                  </div>
+                )}
               </div>
               <div className="row-item">
                 <span

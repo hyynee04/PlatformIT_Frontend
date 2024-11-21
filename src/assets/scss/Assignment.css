@@ -65,6 +65,9 @@
 }
 .list-assign-container {
   margin: 16px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 .list-assign-container .assign-item {
   width: 100%;
@@ -115,9 +118,23 @@
 /* Create New */
 .assign-span {
   padding: 48px 64px 24px;
-
-  font-weight: 800;
   font-size: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.assign-span .name-container {
+  padding: 0 30px;
+}
+.assign-span .name-container .name-sub-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.assign-span .name-course {
+  font-size: 14px;
+  font-weight: 500px;
 }
 .container-assign {
   padding: 0px 64px 48px;

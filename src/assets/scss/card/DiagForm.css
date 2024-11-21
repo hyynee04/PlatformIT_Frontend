@@ -9,7 +9,12 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  /* opacity: 0;
+  transition: opacity 0.3s ease; */
 }
+/* .modal-overlay.show {
+  opacity: 1;
+} */
 .modal-container {
   width: fit-content;
   display: flex;
@@ -21,7 +26,12 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.36), 0 2px 4px rgba(0, 0, 0, 0.06);
   min-width: 360px;
   min-height: 160px;
+  /* transform: translateY(-30px);
+  transition: transform 0.3s ease-in-out; */
 }
+/* .modal-overlay.show .modal-container {
+  transform: translateY(0);
+} */
 
 .modal-container > .diag-header {
   display: flex;
@@ -333,8 +343,8 @@
 }
 
 .modal-container.float-out {
-    animation: slideOut 0.3s linear forwards;
-} 
+  animation: slideOut 0.3s linear forwards;
+}
 
 @keyframes slideIn {
   0% {
@@ -352,16 +362,16 @@
 }
 
 @keyframes slideOut {
-    0% {
-        transform: translateY(0); /* Start in its current position */
-        opacity: 1; /* Fully visible */
-    }
-    10% {
-        transform: translateY(-40%); /* Partially down */
-        opacity: 0.5; /* Partially visible */
-    }
-    100% {
-        transform: translateY(-50%); /* Move off-screen above */
-        opacity: 0; /* Fully transparent */
-    }
+  0% {
+    transform: translateY(0); /* Start in its current position */
+    opacity: 1; /* Fully visible */
+  }
+  10% {
+    transform: translateY(-40%); /* Partially down */
+    opacity: 0.5; /* Partially visible */
+  }
+  100% {
+    transform: translateY(-50%); /* Move off-screen above */
+    opacity: 0; /* Fully transparent */
+  }
 }

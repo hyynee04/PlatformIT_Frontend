@@ -144,7 +144,7 @@ const postAddManualAssignment = async (dataToSubmit) => {
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
-    formData.append("EndDate", dataToSubmit.endDate);
+    formData.append("DueDate", dataToSubmit.endDate);
     formData.append("Duration", dataToSubmit.duration);
     formData.append("AssignmentType", dataToSubmit.assignmentType);
 
@@ -195,7 +195,7 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
-    formData.append("EndDate", dataToSubmit.endDate);
+    formData.append("DueDate", dataToSubmit.endDate);
     formData.append("Duration", dataToSubmit.duration);
     formData.append("AssignmentType", dataToSubmit.assignmentType);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { TiPlus } from "react-icons/ti";
-import { LuAlignJustify } from "react-icons/lu";
+import { LuAlignJustify, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import {
   APIStatus,
   AssignmentItemAnswerType,
@@ -16,23 +16,41 @@ import {
   postAddQuizAssignment,
 } from "../../services/courseService";
 import NewManualQuestion from "../../components/assigment/NewManualQuestion";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import NewQuizQuestion from "../../components/assigment/NewQuizQuestion";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [title, setTitle] = useState("");
   //COURSE
+  const [isAddByCourse, setIsAddByCourse] = useState(false);
+  const [isAddByLecture, setIsAddByLecture] = useState(false);
   const [listCourse, setListCourse] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isLimitedTimeCourse, setIsLimitedTimeCourse] = useState(false);
+  useEffect(() => {
+    const state = location.state;
+    if (state) {
+      if (state.idLecture) {
+        setIsAddByLecture(true);
+        setSelectedLecture(state.idLecture);
+        setIsTest(false);
+      } else if (state.selectedCourse) {
+        setIsAddByCourse(true);
+        setSelectedCourse(state.selectedCourse);
+        setIsTest(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
       const response = await getAllActiveCourseOfTeacher();
       if (response.status === APIStatus.success) {
         const sortedCourses = response.data.sort((a, b) =>
-          a.title.localeCompare(b.title)
+          a.courseTitle.localeCompare(b.courseTitle)
         );
         setListCourse(sortedCourses);
       }
@@ -41,7 +59,9 @@ const AddNewAssign = () => {
   }, []);
   const handleCourseChange = (event) => {
     const selectedCourseTitle = event.target.value;
-    const course = listCourse.find((c) => c.title === selectedCourseTitle);
+    const course = listCourse.find(
+      (c) => c.courseTitle === selectedCourseTitle
+    );
     setSelectedCourse(course);
   };
 
@@ -188,21 +208,25 @@ const AddNewAssign = () => {
   const handleStartDateChange = (e) => {
     const value = e.target.value;
     setStartDate(value);
-    setIsValid(validateForm(value, endDate, duration, selectedCourse.endDate));
+    setIsValid(
+      validateForm(value, endDate, duration, selectedCourse.courseEndDate)
+    );
   };
 
   const handleEndDateChange = (e) => {
     const value = e.target.value;
     setEndDate(value);
     setIsValid(
-      validateForm(startDate, value, duration, selectedCourse.endDate)
+      validateForm(startDate, value, duration, selectedCourse.courseEndDate)
     );
   };
 
   const handleDurationChange = (e) => {
     const value = e.target.value;
     setDuration(value);
-    setIsValid(validateForm(startDate, endDate, value, selectedCourse.endDate));
+    setIsValid(
+      validateForm(startDate, endDate, value, selectedCourse.courseEndDate)
+    );
   };
 
   //ISSHUFFLINGQUESTION
@@ -326,12 +350,38 @@ const AddNewAssign = () => {
   return (
     <div>
       <div className="assign-span">
-        <span>Create new assignment</span>
+        <span
+          onClick={() => navigate(-1)}
+          style={{ cursor: "pointer", fontWeight: "800" }}
+        >
+          <LuChevronLeft strokeWidth={4} />
+          Create new assignment
+        </span>
+        <div className="name-container">
+          {isAddByCourse && (
+            <span className="name-course">{selectedCourse.courseTitle}</span>
+          )}
+          {isAddByLecture && (
+            <div className="name-sub-container">
+              <span className="name-course">Name Course</span>
+              <LuChevronRight className="icon" />
+              <span className="name-course">Name Section</span>
+              <LuChevronRight className="icon" />
+              <span className="name-course">Name Lecture</span>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="container-assign">
         <div className="container-left-assign">
-          <span className="title-span">Detail assignment</span>
+          <span className="title-span">
+            {isAddByLecture
+              ? "Detail exercise"
+              : isAddByCourse
+              ? "Detail test"
+              : "Detail assignment"}
+          </span>
           <div className="assign-info">
             <div className="info">
               <span>
@@ -344,31 +394,37 @@ const AddNewAssign = () => {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div className="info">
-              <span>
-                Add to course<span className="required">*</span>
-              </span>
-              <div className="select-container">
-                <select className="input-form-pi" onChange={handleCourseChange}>
-                  <option value="" disabled selected hidden>
-                    Select a course
-                  </option>
-                  {listCourse.map((course, index) => (
-                    <option
-                      value={course.title}
-                      key={index}
-                      className="option-container"
-                    >
-                      {course.title}
-                      {/* <span className="time-label">
+            {!isAddByCourse && (
+              <div className="info">
+                <span>
+                  Add to course<span className="required">*</span>
+                </span>
+                <div className="select-container">
+                  <select
+                    className="input-form-pi"
+                    onChange={handleCourseChange}
+                  >
+                    <option value="" disabled selected hidden>
+                      Select a course
+                    </option>
+                    {listCourse.map((course, index) => (
+                      <option
+                        value={course.courseTitle}
+                        key={index}
+                        className="option-container"
+                      >
+                        {course.courseTitle}
+                        {/* <span className="time-label">
                         {course.isLimitedTime ? "Limit Time" : "Unlimit Time"}
                       </span> */}
-                    </option>
-                  ))}
-                </select>
-                <FaChevronDown className="arrow-icon" />
+                      </option>
+                    ))}
+                  </select>
+                  <FaChevronDown className="arrow-icon" />
+                </div>
               </div>
-            </div>
+            )}
+
             {selectedCourse && (
               <div
                 style={{
@@ -377,67 +433,70 @@ const AddNewAssign = () => {
                   gap: "24px",
                 }}
               >
-                <div className="info">
-                  <div className="check-container">
-                    <input
-                      type="checkbox"
-                      name="isAttendLimited"
-                      checked={!isLimitedTimeCourse || !isTest} // Nếu không phải limitedTimeCourse thì luôn checked, nếu có thì dựa vào !isTest
-                      disabled={!isLimitedTimeCourse} // Vô hiệu hóa checkbox nếu không phải limitedTimeCourse
-                      onChange={(e) => {
-                        if (isLimitedTimeCourse) {
-                          setIsTest(!e.target.checked); // Cập nhật isTest ngược lại với trạng thái checked của checkbox
-                        }
-                      }}
-                    />
-                    <span style={{ color: "var(--black-color)" }}>
-                      This is an exercise of a lecture.
-                      {!isLimitedTimeCourse && (
-                        <span className="required">*</span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="select-container">
-                    <select
-                      className="input-form-pi"
-                      onChange={handleSectionChange}
-                    >
-                      <option value="" disabled selected hidden>
-                        Section
-                      </option>
-                      {listSection.map((section, index) => (
-                        <option
-                          value={section.title}
-                          key={index}
-                          className="option-container"
-                        >
-                          {section.title}
+                {!isAddByCourse && (
+                  <div className="info">
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isAttendLimited"
+                        checked={!isLimitedTimeCourse || !isTest} // Nếu không phải limitedTimeCourse thì luôn checked, nếu có thì dựa vào !isTest
+                        disabled={!isLimitedTimeCourse} // Vô hiệu hóa checkbox nếu không phải limitedTimeCourse
+                        onChange={(e) => {
+                          if (isLimitedTimeCourse) {
+                            setIsTest(!e.target.checked); // Cập nhật isTest ngược lại với trạng thái checked của checkbox
+                          }
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        This is an exercise of a lecture.
+                        {!isLimitedTimeCourse && (
+                          <span className="required">*</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="select-container">
+                      <select
+                        className="input-form-pi"
+                        onChange={handleSectionChange}
+                      >
+                        <option value="" disabled selected hidden>
+                          Section
                         </option>
-                      ))}
-                    </select>
-                    <FaChevronDown className="arrow-icon" />
-                  </div>
-                  <div className="select-container">
-                    <select
-                      className="input-form-pi"
-                      onChange={handleLectureChange}
-                    >
-                      <option value="" disabled selected hidden>
-                        Lecture
-                      </option>
-                      {listLecture.map((lecture, index) => (
-                        <option
-                          value={lecture.titleLecture}
-                          key={index}
-                          className="option-container"
-                        >
-                          {lecture.titleLecture}
+                        {listSection.map((section, index) => (
+                          <option
+                            value={section.title}
+                            key={index}
+                            className="option-container"
+                          >
+                            {section.title}
+                          </option>
+                        ))}
+                      </select>
+                      <FaChevronDown className="arrow-icon" />
+                    </div>
+                    <div className="select-container">
+                      <select
+                        className="input-form-pi"
+                        onChange={handleLectureChange}
+                      >
+                        <option value="" disabled selected hidden>
+                          Lecture
                         </option>
-                      ))}
-                    </select>
-                    <FaChevronDown className="arrow-icon" />
+                        {listLecture.map((lecture, index) => (
+                          <option
+                            value={lecture.titleLecture}
+                            key={index}
+                            className="option-container"
+                          >
+                            {lecture.titleLecture}
+                          </option>
+                        ))}
+                      </select>
+                      <FaChevronDown className="arrow-icon" />
+                    </div>
                   </div>
-                </div>
+                )}
+
                 <div className="container-field">
                   <div className="container-left">
                     <div className="info">

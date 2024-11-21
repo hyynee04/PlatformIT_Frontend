@@ -27,8 +27,17 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   const fetchWorkingHours = async () => {
     try {
       const response = await getWorkingHours();
-      if (response !== "Center not found or no working hours available.") {
+      if (response.status === APIStatus.success) {
         setWorkingHours(response.data);
+      } else {
+        setWorkingHours(
+          daysOfWeek.map((day) => ({
+            day: day,
+            startTime: "08:30",
+            closeTime: "16:00",
+            isOpen: true,
+          }))
+        );
       }
     } catch (error) {
       throw error;

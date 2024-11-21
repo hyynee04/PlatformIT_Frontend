@@ -272,6 +272,7 @@ const AddNewAssign = () => {
           explanation: "",
           isMultipleAnswer: false,
           attachedFile: null,
+          attachedFilePreview: null,
           items: [
             {
               content: "",
@@ -338,7 +339,17 @@ const AddNewAssign = () => {
       }
 
       if (response?.status === APIStatus.success) {
-        navigate("/teacherAssignment");
+        if (isAddByCourse) {
+          navigate("/courseDetail", {
+            state: {
+              idCourse: selectedCourse.idCourse,
+              idUser: localStorage.getItem("idUser"),
+              idRole: localStorage.getItem("idRole"),
+            },
+          });
+        } else {
+          navigate("/teacherAssignment");
+        }
       } else {
         console.error("Error adding assignment:", response?.message);
       }

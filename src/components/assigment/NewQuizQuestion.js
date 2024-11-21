@@ -30,9 +30,12 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
         alert("Please upload an image file (e.g., .jpg, .png)");
         return;
       }
+      const fileURL = URL.createObjectURL(file);
 
       const updatedQuestions = [...questions];
-      updatedQuestions[idx].attachedFile = URL.createObjectURL(file); // Gắn URL của ảnh để hiển thị
+      // updatedQuestions[idx].attachedFile = URL.createObjectURL(file); // Gắn URL của ảnh để hiển thị
+      updatedQuestions[idx].attachedFilePreview = fileURL;
+      updatedQuestions[idx].attachedFile = file;
       setQuestions(updatedQuestions);
     }
   };
@@ -104,7 +107,7 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
                   <img
                     className="question-img"
                     alt=""
-                    src={question.attachedFile || default_image}
+                    src={question.attachedFilePreview || default_image}
                   />
                   <button className="btn quiz-img-btn attach">
                     <RiAttachment2

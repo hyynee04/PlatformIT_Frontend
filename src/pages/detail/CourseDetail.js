@@ -44,7 +44,7 @@ const CourseDetail = (props) => {
 
     // console.log(">> Course Detail:", addSection);
 
-    const [idRole, setIDRole] = useState(4);
+    const [idRole, setIDRole] = useState(0);
     const [idUser, setIDUser] = useState("");
     const [courseInfo, setCourseInfo] = useState({});
     const [menuIndex, setMenuIndex] = useState(1);
@@ -234,16 +234,20 @@ const CourseDetail = (props) => {
             ) : (
               <button disabled>Can't buy now</button>
             )} */}
+                        {(idRole === Role.student || !idRole) && (
+                            <>
+                                {!isEnrolledCourse &&
+                                    (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
+                                        <button onClick={handleBuyCourse}>Buy Now</button>
+                                    ) : new Date() >= new Date(courseInfo.registStartDate) &&
+                                        new Date() <= new Date(courseInfo.registEndDate) ? (
+                                        <button onClick={handleBuyCourse}>Buy Now</button>
+                                    ) : (
+                                        <button disabled>Can't buy now</button>
+                                    ))}
+                            </>
+                        )}
 
-                        {!isEnrolledCourse &&
-                            (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
-                                <button onClick={handleBuyCourse}>Buy Now</button>
-                            ) : new Date() >= new Date(courseInfo.registStartDate) &&
-                                new Date() <= new Date(courseInfo.registEndDate) ? (
-                                <button onClick={handleBuyCourse}>Buy Now</button>
-                            ) : (
-                                <button disabled>Can't buy now</button>
-                            ))}
                     </div>
                 </div>
 

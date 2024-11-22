@@ -17,6 +17,13 @@ const getAllCourseCardsByIdTeacher = (idTeacher) => {
     },
   });
 };
+const getAllCourseCardsByIdStudent = (idStudent) => {
+  return axios.get("api/Course/GetAllCourseCardsByIdStudent", {
+    params: {
+      idStudent: idStudent,
+    },
+  });
+};
 const getAllTagModel = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
@@ -254,18 +261,9 @@ const postAddQuizAssignment = async (dataToSubmit) => {
   }
 };
 export {
-  getAllCourseCards,
-  getAllCourseCardsByIdCenter,
-  getAllCourseCardsByIdTeacher,
-  getAllTagModel,
-  getAllActiveSectionOfCourse,
-  getCourseDetail,
-  postAddCourse,
-  getIsEnRolledCourse,
-  postEnrollCourse,
   getAllActiveCourseOfTeacher,
-  getAllActiveLecturesOfCoure,
-  getAllAssignmentCardOfTeacher,
-  postAddManualAssignment,
-  postAddQuizAssignment,
+  getAllActiveLecturesOfCoure, getAllActiveSectionOfCourse, getAllAssignmentCardOfTeacher, getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdStudent, getAllCourseCardsByIdTeacher,
+  getAllTagModel, getCourseDetail, getIsEnRolledCourse, postAddCourse, postAddManualAssignment,
+  postAddQuizAssignment, postEnrollCourse
 };
+

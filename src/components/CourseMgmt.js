@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 import "../assets/scss/ViewAll.css";
 import { Role } from "../constants/constants";
-import { getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdTeacher, getAllTagModel } from "../services/courseService";
+import { getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdStudent, getAllCourseCardsByIdTeacher, getAllTagModel } from "../services/courseService";
 import CourseCard from "./Card/CourseCard";
 
 const CourseMgmt = (props) => {
@@ -64,6 +64,8 @@ const CourseMgmt = (props) => {
             response = await getAllCourseCardsByIdCenter(id);
         } else if (id && role === Role.teacher) {
             response = await getAllCourseCardsByIdTeacher(id);
+        } else if (id && role === Role.student) {
+            response = await getAllCourseCardsByIdStudent(id);
         }
         else {
             response = await getAllCourseCards();

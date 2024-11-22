@@ -5,12 +5,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/scss/Detail.css";
 
 import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
   LuCalendar,
   LuCheckSquare,
   LuClock,
   LuFileEdit,
+  LuFileQuestion,
   LuMail,
   LuMinus,
   LuPlus,
@@ -35,6 +37,8 @@ const CourseDetail = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const [isShowed, setIsShowed] = useState(false);
   const [popupAdd, setPopupAdd] = useState(false);
   const [addSection, setAddSection] = useState(false);
@@ -48,14 +52,21 @@ const CourseDetail = (props) => {
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const fetchCourseDetail = async (idCourse) => {
-    let response = await getCourseDetail(idCourse);
-    setCourseInfo(response.data);
+    setLoading(true)
+    try {
+      let response = await getCourseDetail(idCourse);
+      setCourseInfo(response.data);
 
-    const responseIsEnroll = await getIsEnRolledCourse(idCourse);
-    if (responseIsEnroll.data === true) {
-      setIsEnrolledCourse(true);
-    } else {
-      setIsEnrolledCourse(false);
+      const responseIsEnroll = await getIsEnRolledCourse(idCourse);
+      if (responseIsEnroll.data === true) {
+        setIsEnrolledCourse(true);
+      } else {
+        setIsEnrolledCourse(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
 
@@ -175,6 +186,10 @@ const CourseDetail = (props) => {
       navigate("/login");
     }
   };
+  console.log(idRole);
+  if (loading) {
+    return <div className="loading-page"><ImSpinner2 color="#397979" /></div>; // Show loading while waiting for API response
+  }
   return (
     <div className="detail-container">
       <div className="left-container">
@@ -468,22 +483,23 @@ const CourseDetail = (props) => {
 
         {idRole !== Role.teacher ? (
           <>
-            <div className="block-container">
-              <div className="block-container-header">
-                <span className="block-container-title">Course Content</span>
-                <span className="block-container-sub-title">
-                  {courseInfo.sectionsWithCourses
-                    ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
-                      ? "section"
-                      : "sections"
-                    }`
-                    : "0 section"}{" "}
-                  -{" "}
-                  {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
-                    }`}
-                </span>
-              </div>
-              {courseInfo.sectionsWithCourses && (
+            {courseInfo.sectionsWithCourses && courseInfo.sectionsWithCourses.length > 0 && (
+              <div className="block-container">
+                <div className="block-container-header">
+                  <span className="block-container-title">Course Content</span>
+                  <span className="block-container-sub-title">
+                    {courseInfo.sectionsWithCourses
+                      ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
+                        ? "section"
+                        : "sections"
+                      }`
+                      : "0 section"}{" "}
+                    -{" "}
+                    {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
+                      }`}
+                  </span>
+                </div>
+
                 <div className="block-container-col">
                   {courseInfo.sectionsWithCourses.map((section, index) => (
                     <div key={index} className="lecture">
@@ -529,8 +545,8 @@ const CourseDetail = (props) => {
                                 </span>
                                 <span className="lecture-exercise-num">
                                   {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                      ? "exercises"
-                                      : "exercise"
+                                    ? "exercises"
+                                    : "exercise"
                                     }`}
                                 </span>
                               </div>
@@ -544,8 +560,8 @@ const CourseDetail = (props) => {
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {courseInfo.tests && courseInfo.tests.length !== 0 && (
               <div className="block-container">
@@ -577,7 +593,7 @@ const CourseDetail = (props) => {
                             </span>
                           )}
                           <span>
-                            <LuCheckSquare /> {test.maxScore} marks
+                            <LuFileQuestion /> {test.maxScore} questions
                           </span>
                           <span>
                             <LuCalendar />
@@ -589,7 +605,8 @@ const CourseDetail = (props) => {
                   ))}
                 </div>
               </div>
-            )}
+            )
+            }
           </>
         ) : null}
 

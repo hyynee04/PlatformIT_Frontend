@@ -33,6 +33,7 @@ import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 import { Role } from "./constants/constants";
 import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
 import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
+import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import LectureView from "./pages/lectureMgmt/LectureView";
 import ViewAll from "./pages/ViewAll";
@@ -207,6 +208,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <Home role={Role.student} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/studentCourse"
+            element={
+              <PrivateRoute>
+                <StudentCourseMgmt />
               </PrivateRoute>
             }
           />

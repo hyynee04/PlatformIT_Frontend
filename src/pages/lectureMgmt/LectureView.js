@@ -3,11 +3,13 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
     LuCheckSquare,
     LuClock,
-    LuFileEdit
+    LuFileEdit,
+    LuFileQuestion
 } from "react-icons/lu";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/LectureView.css";
+import SectionView from "./SectionView";
 
 const LectureView = (props) => {
     const [index, setIndex] = useState(1);
@@ -132,7 +134,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -153,7 +155,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -174,7 +176,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -301,7 +303,9 @@ const LectureView = (props) => {
                         </div>
 
                     </div>
-                    <div className="course-content-section"></div>
+                    <div className="course-content-section">
+                        <SectionView />
+                    </div>
                 </div>
             </div>
 

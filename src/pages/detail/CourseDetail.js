@@ -470,91 +470,95 @@ const CourseDetail = (props) => {
 
         {idRole !== Role.teacher ? (
           <>
-            <div className="block-container">
-              <div className="block-container-header">
-                <span className="block-container-title">Course Content</span>
-                <span className="block-container-sub-title">
-                  {courseInfo.sectionsWithCourses
-                    ? `${courseInfo.sectionsWithCourses.length} ${
-                        courseInfo.sectionsWithCourses.length === 1
-                          ? "section"
-                          : "sections"
-                      }`
-                    : "0 section"}{" "}
-                  -{" "}
-                  {`${numberOfLectures} ${
-                    numberOfLectures >= 1 ? "lecture" : "lectures"
-                  }`}
-                </span>
-              </div>
-              {courseInfo.sectionsWithCourses && (
-                <div className="block-container-col">
-                  {courseInfo.sectionsWithCourses.map((section, index) => (
-                    <div key={index} className="lecture">
-                      <div
-                        className={`lecture-header ${
-                          isShowed ? "" : "change-border-radius"
-                        } `}
-                      >
-                        <span className="section-name">
-                          {section.sectionName}
-                        </span>
-                        <div className="section-info">
-                          <span className="section-name">
-                            {section.lectures
-                              ? `${section.lectures.length} ${
-                                  section.lectures.length > 1
-                                    ? "lectures"
-                                    : "lecture"
-                                }`
-                              : "0 lecture"}
-                          </span>
-                          <button
-                            className="showhide-button"
-                            onClick={() => handleIsShowed()}
-                            disabled={section.lectures.length === 0}
-                          >
-                            {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                          </button>
-                        </div>
-                      </div>
-                      {section.lectures && (
+            {courseInfo.sectionsWithCourses &&
+              courseInfo.sectionsWithCourses.length > 0 && (
+                <div className="block-container">
+                  <div className="block-container-header">
+                    <span className="block-container-title">
+                      Course Content
+                    </span>
+                    <span className="block-container-sub-title">
+                      {courseInfo.sectionsWithCourses
+                        ? `${courseInfo.sectionsWithCourses.length} ${
+                            courseInfo.sectionsWithCourses.length === 1
+                              ? "section"
+                              : "sections"
+                          }`
+                        : "0 section"}{" "}
+                      -{" "}
+                      {`${numberOfLectures} ${
+                        numberOfLectures >= 1 ? "lecture" : "lectures"
+                      }`}
+                    </span>
+                  </div>
+
+                  <div className="block-container-col">
+                    {courseInfo.sectionsWithCourses.map((section, index) => (
+                      <div key={index} className="lecture">
                         <div
-                          className={`lecture-block ${
-                            isShowed ? "" : "adjust-lecture-block"
-                          }`}
+                          className={`lecture-header ${
+                            isShowed ? "" : "change-border-radius"
+                          } `}
                         >
-                          {section.lectures.map((lecture, index) => (
-                            <div
-                              key={index}
-                              className={`lecture-content ${
-                                isShowed ? "" : "remove-border"
-                              } `}
+                          <span className="section-name">
+                            {section.sectionName}
+                          </span>
+                          <div className="section-info">
+                            <span className="section-name">
+                              {section.lectures
+                                ? `${section.lectures.length} ${
+                                    section.lectures.length > 1
+                                      ? "lectures"
+                                      : "lecture"
+                                  }`
+                                : "0 lecture"}
+                            </span>
+                            <button
+                              className="showhide-button"
+                              onClick={() => handleIsShowed()}
+                              disabled={section.lectures.length === 0}
                             >
-                              <div className="lecture-name">
-                                <span className="lecture-title">
-                                  {lecture.lectureTitle}
-                                </span>
-                                <span className="lecture-exercise-num">
-                                  {`${lecture.exerciseCount} ${
-                                    lecture.exerciseCount > 1
-                                      ? "exercises"
-                                      : "exercise"
-                                  }`}
+                              {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                            </button>
+                          </div>
+                        </div>
+                        {section.lectures && (
+                          <div
+                            className={`lecture-block ${
+                              isShowed ? "" : "adjust-lecture-block"
+                            }`}
+                          >
+                            {section.lectures.map((lecture, index) => (
+                              <div
+                                key={index}
+                                className={`lecture-content ${
+                                  isShowed ? "" : "remove-border"
+                                } `}
+                              >
+                                <div className="lecture-name">
+                                  <span className="lecture-title">
+                                    {lecture.lectureTitle}
+                                  </span>
+                                  <span className="lecture-exercise-num">
+                                    {`${lecture.exerciseCount} ${
+                                      lecture.exerciseCount > 1
+                                        ? "exercises"
+                                        : "exercise"
+                                    }`}
+                                  </span>
+                                </div>
+                                <span className="lecture-description">
+                                  {lecture.lectureIntroduction}
                                 </span>
                               </div>
-                              <span className="lecture-description">
-                                {lecture.lectureIntroduction}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
 
             {courseInfo.tests && courseInfo.tests.length !== 0 && (
               <div className="block-container">

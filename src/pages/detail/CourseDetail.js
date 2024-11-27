@@ -166,25 +166,23 @@ const CourseDetail = (props) => {
     return () => clearInterval(interval);
   }, []);
 
-  const [menuIndex, setMenuIndex] = useState(1);
   useEffect(() => {
-    const savedMenuIndex = localStorage.getItem("menuIndex");
-    if (savedMenuIndex) {
-      setMenuIndex(Number(savedMenuIndex)); // Restore the value if it exists
-    }
-  }, []);
-
-  // Update localStorage whenever menuIndex changes
-  useEffect(() => {
-    localStorage.setItem("menuIndex", menuIndex);
-  }, [menuIndex]);
-
-  useEffect(() => {
-    return () => {
-      // This runs when the component unmounts or route changes
-      localStorage.removeItem("menuIndex");
+    const handleBeforeUnload = () => {
+      // Remove the item if the user refreshes or leaves the page
+      if (location.pathname === "/courseDetail") {
+        localStorage.removeItem("menuIndex");
+      }
     };
-  }, [location]);
+    // Handle refresh scenarios
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      // Handle navigation away from the page
+      if (location.pathname !== "/courseDetail") {
+        localStorage.removeItem("menuIndex");
+      }
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [location.pathname]); // Re-run when the path changes
 
   const reviews = courseInfo?.rateModels || [];
 
@@ -301,7 +299,7 @@ const CourseDetail = (props) => {
                 </>
               ) : (
                 <span className="number-course">
-                  <LuClock color="#757575" /> Create on:{" "}
+                  <LuClock color="#757575" /> Create on:&nbsp;
                   {formatDate(courseInfo.createdDate)}
                 </span>
               )}
@@ -478,8 +476,6 @@ const CourseDetail = (props) => {
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
             fetchCourseDetail={fetchCourseDetail}
-            menuIndex={menuIndex}
-            setMenuIndex={setMenuIndex}
           />) : null}
 
         {/* Student View */}
@@ -658,7 +654,6 @@ const CourseDetail = (props) => {
             }
           </>
         ) : null}
-
       </div>
 
       <div>

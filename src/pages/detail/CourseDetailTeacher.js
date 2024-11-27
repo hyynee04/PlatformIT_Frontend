@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -24,7 +24,7 @@ import { postAddBoardNotificationForCourse } from "../../services/courseService"
 
 
 const CourseDetailTeacher = (props) => {
-    const { courseInfo, idUser, fetchCourseDetail, notificationBoard, setAddedNotification, menuIndex, setMenuIndex } = props;
+    const { courseInfo, idUser, fetchCourseDetail, notificationBoard, setAddedNotification } = props;
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -36,6 +36,18 @@ const CourseDetailTeacher = (props) => {
 
     const [popupAdd, setPopupAdd] = useState(false);
     const [addSection, setAddSection] = useState(false);
+    const [menuIndex, setMenuIndex] = useState(1);
+    useEffect(() => {
+        const savedMenuIndex = localStorage.getItem("menuIndex");
+        if (savedMenuIndex) {
+            setMenuIndex(Number(savedMenuIndex)); // Restore the value if it exists
+        }
+    }, []);
+
+    // Update localStorage whenever menuIndex changes
+    useEffect(() => {
+        localStorage.setItem("menuIndex", menuIndex);
+    }, [menuIndex]);
 
     const menuItems = [
         { label: "Main content", index: 1 },

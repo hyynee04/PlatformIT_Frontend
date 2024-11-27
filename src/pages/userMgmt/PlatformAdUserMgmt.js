@@ -7,6 +7,7 @@ import {
   LuChevronRight,
   LuChevronLeft,
 } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import {
   CenterAdminLevel,
   CenterStatus,
@@ -19,17 +20,13 @@ import FilterUser from "../../components/FilterUser";
 import SortByUser from "../../components/SortByUser";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../../store/userSlice";
-import Spinner from "react-bootstrap/Spinner";
 
 import "../../assets/scss/UserMgmt.css";
 
 const PlatformAdUserMgmt = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const {
-    users = [],
-    loading,
-    error,
-  } = useSelector((state) => state.users || {});
+  const { users = [], error } = useSelector((state) => state.users || {});
   const [activeRole, setActiveRole] = useState(Role.centerAdmin);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,9 +40,19 @@ const PlatformAdUserMgmt = () => {
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
 
+  const fetchListUser = async () => {
+    setLoading(true);
+    try {
+      await dispatch(fetchAllUsers());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
+  };
   useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, [dispatch]);
+    fetchListUser();
+  }, []);
 
   useEffect(() => {
     if (users && users.length > 0) {
@@ -206,6 +213,13 @@ const PlatformAdUserMgmt = () => {
 
   if (error) {
     return <div>Error: {error}</div>;
+  }
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
   }
   return (
     <>

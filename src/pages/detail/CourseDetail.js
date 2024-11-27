@@ -12,7 +12,7 @@ import {
   LuClock,
   LuFileEdit,
   LuFileQuestion,
-  LuPlus
+  LuPlus,
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
 
@@ -26,7 +26,7 @@ import {
   getCourseDetail,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
-  postEnrollCourse
+  postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
 
@@ -53,7 +53,7 @@ const CourseDetail = (props) => {
     }));
   };
   const fetchCourseDetail = async (idCourse) => {
-    setLoading(true)
+    setLoading(true);
     try {
       let response = await getCourseDetail(idCourse);
       setCourseInfo(response.data);
@@ -232,7 +232,7 @@ const CourseDetail = (props) => {
 
   //REGIST COURSE
   const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
-  const [addedNotification, setAddedNotification] = useState(false)
+  const [addedNotification, setAddedNotification] = useState(false);
 
   const openSuccessModal = () => setIsModalSuccessOpen(true);
   const closeSuccessModal = () => setIsModalSuccessOpen(false);
@@ -253,7 +253,11 @@ const CourseDetail = (props) => {
 
   console.log(idRole);
   if (loading) {
-    return <div className="loading-page"><ImSpinner2 color="#397979" /></div>; // Show loading while waiting for API response
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
   }
   return (
     <div className="detail-container">
@@ -468,7 +472,6 @@ const CourseDetail = (props) => {
       </div>
 
       <div className="right-container">
-
         {idUser && idRole === Role.teacher ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
@@ -529,84 +532,90 @@ const CourseDetail = (props) => {
 
         {idRole !== Role.teacher ? (
           <>
-            {courseInfo.sectionsWithCourses && courseInfo.sectionsWithCourses.length > 0 && (
-              <div className="block-container">
-                <div className="block-container-header">
-                  <span className="block-container-title">Course Content</span>
-                  <span className="block-container-sub-title">
-                    {courseInfo.sectionsWithCourses
-                      ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
-                        ? "section"
-                        : "sections"
-                      }`
-                      : "0 section"}{" "}
-                    -{" "}
-                    {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
-                      }`}
-                  </span>
-                </div>
+            {courseInfo.sectionsWithCourses &&
+              courseInfo.sectionsWithCourses.length > 0 && (
+                <div className="block-container">
+                  <div className="block-container-header">
+                    <span className="block-container-title">
+                      Course Content
+                    </span>
+                    <span className="block-container-sub-title">
+                      {courseInfo.sectionsWithCourses
+                        ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
+                          ? "section"
+                          : "sections"
+                        }`
+                        : "0 section"}{" "}
+                      -{" "}
+                      {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
+                        }`}
+                    </span>
+                  </div>
 
-                <div className="block-container-col">
-                  {courseInfo.sectionsWithCourses.map((section, index) => (
-                    <div key={index} className="lecture">
-                      <div
-                        className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
-                          } `}
-                      >
-                        <span className="section-name">
-                          {section.sectionName}
-                        </span>
-                        <div className="section-info">
-                          <span className="section-name">
-                            {section.lectures
-                              ? `${section.lectures.length} ${section.lectures.length > 1
-                                ? "lectures"
-                                : "lecture"
-                              }`
-                              : "0 lecture"}
-                          </span>
-                          <button
-                            className="showhide-button"
-                            onClick={() => handleIsShowed(index)}
-                            disabled={section.lectures.length === 0}
-                          >
-                            {showedSections[index] ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                          </button>
-                        </div>
-                      </div>
-                      {section.lectures && (
+                  <div className="block-container-col">
+                    {courseInfo.sectionsWithCourses.map((section, index) => (
+                      <div key={index} className="lecture">
                         <div
-                          className={`lecture-block ${showedSections[index] ? "" : "adjust-lecture-block"
-                            }`}
+                          className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
+                            } `}
                         >
-                          {section.lectures.map((lecture, index) => (
-                            <div
-                              key={index}
-                              className="lecture-content"
+                          <span className="section-name">
+                            {section.sectionName}
+                          </span>
+                          <div className="section-info">
+                            <span className="section-name">
+                              {section.lectures
+                                ? `${section.lectures.length} ${section.lectures.length > 1
+                                  ? "lectures"
+                                  : "lecture"
+                                }`
+                                : "0 lecture"}
+                            </span>
+                            <button
+                              className="showhide-button"
+                              onClick={() => handleIsShowed(index)}
+                              disabled={section.lectures.length === 0}
                             >
-                              <div className="lecture-name">
-                                <span className="lecture-title">
-                                  {lecture.lectureTitle}
-                                </span>
-                                <span className="lecture-exercise-num">
-                                  {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                    ? "exercises"
-                                    : "exercise"
-                                    }`}
+                              {showedSections[index] ? (
+                                <IoIosArrowUp />
+                              ) : (
+                                <IoIosArrowDown />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                        {section.lectures && (
+                          <div
+                            className={`lecture-block ${showedSections[index]
+                                ? ""
+                                : "adjust-lecture-block"
+                              }`}
+                          >
+                            {section.lectures.map((lecture, index) => (
+                              <div key={index} className="lecture-content">
+                                <div className="lecture-name">
+                                  <span className="lecture-title">
+                                    {lecture.lectureTitle}
+                                  </span>
+                                  <span className="lecture-exercise-num">
+                                    {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
+                                        ? "exercises"
+                                        : "exercise"
+                                      }`}
+                                  </span>
+                                </div>
+                                <span className="lecture-description">
+                                  {lecture.lectureIntroduction}
                                 </span>
                               </div>
-                              <span className="lecture-description">
-                                {lecture.lectureIntroduction}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {courseInfo.tests && courseInfo.tests.length !== 0 && (
               <div className="block-container">
@@ -623,9 +632,9 @@ const CourseDetail = (props) => {
                             <div className="test-info">
                               Due: 09/15/2024, 23:59
                             </div>
-                            // <div className="test-info">Submitted <FiCheckSquare /></div>
+                          ) : // <div className="test-info">Submitted <FiCheckSquare /></div>
                             // <div className="test-info past-due">Past Due</div>
-                          ) : null}
+                            null}
                         </div>
 
                         <div className="test-description">
@@ -650,8 +659,7 @@ const CourseDetail = (props) => {
                   ))}
                 </div>
               </div>
-            )
-            }
+            )}
           </>
         ) : null}
       </div>
@@ -667,12 +675,10 @@ const CourseDetail = (props) => {
         <DiagSuccessfully
           isOpen={addedNotification}
           onClose={() => setAddedNotification(false)}
-          notification={
-            "Successfully post a new notification to board."
-          }
+          notification={"Successfully post a new notification to board."}
         />
       </div>
-    </div >
+    </div>
   );
 };
 

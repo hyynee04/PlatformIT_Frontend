@@ -6,12 +6,12 @@ const DiagSuccessfully = ({ isOpen, onClose, notification }) => {
     if (isOpen) {
       setShow(true);
       const timer = setTimeout(() => {
-        onClose(); // Đóng modal sau 3 giây
+        onClose();
       }, 3000);
 
       return () => clearTimeout(timer);
     } else {
-      setShow(false); // Ẩn modal khi isOpen là false
+      setShow(false);
     }
   }, [isOpen, onClose]);
   if (!isOpen && !show) return null;

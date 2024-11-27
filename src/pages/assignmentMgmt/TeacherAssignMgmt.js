@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   LuChevronDown,
   LuFilter,
@@ -7,49 +7,92 @@ import {
   LuFileEdit,
   LuCheckSquare,
   LuCalendar,
+  LuChevronRight,
+  LuMinusCircle,
+  LuX,
 } from "react-icons/lu";
+import { FaTrashAlt } from "react-icons/fa";
 import { TiPlus } from "react-icons/ti";
+import { MdPublish } from "react-icons/md";
+import { IoDuplicateSharp } from "react-icons/io5";
+import { ImSpinner2 } from "react-icons/im";
 import {
   APIStatus,
   AssignmentStatus,
   AssignmentType,
 } from "../../constants/constants";
-import FilterUser from "../../components/FilterUser";
-import SortByUser from "../../components/SortByUser";
 import { useNavigate } from "react-router-dom";
-import { getAllAssignmentCardOfTeacher } from "../../services/courseService";
+import {
+  deleteAssignment,
+  getAllAssignmentCardOfTeacher,
+} from "../../services/courseService";
 
 const TeacherAssignMgmt = () => {
+  const [loading, setLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState(AssignmentStatus.publish);
-  const handleStatusClick = (status) => {
-    setActiveStatus(status);
-  };
+
   const [searchTerm, setSearchTerm] = useState("");
+
+  //FILTER
   const [filterVisble, setFilterVisble] = useState(false);
+  const filterRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setFilterVisble(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [filterRef]);
+
+  const [isTest, setIsTest] = useState("all");
+  const [assignmentType, setAssignmentType] = useState("all");
+
+  const [tempIsTest, setTempIsTest] = useState("all");
+  const [tempAssignmentType, setTempAssignmentType] = useState("all");
+
+  //SORT BY
   const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortByRef.current && !sortByRef.current.contains(event.target)) {
+        setSortByVisible(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sortByRef]);
+  const [sortField, setSortField] = useState("createdDate");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  const [tempSortField, setTempSortField] = useState("createdDate");
+  const [tempSortOrder, setTempSortOrder] = useState("desc");
+  //LIST ASSIGNMENT
   const [listAssignment, setListAssigment] = useState([]);
+
   const navigate = useNavigate();
   const fetchAssignment = async () => {
-    const response = await getAllAssignmentCardOfTeacher();
-    if (response.status === APIStatus.success) {
-      setListAssigment(response.data);
+    setLoading(true);
+    try {
+      const response = await getAllAssignmentCardOfTeacher();
+      if (response.status === APIStatus.success) {
+        setListAssigment(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
   useEffect(() => {
     fetchAssignment();
   }, []);
-  const filteredAssignments = listAssignment.filter((assignment) => {
-    if (activeStatus === AssignmentStatus.publish) {
-      return assignment.isPublish === 1;
-    }
-    if (activeStatus === AssignmentStatus.unpublish) {
-      return assignment.isPublish === 0;
-    }
-    if (activeStatus === AssignmentStatus.pastDue) {
-      return assignment.endDate && new Date(assignment.endDate) < new Date();
-    }
-    return true;
-  });
   const formatDateTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
@@ -61,6 +104,190 @@ const TeacherAssignMgmt = () => {
       hour12: false, // Hiển thị giờ theo định dạng 24h
     });
   };
+  const filteredAssignments = listAssignment
+    .filter((assignment) => {
+      if (activeStatus === AssignmentStatus.publish) {
+        return assignment.isPublish === 1;
+      }
+      if (activeStatus === AssignmentStatus.unpublish) {
+        return assignment.isPublish === 0;
+      }
+      if (activeStatus === AssignmentStatus.pastDue) {
+        return (
+          assignment.isPastDue === 1 ||
+          (assignment.endDate && new Date(assignment.endDate) < new Date())
+        );
+      }
+      return true;
+    })
+    .filter((assignment) => {
+      if (isTest !== "all" && assignment.isTest !== Number(isTest)) {
+        return false;
+      }
+      if (
+        assignmentType !== "all" &&
+        assignment.assignmentType !== assignmentType
+      ) {
+        return false;
+      }
+
+      return true;
+    })
+    .filter((assignment) => {
+      // Tìm kiếm theo searchTerm (theo tiêu đề)
+      const searchLower = searchTerm.toLowerCase().trim();
+      if (
+        searchTerm &&
+        !(
+          (assignment.nameLecture &&
+            assignment.nameLecture.toLowerCase().includes(searchLower)) ||
+          (assignment.nameCourse &&
+            assignment.nameCourse.toLowerCase().includes(searchLower)) ||
+          (assignment.assignmentType &&
+            (assignment.assignmentType === AssignmentType.manual
+              ? "Manual"
+              : assignment.assignmentType === AssignmentType.quiz
+              ? "Quiz"
+              : "Code"
+            )
+              .toLowerCase()
+              .includes(searchTerm)) ||
+          assignment.title.toLowerCase().includes(searchLower) ||
+          (assignment.duration &&
+            String(assignment.duration).includes(searchLower)) ||
+          (assignment.questionQuantity &&
+            String(assignment.questionQuantity).includes(searchLower)) ||
+          (assignment.startDate &&
+            formatDateTime(assignment.startDate)
+              .toLowerCase()
+              .includes(searchLower)) ||
+          (assignment.dueDate &&
+            formatDateTime(assignment.dueDate)
+              .toLowerCase()
+              .includes(searchLower)) ||
+          (assignment.isTest === 1 ? "Test" : "Exercise")
+            .toLowerCase()
+            .includes(searchLower)
+        )
+      ) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortField === "createdDate") {
+        aValue = new Date(a.createdDate) || new Date(0);
+        bValue = new Date(b.createdDate) || new Date(0);
+      } else if (sortField === "startDate") {
+        aValue = new Date(a.startDate) || new Date(0);
+        bValue = new Date(b.startDate) || new Date(0);
+      } else if (sortField === "dueDate") {
+        aValue = new Date(a.dueDate) || new Date(0);
+        bValue = new Date(b.dueDate) || new Date(0);
+      }
+
+      return sortOrder === "asc"
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
+    });
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-GB", {
+      weekday: "long",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  //CREATED DATE
+  const groupedAssignments = useMemo(() => {
+    if (filteredAssignments.length === 0) return [];
+
+    // Nhóm assignments theo ngày
+    const grouped = filteredAssignments.reduce((acc, assignment) => {
+      const formattedDate = formatDate(assignment.createdDate); // Định dạng ngày
+      if (!acc[formattedDate]) {
+        acc[formattedDate] = [];
+      }
+      acc[formattedDate].push(assignment); // Thêm assignment vào nhóm có ngày giống nhau
+      return acc;
+    }, {});
+
+    // Chuyển grouped thành mảng có thứ tự theo ngày
+    return Object.entries(grouped).map(([date, assignments]) => ({
+      date,
+      assignments,
+    }));
+  }, [filteredAssignments]);
+
+  const handleStatusClick = (status) => {
+    setActiveStatus(status);
+    setSearchTerm("");
+    setSortField("createdDate");
+    setTempSortField("createdDate");
+
+    setSortOrder("desc");
+    setTempSortOrder("desc");
+
+    setIsTest("all");
+    setTempIsTest("all");
+
+    setAssignmentType("all");
+    setTempAssignmentType("all");
+  };
+
+  const [selectedAssignment, setSelectedAssignment] = useState({});
+  const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
+  const optionRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        optionRef.current &&
+        !optionRef.current.contains(event.target) &&
+        !diagDeleteVisible
+      ) {
+        setSelectedAssignment({});
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [optionRef, diagDeleteVisible]);
+  const handleMoreIconClick = (assignment) => {
+    setSelectedAssignment((prevSelected) =>
+      prevSelected === assignment ? {} : assignment
+    );
+  };
+
+  const handleOpenDeleteDiag = () => {
+    setDiagDeleteVisible(true);
+  };
+  const handleDeleteAssignment = async () => {
+    try {
+      const response = await deleteAssignment(selectedAssignment.idAssignment);
+      if (response.status === APIStatus.success) {
+        fetchAssignment();
+        setDiagDeleteVisible(false);
+        setSelectedAssignment({});
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="page-list-container">
@@ -96,33 +323,174 @@ const TeacherAssignMgmt = () => {
               <div
                 className="btn"
                 onClick={() => {
-                  // setFilterVisble(!filterVisble);
-                  // setSortByVisible(false);
+                  setFilterVisble(!filterVisble);
                 }}
               >
                 <LuFilter className="icon" />
                 <span>Filter</span>
               </div>
               {filterVisble && (
-                <FilterUser
-                  // onFilterChange={handleFilterChange}
-                  onClose={() => setFilterVisble(false)}
-                />
+                <div ref={filterRef} className="filter-container user">
+                  <div className="title-filter">
+                    <span>Filter</span>
+                  </div>
+                  <div className="main-filter">
+                    <div className="field-filter">
+                      <span className="label-field">Test/Assignment</span>
+                      <label className="radio-container gender">
+                        <input
+                          type="radio"
+                          value="exercise"
+                          checked={tempIsTest === 0}
+                          onChange={() => setTempIsTest(0)}
+                        />
+                        Exercise
+                      </label>
+                      <label className="radio-container gender">
+                        <input
+                          type="radio"
+                          value="test"
+                          checked={tempIsTest === 1}
+                          onChange={() => setTempIsTest(1)}
+                        />
+                        Test
+                      </label>
+                      <label className="radio-container gender">
+                        <input
+                          type="radio"
+                          value="all"
+                          checked={tempIsTest === "all"}
+                          onChange={() => setTempIsTest("all")}
+                          selected
+                        />
+                        All
+                      </label>
+                    </div>
+
+                    <div className="field-filter">
+                      <span className="label-field">Assignment type</span>
+                      <label className="radio-container status">
+                        <input
+                          type="radio"
+                          value="manual"
+                          checked={tempAssignmentType === AssignmentType.manual}
+                          onChange={() =>
+                            setTempAssignmentType(AssignmentType.manual)
+                          }
+                        />
+                        Manual
+                      </label>
+                      <label className="radio-container status">
+                        <input
+                          type="radio"
+                          value="quiz"
+                          checked={tempAssignmentType === AssignmentType.quiz}
+                          onChange={() =>
+                            setTempAssignmentType(AssignmentType.quiz)
+                          }
+                        />
+                        Quiz
+                      </label>
+                      <label className="radio-container status">
+                        <input
+                          type="radio"
+                          value="code"
+                          checked={tempAssignmentType === AssignmentType.code}
+                          onChange={() =>
+                            setTempAssignmentType(AssignmentType.code)
+                          }
+                        />
+                        Code
+                      </label>
+                      <label className="radio-container status">
+                        <input
+                          type="radio"
+                          value="all"
+                          checked={tempAssignmentType === "all"}
+                          onChange={() => setTempAssignmentType("all")}
+                        />
+                        All
+                      </label>
+                    </div>
+                  </div>
+                  <div className="btn-filter">
+                    <button
+                      className="btn cancel-filter"
+                      onClick={() => setFilterVisble(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn save-filter"
+                      onClick={() => {
+                        setIsTest(tempIsTest);
+                        setAssignmentType(tempAssignmentType);
+                        setFilterVisble(false);
+                      }}
+                    >
+                      Filter
+                    </button>
+                  </div>
+                </div>
               )}
               <div
                 className="btn"
                 onClick={() => {
                   setSortByVisible(!sortByVisible);
-                  setFilterVisble(false);
                 }}
               >
                 <span>Sort by</span>
                 <LuChevronDown className="icon" />
               </div>
               {sortByVisible && (
-                <SortByUser
-                //   onSortByChange={handleSortByChange}
-                />
+                <div ref={sortByRef} className="filter-container user">
+                  <div className="title-filter">
+                    <span>Sort</span>
+                  </div>
+                  <div className="main-filter">
+                    <div className="field-filter">
+                      <span className="label-field">Sort by</span>
+                      <div className="select-sort-container">
+                        <select
+                          className="input-sortby"
+                          value={tempSortField}
+                          onChange={(e) => setTempSortField(e.target.value)}
+                        >
+                          <option value="startDate">Start date</option>
+                          <option value="dueDate">Due date</option>
+                        </select>
+                      </div>
+                      <div className="select-sort-container">
+                        <select
+                          className="input-sortby"
+                          value={tempSortOrder}
+                          onChange={(e) => setTempSortOrder(e.target.value)}
+                        >
+                          <option value="asc">Ascending</option>
+                          <option value="desc">Descending</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="btn-filter">
+                    <button
+                      className="btn cancel-filter"
+                      onClick={() => setSortByVisible(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn save-filter"
+                      onClick={() => {
+                        setSortField(tempSortField);
+                        setSortOrder(tempSortOrder);
+                        setSortByVisible(false);
+                      }}
+                    >
+                      Sort
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -144,77 +512,189 @@ const TeacherAssignMgmt = () => {
           </div>
         </div>
         <div className="list-assign-container">
-          {filteredAssignments.map((assignment, index) => (
-            <div className="assign-item" key={index}>
-              <div className="row-item">
-                <span className="title-assign" style={{ fontWeight: "bold" }}>
-                  {assignment.title}
-                </span>
-                <button className="btn">
-                  <LuMoreHorizontal />
-                </button>
-              </div>
-              <div className="attribute-container">
-                <div className="attribute-item">
-                  <LuFileEdit className="icon-attribute-assign" />
-                  <label htmlFor="">
-                    {assignment.assignmentType === AssignmentType.code
-                      ? "Code"
-                      : assignment.assignmentType === AssignmentType.quiz
-                      ? "Quiz"
-                      : "Manual"}
-                  </label>
-                </div>
-                {assignment.duration > 0 && (
-                  <div className="attribute-item">
-                    <LuClock4 className="icon-attribute-assign" />
-                    <label htmlFor="">{assignment.duration} minutes</label>
+          {groupedAssignments.map(({ date, assignments }, index) => {
+            return (
+              <div className="time-assign-container" key={index}>
+                <span className="create-time-assign">{date}</span>
+                {assignments.map((assignment, idx) => (
+                  <div className="assign-item" key={idx}>
+                    <div className="row-item">
+                      <span
+                        className="title-assign"
+                        style={{ fontWeight: "bold" }}
+                      >
+                        {assignment.title}
+                      </span>
+                      <button
+                        className="btn-option"
+                        onClick={() => handleMoreIconClick(assignment)}
+                      >
+                        <LuMoreHorizontal />
+                      </button>
+                    </div>
+                    <div className="attribute-container">
+                      <div className="attribute-item">
+                        <LuFileEdit className="icon-attribute-assign" />
+                        <label htmlFor="">
+                          {assignment.assignmentType === AssignmentType.code
+                            ? "Code"
+                            : assignment.assignmentType === AssignmentType.quiz
+                            ? "Quiz"
+                            : "Manual"}
+                        </label>
+                      </div>
+                      {assignment.duration > 0 && (
+                        <div className="attribute-item">
+                          <LuClock4 className="icon-attribute-assign" />
+                          <label htmlFor="">
+                            {assignment.duration} minutes
+                          </label>
+                        </div>
+                      )}
+                      <div className="attribute-item">
+                        <LuCheckSquare className="icon-attribute-assign" />
+                        <label htmlFor="">
+                          {assignment.questionQuantity}{" "}
+                          {assignment.questionQuantity > 1
+                            ? " questions"
+                            : "question"}
+                        </label>
+                      </div>
+                      {assignment.startDate && (
+                        <div className="attribute-item">
+                          <LuCalendar className="icon-attribute-assign" />
+                          <label htmlFor="">
+                            Start date: {formatDateTime(assignment.startDate)}
+                          </label>
+                        </div>
+                      )}
+                      {assignment.dueDate && (
+                        <div className="attribute-item">
+                          <LuCalendar className="icon-attribute-assign" />
+                          <label htmlFor="">
+                            Due date: {formatDateTime(assignment.dueDate)}
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                    <div className="row-item">
+                      <span
+                        style={{
+                          fontWeight: "400",
+                          color: "var(--text-gray)",
+                          fontSize: "15px",
+                        }}
+                      >
+                        Course: {assignment.nameCourse}
+                        {assignment.nameLecture && (
+                          <>
+                            <LuChevronRight
+                              className="icon"
+                              style={{ width: "18px", height: "auto" }}
+                            />
+                            {assignment.nameLecture}
+                          </>
+                        )}
+                      </span>
+                      <span className="isExam-label">
+                        {assignment.isTest ? "Test" : "Exercise"}
+                      </span>
+                    </div>
+                    {selectedAssignment.idAssignment ===
+                      assignment.idAssignment && (
+                      <div
+                        ref={optionRef}
+                        className="container-options assignment-option"
+                      >
+                        {assignment.isPublish === 0 && (
+                          <button className="op-buts">
+                            <span>Publish</span>
+                            <MdPublish />
+                          </button>
+                        )}
+                        <button
+                          className="op-buts"
+                          //onClick={handleOpenDeleteDiag}
+                        >
+                          <span>Duplicate</span>
+                          <IoDuplicateSharp />
+                        </button>
+                        <button
+                          className="op-buts"
+                          onClick={handleOpenDeleteDiag}
+                        >
+                          <span>Delete</span>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className="attribute-item">
-                  <LuCheckSquare className="icon-attribute-assign" />
-                  <label htmlFor="">
-                    {assignment.questionQuantity}{" "}
-                    {assignment.questionQuantity > 1
-                      ? " questions"
-                      : "question"}
-                  </label>
-                </div>
-                {assignment.startDate && (
-                  <div className="attribute-item">
-                    <LuCalendar className="icon-attribute-assign" />
-                    <label htmlFor="">
-                      Start date: {formatDateTime(assignment.startDate)}
-                    </label>
-                  </div>
-                )}
-                {assignment.dueDate && (
-                  <div className="attribute-item">
-                    <LuCalendar className="icon-attribute-assign" />
-                    <label htmlFor="">
-                      Due date: {formatDateTime(assignment.dueDate)}
-                    </label>
-                  </div>
-                )}
+                ))}
               </div>
-              <div className="row-item">
-                <span
-                  style={{
-                    fontWeight: "400",
-                    color: "var(--text-gray)",
-                    fontSize: "15px",
-                  }}
-                >
-                  Course: {assignment.nameCourse}
-                </span>
-                <span className="isExam-label">
-                  {assignment.isExam ? "Test" : "Exercise"}
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
+      {diagDeleteVisible && (
+        <div
+          className="modal-overlay"
+          onClick={() => setDiagDeleteVisible(false)}
+        >
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="diag-header"
+              style={{ backgroundColor: "var(--red-color)" }}
+            >
+              <div className="container-title">
+                <LuMinusCircle className="diag-icon" />
+                <span className="diag-title">Delete Assignment</span>
+              </div>
+              <LuX
+                className="diag-icon"
+                onClick={() => setDiagDeleteVisible(false)}
+              />
+            </div>
+            <div className="diag-body">
+              {selectedAssignment.isPublish === 1 ? (
+                <span
+                  style={{
+                    lineHeight: "1.75",
+                    textAlign: "justify",
+                  }}
+                >
+                  This assignment has been <strong>published</strong>.
+                  <br />
+                  Deleting it will remove all associated information, including
+                  <strong> submitted work</strong>.
+                  <br /> Please consider carefully before proceeding.
+                </span>
+              ) : (
+                <span>Are you sure you want to delete this assignment?</span>
+              )}
+
+              <div className="str-btns">
+                <div className="act-btns">
+                  <button
+                    className="btn diag-btn cancel"
+                    onClick={() => setDiagDeleteVisible(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn diag-btn signout"
+                    style={{ backgroundColor: "var(--red-color)" }}
+                    onClick={() => {
+                      handleDeleteAssignment();
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

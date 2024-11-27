@@ -104,7 +104,7 @@ const AddNewAssign = () => {
   const [selectedLecture, setSelectedLecture] = useState(null);
   useEffect(() => {
     const fetchLectures = async () => {
-      if (selectedCourse && selectedCourse.idCourse) {
+      if (selectedCourse && selectedCourse.idCourse && selectedSection) {
         const response = await getAllActiveLecturesOfCoure(
           selectedCourse.idCourse
         );
@@ -361,13 +361,7 @@ const AddNewAssign = () => {
   return (
     <div>
       <div className="assign-span">
-        <span
-          onClick={() => navigate(-1)}
-          style={{ cursor: "pointer", fontWeight: "800" }}
-        >
-          <LuChevronLeft strokeWidth={4} />
-          Create new assignment
-        </span>
+        <span style={{ fontWeight: "800" }}>Create new assignment</span>
         <div className="name-container">
           {isAddByCourse && (
             <span className="name-course">{selectedCourse.courseTitle}</span>
@@ -469,6 +463,7 @@ const AddNewAssign = () => {
                       <select
                         className="input-form-pi"
                         onChange={handleSectionChange}
+                        disabled={isTest}
                       >
                         <option value="" disabled selected hidden>
                           Section
@@ -517,7 +512,10 @@ const AddNewAssign = () => {
                       <div className="select-container">
                         <select
                           className="input-form-pi"
-                          onChange={(e) => setTypeAssignment(e.target.value)}
+                          onChange={(e) => {
+                            setTypeAssignment(e.target.value);
+                            setQuestions([]);
+                          }}
                         >
                           <option value="" disabled selected hidden>
                             Select a type
@@ -659,7 +657,7 @@ const AddNewAssign = () => {
             )}
             {showOptionQuiz && (
               <div
-                className="container-options assign-option"
+                className="container-options assign-setting-option"
                 ref={optionQuizRef}
               >
                 <div className="item">

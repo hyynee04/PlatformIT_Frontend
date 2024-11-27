@@ -4,7 +4,6 @@ import { IoMdOpen } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import logoPlait from "../assets/img/logoPlait.png";
 import "../assets/scss/Home.css";
-
 import Carousel from "../components/Carousel";
 import { Object, Role } from "../constants/constants";
 import { getAllCenterCards } from "../services/centerService";
@@ -12,10 +11,9 @@ import { getAllCourseCards } from "../services/courseService";
 import { getAllTeacherCards } from "../services/userService";
 
 const Home = (props) => {
+  const [loading, setLoading] = useState(false);
   const { role } = props;
   const navigate = useNavigate();
-
-  const [loading, setLoading] = useState(false)
 
   const [listTeacher, setListTeacher] = useState([]);
   const [totalTeacherTracks, setTotalTeacherTracks] = useState(0);
@@ -27,37 +25,58 @@ const Home = (props) => {
   const [totalCourseTracks, setTotalCourseTracks] = useState(0);
 
   const getTeacherCards = async () => {
-    let response = await getAllTeacherCards();
-    let teachers = response.data;
-    teachers.sort((a, b) => b.coursesCount - a.coursesCount);
-    if (teachers.length > 12) {
-      setTotalTeacherTracks(3);
-    } else setTotalTeacherTracks(Math.ceil(teachers.length / 4));
-    setListTeacher(teachers);
+    setLoading(true);
+    try {
+      let response = await getAllTeacherCards();
+      let teachers = response.data;
+      teachers.sort((a, b) => b.coursesCount - a.coursesCount);
+      if (teachers.length > 12) {
+        setTotalTeacherTracks(3);
+      } else setTotalTeacherTracks(Math.ceil(teachers.length / 4));
+      setListTeacher(teachers);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
   };
 
   const getCenterCards = async () => {
-    let response = await getAllCenterCards();
-    let centers = response.data;
-    centers.sort((a, b) => b.studentsCount - a.studentsCount);
-    if (centers.length > 12) {
-      setTotalCenterTracks(3);
-    } else setTotalCenterTracks(Math.ceil(centers.length / 4));
-    setListCenter(centers);
+    setLoading(true);
+    try {
+      let response = await getAllCenterCards();
+      let centers = response.data;
+      centers.sort((a, b) => b.studentsCount - a.studentsCount);
+      if (centers.length > 12) {
+        setTotalCenterTracks(3);
+      } else setTotalCenterTracks(Math.ceil(centers.length / 4));
+      setListCenter(centers);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
   };
 
   const getCourseCards = async () => {
-    let response = await getAllCourseCards();
-    let courses = response.data;
-    //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
-    if (courses.length > 12) {
-      setTotalCourseTracks(3);
-    } else setTotalCourseTracks(Math.ceil(courses.length / 4));
-    setListCourse(courses);
+    setLoading(true);
+    try {
+      let response = await getAllCourseCards();
+      let courses = response.data;
+      //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
+      if (courses.length > 12) {
+        setTotalCourseTracks(3);
+      } else setTotalCourseTracks(Math.ceil(courses.length / 4));
+      setListCourse(courses);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
   };
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     try {
       getTeacherCards();
       getCenterCards();
@@ -70,7 +89,11 @@ const Home = (props) => {
   }, []);
 
   if (loading) {
-    return <div className="loading-page"><ImSpinner2 color="#397979" /></div>; // Show loading while waiting for API response
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
   }
   return (
     <div>

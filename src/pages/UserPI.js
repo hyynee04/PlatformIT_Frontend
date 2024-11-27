@@ -17,6 +17,7 @@ import {
   LuFile,
   LuTrash2,
 } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch, useSelector } from "react-redux";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
@@ -40,6 +41,7 @@ import {
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
 
 const TeacherPI = () => {
+  const [loading, setLoading] = useState(false);
   const idUser = +localStorage.getItem("idUser");
   const idRole = +localStorage.getItem("idRole");
 
@@ -122,6 +124,7 @@ const TeacherPI = () => {
     }
 
     const fetchData = async () => {
+      setLoading(true);
       try {
         await dispatch(fetchUserProfile(idUser));
         if (idRole === Role.platformAdmin) {
@@ -135,6 +138,8 @@ const TeacherPI = () => {
         }
       } catch (error) {
         console.error("Có lỗi xảy ra khi lấy thông tin cá nhân:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -380,7 +385,13 @@ const TeacherPI = () => {
       }
     }
   };
-
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
   return (
     <div>
       <div className="container-pi">

@@ -144,10 +144,10 @@ const postAddManualAssignment = async (dataToSubmit) => {
     formData.append("IdCourse", dataToSubmit.idCourse);
 
     if (!dataToSubmit.isTest) {
-      formData.append("IsExam", 0);
+      formData.append("IsTest", 0);
       formData.append("IdLecture", dataToSubmit.idLecture);
     } else {
-      formData.append("IsExam", 1);
+      formData.append("IsTest", 1);
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
@@ -195,10 +195,10 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     formData.append("IdCourse", dataToSubmit.idCourse);
 
     if (!dataToSubmit.isTest) {
-      formData.append("IsExam", 0);
+      formData.append("IsTest", 0);
       formData.append("IdLecture", dataToSubmit.idLecture);
     } else {
-      formData.append("IsExam", 1);
+      formData.append("IsTest", 1);
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
@@ -260,16 +260,29 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const deleteAssignment = async (idAssignment) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  try {
+    return await axios.delete("api/Assignment/DeleteAssignment", {
+      params: {
+        idAssignment: idAssignment,
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 const postAddSection = (sectionName, idCourse, idCreatedBy) => {
   return axios.post(`api/Course/AddSection`, null, {
     params: {
       sectionName: sectionName,
       idCourse: idCourse,
-      idCreatedBy: idCreatedBy
-    }
+      idCreatedBy: idCreatedBy,
+    },
   });
-}
+};
 
 const postAddLecture = async (idList, lectureData) => {
   try {
@@ -315,7 +328,7 @@ const getNotificationBoardOfCourse = (idCourse) => {
       idCourse: idCourse,
     },
   });
-}
+};
 
 const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
   return axios.post(`api/Notification/AddBoardNotificationForCourse`, null, {
@@ -323,14 +336,29 @@ const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
       idCourse: idCourse,
       content: content,
       idCreatedBy: idCreatedBy,
-    }
-  })
-}
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
-  getAllActiveLecturesOfCoure, getAllActiveSectionOfCourse, getAllAssignmentCardOfTeacher, getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdStudent, getAllCourseCardsByIdTeacher,
-  getAllTagModel, getCourseDetail, getIsEnRolledCourse, getNotificationBoardOfCourse, postAddBoardNotificationForCourse, postAddCourse, postAddLecture, postAddManualAssignment,
-  postAddQuizAssignment, postAddSection, postEnrollCourse
+  getAllActiveLecturesOfCoure,
+  getAllActiveSectionOfCourse,
+  getAllAssignmentCardOfTeacher,
+  getAllCourseCards,
+  getAllCourseCardsByIdCenter,
+  getAllCourseCardsByIdStudent,
+  getAllCourseCardsByIdTeacher,
+  getAllTagModel,
+  getCourseDetail,
+  getIsEnRolledCourse,
+  getNotificationBoardOfCourse,
+  postAddBoardNotificationForCourse,
+  postAddCourse,
+  postAddLecture,
+  postAddManualAssignment,
+  postAddQuizAssignment,
+  postAddSection,
+  postEnrollCourse,
+  deleteAssignment,
 };
-

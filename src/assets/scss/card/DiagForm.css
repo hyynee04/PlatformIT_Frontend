@@ -47,7 +47,7 @@
 .modal-container .diag-header .diag-icon {
   width: 32px;
   height: 32px;
-  color: var(--border-gray);
+  color: var(--white-color);
 }
 
 .modal-container .diag-header > .container-title {
@@ -153,19 +153,22 @@
   margin-right: 5px;
 }
 
-.modal-container .diag-body .str-btns .act-btns .cancle {
+.modal-container .diag-body .str-btns .act-btns .cancel {
   background-color: var(--white-color);
+  /* color: var(--main-color); */
+}
+.modal-container .diag-body .str-btns .act-btns .cancle:active,
+.modal-container .diag-body .str-btns .act-btns .cancle:focus-visible,
+.modal-container .diag-body .str-btns .act-btns .cancle:focus {
+  background-color: rgba(217, 217, 217, 0.5);
+  border: none;
+  outline: none;
   color: var(--text-gray);
 }
 .modal-container .diag-body .str-btns .act-btns .cancle:hover {
   background-color: rgba(217, 217, 217, 0.5);
   color: var(--black-color);
 }
-/* .modal-container .diag-body .str-btns .act-btns .cancle:active{
-    background-color: var(--white-color);
-    border: 1px solid var(--main-color);
-    color: var(--main-color);
-} */
 
 .modal-container .diag-body .str-btns .act-btns .signout {
   display: flex;

@@ -11,6 +11,7 @@ import {
   LuChevronRight,
   LuUserPlus,
 } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import SortByUserOfCenter from "../../components/SortByUserOfCenter";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
 import DiagAddUserForm from "../../components/diag/DiagAddUserForm";
@@ -19,11 +20,10 @@ import UserOption from "../../components/option/UserOption";
 const CenterAdAdminMgmt = () => {
   const idUser = +localStorage.getItem("idUser");
   const dispatch = useDispatch();
-  const {
-    listUserOfCenter = [],
-    loading,
-    error,
-  } = useSelector((state) => state.listUserOfCenter || {});
+  const { listUserOfCenter = [] } = useSelector(
+    (state) => state.listUserOfCenter || {}
+  );
+  const [loading, setLoading] = useState(false);
   const [listUser, setListUser] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -53,7 +53,17 @@ const CenterAdAdminMgmt = () => {
     }
   };
   useEffect(() => {
-    dispatch(fetchListUserOfCenter(Role.centerAdmin));
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await dispatch(fetchListUserOfCenter(Role.centerAdmin));
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [dispatch]);
 
   useEffect(() => {
@@ -148,6 +158,14 @@ const CenterAdAdminMgmt = () => {
       prevSelectedId === idUser ? null : idUser
     );
   };
+
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="admin-info">

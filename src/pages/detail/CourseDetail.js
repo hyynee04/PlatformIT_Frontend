@@ -5,12 +5,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/scss/Detail.css";
 
 import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
   LuCalendar,
   LuCheckSquare,
   LuClock,
   LuFileEdit,
+  LuFileQuestion,
   LuMail,
   LuMinus,
   LuPlus,
@@ -23,17 +25,19 @@ import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
 import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
+import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
 import {
   getCourseDetail,
   getIsEnRolledCourse,
   postEnrollCourse,
 } from "../../services/courseService";
-import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 
 const CourseDetail = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [isShowed, setIsShowed] = useState(false);
   const [popupAdd, setPopupAdd] = useState(false);
@@ -41,21 +45,28 @@ const CourseDetail = (props) => {
 
   // console.log(">> Course Detail:", addSection);
 
-  const [idRole, setIDRole] = useState(4);
+  const [idRole, setIDRole] = useState(0);
   const [idUser, setIDUser] = useState("");
   const [courseInfo, setCourseInfo] = useState({});
   const [menuIndex, setMenuIndex] = useState(1);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const fetchCourseDetail = async (idCourse) => {
-    let response = await getCourseDetail(idCourse);
-    setCourseInfo(response.data);
+    setLoading(true);
+    try {
+      let response = await getCourseDetail(idCourse);
+      setCourseInfo(response.data);
 
-    const responseIsEnroll = await getIsEnRolledCourse(idCourse);
-    if (responseIsEnroll.data === true) {
-      setIsEnrolledCourse(true);
-    } else {
-      setIsEnrolledCourse(false);
+      const responseIsEnroll = await getIsEnRolledCourse(idCourse);
+      if (responseIsEnroll.data === true) {
+        setIsEnrolledCourse(true);
+      } else {
+        setIsEnrolledCourse(false);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
     }
   };
 
@@ -175,6 +186,14 @@ const CourseDetail = (props) => {
       navigate("/login");
     }
   };
+  // console.log(idRole);
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
   return (
     <div className="detail-container">
       <div className="left-container">
@@ -238,7 +257,7 @@ const CourseDetail = (props) => {
             ) : (
               <button disabled>Can't buy now</button>
             )} */}
-            {(idRole === Role.student || idRole === Role.guest || !idRole) &&
+            {(idRole === Role.student || !idRole) &&
               !isEnrolledCourse &&
               (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
                 <button onClick={handleBuyCourse}>Buy Now</button>
@@ -590,7 +609,7 @@ const CourseDetail = (props) => {
                             </span>
                           )}
                           <span>
-                            <LuCheckSquare /> {test.maxScore} marks
+                            <LuFileQuestion /> {test.maxScore} questions
                           </span>
                           <span>
                             <LuCalendar />

@@ -7,6 +7,7 @@ import {
   LuChevronLeft,
   LuChevronRight,
 } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { CenterStatus } from "../../constants/constants";
 import CenterOption from "../../components/option/CenterOption";
 import DiagActionCenterForm from "../../components/diag/DiagActionCenterForm";
@@ -21,12 +22,9 @@ import {
 } from "../../store/listCenterSlice";
 
 const PlatformAdCenterMgmt = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const {
-    centers = [],
-    loading,
-    error,
-  } = useSelector((state) => state.centers || {});
+  const { centers = [] } = useSelector((state) => state.centers || {});
 
   const activeStatusCenter = useSelector(
     (state) => state.centers.activeStatusCenter
@@ -44,9 +42,19 @@ const PlatformAdCenterMgmt = () => {
 
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
+  const fetchListCenter = async () => {
+    setLoading(true);
+    try {
+      await dispatch(fetchCenters(activeStatusCenter));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
+  };
   useEffect(() => {
-    dispatch(fetchCenters(activeStatusCenter));
-  }, [dispatch, activeStatusCenter]);
+    fetchListCenter();
+  }, [activeStatusCenter]);
 
   useEffect(() => {
     setListCenter(centers);
@@ -162,6 +170,13 @@ const PlatformAdCenterMgmt = () => {
   const openActionModal = () => setIsModalActionOpen(true);
   const closeActionModal = () => setIsModalActionOpen(false);
 
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <>
       <div className="page-list-container">
@@ -241,6 +256,7 @@ const PlatformAdCenterMgmt = () => {
                   <th>Center Admin Name</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
+                  <th>Description</th>
                   <th>Submission Date</th>
                   <th></th>
                 </tr>
@@ -252,6 +268,7 @@ const PlatformAdCenterMgmt = () => {
                     <td>{center.centerAdminName}</td>
                     <td>{center.centerAdminEmail}</td>
                     <td>{center.tin}</td>
+                    <td>{center.description}</td>
                     <td>
                       {center.submissionDate &&
                         (() => {

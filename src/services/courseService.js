@@ -17,6 +17,13 @@ const getAllCourseCardsByIdTeacher = (idTeacher) => {
     },
   });
 };
+const getAllCourseCardsByIdStudent = (idStudent) => {
+  return axios.get("api/Course/GetAllCourseCardsByIdStudent", {
+    params: {
+      idStudent: idStudent,
+    },
+  });
+};
 const getAllTagModel = async () => {
   return await axios.get("api/Course/GetAllTagModel");
 };
@@ -137,10 +144,10 @@ const postAddManualAssignment = async (dataToSubmit) => {
     formData.append("IdCourse", dataToSubmit.idCourse);
 
     if (!dataToSubmit.isTest) {
-      formData.append("IsExam", 0);
+      formData.append("IsTest", 0);
       formData.append("IdLecture", dataToSubmit.idLecture);
     } else {
-      formData.append("IsExam", 1);
+      formData.append("IsTest", 1);
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
@@ -188,10 +195,10 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     formData.append("IdCourse", dataToSubmit.idCourse);
 
     if (!dataToSubmit.isTest) {
-      formData.append("IsExam", 0);
+      formData.append("IsTest", 0);
       formData.append("IdLecture", dataToSubmit.idLecture);
     } else {
-      formData.append("IsExam", 1);
+      formData.append("IsTest", 1);
     }
 
     formData.append("StartDate", dataToSubmit.startDate);
@@ -253,19 +260,34 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const deleteAssignment = async (idAssignment) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  try {
+    return await axios.delete("api/Assignment/DeleteAssignment", {
+      params: {
+        idAssignment: idAssignment,
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 export {
-  getAllCourseCards,
-  getAllCourseCardsByIdCenter,
-  getAllCourseCardsByIdTeacher,
-  getAllTagModel,
-  getAllActiveSectionOfCourse,
-  getCourseDetail,
-  postAddCourse,
-  getIsEnRolledCourse,
-  postEnrollCourse,
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
+  getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,
+  getAllCourseCards,
+  getAllCourseCardsByIdCenter,
+  getAllCourseCardsByIdStudent,
+  getAllCourseCardsByIdTeacher,
+  getAllTagModel,
+  getCourseDetail,
+  getIsEnRolledCourse,
+  postAddCourse,
   postAddManualAssignment,
   postAddQuizAssignment,
+  postEnrollCourse,
+  deleteAssignment,
 };

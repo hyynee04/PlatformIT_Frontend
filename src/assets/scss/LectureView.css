@@ -46,6 +46,7 @@
 }
 .lecture-container .lecture-content .lecture-detail > .course-content-section {
     width: 40%;
+    padding: 1.5rem;
 }
 .lecture-container .lecture-content .lecture-detail .lecture-content-section > .course-background {
     width: 100%;
@@ -207,32 +208,27 @@
 }
 .lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
 .part-item .comment-display > .ava-holder {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: fit-content;
+    height: 100%;
 }
 .lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
 .part-item .comment-display .ava-holder > img {
-    width: 100%;
-    height: 100%;
+    width: 2.5rem;
+    height: 2.5rem;
 
     object-fit: cover;
     border-radius: 50%;
 }
-
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display > .comment-content {
+.comment-content {
     width: 100%;
     height: fit-content;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content > .comment-entering {
+.comment-content > .comment-entering {
     width: 100%;
-    /* height: 25px; */
-    font-size: .8rem;
-
+    font-size: 0.8rem;
+    margin-bottom: 5px;
     border: none;
     border-bottom: 1px solid var(--border-gray);
     outline: none;
@@ -243,36 +239,176 @@
     box-sizing: border-box;
     resize: none; 
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content > .button-container {
+.comment-content > .button-container {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: end;
     gap: 10px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content .button-container > button {
-    font-size: .8rem;
+.comment-content .button-container > button {
+    font-size: .85rem;
     padding: 2px 8px;
     border: none;
     border-radius: .25rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content .button-container > button.comment {
+.comment-content .button-container > button.comment {
     background-color: var(--main-color);
     color: var(--white-color);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content .button-container > button.comment:hover {
+.comment-content .button-container > button.comment:hover {
     background-color: rgba(57, 121, 121, 0.8);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content .button-container > button.cancel {
+.comment-content .button-container > button.cancel {
     background-color: transparent;
     color: var(--text-gray);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .comment-content .button-container > button.cancel:hover {
+.comment-content .button-container > button.cancel:hover {
     background-color: rgba(217 , 217, 217, 0.5);
+}
+.comment-content > .comment-header {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+}
+.comment-content .comment-header > .commentator-name {
+    font-size: .9rem;
+    color: var(--second-main-color);
+    font-weight: 600;
+}
+.comment-content .comment-header > .comment-time {
+    font-size: .7rem;
+    color: var(--text-gray);
+    font-weight: 600;
+}
+.comment-content > .comment-body {
+    width: 100%;
+    font-size: .8rem;
+    color: var(--text-gray);
+    text-wrap: wrap;
+    overflow-y: hidden;
+    position: relative;
+    text-align: justify;
+    max-height: 50px;
+    transition: max-height 0.1s ease-in-out;
+}
+.comment-content > .comment-body.expanded {
+    overflow-y: visible;
+    max-height: 500px;
+    transition: max-height 0.3s ease;
+}
+.comment-content .comment-body > .blur-bottom {
+    width: 100%;
+    height: 20px;
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+    opacity: 0;                
+    visibility: hidden;        
+    transition: opacity 0.1s ease-out, visibility 0s 0.1s; 
+}
+.comment-content .comment-body > .blur-bottom.show {
+    opacity: 1;                /* Visible after transition */
+    visibility: visible;       /* Make it visible */
+}
+.comment-content > .view-more-container {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.comment-content .view-more-container > hr {
+    margin: 0;
+    background-color: rgba(217 , 217, 217, 0.5);
+}
+.comment-content .view-more-container > .line-1 {
+    width: 10%;
+}
+.comment-content .view-more-container > .line-2 {
+    width: 78%;
+}
+.comment-content .view-more-container > button {
+    border: none;
+    border-radius: .25rem;
+    background-color: transparent;
+    color: var(--text-gray);
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    outline: none;
+    cursor: pointer;
+}
+.comment-content .view-more-container > button:hover {
+    background-color: rgba(217 , 217, 217, 0.5);
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .comment-responses-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    padding-left: 50px;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item .comment-responses-container > .comment-response {
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.comment-responses-container > .more-responses {
+    width: fit-content;
+    height: fit-content;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.comment-responses-container .more-responses > button {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+    background-color: rgba(217 , 217, 217, 0.5);
+    color: var(--main-color);
+    border: none;
+    border-radius: .5rem;
+    font-size: .7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    margin-top: .5rem;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
+.comment-responses-container .more-responses button > svg {
+    width: .8rem;
+    height: .8rem;
+    margin-top: 1px;
+}
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
+.part-item .comment-responses-container .comment-response .ava-holder > img {
+    width: 2rem;
+    height: 2rem;
+
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+
+
+
+
+.section-view-container {
+    width: 100%;
+    height: 100px;
+}
+.section-view-container > .section-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.section-view-container .section-header > .header-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--main-color);
+}
+.section-view-container .section-header > .header-info {
+    color: var(--text-gray);
 }

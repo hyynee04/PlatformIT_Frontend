@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
     LuCheckSquare,
     LuClock,
-    LuFileEdit
+    LuFileEdit,
+    LuFileQuestion
 } from "react-icons/lu";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/scss/LectureView.css";
+import SectionView from "./SectionView";
 
 const LectureView = (props) => {
     const [index, setIndex] = useState(1);
@@ -18,7 +21,15 @@ const LectureView = (props) => {
 
     const [value, setValue] = useState("");
     const [textAreaHeight, setTextAreaHeight] = useState(30)
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isLongContent, setIsLongContent] = useState(false);
+
     const textareaRef = useRef(null);
+    const contentRef = useRef(null);
+
+    const toggleComment = () => {
+        setIsExpanded(!isExpanded);
+    };
 
     const adjustHeight = () => {
         const textarea = textareaRef.current;
@@ -45,6 +56,17 @@ const LectureView = (props) => {
     useEffect(() => {
         adjustHeight(); // Adjust on mount or when content changes
     }, [value]);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            const contentHeight = contentRef.current.scrollHeight;
+            const containerHeight = contentRef.current.clientHeight;
+            console.log(contentHeight, containerHeight)
+
+            // Show "View More" button only if content exceeds the max height of the container
+            setIsLongContent(contentHeight > containerHeight);
+        }
+    }, [isExpanded]);
     return (
         <div className="lecture-container ">
             <div className="lecture-content">
@@ -112,7 +134,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -133,7 +155,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -154,7 +176,7 @@ const LectureView = (props) => {
                                                                 <LuClock color="#003B57" /> 45 mins
                                                             </span>
                                                             <span>
-                                                                <LuCheckSquare color="#003B57" /> 40 marks
+                                                                <LuFileQuestion color="#003B57" /> 40 questions
                                                             </span>
                                                         </div>
                                                     </div>
@@ -188,6 +210,92 @@ const LectureView = (props) => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div className="part-item">
+                                                <div className="comment-display">
+                                                    <div className="ava-holder">
+                                                        <img src={default_ava} />
+                                                    </div>
+                                                    <div className="comment-content">
+                                                        <div className="comment-header">
+                                                            <span className="commentator-name">Commentator name</span>
+                                                            <span className="comment-time">13 hr. ago</span>
+                                                        </div>
+                                                        <div
+                                                            ref={contentRef}
+                                                            className={`comment-body ${isExpanded ? "expanded" : ""}`}
+                                                        >
+                                                            <span>
+                                                                Today's lecture was incredibly insightful!
+                                                                The explanation was clear and well-structured, especially the examples that tied theory to practical applications.
+                                                            </span>
+                                                            <div className={`blur-bottom ${(isLongContent && !isExpanded) ? "show" : ""}`}></div>
+                                                        </div>
+                                                        {isLongContent && (
+                                                            <div className="view-more-container">
+                                                                <hr className="line-1" />
+                                                                <button
+                                                                    className="view-more-comment"
+                                                                    onClick={() => toggleComment()}
+                                                                >
+                                                                    {isExpanded ?
+                                                                        (<>View Less <IoIosArrowUp /></>) : (<>View More <IoIosArrowDown /></>)
+                                                                    }
+                                                                </button>
+                                                                <hr className="line-2" />
+                                                            </div>
+                                                        )}
+
+                                                    </div>
+                                                </div>
+                                                <div className="comment-responses-container">
+                                                    <div className="more-responses">
+                                                        <button><IoIosArrowDown /> 3 replies</button>
+                                                    </div>
+                                                    <div className="comment-response">
+                                                        <div className="ava-holder">
+                                                            <img src={default_ava} />
+                                                        </div>
+                                                        <div className="comment-content">
+                                                            <div className="comment-header">
+                                                                <span className="commentator-name">Commentator name</span>
+                                                                <span className="comment-time">13 hr. ago</span>
+                                                            </div>
+                                                            <div
+                                                                // ref={contentRef}
+                                                                className={`comment-body ${isExpanded ? "expanded" : ""}`}
+                                                            >
+                                                                <span>
+                                                                    Today's lecture was incredibly insightful!
+                                                                    The explanation was clear and well-structured, especially the examples that tied theory to practical applications.
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="comment-response">
+                                                        <div className="ava-holder">
+                                                            <img src={default_ava} />
+                                                        </div>
+                                                        <div className="comment-content">
+                                                            <div className="comment-content">
+                                                                <textarea
+                                                                    ref={textareaRef}
+                                                                    style={{ height: `${textAreaHeight}px` }}
+                                                                    placeholder="Write your comment..."
+                                                                    className="comment-entering"
+                                                                    value={value}
+                                                                    onChange={(e) => setValue(e.target.value)}
+                                                                >
+                                                                </textarea>
+                                                                <div className="button-container">
+                                                                    <button className="cancel">Cancel</button>
+                                                                    <button className="comment">Comment</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </>)
                                     )}
 
@@ -195,7 +303,9 @@ const LectureView = (props) => {
                         </div>
 
                     </div>
-                    <div className="course-content-section"></div>
+                    <div className="course-content-section">
+                        <SectionView />
+                    </div>
                 </div>
             </div>
 

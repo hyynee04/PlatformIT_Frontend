@@ -155,7 +155,7 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
                   </label>
                 </span>
                 {question.items.map((choice, choiceIdx) => (
-                  <div className="info-in-row">
+                  <div className="info-in-row" key={choiceIdx}>
                     <label className="radio-choice">
                       <input
                         type={question.isMultipleAnswer ? "checkbox" : "radio"}

@@ -59,6 +59,29 @@
   background-color: var(--main-color);
 }
 
+.loading-page {
+  /* width: 100%;
+  margin: 0 5px 3px 0;
+  animation: spin 1s infinite linear; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.loading-page > svg {
+  animation: spin 1s infinite linear;
+  width: 40px;
+  height: 40px;
+}
+@keyframes spin {
+  from {
+      transform: scale(1) rotate(0deg);
+  }
+  to {
+      transform: scale(1) rotate(360deg);
+  }
+}
+
 // .App-logo {
 //   height: 40vmin;
 //   pointer-events: none;

@@ -12,7 +12,7 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    width: 30%;
+    width: 382px;
 }
 
 .detail-container > .right-container {
@@ -20,7 +20,7 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    width: 70%;
+    width: 890px;
 }
 
 

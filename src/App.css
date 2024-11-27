@@ -44,11 +44,8 @@
 .app-container::-webkit-scrollbar {
   display: none;
 }
-
-.header-container {
-  .bg-body-tertiary {
+.header-container >  .bg-body-tertiary {
     background-color: var(--main-color) !important;
-  }
 }
 .main-container {
   flex: 1;
@@ -85,7 +82,7 @@
   }
 }
 
-// .App-logo {
+/* // .App-logo {
 //   height: 40vmin;
 //   pointer-events: none;
 // }
@@ -118,4 +115,4 @@
 //   to {
 //     transform: rotate(360deg);
 //   }
-// }
+// } */

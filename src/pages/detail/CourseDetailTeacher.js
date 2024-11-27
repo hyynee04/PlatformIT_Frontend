@@ -14,7 +14,7 @@ import {
     LuTrash2
 } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
-import "../../assets/scss/Detail.css";
+import "../../assets/css/Detail.css";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";

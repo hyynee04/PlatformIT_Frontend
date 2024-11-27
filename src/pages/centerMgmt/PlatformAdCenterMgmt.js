@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
   LuChevronLeft,
   LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
 } from "react-icons/lu";
-import { ImSpinner2 } from "react-icons/im";
-import { CenterStatus } from "../../constants/constants";
-import CenterOption from "../../components/option/CenterOption";
 import DiagActionCenterForm from "../../components/diag/DiagActionCenterForm";
 import FilterCenter from "../../components/FilterCenter";
+import CenterOption from "../../components/option/CenterOption";
 import SortByCenter from "../../components/SortByCenter";
+import { CenterStatus } from "../../constants/constants";
 
-import "../../assets/scss/UserMgmt.css";
 import { useDispatch, useSelector } from "react-redux";
+import "../../assets/css/UserMgmt.css";
 import {
   fetchCenters,
   setActiveStatusCenter,
@@ -126,8 +126,8 @@ const PlatformAdCenterMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -182,25 +182,22 @@ const PlatformAdCenterMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.active ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.active ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.active)}
           >
             Approval
           </button>
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.pending ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.pending ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.pending)}
           >
             Pending Approval
           </button>
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.inactive ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.inactive ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.inactive)}
           >
             Inactive
@@ -283,11 +280,10 @@ const PlatformAdCenterMgmt = () => {
                         })()}
                     </td>
                     <td
-                      className={`table-cell ${
-                        activeStatusCenter === CenterStatus.pending
+                      className={`table-cell ${activeStatusCenter === CenterStatus.pending
                           ? "pending"
                           : ""
-                      }`}
+                        }`}
                       style={{ cursor: "pointer" }}
                     >
                       <button
@@ -397,16 +393,15 @@ const PlatformAdCenterMgmt = () => {
                                 {center.reason
                                   ? center.reason
                                   : center.centerStatus === CenterStatus.locked
-                                  ? "Locked"
-                                  : ""}
+                                    ? "Locked"
+                                    : ""}
                               </td>
                             )}
                             <td
-                              className={`table-cell ${
-                                center.centerStatus === CenterStatus.pending
+                              className={`table-cell ${center.centerStatus === CenterStatus.pending
                                   ? "pending"
                                   : ""
-                              }`}
+                                }`}
                               style={{ cursor: "pointer" }}
                             >
                               <LuMoreHorizontal

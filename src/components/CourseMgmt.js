@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiEdit } from "react-icons/fi";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuArrowRight,
   LuChevronDown,
@@ -9,10 +10,9 @@ import {
   LuSearch,
   LuX,
 } from "react-icons/lu";
-import { ImSpinner2 } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
 
-import "../assets/scss/ViewAll.css";
+import "../assets/css/ViewAll.css";
 import { Role } from "../constants/constants";
 import {
   getAllCourseCards,
@@ -142,7 +142,7 @@ const CourseMgmt = (props) => {
                 new Date(course.courseEndDate) <= new Date(endDate)) &&
               (!startRegistration ||
                 new Date(course.registStartDate) >=
-                  new Date(startRegistration)) &&
+                new Date(startRegistration)) &&
               (!endRegistration ||
                 new Date(course.registEndDate) <= new Date(endRegistration))))
       )

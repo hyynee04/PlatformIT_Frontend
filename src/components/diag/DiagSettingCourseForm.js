@@ -1,8 +1,8 @@
 import React from "react";
+import Form from "react-bootstrap/Form";
 import { FiSettings } from "react-icons/fi";
 import { LuX } from "react-icons/lu";
-import Form from "react-bootstrap/Form";
-import "../../assets/scss/card/DiagForm.css";
+import "../../assets/css/card/DiagForm.css";
 const DiagSettingCourseForm = ({
   isOpen,
   onClose,

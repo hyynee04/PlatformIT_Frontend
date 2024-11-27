@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { LuAlignJustify, LuChevronRight } from "react-icons/lu";
 import { TiPlus } from "react-icons/ti";
-import { LuAlignJustify, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../../assets/css/Assignment.css";
+import NewManualQuestion from "../../components/assigment/NewManualQuestion";
+import NewQuizQuestion from "../../components/assigment/NewQuizQuestion";
 import {
   APIStatus,
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
-import "../../assets/scss/Assignment.css";
 import {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
@@ -15,9 +18,6 @@ import {
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/courseService";
-import NewManualQuestion from "../../components/assigment/NewManualQuestion";
-import { useLocation, useNavigate } from "react-router-dom";
-import NewQuizQuestion from "../../components/assigment/NewQuizQuestion";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();
@@ -384,8 +384,8 @@ const AddNewAssign = () => {
             {isAddByLecture
               ? "Detail exercise"
               : isAddByCourse
-              ? "Detail test"
-              : "Detail assignment"}
+                ? "Detail test"
+                : "Detail assignment"}
           </span>
           <div className="assign-info">
             <div className="info">
@@ -578,7 +578,7 @@ const AddNewAssign = () => {
                           className="input-form-pi"
                           value={endDate}
                           onChange={handleEndDateChange}
-                          // disabled={!startDate}
+                        // disabled={!startDate}
                         />
                         <div className="container-validate">
                           {" "}

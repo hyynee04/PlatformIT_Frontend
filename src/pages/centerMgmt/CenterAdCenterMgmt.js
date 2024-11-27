@@ -3,8 +3,8 @@ import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { FaGlobe, FaInfoCircle, FaRegFilePdf } from "react-icons/fa";
-import { LuCheck, LuFile, LuLock, LuTrash2 } from "react-icons/lu";
 import { ImSpinner2 } from "react-icons/im";
+import { LuCheck, LuFile, LuLock, LuTrash2 } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import {
   postAddCenterLink,
@@ -18,8 +18,8 @@ import {
 import { fetchCenterProfile } from "../../store/profileCenterSlice";
 import CenterAdAdminMgmt from "../userMgmt/CenterAdAdminMgmt";
 
+import "../../assets/css/PI.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/PI.css";
 import AvatarImageOption from "../../components/AvatarImageOption";
 import DiagLockCenterForm from "../../components/diag/DiagLockCenterForm";
 import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
@@ -332,18 +332,16 @@ const CenterAdCenterMgmt = () => {
             <div className="sub-container-action">
               <div className="action-btn">
                 <div
-                  className={`btn ${
-                    activeAction === "basicInfo" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "basicInfo" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("basicInfo")}
                 >
                   <FaInfoCircle className="icon" />
                   Basic Infomation
                 </div>
                 <div
-                  className={`btn ${
-                    activeAction === "link_quali" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "link_quali" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("link_quali")}
                 >
                   <FaGlobe className="icon" />
@@ -607,7 +605,7 @@ const CenterAdCenterMgmt = () => {
                       </div>
                       <div className="quali-image">
                         {qualification.path &&
-                        qualification.path.endsWith(".pdf") ? (
+                          qualification.path.endsWith(".pdf") ? (
                           <div
                             onClick={() =>
                               window.open(qualification.path, "_blank")

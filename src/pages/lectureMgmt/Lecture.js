@@ -1,5 +1,5 @@
 
-import "../../assets/scss/LectureView.css";
+import "../../assets/css/LectureView.css";
 import LectureView from "./LectureView";
 import SectionView from "./SectionView";
 

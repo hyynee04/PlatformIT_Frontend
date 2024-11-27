@@ -3,8 +3,8 @@ import { FaDongSign } from "react-icons/fa6";
 import { LuBuilding2, LuClock, LuStar } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/card/Card.css";
 
 const CourseCard = (props) => {
   const navigate = useNavigate();

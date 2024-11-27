@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
 import { APIStatus, Role } from "../../constants/constants";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
 
-import "../../assets/scss/card/DiagForm.css";
+import "../../assets/css/card/DiagForm.css";
 import {
   postAddCenterAmin,
   postAddTeacher,

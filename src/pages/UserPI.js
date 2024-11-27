@@ -9,6 +9,7 @@ import {
   FaUser,
   FaUserGraduate,
 } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuCamera,
   LuCheck,
@@ -17,11 +18,10 @@ import {
   LuFile,
   LuTrash2,
 } from "react-icons/lu";
-import { ImSpinner2 } from "react-icons/im";
 import { useDispatch, useSelector } from "react-redux";
+import "../assets/css/PI.css";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
-import "../assets/scss/PI.css";
 import AvatarImageOption from "../components/AvatarImageOption";
 import {
   APIStatus,
@@ -421,9 +421,8 @@ const TeacherPI = () => {
               </div>
               {idRole === Role.teacher && (
                 <div
-                  className={`btn ${
-                    activeAction === "specializedPI" ? "active" : ""
-                  }`}
+                  className={`btn ${activeAction === "specializedPI" ? "active" : ""
+                    }`}
                   onClick={() => handleActionClick("specializedPI")}
                 >
                   <FaUserGraduate className="icon" />
@@ -706,19 +705,18 @@ const TeacherPI = () => {
                       />
                       <div className="status-action">
                         <span
-                          className={`span ${
-                            qualification.status === UserStatus.active
+                          className={`span ${qualification.status === UserStatus.active
                               ? "approved"
                               : qualification.status === UserStatus.pending
-                              ? "pending"
-                              : "rejected"
-                          }`}
+                                ? "pending"
+                                : "rejected"
+                            }`}
                         >
                           {qualification.status === UserStatus.active
                             ? "Approved"
                             : qualification.status === UserStatus.pending
-                            ? "Pending"
-                            : `Rejected. Reason: ${qualification.reason}`}
+                              ? "Pending"
+                              : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
@@ -736,7 +734,7 @@ const TeacherPI = () => {
                     </div>
                     <div className="quali-image">
                       {qualification.path &&
-                      qualification.path.endsWith(".pdf") ? (
+                        qualification.path.endsWith(".pdf") ? (
                         <div
                           onClick={() =>
                             window.open(qualification.path, "_blank")

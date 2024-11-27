@@ -1,12 +1,12 @@
 import React from "react";
 import { PiBuildingOffice, PiStudentFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import '../assets/css/AboutUs.css';
 import diverse_courses from "../assets/img/diverse_courses.png";
 import flexible_learning from "../assets/img/flexible_learning.png";
 import interaction from "../assets/img/interaction.png";
 import logoPlait from "../assets/img/logoPlait.png";
 import logoPlait2 from "../assets/img/logoPlait2.png";
-import '../assets/scss/AboutUs.css';
 
 
 const AboutUs = () => {

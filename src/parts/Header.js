@@ -14,7 +14,7 @@ import HeaderAvatarOption from "../components/HeaderAvatarOption";
 import { APIStatus, Role } from "../constants/constants";
 
 import { useDispatch, useSelector } from "react-redux";
-import "../assets/scss/Header.css";
+import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
@@ -179,8 +179,8 @@ const Header = () => {
                   {idRole === Role.centerAdmin && (
                     <button
                       className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
-                          ? "clicked"
-                          : ""
+                        ? "clicked"
+                        : ""
                         }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >

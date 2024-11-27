@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
-  LuChevronRight,
   LuChevronLeft,
+  LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
 } from "react-icons/lu";
-import { ImSpinner2 } from "react-icons/im";
+import { useDispatch, useSelector } from "react-redux";
+import FilterUser from "../../components/FilterUser";
+import UserOption from "../../components/option/UserOption";
+import SortByUser from "../../components/SortByUser";
 import {
   CenterAdminLevel,
   CenterStatus,
   Role,
-  UserStatus,
   UserGender,
+  UserStatus,
 } from "../../constants/constants";
-import UserOption from "../../components/option/UserOption";
-import FilterUser from "../../components/FilterUser";
-import SortByUser from "../../components/SortByUser";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../../store/userSlice";
 
-import "../../assets/scss/UserMgmt.css";
+import "../../assets/css/UserMgmt.css";
 
 const PlatformAdUserMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -107,8 +107,8 @@ const PlatformAdUserMgmt = () => {
         ? "Main"
         : "Sub"
       : user.status === UserStatus.inactive
-      ? "Rejected"
-      : "Pending";
+        ? "Rejected"
+        : "Pending";
   };
 
   const filteredUser = listUser
@@ -122,8 +122,8 @@ const PlatformAdUserMgmt = () => {
           (user.gender === UserGender.female
             ? "Female"
             : user.gender === UserGender.male
-            ? "Male"
-            : "Other"
+              ? "Male"
+              : "Other"
           )
             .toLowerCase()
             .includes(searchTermLower)) ||
@@ -182,8 +182,8 @@ const PlatformAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -226,25 +226,22 @@ const PlatformAdUserMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeRole === Role.centerAdmin ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.centerAdmin ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.centerAdmin)}
           >
             Center Administrator
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.teacher ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.student ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.student ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -324,8 +321,8 @@ const PlatformAdUserMgmt = () => {
                           ? "Main"
                           : "Sub"
                         : user.status === UserStatus.inactive
-                        ? "Rejected"
-                        : "Pending"}
+                          ? "Rejected"
+                          : "Pending"}
                     </td>
                   )}
                   <td>
@@ -344,26 +341,25 @@ const PlatformAdUserMgmt = () => {
                   </td>
                   <td>
                     <span
-                      className={`status ${
-                        user.status === UserStatus.active
+                      className={`status ${user.status === UserStatus.active
                           ? "active"
                           : user.status === UserStatus.pending
-                          ? "pending"
-                          : user.status === UserStatus.inactive ||
-                            user.status === UserStatus.locked
-                          ? "inactive"
-                          : ""
-                      }`}
+                            ? "pending"
+                            : user.status === UserStatus.inactive ||
+                              user.status === UserStatus.locked
+                              ? "inactive"
+                              : ""
+                        }`}
                     >
                       {user.status === UserStatus.active
                         ? "Active"
                         : user.status === UserStatus.pending
-                        ? "Pending"
-                        : user.status === UserStatus.inactive
-                        ? "Inactive"
-                        : user.status === UserStatus.locked
-                        ? "Locked"
-                        : ""}
+                          ? "Pending"
+                          : user.status === UserStatus.inactive
+                            ? "Inactive"
+                            : user.status === UserStatus.locked
+                              ? "Locked"
+                              : ""}
                     </span>
                   </td>
                   <td className="table-cell" style={{ cursor: "pointer" }}>
@@ -379,10 +375,10 @@ const PlatformAdUserMgmt = () => {
                           : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
                         {...(user.centerStatus === CenterStatus.active ||
-                        user.idRole === Role.student
+                          user.idRole === Role.student
                           ? {
-                              isReactivatable: true,
-                            }
+                            isReactivatable: true,
+                          }
                           : {})}
                         roleUserSelected={user.idRole}
                       />

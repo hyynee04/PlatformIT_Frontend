@@ -1,6 +1,6 @@
 import { React, useEffect, useRef, useState } from 'react';
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
-import '../assets/scss/Carousel.css'; // Import your CSS file for styling
+import '../assets/css/Carousel.css'; // Import your CSS file for styling
 import { Object } from '../constants/constants';
 import CenterCard from './Card/CenterCard';
 import CourseCard from './Card/CourseCard';

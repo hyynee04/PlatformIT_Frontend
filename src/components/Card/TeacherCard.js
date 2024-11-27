@@ -1,7 +1,7 @@
 import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/Card.css";
 import default_ava from "../../assets/img/default_ava.png";
-import "../../assets/scss/card/Card.css";
 
 const TeacherCard = (props) => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const TeacherCard = (props) => {
           </div>
           <div className="teacher-card-info">
             <FaRegFile color="#757575" />
-            {`${teacher.coursesCount || teacher.courseCount || 0} ${(teacher.coursesCount > 1 || teacher.courseCount > 1) ? "courses" : "course"}`} 
+            {`${teacher.coursesCount || teacher.courseCount || 0} ${(teacher.coursesCount > 1 || teacher.courseCount > 1) ? "courses" : "course"}`}
           </div>
         </div>
       </div>

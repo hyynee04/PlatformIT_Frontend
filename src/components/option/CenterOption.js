@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../assets/scss/card/OptionCard.css";
-import DiagLockCenterForm from "../diag/DiagLockCenterForm";
+import "../../assets/css/card/OptionCard.css";
 import { CenterStatus } from "../../constants/constants";
+import DiagLockCenterForm from "../diag/DiagLockCenterForm";
 import DiagUnlockCenterForm from "../diag/DiagUnlockCenterForm";
 const CenterOption = ({
   idCenterSelected,

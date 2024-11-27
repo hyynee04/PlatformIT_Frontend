@@ -8,7 +8,7 @@ import {
     LuX
 } from "react-icons/lu";
 import { useLocation } from "react-router-dom";
-import "../assets/scss/ViewAll.css";
+import "../assets/css/ViewAll.css";
 import CenterCard from "../components/Card/CenterCard";
 import CourseCard from "../components/Card/CourseCard";
 import TeacherCard from "../components/Card/TeacherCard";

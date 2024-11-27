@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../../assets/scss/Detail.css";
+import "../../assets/css/Detail.css";
 
 import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
@@ -587,8 +587,8 @@ const CourseDetail = (props) => {
                         {section.lectures && (
                           <div
                             className={`lecture-block ${showedSections[index]
-                                ? ""
-                                : "adjust-lecture-block"
+                              ? ""
+                              : "adjust-lecture-block"
                               }`}
                           >
                             {section.lectures.map((lecture, index) => (
@@ -599,8 +599,8 @@ const CourseDetail = (props) => {
                                   </span>
                                   <span className="lecture-exercise-num">
                                     {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                        ? "exercises"
-                                        : "exercise"
+                                      ? "exercises"
+                                      : "exercise"
                                       }`}
                                   </span>
                                 </div>

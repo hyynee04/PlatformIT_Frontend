@@ -1,11 +1,11 @@
 import React from "react";
 import { LuUserX, LuX } from "react-icons/lu";
 
-import "../../assets/scss/card/DiagForm.css";
-import { fetchAllUsers, updateUserStatus } from "../../store/userSlice";
 import { useDispatch } from "react-redux";
-import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import "../../assets/css/card/DiagForm.css";
 import { Role } from "../../constants/constants";
+import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
+import { fetchAllUsers, updateUserStatus } from "../../store/userSlice";
 
 const DiagInactiveForm = ({
   isOpen,

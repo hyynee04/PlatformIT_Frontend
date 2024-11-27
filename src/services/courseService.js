@@ -260,10 +260,77 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+
+const postAddSection = (sectionName, idCourse, idCreatedBy) => {
+  return axios.post(`api/Course/AddSection`, null, {
+    params: {
+      sectionName: sectionName,
+      idCourse: idCourse,
+      idCreatedBy: idCreatedBy
+    }
+  });
+}
+
+const postAddLecture = async (idList, lectureData) => {
+  try {
+    const formData = new FormData();
+
+    // Append basic fields to formData
+    formData.append("IdCourse", idList.idCourse);
+    formData.append("IdSection", idList.idSection);
+    formData.append("Title", lectureData.Title);
+    formData.append("Introduction", lectureData.Introduction);
+
+    // Append lecture video
+    formData.append("LectureVideo", lectureData.LectureVideo);
+    // Append main materials
+    formData.append("MainMaterials", lectureData.MainMaterials);
+    // Append support materials (handling multiple)
+    lectureData.SupportMaterials.forEach((material, index) => {
+      formData.append(`SupportMaterials`, material); // each material is appended as SupportMaterials
+    });
+
+    // Make the request with the required headers
+    return await axios.post(
+      `http://localhost:5000/api/Lecture/AddLecture?idCreatedBy=${idList.idCreatedBy}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // needed for file uploads
+        },
+      }
+    );
+  } catch (error) {
+    console.error(
+      "Error adding lecture:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+const getNotificationBoardOfCourse = (idCourse) => {
+  return axios.get("api/Notification/GetNotificationBoardOfCourse", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+}
+
+const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
+  return axios.post(`api/Notification/AddBoardNotificationForCourse`, null, {
+    params: {
+      idCourse: idCourse,
+      content: content,
+      idCreatedBy: idCreatedBy,
+    }
+  })
+}
+
 export {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure, getAllActiveSectionOfCourse, getAllAssignmentCardOfTeacher, getAllCourseCards, getAllCourseCardsByIdCenter, getAllCourseCardsByIdStudent, getAllCourseCardsByIdTeacher,
-  getAllTagModel, getCourseDetail, getIsEnRolledCourse, postAddCourse, postAddManualAssignment,
-  postAddQuizAssignment, postEnrollCourse
+  getAllTagModel, getCourseDetail, getIsEnRolledCourse, getNotificationBoardOfCourse, postAddBoardNotificationForCourse, postAddCourse, postAddLecture, postAddManualAssignment,
+  postAddQuizAssignment, postAddSection, postEnrollCourse
 };
 

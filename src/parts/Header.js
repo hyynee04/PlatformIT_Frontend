@@ -1,23 +1,23 @@
+import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LuBell,
-  LuMessageCircle,
   LuClipboardCheck,
   LuLogOut,
+  LuMessageCircle,
 } from "react-icons/lu";
-import { APIStatus, Role } from "../constants/constants";
-import { useEffect, useState } from "react";
-import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../assets/img/default_ava.png";
+import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import { APIStatus, Role } from "../constants/constants";
 
-import "../assets/scss/Header.css";
-import { getAvaImg } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
-import { setAvatar } from "../store/profileUserSlice";
+import "../assets/scss/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
+import { getAvaImg } from "../services/userService";
+import { setAvatar } from "../store/profileUserSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -169,9 +169,8 @@ const Header = () => {
                 <>
                   {(idRole === Role.student || idRole === Role.teacher) && (
                     <button
-                      className={`circle-buts ${
-                        activeButton === "message" ? "clicked" : ""
-                      }`}
+                      className={`circle-buts ${activeButton === "message" ? "clicked" : ""
+                        }`}
                       onClick={() => handleButtonClick("message")}
                     >
                       <LuMessageCircle className="header-icon" />
@@ -179,29 +178,26 @@ const Header = () => {
                   )}
                   {idRole === Role.centerAdmin && (
                     <button
-                      className={`circle-buts ${
-                        location.pathname === buttonPaths["clipboard"]
+                      className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
                           ? "clicked"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >
                       <LuClipboardCheck className="header-icon" />
                     </button>
                   )}
                   <button
-                    className={`circle-buts ${
-                      location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                    }`}
+                    className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                      }`}
                     onClick={() => handleButtonClick("bell")}
                   >
                     <LuBell className="header-icon" />
                   </button>
 
                   <button
-                    className={`circle-buts ${
-                      isAvatarPage || showOptionAva ? "clicked" : ""
-                    }`}
+                    className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
+                      }`}
                     onClick={() => handleButtonClick("avatar")}
                   >
                     <img

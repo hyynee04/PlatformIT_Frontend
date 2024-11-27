@@ -19,15 +19,16 @@ const CenterDetail = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [listTeacher, setListTeacher] = useState([])
-    const [totalTeacherTracks, setTotalTeacherTracks] = useState(0)
+    const [listTeacher, setListTeacher] = useState([]);
+    const [totalTeacherTracks, setTotalTeacherTracks] = useState(0);
 
-    const [listCourse, setListCourse] = useState([])
-    const [totalCourseTracks, setTotalCourseTracks] = useState(0)
+    const [listCourse, setListCourse] = useState([]);
+    const [totalCourseTracks, setTotalCourseTracks] = useState(0);
 
-    const [idRole, setIDRole] = useState("")
-    const [idUser, setIDUser] = useState("")
-    const [centerInfo, setCenterInfo] = useState({})
+    const [topTags, setTopTags] = useState([])
+    const [idRole, setIDRole] = useState("");
+    const [idUser, setIDUser] = useState("");
+    const [centerInfo, setCenterInfo] = useState({});
 
     const fetchCenterDetail = async (idCenter) => {
         let response = await getCenterDetail(idCenter);
@@ -35,7 +36,7 @@ const CenterDetail = (props) => {
         setCenterInfo(data);
 
         // Set center's Courses Carousel
-        if (data.courseCards && data.courseCards.length) {
+        if (data.courseCards && data.courseCards.length > 0) {
             data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
             setTotalCourseTracks(data.courseCards.length > 6 ? 3 : Math.ceil(data.courseCards.length / 2));
             setListCourse(data.courseCards);
@@ -44,12 +45,21 @@ const CenterDetail = (props) => {
         }
 
         // Set center's Teachers Carousel
-        if (data.teacherCards && data.teacherCards.length) {
+        if (data.teacherCards && data.teacherCards.length > 0) {
             data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
             setTotalTeacherTracks(data.teacherCards.length > 6 ? 3 : Math.ceil(data.teacherCards.length / 2));
             setListTeacher(data.teacherCards);
         } else {
             console.warn("No teacherCards data available");
+        }
+
+        // Set top tags
+        if (data.listTagCourses && data.listTagCourses.length > 0) {
+            const tagList = data.listTagCourses
+                .sort((a, b) => b.courseCount - a.courseCount) // Sort descending by courseCount
+                .slice(0, 20); // Take first 20 elements
+
+            setTopTags(tagList)
         }
     };
 
@@ -62,7 +72,6 @@ const CenterDetail = (props) => {
             setIDUser(state.idUSer);
             fetchCenterDetail(state.idCenter);
         }
-
     }, []);
 
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", {
@@ -78,11 +87,11 @@ const CenterDetail = (props) => {
                     <img className="biography-ava center" src={centerInfo.avatarPath ? centerInfo.avatarPath : default_image} alt="center background" />
                     <div className="biography-block">
                         <span className="biography-name center">{centerInfo.centerName}</span>
-                        {centerInfo.listTagCourses && centerInfo.listTagCourses.length !== 0 && (
+                        {centerInfo.listTagCourses && centerInfo.listTagCourses.length > 0 && (
                             <div className="tag-container">
-                                {centerInfo.listTagCourses.map((tag) => (
+                                {topTags.map((tag, index) => (
                                     <div
-                                        key={tag.idTag}
+                                        key={index}
                                         className='tag-content'
                                     >{tag.tagName}</div>
                                 ))}

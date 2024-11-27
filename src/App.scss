@@ -68,8 +68,11 @@
   align-items: center;
   height: 100vh;
 }
-.loading-page > svg {
+.loading-page > svg,
+.icon-spin {
   animation: spin 1s infinite linear;
+}
+.loading-page > svg {
   width: 40px;
   height: 40px;
 }

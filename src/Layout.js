@@ -35,7 +35,8 @@ import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
 import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
-import LectureView from "./pages/lectureMgmt/LectureView";
+import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
+import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 const Layout = (props) => {
@@ -81,7 +82,10 @@ const Layout = (props) => {
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
-          <Route path="/viewLecture" element={<LectureView />} />
+
+
+          <Route path="/addNewLecture" element={<AddNewLecture />} />
+          <Route path="/viewLecture" element={<Lecture />} />
 
           <Route path="/viewAll" element={<ViewAll />} />
 

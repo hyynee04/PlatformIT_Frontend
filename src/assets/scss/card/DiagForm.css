@@ -143,8 +143,14 @@
 }
 
 .modal-container .diag-body .str-btns .act-btns > .diag-btn {
-  min-width: 80px;
+  min-width: fit-content;
   font-size: 14px;
+  outline: none;
+}
+.modal-container .diag-body .str-btns .act-btns .diag-btn > svg {
+  height: 0.85rem;
+  width: 0.85rem;
+  margin-right: 5px;
 }
 
 .modal-container .diag-body .str-btns .act-btns .cancel {
@@ -157,11 +163,22 @@
   background-color: rgba(217, 217, 217, 0.5);
   border: none;
   outline: none;
-  color: var(--main-color);
+  color: var(--text-gray);
+}
+.modal-container .diag-body .str-btns .act-btns .cancle:hover {
+  background-color: rgba(217, 217, 217, 0.5);
+  color: var(--black-color);
 }
 
 .modal-container .diag-body .str-btns .act-btns .signout {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   background-color: var(--main-color);
+  color: var(--white-color);
+}
+.modal-container .diag-body .str-btns .act-btns .signout:hover {
+  background-color: rgba(57, 121, 121, 0.8);
   color: var(--white-color);
 }
 
@@ -198,6 +215,10 @@
 .modal-container .diag-body .container-diag-field .info > .error-noti {
   color: var(--red-color);
   font-size: 0.85rem;
+}
+.container-diag-field > .section-create-inform {
+  width: 100%;
+  font-weight: 600;
 }
 
 .modal-container
@@ -341,7 +362,6 @@
   outline: none;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
-
 .modal-container.float-in {
   animation: slideIn 0.3s linear forwards;
 }

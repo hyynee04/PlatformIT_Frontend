@@ -9,14 +9,10 @@ import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
   LuCalendar,
-  LuCheckSquare,
   LuClock,
   LuFileEdit,
   LuFileQuestion,
-  LuMail,
-  LuMinus,
   LuPlus,
-  LuTrash2,
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
 
@@ -24,14 +20,15 @@ import StarRatings from "react-star-ratings";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
-import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
 import {
   getCourseDetail,
   getIsEnRolledCourse,
+  getNotificationBoardOfCourse,
   postEnrollCourse,
 } from "../../services/courseService";
+import CourseDetailTeacher from "./CourseDetailTeacher";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -39,25 +36,40 @@ const CourseDetail = (props) => {
 
   const [loading, setLoading] = useState(false);
 
-  const [isShowed, setIsShowed] = useState(false);
-  const [popupAdd, setPopupAdd] = useState(false);
-  const [addSection, setAddSection] = useState(false);
-
   // console.log(">> Course Detail:", addSection);
 
   const [idRole, setIDRole] = useState(0);
   const [idUser, setIDUser] = useState("");
   const [courseInfo, setCourseInfo] = useState({});
-  const [menuIndex, setMenuIndex] = useState(1);
+  const [listTestCards, setListTestCards] = useState([]);
+  const [notificationBoard, setNotificationBoard] = useState([]);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
+  const [showedSections, setShowedSections] = useState({});
+  const handleIsShowed = (index) => {
+    setShowedSections((prev) => ({
+      ...prev,
+      [index]: !prev[index], // Toggle the current section's visibility
+    }));
+  };
   const fetchCourseDetail = async (idCourse) => {
     setLoading(true);
     try {
       let response = await getCourseDetail(idCourse);
       setCourseInfo(response.data);
 
+      // Get Notification Board
+      let notifications = await getNotificationBoardOfCourse(idCourse);
+      const processedData = notifications.data.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      setNotificationBoard(processedData);
+
       const responseIsEnroll = await getIsEnRolledCourse(idCourse);
+      // if (idRole === Role.teacher) {
+
+      // }
       if (responseIsEnroll.data === true) {
         setIsEnrolledCourse(true);
       } else {
@@ -70,8 +82,32 @@ const CourseDetail = (props) => {
     }
   };
 
-  const handleIsShowed = () => {
-    setIsShowed(!isShowed);
+  // Helper to calculate relative time
+  const calculateRelativeTime = (timestamp) => {
+    const now = new Date();
+    const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
+
+    if (difference < 60) return `${difference} seconds ago`;
+    if (difference < 3600) return `${Math.floor(difference / 60)} minutes ago`;
+    if (difference < 86400) return `${Math.floor(difference / 3600)} hours ago`;
+    return `${Math.floor(difference / 86400)} days ago`;
+  };
+
+  // Helper to parse "relativeTime" into a timestamp
+  const parseRelativeTime = (relativeTime) => {
+    const now = new Date();
+    const parts = relativeTime.split(" ");
+
+    if (parts.includes("seconds")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
+    } else if (parts.includes("minutes")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
+    } else if (parts.includes("hours")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
+    } else if (parts.includes("days")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
+    }
+    return now; // Default to current time if unrecognized format
   };
 
   const formatDate = (dateString) =>
@@ -112,14 +148,43 @@ const CourseDetail = (props) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-
     const state = location.state;
     if (state) {
       setIDUser(parseInt(state.idUser));
       setIDRole(parseInt(state.idRole));
       fetchCourseDetail(state.idCourse);
     }
+    const interval = setInterval(() => {
+      setNotificationBoard((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          relativeTime: calculateRelativeTime(notification.timestamp),
+        }))
+      );
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
   }, []);
+
+  const [menuIndex, setMenuIndex] = useState(1);
+  useEffect(() => {
+    const savedMenuIndex = localStorage.getItem("menuIndex");
+    if (savedMenuIndex) {
+      setMenuIndex(Number(savedMenuIndex)); // Restore the value if it exists
+    }
+  }, []);
+
+  // Update localStorage whenever menuIndex changes
+  useEffect(() => {
+    localStorage.setItem("menuIndex", menuIndex);
+  }, [menuIndex]);
+
+  useEffect(() => {
+    return () => {
+      // This runs when the component unmounts or route changes
+      localStorage.removeItem("menuIndex");
+    };
+  }, [location]);
 
   const reviews = courseInfo?.rateModels || [];
 
@@ -169,6 +234,7 @@ const CourseDetail = (props) => {
 
   //REGIST COURSE
   const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
+  const [addedNotification, setAddedNotification] = useState(false);
 
   const openSuccessModal = () => setIsModalSuccessOpen(true);
   const closeSuccessModal = () => setIsModalSuccessOpen(false);
@@ -186,7 +252,8 @@ const CourseDetail = (props) => {
       navigate("/login");
     }
   };
-  // console.log(idRole);
+
+  console.log(idRole);
   if (loading) {
     return (
       <div className="loading-page">
@@ -251,12 +318,6 @@ const CourseDetail = (props) => {
               </span>
               <span>{courseInfo.introduction}</span>
             </div>
-            {/* {new Date() >= new Date(courseInfo.registStartDate) &&
-            new Date() <= new Date(courseInfo.registEndDate) ? (
-              <button onClick={handleBuyCourse}>Buy Now</button>
-            ) : (
-              <button disabled>Can't buy now</button>
-            )} */}
             {(idRole === Role.student || !idRole) &&
               !isEnrolledCourse &&
               (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
@@ -416,26 +477,15 @@ const CourseDetail = (props) => {
 
       <div className="right-container">
         {idUser && idRole === Role.teacher ? (
-          <div className="teacher-menu">
-            <button
-              className={`teacher-menu-btn ${menuIndex === 1 ? "active" : ""}`}
-              onClick={() => setMenuIndex(1)}
-            >
-              Main content
-            </button>
-            <button
-              className={`teacher-menu-btn ${menuIndex === 2 ? "active" : ""}`}
-              onClick={() => setMenuIndex(2)}
-            >
-              Notification
-            </button>
-            <button
-              className={`teacher-menu-btn ${menuIndex === 3 ? "active" : ""}`}
-              onClick={() => setMenuIndex(3)}
-            >
-              Attendance
-            </button>
-          </div>
+          <CourseDetailTeacher
+            courseInfo={courseInfo}
+            idUser={idUser}
+            setAddedNotification={setAddedNotification}
+            notificationBoard={notificationBoard}
+            fetchCourseDetail={fetchCourseDetail}
+            menuIndex={menuIndex}
+            setMenuIndex={setMenuIndex}
+          />
         ) : null}
 
         {/* Student View */}
@@ -516,7 +566,7 @@ const CourseDetail = (props) => {
                       <div key={index} className="lecture">
                         <div
                           className={`lecture-header ${
-                            isShowed ? "" : "change-border-radius"
+                            showedSections[index] ? "" : "change-border-radius"
                           } `}
                         >
                           <span className="section-name">
@@ -534,26 +584,27 @@ const CourseDetail = (props) => {
                             </span>
                             <button
                               className="showhide-button"
-                              onClick={() => handleIsShowed()}
+                              onClick={() => handleIsShowed(index)}
                               disabled={section.lectures.length === 0}
                             >
-                              {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                              {showedSections[index] ? (
+                                <IoIosArrowUp />
+                              ) : (
+                                <IoIosArrowDown />
+                              )}
                             </button>
                           </div>
                         </div>
                         {section.lectures && (
                           <div
                             className={`lecture-block ${
-                              isShowed ? "" : "adjust-lecture-block"
+                              showedSections[index]
+                                ? ""
+                                : "adjust-lecture-block"
                             }`}
                           >
                             {section.lectures.map((lecture, index) => (
-                              <div
-                                key={index}
-                                className={`lecture-content ${
-                                  isShowed ? "" : "remove-border"
-                                } `}
-                              >
+                              <div key={index} className="lecture-content">
                                 <div className="lecture-name">
                                   <span className="lecture-title">
                                     {lecture.lectureTitle}
@@ -584,19 +635,19 @@ const CourseDetail = (props) => {
                 <span className="block-container-title">Test</span>
                 <div className="block-container-col">
                   {courseInfo.tests.map((test, index) => (
-                    <div key={index} className="qualification">
+                    <div key={index} className="qualification test">
                       <div className="qualification-body">
                         <div className="test-header">
                           <span className="test-name">
                             {test.assignmentTitle}
                           </span>
-                          {idUser && idRole === Role.student && (
+                          {idUser && idRole === Role.student ? (
                             <div className="test-info">
                               Due: 09/15/2024, 23:59
                             </div>
-                            // <div className="test-info">Submitted <FiCheckSquare /></div>
-                            // <div className="test-info past-due">Past Due</div>
-                          )}
+                          ) : // <div className="test-info">Submitted <FiCheckSquare /></div>
+                          // <div className="test-info past-due">Past Due</div>
+                          null}
                         </div>
 
                         <div className="test-description">
@@ -624,274 +675,22 @@ const CourseDetail = (props) => {
             )}
           </>
         ) : null}
-
-        {/* Teacher View: Main Content */}
-        {idRole === Role.teacher && menuIndex === 1 ? (
-          <>
-            <div className="block-container">
-              <div className="block-container-header">
-                <span className="block-container-title">Course Content</span>
-                <span className="block-container-sub-title">
-                  1 section - 1 lecture
-                </span>
-              </div>
-              <div className="block-container-col">
-                <div className="lecture">
-                  <div
-                    className={`lecture-header ${
-                      isShowed ? "" : "change-border-radius"
-                    } `}
-                  >
-                    <span className="section-name">Section 1</span>
-                    <div className="section-info">
-                      <span className="section-name">1 lecture</span>
-                      <button
-                        className="showhide-button"
-                        onClick={() => handleIsShowed()}
-                      >
-                        {isShowed ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className={`lecture-block ${
-                      isShowed ? "" : "adjust-lecture-block"
-                    }`}
-                  >
-                    <div
-                      className={`lecture-content ${
-                        isShowed ? "" : "remove-border"
-                      } `}
-                    >
-                      <div className="lecture-name">
-                        <span className="lecture-title">Title</span>
-                        <span className="lecture-exercise-num">
-                          3 exercises
-                        </span>
-                      </div>
-                      <span className="lecture-description">
-                        Body text for whatever you’d like to say. Add main
-                        takeaway points, quotes, anecdotes, or even a very very
-                        short story.
-                      </span>
-                    </div>
-                    <div
-                      className={`lecture-content nohover ${
-                        isShowed ? "" : "remove-border"
-                      } `}
-                    >
-                      <div className="option-container">
-                        <button className="add-lecture">
-                          <LuPlus /> Add new lecture
-                        </button>
-                        <button className="remove-section">
-                          <LuTrash2 /> Remove this section
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <button
-                className="add-section-btn"
-                onClick={() => setAddSection(true)}
-              >
-                <LuPlus /> Add new section
-              </button>
-              <DiagAddSectionForm
-                isOpen={addSection}
-                onClose={() => setAddSection(false)}
-                idCourse={courseInfo.idCourse}
-                idTeacher={idUser}
-              />
-            </div>
-
-            <div className="block-container">
-              <span className="block-container-title">Test</span>
-              <div className="block-container-col">
-                <div className="qualification">
-                  <div className="qualification-body">
-                    <div className="test-header">
-                      <span className="test-name teacher-view">Title</span>
-                    </div>
-
-                    <div className="test-description">
-                      <span>
-                        <LuFileEdit /> Manual
-                      </span>
-                      <span>
-                        <LuClock /> 45 mins
-                      </span>
-                      <span>
-                        <LuCheckSquare /> 40 marks
-                      </span>
-                      <span>
-                        <LuCalendar />
-                        Due date: 11/20/2025
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="test-status">
-                    <div className="test-status-text">Unpublish</div>
-                  </div>
-                </div>
-              </div>
-              <button
-                className="add-section-btn"
-                onClick={() => {
-                  navigate("/addAssignment", {
-                    state: {
-                      selectedCourse: courseInfo,
-                    },
-                  });
-                }}
-              >
-                <LuPlus /> Add new test
-              </button>
-            </div>
-          </>
-        ) : null}
-
-        {/* Teacher View: Notification */}
-        {idRole === Role.teacher && menuIndex === 2 ? (
-          <div className="block-container">
-            <span className="block-container-title">Notification Board</span>
-            <div className="block-container-col noti-size">
-              <div className="notification">
-                <div className="delete-button">
-                  <button>
-                    <LuMinus />
-                  </button>
-                </div>
-                <div className="notification-body">
-                  <span className="notification-title">Title</span>
-                  <span className="notification-content">
-                    Body text for whatever you’d like to say. Add main takeaway
-                    points, quotes, anecdotes, or even a very very short story.
-                  </span>
-
-                  <span className="noti-time">13.hr</span>
-                </div>
-              </div>
-            </div>
-            <button
-              className="add-notification-button"
-              onClick={() => setPopupAdd(!popupAdd)}
-            >
-              <LuPlus />
-            </button>
-            <div
-              className={`add-notification-popup ${popupAdd ? "active" : ""}`}
-            >
-              <span className="popup-title">Add new notification</span>
-              <input
-                className="notification-title-enter"
-                type="text"
-                placeholder="Notification Title"
-              />
-              <textarea placeholder="Write your notification content here..."></textarea>
-              <div className="post-button-container">
-                <button
-                  className="post-notification-button cancel"
-                  onClick={() => setPopupAdd(!popupAdd)}
-                >
-                  Cancel
-                </button>
-                <button className="post-notification-button post">Post</button>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Teacher View: Attendance */}
-        {idRole && idRole === Role.teacher && menuIndex && menuIndex === 3 ? (
-          <div className="block-container course-teacher-attendance">
-            <div className="attendance-progress-container">
-              <div className="attendance-progress-content">
-                <div className="attendance-ava">
-                  <img src={default_ava} />
-                </div>
-                <div className="attendance-progress-body">
-                  <span className="attendance-name">Tian</span>
-                  <span className="attendance-mail">
-                    <LuMail color="#003B57" /> tiannait@snapmail.cc
-                  </span>
-                  <div className="attendance-progress">
-                    <label>Lectures</label>
-                    <div className="progress-line">
-                      <div className="progress-line-inner"></div>
-                    </div>
-                    <span
-                      className="proportion-number"
-                      style={{ width: "20s%" }}
-                    >
-                      3/15
-                    </span>
-                  </div>
-                  <div className="attendance-progress">
-                    <label>Assignments</label>
-                    <div className="progress-line">
-                      <div
-                        className="progress-line-inner"
-                        style={{ width: "53.33%" }}
-                      ></div>
-                    </div>
-                    <span className="proportion-number">8/15</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="attendance-progress-container">
-              <div className="attendance-progress-content">
-                <div className="attendance-ava">
-                  <img src={default_ava} />
-                </div>
-                <div className="attendance-progress-body">
-                  <span className="attendance-name">Ruan</span>
-                  <span className="attendance-mail">
-                    <LuMail color="#003B57" /> tiannait@snapmail.cc
-                  </span>
-                  <div className="attendance-progress">
-                    <label>Lectures</label>
-                    <div className="progress-line">
-                      <div className="progress-line-inner"></div>
-                    </div>
-                    <span
-                      className="proportion-number"
-                      style={{ width: "20s%" }}
-                    >
-                      3/15
-                    </span>
-                  </div>
-                  <div className="attendance-progress">
-                    <label>Assignments</label>
-                    <div className="progress-line">
-                      <div
-                        className="progress-line-inner"
-                        style={{ width: "53.33%" }}
-                      ></div>
-                    </div>
-                    <span className="proportion-number">8/15</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
       </div>
-      {isModalSuccessOpen && (
-        <div>
-          <DiagSuccessfully
-            isOpen={isModalSuccessOpen}
-            onClose={closeSuccessModal}
-            notification={
-              "Congratulations! You have successfully enrolled in the course."
-            }
-          />
-        </div>
-      )}
+
+      <div>
+        <DiagSuccessfully
+          isOpen={isModalSuccessOpen}
+          onClose={closeSuccessModal}
+          notification={
+            "Congratulations! You have successfully enrolled in the course."
+          }
+        />
+        <DiagSuccessfully
+          isOpen={addedNotification}
+          onClose={() => setAddedNotification(false)}
+          notification={"Successfully post a new notification to board."}
+        />
+      </div>
     </div>
   );
 };

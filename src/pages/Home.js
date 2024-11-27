@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import { IoMdOpen } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import logoPlait from "../assets/img/logoPlait.png";
 import "../assets/scss/Home.css";
-import { ImSpinner2 } from "react-icons/im";
 import Carousel from "../components/Carousel";
 import { Object, Role } from "../constants/constants";
 import { getAllCenterCards } from "../services/centerService";
@@ -76,16 +76,24 @@ const Home = (props) => {
   };
 
   useEffect(() => {
-    getTeacherCards();
-    getCenterCards();
-    getCourseCards();
+    setLoading(true);
+    try {
+      getTeacherCards();
+      getCenterCards();
+      getCourseCards();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
   }, []);
+
   if (loading) {
     return (
       <div className="loading-page">
         <ImSpinner2 color="#397979" />
       </div>
-    );
+    ); // Show loading while waiting for API response
   }
   return (
     <div>

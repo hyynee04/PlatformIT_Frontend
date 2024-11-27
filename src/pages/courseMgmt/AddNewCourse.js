@@ -6,13 +6,13 @@ import { FiSettings } from "react-icons/fi";
 import { LuMoveRight, LuX } from "react-icons/lu";
 import TeacherCard from "../../components/Card/TeacherCard";
 
+import { useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
+import { APIStatus } from "../../constants/constants";
 import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import { getAllTagModel, postAddCourse } from "../../services/courseService";
-import { APIStatus } from "../../constants/constants";
-import { useNavigate } from "react-router-dom";
 const AddNewCourse = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -456,14 +456,14 @@ const AddNewCourse = () => {
                       <span>Price</span>
                       {(formValues.priceValidate ||
                         formValues.discountedPriceValidate) && (
-                        <span
-                          className={"warning-error"}
-                          style={{ color: "var(--red-color)" }}
-                        >
-                          {formValues.priceValidate ||
-                            formValues.discountedPriceValidate}
-                        </span>
-                      )}
+                          <span
+                            className={"warning-error"}
+                            style={{ color: "var(--red-color)" }}
+                          >
+                            {formValues.priceValidate ||
+                              formValues.discountedPriceValidate}
+                          </span>
+                        )}
                     </div>
 
                     <div className="left-to-right">
@@ -571,7 +571,7 @@ const AddNewCourse = () => {
                   type="file"
                   ref={inputFileRef}
                   style={{ display: "none" }}
-                  accept=".png, .jpg, .jpeg"
+                  accept=".png, .jpg, .jpeg, .jfif"
                   onChange={handleImgChange}
                 />
               </div>

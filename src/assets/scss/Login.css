@@ -131,7 +131,7 @@
   height: 43px;
   padding: 4px 40px;
   border-radius: .5rem;
-  border-color: rgba(217, 217, 217, 0.3);
+  border: none;
   background-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
 }

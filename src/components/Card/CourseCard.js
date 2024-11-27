@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LuBuilding2, LuClock, LuDollarSign, LuStar } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +13,8 @@ const CourseCard = (props) => {
   const longest_tag =
     course.tags && course.tags.length > 0
       ? course.tags.reduce((longest, current) =>
-          current.length > longest.length ? current : longest
-        )
+        current.length > longest.length ? current : longest
+      )
       : "";
   const remain_tag_number = course.tags ? course.tags.length - 1 : 0;
 
@@ -26,6 +26,14 @@ const CourseCard = (props) => {
       year: "numeric",
     });
 
+  const [status, setStatus] = useState(null);
+  const courseStatus = {
+    1: "Coming soon",
+    2: "Registering",
+    3: "Starting soon",
+    4: "On going",
+  }
+
   const getCourseStatus = (course) => {
     const currentDate = new Date();
     const registStart = new Date(course.registStartDate);
@@ -34,19 +42,20 @@ const CourseCard = (props) => {
     const courseEnd = new Date(course.courseEndDate);
 
     if (currentDate >= registStart && currentDate <= registEnd) {
-      return "Registrating";
+      setStatus(2);
     } else if (currentDate >= registEnd && currentDate <= courseStart) {
-      return "Registration end";
+      setStatus(3);
     } else if (currentDate >= courseStart && currentDate <= courseEnd) {
-      return "On going";
-    } else if (currentDate > courseEnd) {
-      return "Course end";
+      setStatus(4);
     } else {
-      return "Upcoming";
+      setStatus(1);
     }
   };
 
-  const status = getCourseStatus(course);
+  useEffect(() => {
+    getCourseStatus(course);
+  }, [])
+
   return (
     <div className="outside-card">
       <div className="card-container">
@@ -54,6 +63,11 @@ const CourseCard = (props) => {
           className="course-card-container"
           onMouseEnter={() => setIsHover(true)}
         >
+          {course.isLimitedTime === 1 && (
+            <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>
+              {courseStatus[status]}
+            </div>
+          )}
           <img
             src={course.pathImg !== null ? course.pathImg : default_image}
             alt="course image"
@@ -93,9 +107,6 @@ const CourseCard = (props) => {
               <span className="discount-price">{course.price || "Free"}</span>
               {/* <span className='initial-price'>300</span> */}
             </div>
-            {course.isLimitedTime === 1 && (
-              <div className="course-card-period">{status}</div>
-            )}
           </div>
         </div>
       </div>
@@ -106,6 +117,11 @@ const CourseCard = (props) => {
           onMouseLeave={() => setIsHover(false)}
         >
           <div className="course-card-container course-card-hover">
+            {course.isLimitedTime === 1 && (
+              <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>
+                {courseStatus[status]}
+              </div>
+            )}
             <img
               src={course.pathImg !== null ? course.pathImg : default_image}
               alt="course image"

@@ -4,7 +4,7 @@ import { RiAttachment2 } from "react-icons/ri";
 import { AssignmentItemAnswerType } from "../../constants/constants";
 import Form from "react-bootstrap/Form";
 
-const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
+const ManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
   const handleDeleteQuestion = (idx) => {
     const updatedQuestions = questions.filter((_, index) => index !== idx);
     setQuestions(updatedQuestions);
@@ -14,6 +14,9 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
     const updatedQuestions = [...questions];
     updatedQuestions[idx].attachedFile = null;
     setQuestions(updatedQuestions);
+    if (inputFileRef.current[idx]) {
+      inputFileRef.current[idx].value = "";
+    }
   };
 
   const handleOpenReferenceQuestion = (idx) => {
@@ -146,4 +149,4 @@ const NewManualQuestion = ({ questions, setQuestions, inputFileRef }) => {
   );
 };
 
-export default NewManualQuestion;
+export default ManualQuestion;

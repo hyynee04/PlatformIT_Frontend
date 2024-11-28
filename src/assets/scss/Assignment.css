@@ -112,9 +112,19 @@
   background-color: transparent;
 }
 .list-assign-container .assign-item .row-item .btn-option:active,
-.list-assign-container .assign-item .row-item .btn-option:focus {
+.list-assign-container .assign-item .row-item .btn-option:focus,
+.list-assign-container .assign-item .row-item .btn-option:disabled {
   border: none;
   outline: none;
+}
+.list-assign-container .assign-item .row-item .btn-option > .icon {
+  width: 20px;
+  height: auto;
+  stroke-width: 2;
+}
+.list-assign-container .assign-item .row-item .btn-option > .icon:hover {
+  color: var(--black-color);
+  stroke-width: 3;
 }
 /* .list-assign-container .assign-item .row-item .btn:hover {
   background-color: rgba(217, 217, 217, 0.3);
@@ -152,13 +162,18 @@
   padding: 48px 64px 24px;
   font-size: 26px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
 }
-/* .assign-span .name-container {
-  padding: 0 30px;
-} */
+.assign-span .left-assign-span {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+}
 .assign-span .name-container .name-sub-container {
+  margin-left: 30px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -227,27 +242,119 @@
 .container-left-assign .assign-info .info .overall-span {
   color: var(--black-color);
 }
+.container-left-assign .list-options-container {
+  padding: 8px;
+  background-color: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border-radius: 8px;
+  gap: 2px;
+  width: 100%;
+  position: absolute;
+  top: 74px;
+  left: 0;
+  z-index: 9999;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
+.container-left-assign .list-options-container .option-course-container {
+  width: 100%;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  border-radius: 4px;
+  min-height: 39px;
+}
+.container-left-assign .list-options-container .option-course-container:hover {
+  cursor: pointer;
+  background-color: var(--border-gray);
+}
+.container-left-assign .list-options-container .option-course-container > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.container-left-assign
+  .list-options-container
+  .option-course-container
+  > div
+  > span {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  font-size: 12px;
+}
+.container-left-assign
+  .list-options-container
+  .option-course-container
+  .status-time-course {
+  padding: 4px 8px;
+  font-weight: 800;
+  border-radius: 4px;
+  flex: 0.2;
+  text-align: center;
+  font-size: 14px;
+  color: var(--black-color);
+}
+.container-left-assign
+  .list-options-container
+  .option-course-container
+  .status-time-course.on-going {
+  background-color: rgb(178, 224, 200);
+}
+.container-left-assign
+  .list-options-container
+  .option-course-container
+  .status-time-course.starting-soon {
+  background-color: rgb(248, 233, 172);
+}
 
 .action-btns-form {
   width: 100%;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-start;
-  padding: 24px 24px 0;
-  border-top: 1px solid var(--border-gray);
 }
 .action-btns-form .container-button {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   width: auto;
   gap: 10px;
+  padding: 16px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  border-radius: 8px;
 }
 .action-btns-form .container-button .btn {
   padding: 6px 8px;
-  border-radius: 4px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  color: var(--text-gray);
+}
+.action-btns-form .container-button .btn > span {
+  display: none;
+  margin-left: 8px;
+}
+.action-btns-form .container-button .btn:hover {
+  background-color: var(--border-gray);
+}
+.action-btns-form .container-button .btn:hover > span {
+  display: inline;
 }
 
 .action-btns-form .container-button .btn.publish {

@@ -26,6 +26,7 @@ import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
 } from "../../services/courseService";
+import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
 
 const TeacherAssignMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -197,12 +198,15 @@ const TeacherAssignMgmt = () => {
         : -1;
     });
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("en-GB", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    const options = { weekday: "long" };
+    const weekday = new Date(date).toLocaleDateString("en-US", options); // Lấy tên ngày
+
+    const dateObj = new Date(date);
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, "0"); // Tháng (bắt đầu từ 0 nên +1)
+    const day = dateObj.getDate().toString().padStart(2, "0"); // Ngày
+    const year = dateObj.getFullYear(); // Năm
+
+    return `${weekday}, ${month}/${day}/${year}`;
   };
 
   //CREATED DATE
@@ -241,8 +245,13 @@ const TeacherAssignMgmt = () => {
     setAssignmentType("all");
     setTempAssignmentType("all");
   };
-
   const [selectedAssignment, setSelectedAssignment] = useState({});
+  //PUBLISH ASSIGNMENT
+  const [isModalPublishOpen, setIsModalPublishOpen] = useState(false);
+
+  const openPublishModal = () => setIsModalPublishOpen(true);
+  const closePublishModal = () => setIsModalPublishOpen(false);
+
   const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
   const optionRef = useRef(null);
   useEffect(() => {
@@ -250,7 +259,8 @@ const TeacherAssignMgmt = () => {
       if (
         optionRef.current &&
         !optionRef.current.contains(event.target) &&
-        !diagDeleteVisible
+        !diagDeleteVisible &&
+        !isModalPublishOpen
       ) {
         setSelectedAssignment({});
       }
@@ -259,13 +269,14 @@ const TeacherAssignMgmt = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [optionRef, diagDeleteVisible]);
+  }, [optionRef, diagDeleteVisible, isModalPublishOpen]);
   const handleMoreIconClick = (assignment) => {
     setSelectedAssignment((prevSelected) =>
       prevSelected === assignment ? {} : assignment
     );
   };
 
+  //DELETE ASSIGNMENT
   const handleOpenDeleteDiag = () => {
     setDiagDeleteVisible(true);
   };
@@ -281,6 +292,11 @@ const TeacherAssignMgmt = () => {
       throw error;
     }
   };
+  const handlePublishSuccess = () => {
+    fetchAssignment();
+    setSelectedAssignment({});
+  };
+
   if (loading) {
     return (
       <div className="loading-page">
@@ -503,11 +519,11 @@ const TeacherAssignMgmt = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button className="circle-btn">
-              <TiPlus
-                className="icon"
-                onClick={() => navigate("/addAssignment")}
-              />
+            <button
+              className="circle-btn"
+              onClick={() => navigate("/addAssignment")}
+            >
+              <TiPlus className="icon" />
             </button>
           </div>
         </div>
@@ -517,7 +533,25 @@ const TeacherAssignMgmt = () => {
               <div className="time-assign-container" key={index}>
                 <span className="create-time-assign">{date}</span>
                 {assignments.map((assignment, idx) => (
-                  <div className="assign-item" key={idx}>
+                  <div
+                    className="assign-item"
+                    key={idx}
+                    onDoubleClick={() => {
+                      if (assignment.isPublish === 1) {
+                        navigate("/teacherAssignDetail", {
+                          state: {
+                            idAssignment: assignment.idAssignment,
+                          },
+                        });
+                      } else {
+                        navigate("/updateAssignment", {
+                          state: {
+                            idAssignment: assignment.idAssignment,
+                          },
+                        });
+                      }
+                    }}
+                  >
                     <div className="row-item">
                       <span
                         className="title-assign"
@@ -527,9 +561,12 @@ const TeacherAssignMgmt = () => {
                       </span>
                       <button
                         className="btn-option"
-                        onClick={() => handleMoreIconClick(assignment)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMoreIconClick(assignment);
+                        }}
                       >
-                        <LuMoreHorizontal />
+                        <LuMoreHorizontal className="icon" />
                       </button>
                     </div>
                     <div className="attribute-container">
@@ -607,7 +644,13 @@ const TeacherAssignMgmt = () => {
                         className="container-options assignment-option"
                       >
                         {assignment.isPublish === 0 && (
-                          <button className="op-buts">
+                          <button
+                            className="op-buts"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openPublishModal();
+                            }}
+                          >
                             <span>Publish</span>
                             <MdPublish />
                           </button>
@@ -615,13 +658,24 @@ const TeacherAssignMgmt = () => {
                         <button
                           className="op-buts"
                           //onClick={handleOpenDeleteDiag}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/duplicateAssignment", {
+                              state: {
+                                idAssignment: assignment.idAssignment,
+                              },
+                            });
+                          }}
                         >
                           <span>Duplicate</span>
                           <IoDuplicateSharp />
                         </button>
                         <button
                           className="op-buts"
-                          onClick={handleOpenDeleteDiag}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDeleteDiag();
+                          }}
                         >
                           <span>Delete</span>
                           <FaTrashAlt />
@@ -695,6 +749,12 @@ const TeacherAssignMgmt = () => {
           </div>
         </div>
       )}
+      <DiagPublishAssign
+        isOpen={isModalPublishOpen}
+        onClose={closePublishModal}
+        idAssignment={selectedAssignment.idAssignment}
+        onPublishSuccess={handlePublishSuccess}
+      />
     </div>
   );
 };

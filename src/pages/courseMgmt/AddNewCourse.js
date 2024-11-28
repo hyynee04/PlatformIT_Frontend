@@ -157,26 +157,26 @@ const AddNewCourse = () => {
     let durationValidate = "";
     const today = new Date().setHours(0, 0, 0, 0);
     // Kiểm tra không được trước ngày hôm nay
-    // if (new Date(values.registStartDate) < today) {
-    //   registTimeValidate = "Registration start date cannot be before today";
-    // }
-    // if (new Date(values.registEndDate) < today) {
-    //   registTimeValidate = "Registration end date cannot be before today";
-    // }
-    // if (new Date(values.startDate) < today) {
-    //   durationValidate = "Course start date cannot be before today";
-    // }
-    // if (new Date(values.endDate) < today) {
-    //   durationValidate = "Course end date cannot be before today";
-    // }
+    if (new Date(values.registStartDate) < today) {
+      registTimeValidate = "Registration start date cannot be before today";
+    }
+    if (new Date(values.registEndDate) < today) {
+      registTimeValidate = "Registration end date cannot be before today";
+    }
+    if (new Date(values.startDate) < today) {
+      durationValidate = "Course start date cannot be before today";
+    }
+    if (new Date(values.endDate) < today) {
+      durationValidate = "Course end date cannot be before today";
+    }
 
     if (new Date(values.registEndDate) < new Date(values.registStartDate)) {
       registTimeValidate =
         "Registration end date cannot be earlier than registration start date";
     }
     if (
-      new Date(values.registEndDate) > new Date(values.startDate) ||
-      new Date(values.registStartDate) > new Date(values.startDate)
+      new Date(values.registEndDate) >= new Date(values.startDate) ||
+      new Date(values.registStartDate) >= new Date(values.startDate)
     ) {
       registTimeValidate =
         "Course start date must be after the registration period";
@@ -311,7 +311,7 @@ const AddNewCourse = () => {
     const dataToSubmit = {
       title: title,
       description: description,
-      coverImg: coverImage || null,
+      coverImg: coverImage.coverImgFile || null,
       startDate: formValues.startDate,
       endDate: formValues.endDate,
       price: formValues.price,
@@ -456,14 +456,14 @@ const AddNewCourse = () => {
                       <span>Price</span>
                       {(formValues.priceValidate ||
                         formValues.discountedPriceValidate) && (
-                          <span
-                            className={"warning-error"}
-                            style={{ color: "var(--red-color)" }}
-                          >
-                            {formValues.priceValidate ||
-                              formValues.discountedPriceValidate}
-                          </span>
-                        )}
+                        <span
+                          className={"warning-error"}
+                          style={{ color: "var(--red-color)" }}
+                        >
+                          {formValues.priceValidate ||
+                            formValues.discountedPriceValidate}
+                        </span>
+                      )}
                     </div>
 
                     <div className="left-to-right">

@@ -136,6 +136,13 @@ const getAllAssignmentCardOfTeacher = async () => {
     },
   });
 };
+const getAssignmentInfo = async (idAssignment) => {
+  return await axios.get("api/Assignment/GetAssignmentInfo", {
+    params: {
+      idAssignment: idAssignment,
+    },
+  });
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -260,6 +267,19 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postPublishAssignment = async (idAssignment) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  try {
+    return await axios.post("api/Assignment/PublishAssignment", null, {
+      params: {
+        idAssignment: idAssignment,
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const deleteAssignment = async (idAssignment) => {
   const idUpdatedBy = +localStorage.getItem("idUser");
   try {
@@ -356,9 +376,11 @@ export {
   postAddBoardNotificationForCourse,
   postAddCourse,
   postAddLecture,
+  getAssignmentInfo,
   postAddManualAssignment,
   postAddQuizAssignment,
   postAddSection,
   postEnrollCourse,
+  postPublishAssignment,
   deleteAssignment,
 };

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { FaDongSign } from "react-icons/fa6";
+import { BsPinAngleFill } from "react-icons/bs";
 import { LuBuilding2, LuClock, LuStar } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
+import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
@@ -59,6 +60,7 @@ const CourseCard = (props) => {
 
   return (
     <div className="outside-card">
+      <BsPinAngleFill />
       <div className="card-container">
         <div
           className="course-card-container"
@@ -102,19 +104,26 @@ const CourseCard = (props) => {
           <div className="course-card-footer">
             <div className="course-card-price">
               <span className="discount-price">
-                {course.price
-                  ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                  : "Free"
+                {course.discountedPrice ?
+                  `${course.discountedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                  :
+                  (course.price ?
+                    `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                    :
+                    "Free")
                 }
-                {course.price && <FaDongSign />}
+                {course.price && <TbCurrencyDong />}
               </span>
-              {/* <span className='initial-price'>
-                {course.price
-                  ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                  : "Free"
-                }
-                {course.price && <FaDongSign />}
-              </span> */}
+              {course.discountedPrice && (
+                <span className='initial-price'>
+                  {course.price
+                    ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                    : "Free"
+                  }
+                  {course.price && <TbCurrencyDong />}
+                </span>
+              )}
+
             </div>
           </div>
         </div>
@@ -188,7 +197,7 @@ const CourseCard = (props) => {
                     ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
                     : "Free"
                   }
-                  {course.price && <FaDongSign />}
+                  {course.price && <TbCurrencyDong />}
                 </span>
               </div>
               <button

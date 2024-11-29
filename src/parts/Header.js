@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -16,6 +16,8 @@ import { APIStatus, Role } from "../constants/constants";
 import { useDispatch, useSelector } from "react-redux";
 import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
+import Notification from "../components/Notification";
+import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
 
@@ -32,6 +34,8 @@ const Header = () => {
   const currentPath = location.pathname; //current path
   const [activeButton, setActiveButton] = useState(null);
   const [isModalSignoutOpen, setIsModalSignoutOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -53,6 +57,48 @@ const Header = () => {
       }
     }
   }, [idRole, currentPath, navigate]);
+
+  const fetchUserNotification = async (idUser) => {
+    let response = await getAllNotificationOfUser(idUser)
+    if (response.status === APIStatus.success) {
+      const processedData = response.data.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      setNotifications(processedData);
+    } else {
+      console.log(response.data)
+    }
+  }
+
+  // Helper to calculate relative time
+  const calculateRelativeTime = (timestamp) => {
+    const now = new Date();
+    const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
+
+    if (difference < 60) return `${difference} seconds ago`;
+    if (difference < 3600) return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"} ago`;
+    if (difference < 86400) return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"} ago`;
+    return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"} ago`;
+  };
+
+  // Helper to parse "relativeTime" into a timestamp
+  const parseRelativeTime = (relativeTime) => {
+    const now = new Date();
+    const parts = relativeTime.split(" ");
+
+    if (parts.includes("seconds")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
+    } else if (parts.includes("minutes")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
+    } else if (parts.includes("hours")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
+    } else if (parts.includes("days")) {
+      return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
+    }
+    return now; // Default to current time if unrecognized format
+  };
+
   useEffect(() => {
     const fetchAvatar = async () => {
       if (idUser) {
@@ -65,6 +111,17 @@ const Header = () => {
       }
     };
     fetchAvatar();
+    fetchUserNotification(idUser);
+    const interval = setInterval(() => {
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          relativeTime: calculateRelativeTime(notification.timestamp),
+        }))
+      );
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
   }, [dispatch, idUser]);
   const navLinks = {
     [Role.platformAdmin]: [
@@ -110,7 +167,7 @@ const Header = () => {
   };
   const buttonPaths = {
     clipboard: "/centerAdPendingTask",
-    bell: "/notifications",
+    bell: "/allNotifications",
   };
   const toggleVisibility = () => {
     setShowOptionAva(!showOptionAva);
@@ -129,6 +186,7 @@ const Header = () => {
     }
   };
 
+  const notiButtonRef = useRef(null);
   return (
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -188,13 +246,22 @@ const Header = () => {
                     </button>
                   )}
                   <button
+                    ref={notiButtonRef}
                     className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
                       }`}
-                    onClick={() => handleButtonClick("bell")}
+                    onClick={() => {
+                      // handleButtonClick("bell");
+                      setIsNotificationOpen(!isNotificationOpen);
+                    }}
                   >
                     <LuBell className="header-icon" />
                   </button>
-
+                  <Notification
+                    isOpen={isNotificationOpen}
+                    onClose={() => setIsNotificationOpen(false)}
+                    notiButtonRef={notiButtonRef}
+                    notifications={notifications}
+                  />
                   <button
                     className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
                       }`}

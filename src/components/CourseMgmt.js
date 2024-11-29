@@ -4,12 +4,12 @@ import { ImSpinner2 } from "react-icons/im";
 import {
   LuArrowRight,
   LuChevronDown,
-  LuDollarSign,
   LuFilter,
   LuPlus,
   LuSearch,
-  LuX,
+  LuX
 } from "react-icons/lu";
+import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
 import "../assets/css/ViewAll.css";
@@ -359,7 +359,7 @@ const CourseMgmt = (props) => {
                   placeholder="E.g. 50"
                   onChange={(event) => setStartPrice(event.target.value)}
                 />
-                <LuDollarSign color="#757575" />
+                <TbCurrencyDong color="#757575" />
               </div>
               <LuArrowRight />
               <div className="input-number-container">
@@ -370,7 +370,7 @@ const CourseMgmt = (props) => {
                   placeholder="E.g. 50"
                   onChange={(event) => setEndPrice(event.target.value)}
                 />
-                <LuDollarSign color="#757575" />
+                <TbCurrencyDong color="#757575" />
               </div>
             </div>
 

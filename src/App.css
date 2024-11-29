@@ -40,6 +40,10 @@
   flex-direction: column;
   min-height: 100vh;
 }
+button {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
 
 .app-container::-webkit-scrollbar {
   display: none;

@@ -20,7 +20,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
 import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
 import { APIStatus } from "../../constants/constants";
-import { postAddBoardNotificationForCourse } from "../../services/courseService";
+import { getCourseProgress, postAddBoardNotificationForCourse } from "../../services/courseService";
 
 
 const CourseDetailTeacher = (props) => {
@@ -33,6 +33,7 @@ const CourseDetailTeacher = (props) => {
 
     const [notificationContent, setNotificationContent] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [attendanceList, setAttendanceList] = useState([]);
 
     const [popupAdd, setPopupAdd] = useState(false);
     const [addSection, setAddSection] = useState(false);
@@ -98,6 +99,23 @@ const CourseDetailTeacher = (props) => {
         }
     }
 
+    const fetchCourseProgress = async (idCourse) => {
+        setLoading(true)
+        try {
+            let response = await getCourseProgress(idCourse);
+            if (response.status === APIStatus.success) {
+                setAttendanceList(response.data);
+            } else {
+                console.log(response.data)
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchCourseProgress(courseInfo.idCourse);
+    }, [])
 
     return (
         <>
@@ -294,7 +312,9 @@ const CourseDetailTeacher = (props) => {
                     {notificationBoard && notificationBoard.length > 0 && (
                         <div className="block-container-col noti-size">
                             {notificationBoard.map((notification, index) => (
-                                <div className="notification">
+                                <div
+                                    key={index}
+                                    className="notification">
                                     <div className="delete-button">
                                         <button>
                                             <LuMinus />
@@ -360,77 +380,56 @@ const CourseDetailTeacher = (props) => {
             {/* Teacher View: Attendance */}
             {menuIndex === 3 ? (
                 <div className="block-container course-teacher-attendance">
-                    <div className="attendance-progress-container">
-                        <div className="attendance-progress-content">
-                            <div className="attendance-ava">
-                                <img src={default_ava} />
-                            </div>
-                            <div className="attendance-progress-body">
-                                <span className="attendance-name">Tian</span>
-                                <span className="attendance-mail">
-                                    <LuMail color="#003B57" /> tiannait@snapmail.cc
-                                </span>
-                                <div className="attendance-progress">
-                                    <label>Lectures</label>
-                                    <div className="progress-line">
-                                        <div className="progress-line-inner"></div>
+                    {attendanceList.courseStudentProgress && attendanceList.courseStudentProgress.length > 0
+                        && attendanceList.courseStudentProgress.map((attendance, index) => (
+                            <div key={index} className="attendance-progress-container">
+                                <div className="attendance-progress-content">
+                                    <div className="attendance-ava">
+                                        <img src={attendance.avatarPath || default_ava} />
                                     </div>
-                                    <span
-                                        className="proportion-number"
-                                        style={{ width: "20s%" }}
-                                    >
-                                        3/15
-                                    </span>
-                                </div>
-                                <div className="attendance-progress">
-                                    <label>Assignments</label>
-                                    <div className="progress-line">
-                                        <div
-                                            className="progress-line-inner"
-                                            style={{ width: "53.33%" }}
-                                        ></div>
+                                    <div className="attendance-progress-body">
+                                        <span className="attendance-name">{attendance.fullName}</span>
+                                        <span className="attendance-mail">
+                                            <LuMail color="#003B57" /> {attendance.email}
+                                        </span>
+                                        <div className="attendance-progress">
+                                            <label>Lectures</label>
+                                            <div className="progress-line">
+                                                <div
+                                                    className="progress-line-inner"
+                                                    style={{
+                                                        width: `${attendanceList.lectureCount > 0
+                                                            ? (attendance.finishedLectureCount / attendanceList.lectureCount) * 100
+                                                            : 0
+                                                            }%`
+                                                    }}
+                                                ></div>
+                                            </div>
+                                            <span className="proportion-number">
+                                                {attendance.finishedLectureCount}/{attendanceList.lectureCount}
+                                            </span>
+                                        </div>
+                                        <div className="attendance-progress">
+                                            <label>Assignments</label>
+                                            <div className="progress-line">
+                                                <div
+                                                    className="progress-line-inner"
+                                                    style={{
+                                                        width: `${attendanceList.assignmentCount > 0
+                                                            ? (attendance.finishedAssignmentCount / attendanceList.assignmentCount) * 100
+                                                            : 0
+                                                            }%`
+                                                    }}
+                                                ></div>
+                                            </div>
+                                            <span className="proportion-number">
+                                                {attendance.finishedAssignmentCount}/{attendanceList.assignmentCount}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span className="proportion-number">8/15</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="attendance-progress-container">
-                        <div className="attendance-progress-content">
-                            <div className="attendance-ava">
-                                <img src={default_ava} />
-                            </div>
-                            <div className="attendance-progress-body">
-                                <span className="attendance-name">Ruan</span>
-                                <span className="attendance-mail">
-                                    <LuMail color="#003B57" /> tiannait@snapmail.cc
-                                </span>
-                                <div className="attendance-progress">
-                                    <label>Lectures</label>
-                                    <div className="progress-line">
-                                        <div className="progress-line-inner"></div>
-                                    </div>
-                                    <span
-                                        className="proportion-number"
-                                        style={{ width: "20s%" }}
-                                    >
-                                        3/15
-                                    </span>
-                                </div>
-                                <div className="attendance-progress">
-                                    <label>Assignments</label>
-                                    <div className="progress-line">
-                                        <div
-                                            className="progress-line-inner"
-                                            style={{ width: "53.33%" }}
-                                        ></div>
-                                    </div>
-                                    <span className="proportion-number">8/15</span>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        ))}
                 </div>
             ) : null}
         </>

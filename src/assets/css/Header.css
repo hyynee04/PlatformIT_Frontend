@@ -66,6 +66,9 @@
   align-items: center;
   background-color: var(--main-color);
 }
+.navbar > .container .auth-buttons .circle-buts:hover {
+  background-color: rgba(217, 217, 217, 0.3);
+}
 /* .navbar > .container .auth-buttons .pi {
   background-color: var(--border-gray);
   padding: 1px;

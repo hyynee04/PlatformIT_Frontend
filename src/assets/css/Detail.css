@@ -1213,21 +1213,25 @@ svg > .CircularProgressbar-text {
 }
 
 /* Custom scrollbar styling */
-.block-container-col.noti-size::-webkit-scrollbar  {
+.block-container-col.noti-size::-webkit-scrollbar,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar  {
   width: 10px;           /* Set the scrollbar width */
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-track {
+.block-container-col.noti-size::-webkit-scrollbar-track,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   background: var(--border-gray);  /* Background color of the scrollbar track */
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-thumb {
+.block-container-col.noti-size::-webkit-scrollbar-thumb,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   background-color: var(--text-gray); /* Scrollbar thumb color */
   border-radius: 4px;     /* Rounded corners for a flatter look */
   cursor: grab;
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-thumb:active {
+.block-container-col.noti-size::-webkit-scrollbar-thumb:active,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   cursor: grabbing; /* Changes cursor when thumb is clicked and held */
 }
 
@@ -1381,9 +1385,11 @@ svg > .CircularProgressbar-text {
     color: var(--black-color);
 }
 
-/* .detail-container .right-container > .course-teacher-attendance {
-    overflow-y: scroll;
-} */
+.detail-container .right-container > .course-teacher-attendance {
+   padding: 0.5rem 1rem 0.5rem 0.5rem !important;
+   max-height: 100vh;
+   overflow-y: auto;
+}
 
 .detail-container .right-container .course-teacher-attendance > .attendance-progress-container {
     width: 100%;

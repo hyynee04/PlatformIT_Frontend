@@ -19,6 +19,7 @@ import UserPI from "./pages/UserPI";
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
+import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
@@ -28,16 +29,19 @@ import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
-import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
-
-import { Role } from "./constants/constants";
 import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
-import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
-import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
+import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
+import DuplicateAssign from "./pages/assignmentMgmt/DuplicateAssign";
+import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
+import TeacherAssignDetail from "./pages/assignmentMgmt/TeacherAssignDetail";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
+
+import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
+
+import { Role } from "./constants/constants";
 
 const Layout = (props) => {
   return (
@@ -82,7 +86,6 @@ const Layout = (props) => {
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
-
 
           <Route path="/addNewLecture" element={<AddNewLecture />} />
           <Route path="/viewLecture" element={<Lecture />} />
@@ -194,6 +197,30 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <AddNewAssign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/duplicateAssignment"
+            element={
+              <PrivateRoute>
+                <DuplicateAssign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/updateAssignment"
+            element={
+              <PrivateRoute>
+                <UpdateAssignment />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teacherAssignDetail"
+            element={
+              <PrivateRoute>
+                <TeacherAssignDetail />
               </PrivateRoute>
             }
           />

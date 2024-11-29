@@ -136,6 +136,13 @@ const getAllAssignmentCardOfTeacher = async () => {
     },
   });
 };
+const getAssignmentInfo = async (idAssignment) => {
+  return await axios.get("api/Assignment/GetAssignmentInfo", {
+    params: {
+      idAssignment: idAssignment,
+    },
+  });
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -260,6 +267,19 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postPublishAssignment = async (idAssignment) => {
+  const idUpdatedBy = +localStorage.getItem("idUser");
+  try {
+    return await axios.post("api/Assignment/PublishAssignment", null, {
+      params: {
+        idAssignment: idAssignment,
+        idUpdatedBy: idUpdatedBy,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const deleteAssignment = async (idAssignment) => {
   const idUpdatedBy = +localStorage.getItem("idUser");
   try {
@@ -349,7 +369,7 @@ const getCourseProgress = (idCourse) => {
 }
 
 export {
-  deleteAssignment, getAllActiveCourseOfTeacher,
+  deleteAssignment, deleteAssignment, getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,
@@ -357,15 +377,14 @@ export {
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
-  getAllTagModel,
-  getCourseDetail, getCourseProgress, getIsEnRolledCourse,
+  getAllTagModel, getAssignmentInfo, getCourseDetail, getCourseProgress, getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
-  postAddLecture,
-  postAddManualAssignment,
+  postAddLecture, postAddManualAssignment,
   postAddQuizAssignment,
   postAddSection,
-  postEnrollCourse
+  postEnrollCourse,
+  postPublishAssignment
 };
 

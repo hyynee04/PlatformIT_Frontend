@@ -5,7 +5,7 @@ import { BiPlus } from "react-icons/bi";
 import Form from "react-bootstrap/Form";
 import default_image from "../../assets/img/default_image.png";
 
-const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
+const QuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
   const handleDeleteQuestion = (idx) => {
     const updatedQuestions = questions.filter((_, index) => index !== idx);
     setQuestions(updatedQuestions);
@@ -13,10 +13,21 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
 
   const handleDeleteFile = (idx) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[idx].attachedFile = null;
-    setQuestions(updatedQuestions);
-  };
 
+    // Giải phóng URL nếu có
+    if (updatedQuestions[idx].attachedFilePreview) {
+      URL.revokeObjectURL(updatedQuestions[idx].attachedFilePreview);
+    }
+
+    updatedQuestions[idx].attachedFile = null;
+    updatedQuestions[idx].attachedFilePreview = null;
+    setQuestions(updatedQuestions);
+
+    // Reset input file
+    if (inputFileRef.current[idx]) {
+      inputFileRef.current[idx].value = "";
+    }
+  };
   const handleOpenReferenceQuestion = (idx) => {
     inputFileRef.current[idx]?.click();
   };
@@ -33,6 +44,11 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
       const fileURL = URL.createObjectURL(file);
 
       const updatedQuestions = [...questions];
+
+      if (updatedQuestions[idx].attachedFilePreview) {
+        URL.revokeObjectURL(updatedQuestions[idx].attachedFilePreview);
+      }
+
       // updatedQuestions[idx].attachedFile = URL.createObjectURL(file); // Gắn URL của ảnh để hiển thị
       updatedQuestions[idx].attachedFilePreview = fileURL;
       updatedQuestions[idx].attachedFile = file;
@@ -253,4 +269,4 @@ const NewQuizQuestion = ({ questions, setQuestions, inputFileRef }) => {
   );
 };
 
-export default NewQuizQuestion;
+export default QuizQuestion;

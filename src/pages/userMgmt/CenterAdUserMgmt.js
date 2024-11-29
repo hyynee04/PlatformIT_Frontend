@@ -8,18 +8,18 @@ import {
   LuSearch,
   LuUserPlus,
 } from "react-icons/lu";
-import { Role, UserStatus } from "../../constants/constants";
 import { useDispatch, useSelector } from "react-redux";
+import FilterUserOfCenter from "../../components/FilterUserOfCenter";
+import SortByUserOfCenter from "../../components/SortByUserOfCenter";
+import DiagAddUserForm from "../../components/diag/DiagAddUserForm";
+import UserOption from "../../components/option/UserOption";
+import { Role, UserStatus } from "../../constants/constants";
 import {
   fetchListUserOfCenter,
   setActiveRoleUserOfCenter,
 } from "../../store/listUserOfCenter";
-import UserOption from "../../components/option/UserOption";
-import FilterUserOfCenter from "../../components/FilterUserOfCenter";
-import SortByUserOfCenter from "../../components/SortByUserOfCenter";
-import DiagAddUserForm from "../../components/diag/DiagAddUserForm";
 
-import "../../assets/scss/UserMgmt.css";
+import "../../assets/css/UserMgmt.css";
 
 const CenterAdUserMgmt = () => {
   const dispatch = useDispatch();
@@ -128,8 +128,8 @@ const CenterAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -158,17 +158,15 @@ const CenterAdUserMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeRole === Role.teacher ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.student ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.student ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -267,23 +265,22 @@ const CenterAdUserMgmt = () => {
                   {activeRole === Role.teacher && (
                     <td>
                       <span
-                        className={`status ${
-                          user.status === UserStatus.active
+                        className={`status ${user.status === UserStatus.active
                             ? "active"
                             : user.status === UserStatus.pending
-                            ? "pending"
-                            : user.status === UserStatus.inactive
-                            ? "inactive"
-                            : ""
-                        }`}
+                              ? "pending"
+                              : user.status === UserStatus.inactive
+                                ? "inactive"
+                                : ""
+                          }`}
                       >
                         {user.status === UserStatus.active
                           ? "Active"
                           : user.status === UserStatus.pending
-                          ? "Pending"
-                          : user.status === UserStatus.inactive
-                          ? "Inactive"
-                          : ""}
+                            ? "Pending"
+                            : user.status === UserStatus.inactive
+                              ? "Inactive"
+                              : ""}
                       </span>
                     </td>
                   )}
@@ -302,8 +299,8 @@ const CenterAdUserMgmt = () => {
                         roleUserSelected={Role.teacher}
                         {...(user.idRole === Role.teacher
                           ? {
-                              isReactivatable: true,
-                            }
+                            isReactivatable: true,
+                          }
                           : {})}
                       />
                     )}

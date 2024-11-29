@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../assets/scss/card/FilterCard.css";
+import "../assets/css/card/FilterCard.css";
 
 const SortByUser = ({ onSortByChange }) => {
   const [isSortByFormVisible, setIsSortByFormVisible] = useState(true);

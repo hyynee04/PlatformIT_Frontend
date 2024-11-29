@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { LuBuilding2, LuClock, LuDollarSign, LuStar } from "react-icons/lu";
+import { BsPinAngleFill } from "react-icons/bs";
+import { LuBuilding2, LuClock, LuStar } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
+import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/card/Card.css";
 
 const CourseCard = (props) => {
   const navigate = useNavigate();
@@ -58,6 +60,7 @@ const CourseCard = (props) => {
 
   return (
     <div className="outside-card">
+      <BsPinAngleFill />
       <div className="card-container">
         <div
           className="course-card-container"
@@ -86,15 +89,12 @@ const CourseCard = (props) => {
             <div className="course-card-info-container">
               {course.isLimitedTime === 1 ? (
                 <div className="course-card-info">
-                  {" "}
                   <LuClock color="#757575" />
-                  {formatDate(course.courseStartDate)} -{" "}
-                  {formatDate(course.courseEndDate)}
+                  {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}
                 </div>
               ) : (
                 <div className="course-card-info">
-                  {" "}
-                  <LuClock color="#757575" /> Created on{" "}
+                  <LuClock color="#757575" /> Created on&nbsp;
                   {formatDate(course.createdDate)}
                 </div>
               )}
@@ -103,9 +103,27 @@ const CourseCard = (props) => {
 
           <div className="course-card-footer">
             <div className="course-card-price">
-              <LuDollarSign color="#757575" />
-              <span className="discount-price">{course.price || "Free"}</span>
-              {/* <span className='initial-price'>300</span> */}
+              <span className="discount-price">
+                {course.discountedPrice ?
+                  `${course.discountedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                  :
+                  (course.price ?
+                    `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                    :
+                    "Free")
+                }
+                {course.price && <TbCurrencyDong />}
+              </span>
+              {course.discountedPrice && (
+                <span className='initial-price'>
+                  {course.price
+                    ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                    : "Free"
+                  }
+                  {course.price && <TbCurrencyDong />}
+                </span>
+              )}
+
             </div>
           </div>
         </div>
@@ -174,9 +192,13 @@ const CourseCard = (props) => {
 
             <div className="course-card-footer">
               <div className="course-card-price">
-                <LuDollarSign color="#757575" />
-                <span className="discount-price">{course.price || "Free"}</span>
-                {/* <span className='initial-price'>300</span> */}
+                <span className="discount-price">
+                  {course.price
+                    ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
+                    : "Free"
+                  }
+                  {course.price && <TbCurrencyDong />}
+                </span>
               </div>
               <button
                 className="view-detail-btn"

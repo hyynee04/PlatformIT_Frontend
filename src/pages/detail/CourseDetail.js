@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../../assets/scss/Detail.css";
+import "../../assets/css/Detail.css";
 
 import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
@@ -120,8 +120,8 @@ const CourseDetail = (props) => {
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
     ? courseInfo.sectionsWithCourses.reduce((total, section) => {
-        return total + (section.lectures ? section.lectures.length : 0);
-      }, 0)
+      return total + (section.lectures ? section.lectures.length : 0);
+    }, 0)
     : 0;
 
   const getCourseStatus = (course) => {
@@ -166,25 +166,23 @@ const CourseDetail = (props) => {
     return () => clearInterval(interval);
   }, []);
 
-  const [menuIndex, setMenuIndex] = useState(1);
   useEffect(() => {
-    const savedMenuIndex = localStorage.getItem("menuIndex");
-    if (savedMenuIndex) {
-      setMenuIndex(Number(savedMenuIndex)); // Restore the value if it exists
-    }
-  }, []);
-
-  // Update localStorage whenever menuIndex changes
-  useEffect(() => {
-    localStorage.setItem("menuIndex", menuIndex);
-  }, [menuIndex]);
-
-  useEffect(() => {
-    return () => {
-      // This runs when the component unmounts or route changes
-      localStorage.removeItem("menuIndex");
+    const handleBeforeUnload = () => {
+      // Remove the item if the user refreshes or leaves the page
+      if (location.pathname === "/courseDetail") {
+        localStorage.removeItem("menuIndex");
+      }
     };
-  }, [location]);
+    // Handle refresh scenarios
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      // Handle navigation away from the page
+      if (location.pathname !== "/courseDetail") {
+        localStorage.removeItem("menuIndex");
+      }
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [location.pathname]); // Re-run when the path changes
 
   const reviews = courseInfo?.rateModels || [];
 
@@ -305,16 +303,15 @@ const CourseDetail = (props) => {
                 </>
               ) : (
                 <span className="number-course">
-                  <LuClock color="#757575" /> Create on:{" "}
+                  <LuClock color="#757575" /> Create on:&nbsp;
                   {formatDate(courseInfo.createdDate)}
                 </span>
               )}
 
               <span className="">
                 <RiGroupLine color="#757575" />
-                {`${courseInfo.studentCount} ${
-                  courseInfo.studentCount > 1 ? "students" : "student"
-                }`}
+                {`${courseInfo.studentCount} ${courseInfo.studentCount > 1 ? "students" : "student"
+                  }`}
               </span>
               <span>{courseInfo.introduction}</span>
             </div>
@@ -396,9 +393,8 @@ const CourseDetail = (props) => {
                 </span>
                 <span className="number-course">
                   <FaRegFile color="#757575" />
-                  {`${courseInfo.teacherCourseCount} ${
-                    courseInfo.teacherCourseCount > 1 ? "courses" : "course"
-                  }`}
+                  {`${courseInfo.teacherCourseCount} ${courseInfo.teacherCourseCount > 1 ? "courses" : "course"
+                    }`}
                 </span>
               </div>
             </div>
@@ -483,10 +479,7 @@ const CourseDetail = (props) => {
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
             fetchCourseDetail={fetchCourseDetail}
-            menuIndex={menuIndex}
-            setMenuIndex={setMenuIndex}
-          />
-        ) : null}
+          />) : null}
 
         {/* Student View */}
         {idUser && idRole === Role.student && isEnrolledCourse ? (
@@ -548,16 +541,14 @@ const CourseDetail = (props) => {
                     </span>
                     <span className="block-container-sub-title">
                       {courseInfo.sectionsWithCourses
-                        ? `${courseInfo.sectionsWithCourses.length} ${
-                            courseInfo.sectionsWithCourses.length === 1
-                              ? "section"
-                              : "sections"
-                          }`
+                        ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
+                          ? "section"
+                          : "sections"
+                        }`
                         : "0 section"}{" "}
                       -{" "}
-                      {`${numberOfLectures} ${
-                        numberOfLectures >= 1 ? "lecture" : "lectures"
-                      }`}
+                      {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
+                        }`}
                     </span>
                   </div>
 
@@ -565,9 +556,8 @@ const CourseDetail = (props) => {
                     {courseInfo.sectionsWithCourses.map((section, index) => (
                       <div key={index} className="lecture">
                         <div
-                          className={`lecture-header ${
-                            showedSections[index] ? "" : "change-border-radius"
-                          } `}
+                          className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
+                            } `}
                         >
                           <span className="section-name">
                             {section.sectionName}
@@ -575,11 +565,10 @@ const CourseDetail = (props) => {
                           <div className="section-info">
                             <span className="section-name">
                               {section.lectures
-                                ? `${section.lectures.length} ${
-                                    section.lectures.length > 1
-                                      ? "lectures"
-                                      : "lecture"
-                                  }`
+                                ? `${section.lectures.length} ${section.lectures.length > 1
+                                  ? "lectures"
+                                  : "lecture"
+                                }`
                                 : "0 lecture"}
                             </span>
                             <button
@@ -597,11 +586,10 @@ const CourseDetail = (props) => {
                         </div>
                         {section.lectures && (
                           <div
-                            className={`lecture-block ${
-                              showedSections[index]
-                                ? ""
-                                : "adjust-lecture-block"
-                            }`}
+                            className={`lecture-block ${showedSections[index]
+                              ? ""
+                              : "adjust-lecture-block"
+                              }`}
                           >
                             {section.lectures.map((lecture, index) => (
                               <div key={index} className="lecture-content">
@@ -610,11 +598,10 @@ const CourseDetail = (props) => {
                                     {lecture.lectureTitle}
                                   </span>
                                   <span className="lecture-exercise-num">
-                                    {`${lecture.exerciseCount} ${
-                                      lecture.exerciseCount > 1
-                                        ? "exercises"
-                                        : "exercise"
-                                    }`}
+                                    {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
+                                      ? "exercises"
+                                      : "exercise"
+                                      }`}
                                   </span>
                                 </div>
                                 <span className="lecture-description">
@@ -646,8 +633,8 @@ const CourseDetail = (props) => {
                               Due: 09/15/2024, 23:59
                             </div>
                           ) : // <div className="test-info">Submitted <FiCheckSquare /></div>
-                          // <div className="test-info past-due">Past Due</div>
-                          null}
+                            // <div className="test-info past-due">Past Due</div>
+                            null}
                         </div>
 
                         <div className="test-description">

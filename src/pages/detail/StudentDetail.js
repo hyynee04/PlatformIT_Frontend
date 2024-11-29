@@ -6,8 +6,8 @@ import { IoMdOpen } from "react-icons/io";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
 import { LuGlobe2, LuMail, LuPhone } from "react-icons/lu";
 import { RiChat3Line } from "react-icons/ri";
+import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
-import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
 import { getAllCourseCards } from "../../services/courseService";
 

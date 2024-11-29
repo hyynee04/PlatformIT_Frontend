@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { LuCheckCircle, LuPlus } from "react-icons/lu";
-import "../../assets/scss/LectureView.css";
+import "../../assets/css/LectureView.css";
 import { Role } from "../../constants/constants";
 const SectionView = (props) => {
     const [isShowed, setIsShowed] = useState(false)

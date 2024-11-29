@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 
-import "../../assets/scss/card/OptionCard.css";
-import DiagInactiveForm from "../diag/DiagInactiveForm";
-import { Role, UserStatus } from "../../constants/constants";
-import DiagTransmitForm from "../diag/DiagTransmitForm";
-import DiagReactiveForm from "../diag/DiagReactiveForm";
 import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/OptionCard.css";
+import { Role, UserStatus } from "../../constants/constants";
+import DiagInactiveForm from "../diag/DiagInactiveForm";
+import DiagReactiveForm from "../diag/DiagReactiveForm";
+import DiagTransmitForm from "../diag/DiagTransmitForm";
 
 const UserOption = ({
   idUserSelected,

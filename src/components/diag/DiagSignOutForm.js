@@ -1,10 +1,10 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
-import "../../assets/scss/card/DiagForm.css";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { resetUserPI } from "../../store/profileUserSlice";
+import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/DiagForm.css";
 import { resetCenterPI } from "../../store/profileCenterSlice";
+import { resetUserPI } from "../../store/profileUserSlice";
 
 const DiagSignOutForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();

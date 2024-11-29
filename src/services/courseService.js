@@ -360,8 +360,16 @@ const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
   });
 };
 
+const getCourseProgress = (idCourse) => {
+  return axios.get("api/Course/GetCourseProgress", {
+    params: {
+      idCourse: idCourse
+    }
+  })
+}
+
 export {
-  getAllActiveCourseOfTeacher,
+  deleteAssignment, deleteAssignment, getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,
@@ -369,18 +377,14 @@ export {
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
-  getAllTagModel,
-  getCourseDetail,
-  getIsEnRolledCourse,
+  getAllTagModel, getAssignmentInfo, getCourseDetail, getCourseProgress, getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
-  postAddLecture,
-  getAssignmentInfo,
-  postAddManualAssignment,
+  postAddLecture, postAddManualAssignment,
   postAddQuizAssignment,
   postAddSection,
   postEnrollCourse,
-  postPublishAssignment,
-  deleteAssignment,
+  postPublishAssignment
 };
+

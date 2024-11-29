@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaCalendar, FaSave } from "react-icons/fa";
-import { TiPlus } from "react-icons/ti";
+import { FaCalendar, FaChevronDown, FaSave } from "react-icons/fa";
+import { LuAlignJustify, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
-import { LuAlignJustify, LuChevronRight, LuChevronLeft } from "react-icons/lu";
+import { TiPlus } from "react-icons/ti";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../../assets/css/Assignment.css";
+import ManualQuestion from "../../components/assigment/ManualQuestion";
+import QuizQuestion from "../../components/assigment/QuizQuestion";
 import {
   APIStatus,
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
-import "../../assets/scss/Assignment.css";
 import {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
@@ -16,9 +19,6 @@ import {
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/courseService";
-import ManualQuestion from "../../components/assigment/ManualQuestion";
-import { useLocation, useNavigate } from "react-router-dom";
-import QuizQuestion from "../../components/assigment/QuizQuestion";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();

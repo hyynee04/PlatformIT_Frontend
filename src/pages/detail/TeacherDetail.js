@@ -5,9 +5,9 @@ import { BsFiletypePdf } from "react-icons/bs";
 import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { IoMdOpen } from "react-icons/io";
 import { RiChat3Line } from "react-icons/ri";
+import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
 import { Object, Role } from "../../constants/constants";
 

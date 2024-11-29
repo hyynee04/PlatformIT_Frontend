@@ -6,9 +6,9 @@ import {
     LuFileEdit,
     LuFileQuestion
 } from "react-icons/lu";
+import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/LectureView.css";
 
 const LectureView = (props) => {
     const [index, setIndex] = useState(1);

@@ -11,7 +11,7 @@ import {
 } from "react-icons/lu";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
-import "../assets/scss/Login.css";
+import "../assets/css/Login.css";
 import DiagLoginMessageForm from "../components/diag/DiagLoginMessageForm";
 import { APIStatus, Role, UserStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";

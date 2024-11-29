@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import { LuBuilding2, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
 import {
@@ -9,7 +9,7 @@ import {
   rejectCenter,
 } from "../../store/listCenterSlice";
 
-import "../../assets/scss/card/DiagForm.css";
+import "../../assets/css/card/DiagForm.css";
 const DiagActionCenterForm = ({
   isOpen,
   onClose,

@@ -8,8 +8,8 @@ import { RiGroupLine } from "react-icons/ri";
 
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import "../../assets/css/Detail.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/Detail.css";
 
 import Carousel from "../../components/Carousel";
 import { Object } from "../../constants/constants";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
-import "../assets/scss/card/FilterCard.css";
+import "../assets/css/card/FilterCard.css";
 
 const FilterCenter = ({ onFilterChange }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);

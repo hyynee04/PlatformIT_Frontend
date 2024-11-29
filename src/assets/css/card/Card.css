@@ -3,6 +3,18 @@
     height: fit-content;
     position: relative;
 }
+.outside-card  > svg {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    color: #DF8786;
+    font-size: 1.3rem;
+    z-index: 1;
+
+}
+/* .outside-card .card-container .course-card-container svg > path {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
+} */
 .card-container {
     border: 1px solid var(--border-gray);
     border-radius: .5rem;
@@ -160,7 +172,7 @@
 .course-card-footer > .course-card-price {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .card-container .course-card-container 
@@ -174,36 +186,53 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--black-color);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.card-container .course-card-container 
+.course-card-footer .course-card-price .discount-price > svg {
+    font-size: 1.5rem;
+    color: var(--text-gray);
+    margin-left: -5px;
 }
 
 .card-container .course-card-container 
 .course-card-footer .course-card-price > .initial-price {
-    font-size: 1rem;
+    font-size: .8rem;
     font-weight: 500;
     color: var(--text-gray);
     text-decoration: line-through;
     text-decoration-color: var(--red-color);
-    align-self: normal;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.card-container .course-card-container 
+.course-card-footer .course-card-price .initial-price > svg {
+    font-size: .8rem;
+    margin-left: -3px;
 }
 
 .card-container .course-card-container > .course-card-period {
     font-size: .75rem;
-
+    font-weight: 600;
+    border-radius: 0 .25rem .25rem 0;
     position: absolute;
     top: 7px;
+    color: var(--black-color);
 }
 
 .card-container .course-card-container > .course-card-period.registering {
-    background-color: var(--border-gray);
-    color: var(--text-gray);
+    background-color: #ACBEC6;
 }
 .card-container .course-card-container > .course-card-period.soon {
     background-color: #F8E9AC;
-    color: var(--black-color);
 }
 .card-container .course-card-container > .course-card-period.ongoing {
-    background-color: var(--green-color);
-    color: var(--black-color);
+    background-color: #B2E0C8;
 }
 
 .card-container.card-container-hover {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ImSpinner2 } from "react-icons/im";
 import { LuPenLine, LuX } from "react-icons/lu";
-import "../../assets/scss/card/DiagForm.css";
+import "../../assets/css/card/DiagForm.css";
 import { APIStatus } from "../../constants/constants";
 import { postAddSection } from "../../services/courseService";
 

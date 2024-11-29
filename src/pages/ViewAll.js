@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import {
     LuArrowRight,
     LuChevronDown,
-    LuDollarSign,
     LuFilter,
     LuSearch,
     LuX
 } from "react-icons/lu";
+import { TbCurrencyDong } from "react-icons/tb";
 import { useLocation } from "react-router-dom";
-import "../assets/scss/ViewAll.css";
+import "../assets/css/ViewAll.css";
 import CenterCard from "../components/Card/CenterCard";
 import CourseCard from "../components/Card/CourseCard";
 import TeacherCard from "../components/Card/TeacherCard";
@@ -384,7 +384,6 @@ const ViewAll = () => {
     } else {
         currentItemsPage.centerPage = currentCenters.slice(currentPage.centerPage * itemsPerPage - itemsPerPage, currentPage.centerPage * itemsPerPage);
     }
-    console.log(menuIndex)
     return (
 
         <div className="viewall-container">
@@ -521,7 +520,7 @@ const ViewAll = () => {
                                             placeholder="E.g. 50"
                                             onChange={(event) => setStartPrice(event.target.value)}
                                         />
-                                        <LuDollarSign color="#757575" />
+                                        <TbCurrencyDong color="#757575" />
                                     </div>
                                     <LuArrowRight />
                                     <div className="input-number-container">
@@ -532,7 +531,7 @@ const ViewAll = () => {
                                             placeholder="E.g. 50"
                                             onChange={(event) => setEndPrice(event.target.value)}
                                         />
-                                        <LuDollarSign color="#757575" />
+                                        <TbCurrencyDong color="#757575" />
                                     </div>
                                 </div>
 

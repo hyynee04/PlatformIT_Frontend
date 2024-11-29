@@ -729,31 +729,26 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         Type<span className="required">*</span>
                       </span>
                       <div className="select-container">
-                        <select
+                        <input
                           className="input-form-pi"
-                          value={assignmentInfo.assignmentType}
-                          onChange={(e) => {
-                            handleUpdateAssignment(
-                              "assignmentType",
-                              e.target.value
-                            );
-                            setQuestions([]);
-                          }}
-                        >
-                          <option value="" disabled selected hidden>
-                            Select a type
-                          </option>
-                          <option value={AssignmentType.quiz}>Quiz</option>
-
-                          {assignmentInfo.isLimitedTime === 0 && (
-                            <option value={AssignmentType.manual}>
-                              Manual
-                            </option>
-                          )}
-
-                          <option value={AssignmentType.code}>Code</option>
-                        </select>
-                        <FaChevronDown className="arrow-icon" />
+                          value={
+                            assignmentInfo.assignmentType ===
+                            AssignmentType.quiz
+                              ? "Quiz"
+                              : assignmentInfo.assignmentType ===
+                                AssignmentType.manual
+                              ? "Manual"
+                              : "Code"
+                          }
+                          readOnly
+                          // onChange={(e) => {
+                          //   handleUpdateAssignment(
+                          //     "assignmentType",
+                          //     e.target.value
+                          //   );
+                          //   setQuestions([]);
+                          // }}
+                        />
                       </div>
                     </div>
                     {isDuplicate

@@ -259,6 +259,16 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
+.container-left-assign .list-options-container.section {
+  position: absolute;
+  top: 80px;
+  left: 0;
+}
+.container-left-assign .list-options-container.lecture {
+  position: absolute;
+  top: 130px;
+  left: 0;
+}
 .container-left-assign .list-options-container .option-course-container {
   width: 100%;
   padding: 6px 8px;
@@ -305,6 +315,16 @@
   text-align: center;
   font-size: 14px;
   color: var(--black-color);
+}
+.container-left-assign
+  .list-options-container
+  .option-course-container
+  .section-lecture {
+  padding: 4px 8px;
+  flex: auto;
+  text-align: right;
+  font-size: 14px;
+  color: var(--text-gray);
 }
 .container-left-assign
   .list-options-container

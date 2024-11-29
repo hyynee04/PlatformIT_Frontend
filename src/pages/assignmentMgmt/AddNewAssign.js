@@ -67,15 +67,17 @@ const AddNewAssign = () => {
   //   );
   //   setSelectedCourse(course);
   // };
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const [isDropdownCourseVisible, setDropdownCourseVisible] = useState(false);
 
-  const handleInputClick = () => {
-    setDropdownVisible(!isDropdownVisible);
-  };
+  // const handleInputCourseClick = () => {
+  //   setDropdownCourseVisible(!isDropdownCourseVisible);
+  // };
 
   const handleCourseSelect = (course) => {
     setSelectedCourse(course);
-    setDropdownVisible(false);
+    setSelectedSection(null);
+    setSelectedLecture(null);
+    setDropdownCourseVisible(false);
   };
   const formatTimeCourse = (courseStartDate, courseEndDate) => {
     const now = new Date();
@@ -92,12 +94,13 @@ const AddNewAssign = () => {
   };
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US"); // Định dạng theo month/day/year
+    return date.toLocaleDateString("en-US");
   };
 
   //SECTION
   const [listSection, setListSection] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [isDropdownSectionVisible, setDropdownSectionVisible] = useState(false);
 
   useEffect(() => {
     const fectchSection = async () => {
@@ -121,15 +124,17 @@ const AddNewAssign = () => {
     };
     fectchSection();
   }, [selectedCourse]);
-  const handleSectionChange = (event) => {
-    const selectedSectionTitle = event.target.value;
-    const section = listSection.find((c) => c.title === selectedSectionTitle);
+
+  const handleSectionSelect = (section) => {
     setSelectedSection(section);
+    setSelectedLecture(null);
+    setDropdownSectionVisible(false);
   };
 
   //LECTURE
   const [listLecture, setListLecture] = useState([]);
   const [selectedLecture, setSelectedLecture] = useState(null);
+  const [isDropdownLectureVisible, setDropdownLectureVisible] = useState(false);
   useEffect(() => {
     const fetchLectures = async () => {
       if (selectedCourse && selectedCourse.idCourse) {
@@ -159,12 +164,15 @@ const AddNewAssign = () => {
     };
     fetchLectures();
   }, [selectedCourse, selectedSection]);
-  const handleLectureChange = (event) => {
-    const selectedLectureTitle = event.target.value;
-    const lecture = listLecture.find(
-      (c) => c.titleLecture === selectedLectureTitle
-    );
+  const handleLectureSelect = (lecture) => {
     setSelectedLecture(lecture);
+    setDropdownLectureVisible(false);
+  };
+
+  const handleDropdownClick = (type) => {
+    setDropdownCourseVisible((prev) => (type === "course" ? !prev : false));
+    setDropdownSectionVisible((prev) => (type === "section" ? !prev : false));
+    setDropdownLectureVisible((prev) => (type === "lecture" ? !prev : false));
   };
   //TYPE ASSIGNMENT
   const [typeAssignment, setTypeAssignment] = useState(null);
@@ -327,7 +335,7 @@ const AddNewAssign = () => {
   const isFormValid = () => {
     if (title === "") return false;
     if (!selectedCourse) return false;
-    if (!isLimitedTimeCourse && (!selectedSection || !selectedLecture))
+    if (!isLimitedTimeCourse && (!selectedLecture || !selectedLecture))
       return false;
     if (!typeAssignment) return false;
     if (errorMessage !== "") return false;
@@ -478,14 +486,14 @@ const AddNewAssign = () => {
                         : "Select a course"
                     }
                     readOnly
-                    onClick={handleInputClick}
+                    onClick={() => handleDropdownClick("course")}
                     // onChange={(e) => setTitle(e.target.value)}
                   />
 
                   <FaChevronDown className="arrow-icon" />
                 </div>
 
-                {isDropdownVisible && (
+                {isDropdownCourseVisible && (
                   <div className="list-options-container">
                     {listCourse.map((course, index) => (
                       <div
@@ -557,48 +565,64 @@ const AddNewAssign = () => {
                       </span>
                     </div>
                     <div className="select-container">
-                      <select
+                      <input
+                        style={{ cursor: "default" }}
+                        type="text"
                         className="input-form-pi"
-                        onChange={handleSectionChange}
+                        value={
+                          selectedSection
+                            ? selectedSection.title
+                            : "Select a section"
+                        }
                         disabled={isTest}
-                      >
-                        <option value="" disabled selected hidden>
-                          {selectedLecture
-                            ? selectedLecture.titleSection
-                            : "Select a section"}
-                        </option>
+                        onClick={() => handleDropdownClick("section")}
+                      />
+                      <FaChevronDown className="arrow-icon" />
+                    </div>
+                    {isDropdownSectionVisible && (
+                      <div className="list-options-container section">
                         {listSection.map((section, index) => (
-                          <option
-                            value={section.title}
+                          <div
                             key={index}
-                            className="option-container"
+                            className="option-course-container"
+                            onClick={() => handleSectionSelect(section)}
                           >
-                            {section.title}
-                          </option>
+                            <div>{section.title}</div>
+                          </div>
                         ))}
-                      </select>
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
+                      </div>
+                    )}
                     <div className="select-container">
-                      <select
+                      <input
+                        style={{ cursor: "default" }}
+                        type="text"
                         className="input-form-pi"
-                        onChange={handleLectureChange}
-                      >
-                        <option value="" disabled selected hidden>
-                          Select a lecture
-                        </option>
-                        {listLecture.map((lecture, index) => (
-                          <option
-                            value={lecture.titleLecture}
-                            key={index}
-                            className="option-container"
-                          >
-                            {lecture.titleLecture}
-                          </option>
-                        ))}
-                      </select>
+                        value={
+                          selectedLecture
+                            ? selectedLecture.titleLecture
+                            : "Select a lecture"
+                        }
+                        onClick={() => handleDropdownClick("lecture")}
+                        disabled={isTest}
+                      />
                       <FaChevronDown className="arrow-icon" />
                     </div>
+                    {isDropdownLectureVisible && (
+                      <div className="list-options-container lecture">
+                        {listLecture.map((lecture, index) => (
+                          <div
+                            key={index}
+                            className="option-course-container"
+                            onClick={() => handleLectureSelect(lecture)}
+                          >
+                            <div>{lecture.titleLecture}</div>
+                            <span className="section-lecture">
+                              {lecture.titleSection}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -10,7 +10,14 @@
     color: #DF8786;
     font-size: 1.3rem;
     z-index: 1;
-
+}
+.card-container-hover  > svg.pin-hover {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.6rem;
+    color: #DF8786;
+    font-size: 1.3rem;
+    z-index: 3;
 }
 /* .outside-card .card-container .course-card-container svg > path {
     box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
@@ -240,6 +247,7 @@
     top: 0;
     left: 0;
     padding: 1rem 1.5rem;
+    z-index: 2;
 }
 
 .card-container > .course-card-container.course-card-hover {

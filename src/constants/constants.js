@@ -48,3 +48,8 @@ export const AssignmentStatus = {
   unpublish: 0,
   pastDue: 2,
 };
+export const NotificationType = {
+  qualification: 1,
+  assignedTeacher: 2,
+  notificationBoard: 3,
+}

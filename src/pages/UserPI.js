@@ -158,6 +158,7 @@ const TeacherPI = () => {
       description: userPI.description,
     });
   }, [userPI]);
+
   const handleInputChange = (field, value) => {
     setTempUserPI({ ...tempUserPI, [field]: value });
   };
@@ -706,10 +707,10 @@ const TeacherPI = () => {
                       <div className="status-action">
                         <span
                           className={`span ${qualification.status === UserStatus.active
-                              ? "approved"
-                              : qualification.status === UserStatus.pending
-                                ? "pending"
-                                : "rejected"
+                            ? "approved"
+                            : qualification.status === UserStatus.pending
+                              ? "pending"
+                              : "rejected"
                             }`}
                         >
                           {qualification.status === UserStatus.active

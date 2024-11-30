@@ -209,6 +209,7 @@ const CourseDetailTeacher = (props) => {
                                                         </span>
                                                     </div>
                                                 ))}
+
                                                 <div
                                                     className={`lecture-content nohover`}
                                                 >
@@ -236,6 +237,8 @@ const CourseDetailTeacher = (props) => {
                                                         </button>
                                                     </div>
                                                 </div>
+
+
                                             </div>
                                         )}
                                     </div>

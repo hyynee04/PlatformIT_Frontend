@@ -134,6 +134,7 @@ const CourseCard = (props) => {
           className="card-container card-container-hover"
           onMouseLeave={() => setIsHover(false)}
         >
+          <BsPinAngleFill className="pin-hover" />
           <div className="course-card-container course-card-hover">
             {course.isLimitedTime === 1 && (
               <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>

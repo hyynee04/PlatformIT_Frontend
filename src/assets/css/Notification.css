@@ -1,11 +1,12 @@
 .notification-container {
     width: 360px;
     height: fit-content;
+    min-height: 120px;
     padding: 1rem 0 0;
     position: absolute;
     z-index: -1;
-    top: 4rem;
-    right: 8rem;
+    top: 3rem;
+    right: 4rem;
     opacity: 0;
     transition: opacity 0.2s ease, z-index 0s linear 0.2s;
 
@@ -15,7 +16,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 .notification-container.active {
-    z-index: 1;
+    z-index: 3;
     opacity: 1;
     transition: opacity 0.2s linear;
 }
@@ -185,4 +186,65 @@
   
 .notification-container > .notification-list::-webkit-scrollbar-thumb:active {
     cursor: grabbing; /* Changes cursor when thumb is clicked and held */
+}
+
+
+/* All Notifications Page*/
+.all-notification-container {
+    width: 100%;
+    height: fit-content;
+    padding: 3rem 0;
+
+    background-color: #FAFAFA;
+}
+.all-notification-container > .notification-display-block {
+    width: 800px;
+    height: 100vh;
+    margin: 0 auto;
+    padding: 1.5rem 0;
+    background-color: var(--white-color);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border: none;
+    border-radius: .5rem;
+}
+.all-notification-container .notification-display-block > .container-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+.all-notification-container .container-header > .header-content {
+    padding: 0 1.5rem;
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.all-notification-container .container-header .header-content > span {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--main-color);
+}
+.all-notification-container .container-header .header-content > button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-gray);
+    font-size: 1.2rem;
+    font-weight: 500;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.all-notification-container .container-header .header-content > button:hover {
+    background-color: rgba(217, 217, 217, 0.5);
+}
+.all-notification-container .container-header > hr {
+    margin: 1rem 0;
 }

@@ -450,21 +450,22 @@
 
 .viewall-container .viewall-main-section > .all-cards-container.course {
     padding: 0 1.3rem;
-    gap: 8rem;
+    /* gap: 8rem; */
     row-gap: 3rem;
 }
 
-.viewall-container .viewall-main-section .course > .one-card-container {
-    width: fit-content;
+.viewall-container .viewall-main-section .all-cards-container > .one-card-container {
+    width: calc(100%/4);
     height: fit-content;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: 10px;
 }
 
-.viewall-container .viewall-main-section .course .one-card-container > .edit-course-btn {
+.viewall-container .viewall-main-section .all-cards-container .one-card-container > .edit-course-btn {
     width: 100%;
     display: flex;
     align-items: center;
@@ -496,13 +497,13 @@
 
 .viewall-container .viewall-main-section > .all-cards-container.teacher {
     padding: 0 1.25rem;
-    gap: 6rem;
+    /* gap: 6rem; */
     row-gap: 3rem;
 }
 
 .viewall-container .viewall-main-section > .all-cards-container.center {
     padding: 0 3.3rem;
-    gap: 8rem;
+    /* gap: 8rem; */
     row-gap: 3rem;
 }
 

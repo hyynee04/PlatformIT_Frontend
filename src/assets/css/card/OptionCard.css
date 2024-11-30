@@ -16,7 +16,8 @@
   width: 100%;
   border: none;
   background-color: var(--white-color);
-  padding: 2px;
+  padding: 2px 4px;
+  font-size: .9rem;
 }
 .container-options .op-buts:hover {
   background-color: rgba(217, 217, 217, 0.4);

@@ -369,7 +369,7 @@ const getCourseProgress = (idCourse) => {
 }
 
 export {
-  deleteAssignment, deleteAssignment, getAllActiveCourseOfTeacher,
+  deleteAssignment, getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,

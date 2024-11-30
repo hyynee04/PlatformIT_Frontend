@@ -472,7 +472,7 @@ const CourseDetail = (props) => {
       </div>
 
       <div className="right-container">
-        {idUser && idRole === Role.teacher ? (
+        {idUser && idRole === Role.teacher && courseInfo.idTeacher === idUser ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
             idUser={idUser}
@@ -530,7 +530,7 @@ const CourseDetail = (props) => {
           </>
         ) : null}
 
-        {idRole !== Role.teacher ? (
+        {idRole !== Role.teacher || idUser !== courseInfo.idTeacher ? (
           <>
             {courseInfo.sectionsWithCourses &&
               courseInfo.sectionsWithCourses.length > 0 && (

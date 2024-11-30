@@ -129,6 +129,7 @@
 
     font-size: 1rem;
     color: var(--text-gray);
+    text-align: justify;
 }
 
 .detail-container .left-container .block-container .biography-block .teacher-information span > svg {
@@ -277,6 +278,14 @@
     font-size: .875rem;
     color: var(--text-gray);
     font-weight: 400;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;   /* Show only 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;      
+    text-align: justify;
 }
 
 
@@ -1243,7 +1252,8 @@ svg > .CircularProgressbar-text {
 }
 
 .detail-container .right-container .teacher-menu > .teacher-menu-btn {
-    padding: .6rem 5.5rem;
+    width: calc(90%/3);
+    padding: .6rem 0;
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-gray);

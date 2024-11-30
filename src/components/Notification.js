@@ -1,11 +1,17 @@
+
 import { useEffect, useRef, useState } from "react";
 import { IoMdCheckmark, IoMdOpen } from "react-icons/io";
 import { IoEllipsisHorizontal } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import "../assets/css/Notification.css";
 import default_ava from "../assets/img/default_ava.png";
+import { NotificationType } from "../constants/constants";
+
 
 const Notification = (props) => {
     const { isOpen, onClose, notiButtonRef, notifications } = props;
+    const navigate = useNavigate();
+    console.log(">>> received notifications bell:", notifications)
 
     const [isOptionOpen, setIsOptionOpen] = useState(false);
     const optionBoxRef = useRef(null);
@@ -14,6 +20,12 @@ const Notification = (props) => {
 
     // This state will help with the delay before removing the notification from the DOM
     const [isExiting, setIsExiting] = useState(false);
+
+    const handleNotificationNavigate = (notification) => {
+        if (notification.notificationType === NotificationType.qualification) {
+            navigate("./pi");
+        }
+    }
     useEffect(() => {
         if (!isOpen) {
             setIsExiting(true);
@@ -70,7 +82,7 @@ const Notification = (props) => {
             >
                 <div className="container-header">
                     <div className="header-content">
-                        <span className="container-title">Notification</span>
+                        <span className="container-title">Notifications</span>
                         <button
                             ref={optionButtonRef}
                             onClick={() => setIsOptionOpen(!isOptionOpen)}
@@ -83,7 +95,11 @@ const Notification = (props) => {
                         {notifications.map((notification, index) => (
                             <div
                                 key={index}
-                                className={`notification-item ${notification.isRead ? "" : "unread"}`}>
+                                className={`notification-item ${notification.isRead ? "" : "unread"}`}
+                                onClick={() => {
+                                    handleNotificationNavigate(notification);
+                                }}
+                            >
                                 <div className="noti-ava-container">
                                     <img src={notification.senderAvatar || default_ava} alt="ava" />
                                 </div>

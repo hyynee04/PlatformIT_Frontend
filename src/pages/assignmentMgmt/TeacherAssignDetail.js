@@ -10,13 +10,6 @@ const TeacherAssignDetail = () => {
   // const [assignmentInfo, setAssignmentInfo] = useState({});
   const [assignmentInfo, setAssignmentInfo] = useState({});
 
-  // Hàm xử lý cập nhật thông tin
-  const handleUpdateAssignment = (key, value) => {
-    setAssignmentInfo((prevInfo) => ({
-      ...prevInfo,
-      [key]: value,
-    }));
-  };
   useEffect(() => {
     const fetchAssignmentData = async (idAssignment) => {
       setLoading(true);
@@ -39,7 +32,17 @@ const TeacherAssignDetail = () => {
       }
     }
   }, [location]);
-  return <div></div>;
+  return (
+    <div>
+      <div className="assign-span"></div>
+      <div className="container-assign">
+        <div className="container-right-assign">
+          {" "}
+          <span className="name-course">{assignmentInfo.courseTitle}</span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default TeacherAssignDetail;

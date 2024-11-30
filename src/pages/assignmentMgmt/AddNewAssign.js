@@ -301,6 +301,7 @@ const AddNewAssign = () => {
           mark: "",
           assignmentItemAnswerType: AssignmentItemAnswerType.text,
           attachedFile: null,
+          assignmentItemStatus: 1,
         },
       ]);
     } else if (+typeAssignment === AssignmentType.quiz) {
@@ -313,10 +314,12 @@ const AddNewAssign = () => {
           isMultipleAnswer: false,
           attachedFile: null,
           attachedFilePreview: null,
+          assignmentItemStatus: 1,
           items: [
             {
               content: "",
               isCorrect: false,
+              multipleAssignmentItemStatus: 1,
             },
           ],
         },

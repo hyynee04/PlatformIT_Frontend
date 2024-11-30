@@ -215,7 +215,9 @@ const TeacherAssignMgmt = () => {
 
     // Nhóm assignments theo ngày
     const grouped = filteredAssignments.reduce((acc, assignment) => {
-      const formattedDate = formatDate(assignment.createdDate); // Định dạng ngày
+      const formattedDate = formatDate(
+        assignment.updatedDate || assignment.createdDate
+      ); // Định dạng ngày
       if (!acc[formattedDate]) {
         acc[formattedDate] = [];
       }
@@ -224,10 +226,16 @@ const TeacherAssignMgmt = () => {
     }, {});
 
     // Chuyển grouped thành mảng có thứ tự theo ngày
-    return Object.entries(grouped).map(([date, assignments]) => ({
-      date,
-      assignments,
-    }));
+    return Object.entries(grouped)
+      .map(([date, assignments]) => ({
+        date,
+        assignments,
+      }))
+      .sort((a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return dateB - dateA; // Sắp xếp từ ngày gần nhất đến xa nhất
+      });
   }, [filteredAssignments]);
 
   const handleStatusClick = (status) => {
@@ -536,7 +544,7 @@ const TeacherAssignMgmt = () => {
                   <div
                     className="assign-item"
                     key={idx}
-                    onDoubleClick={() => {
+                    onClick={() => {
                       if (assignment.isPublish === 1) {
                         navigate("/teacherAssignDetail", {
                           state: {

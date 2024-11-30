@@ -21,6 +21,7 @@ import {
   getAssignmentInfo,
   postAddManualAssignment,
   postAddQuizAssignment,
+  postUpdateAssignment,
 } from "../../services/courseService";
 import {
   APIStatus,
@@ -56,10 +57,31 @@ const UpdateAssignment = ({ isDuplicate }) => {
             ? `${fetchedAssignmentInfo.title} (Duplicate)`
             : fetchedAssignmentInfo.title;
 
-          setAssignmentInfo({ ...fetchedAssignmentInfo, title: updatedTitle });
+          setAssignmentInfo({
+            ...fetchedAssignmentInfo,
+            title: updatedTitle,
+            startDate: fetchedAssignmentInfo.startDate || "",
+            dueDate: fetchedAssignmentInfo.dueDate || "",
+            duration: fetchedAssignmentInfo.duration || "",
+          });
           setOriginAssignInfo({
             ...fetchedAssignmentInfo,
             title: updatedTitle,
+            assignmentItems: fetchedAssignmentInfo.assignmentItems.map(
+              (item) => ({
+                idAssignmentItem: item.idAssignmentItem,
+                question: item.question,
+                mark: item.mark,
+                explanation: item.explanation,
+                isMultipleAnswer: item.isMultipleAnswer,
+                fileUrl: item.fileUrl,
+                attachedFile: null,
+                nameFile: item.nameFile,
+                assignmentItemAnswerType: item.assignmentItemAnswerType,
+                assignmentItemStatus: item.assignmentItemStatus,
+                items: item.items,
+              })
+            ),
           });
           setQuestions(fetchedAssignmentInfo.assignmentItems);
         }
@@ -322,50 +344,65 @@ const UpdateAssignment = ({ isDuplicate }) => {
       )
     );
   };
+  useEffect(() => {
+    if (assignmentInfo.startDate && assignmentInfo.dueDate) {
+      setIsValid(
+        validateForm(
+          assignmentInfo.startDate,
+          assignmentInfo.dueDate,
+          assignmentInfo.duration,
+          selectedCourse
+            ? selectedCourse.courseEndDate
+            : assignmentInfo.courseEndDate
+        )
+      );
+    }
+  }, [assignmentInfo, selectedCourse]);
   //QUESTION
 
   const inputFileRef = useRef([]);
-  const totalQuestions = assignmentInfo.assignmentItems
-    ? assignmentInfo.assignmentItems.length
-    : 0;
+  const totalQuestions = questions.length;
 
-  const totalMarks = assignmentInfo.assignmentItems
-    ? assignmentInfo.assignmentItems.reduce(
-        (acc, question) => acc + Number(question.mark),
-        0
-      )
-    : 0;
+  const totalMarks = questions.reduce(
+    (acc, question) => acc + Number(question.mark),
+    0
+  );
   const handleAddQuestion = () => {
     const newQuestion =
       +assignmentInfo.assignmentType === AssignmentType.manual
         ? {
+            idAssignmentItem: "",
             question: "",
             mark: "",
             assignmentItemAnswerType: AssignmentItemAnswerType.text,
             attachedFile: null,
+            assignmentItemStatus: 1,
           }
         : +assignmentInfo.assignmentType === AssignmentType.quiz
         ? {
+            idAssignmentItem: "",
             question: "",
             mark: "",
             explanation: "",
             isMultipleAnswer: false,
             attachedFile: null,
             attachedFilePreview: null,
+            assignmentItemStatus: 1,
             items: [
               {
+                idMultipleAssignmentItem: "",
                 content: "",
                 isCorrect: false,
+                multipleAssignmentItemStatus: 1,
               },
             ],
           }
         : {};
 
     setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
-    // handleUpdateAssignment("assignmentItems", [...questions, newQuestion]);
   };
 
-  //HANDLE ADD ASSIGNMENT
+  //HANDLE EDIT ASSIGNMENT
   const isFormValid = () => {
     if (assignmentInfo.title === "") return false;
     if (isDuplicate && !selectedCourse) return false;
@@ -377,7 +414,9 @@ const UpdateAssignment = ({ isDuplicate }) => {
       return false;
     if (!assignmentInfo.assignmentType) return false;
     if (errorMessage !== "") return false;
-    if (questions.length <= 0) return false;
+    if (questions.filter((q) => q.assignmentItemStatus === 1).length <= 0) {
+      return false;
+    }
     for (const question of questions) {
       if (!question.question || question.question.trim() === "") return false;
       if (!question.mark || question.mark <= 0) return false;
@@ -394,7 +433,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       return false;
     return true;
   };
-  const handleAddAssignment = async (isPublish) => {
+  const handleDuplicateAssignment = async (isPublish) => {
     const dataToSubmit = {
       title: assignmentInfo.title,
       idCourse: selectedCourse.idCourse,
@@ -426,6 +465,34 @@ const UpdateAssignment = ({ isDuplicate }) => {
       }
     } catch (error) {
       console.error("Failed to add assignment:", error);
+    }
+  };
+  const handleEditAssignment = async (isPublish) => {
+    const dataToSubmit = {
+      idAssignment: assignmentInfo.idAssignment,
+      title: assignmentInfo.title,
+      isTest: isTest,
+      startDate: assignmentInfo.startDate || "",
+      endDate: assignmentInfo.dueDate || "",
+      duration: assignmentInfo.duration || "",
+      assignmentType: Number(assignmentInfo.assignmentType),
+      isPublish: isPublish,
+      isShufflingQuestion: assignmentInfo.isShufflingQuestion,
+      isShufflingAnswer: assignmentInfo.isShufflingAnswer,
+      isShowAnswer: assignmentInfo.isShowAnswer,
+      assignmentStatus: assignmentInfo.assignmentStatus,
+      questions: questions,
+    };
+    try {
+      const response = await postUpdateAssignment(dataToSubmit);
+
+      if (response.status === APIStatus.success) {
+        navigate("/teacherAssignment");
+      } else {
+        console.error("Error updating assignment:", response?.message);
+      }
+    } catch (error) {
+      console.error("Failed to updating assignment:", error);
     }
   };
   const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
@@ -520,7 +587,23 @@ const UpdateAssignment = ({ isDuplicate }) => {
                   className="btn"
                   onClick={() => {
                     setAssignmentInfo(originAssignInfo);
-                    setQuestions(originAssignInfo.assignmentItems);
+                    setQuestions(
+                      originAssignInfo.assignmentItems.map((item) => ({
+                        idAssignmentItem: item.idAssignmentItem,
+                        question: item.question,
+                        mark: item.mark,
+                        explanation: item.explanation,
+                        isMultipleAnswer: item.isMultipleAnswer,
+                        fileUrl: item.fileUrl,
+                        attachedFile: null,
+                        nameFile: item.nameFile,
+                        assignmentItemAnswerType: item.assignmentItemAnswerType,
+                        assignmentItemStatus: item.assignmentItemStatus,
+                        items: JSON.parse(JSON.stringify(item?.items)),
+                      }))
+                    );
+
+                    // setQuestions(fetchedAssignmentInfo.assignmentItems);
                   }}
                 >
                   <HiRefresh />
@@ -547,7 +630,11 @@ const UpdateAssignment = ({ isDuplicate }) => {
             <button
               className="btn save"
               disabled={!isFormValid()}
-              onClick={() => handleAddAssignment(false)}
+              onClick={() => {
+                isDuplicate
+                  ? handleDuplicateAssignment(false)
+                  : handleEditAssignment(false);
+              }}
             >
               <FaSave />
               Save
@@ -555,7 +642,11 @@ const UpdateAssignment = ({ isDuplicate }) => {
             <button
               className="btn publish"
               disabled={!isFormValid()}
-              onClick={() => handleAddAssignment(true)}
+              onClick={() => {
+                isDuplicate
+                  ? handleDuplicateAssignment(true)
+                  : handleEditAssignment(true);
+              }}
             >
               <MdPublish />
               Publish
@@ -751,21 +842,21 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         />
                       </div>
                     </div>
-                    {isDuplicate
-                      ? selectedCourse && isLimitedTimeCourse
-                      : assignmentInfo.isLimitedTime === 1 && (
-                          <div className="info">
-                            <div className="container-validate">
-                              <span>Start date</span>
-                            </div>
-                            <input
-                              type="datetime-local"
-                              className="input-form-pi"
-                              value={assignmentInfo.startDate || ""}
-                              onChange={handleStartDateChange}
-                            />
-                          </div>
-                        )}
+                    {(isDuplicate
+                      ? selectedCourse?.isLimitedTime
+                      : assignmentInfo.isLimitedTime === 1) && (
+                      <div className="info">
+                        <div className="container-validate">
+                          <span>Start date</span>
+                        </div>
+                        <input
+                          type="datetime-local"
+                          className="input-form-pi"
+                          value={assignmentInfo.startDate || ""}
+                          onChange={handleStartDateChange}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="container-gap"></div>
                   <div className="container-right">
@@ -789,37 +880,37 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         </span>
                       </div>
                     </div>
-                    {isDuplicate
-                      ? selectedCourse && isLimitedTimeCourse
-                      : assignmentInfo.isLimitedTime === 1 && (
-                          <div className="info">
-                            <div className="container-validate">
-                              <span>Due date</span>
-                            </div>
+                    {(isDuplicate
+                      ? selectedCourse?.isLimitedTime
+                      : assignmentInfo.isLimitedTime === 1) && (
+                      <div className="info">
+                        <div className="container-validate">
+                          <span>Due date</span>
+                        </div>
 
-                            <input
-                              type="datetime-local"
-                              className="input-form-pi"
-                              value={assignmentInfo.dueDate || ""}
-                              onChange={handleEndDateChange}
-                              // disabled={!startDate}
-                            />
-                            <div className="container-validate">
-                              {" "}
-                              {!isValid.registTimeValidate && (
-                                <span
-                                  className={"warning-error"}
-                                  style={{
-                                    color: "var(--red-color)",
-                                    marginLeft: "auto",
-                                  }}
-                                >
-                                  {errorMessage}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
+                        <input
+                          type="datetime-local"
+                          className="input-form-pi"
+                          value={assignmentInfo.dueDate || ""}
+                          onChange={handleEndDateChange}
+                          // disabled={!startDate}
+                        />
+                        <div className="container-validate">
+                          {" "}
+                          {!isValid.registTimeValidate && (
+                            <span
+                              className={"warning-error"}
+                              style={{
+                                color: "var(--red-color)",
+                                marginLeft: "auto",
+                              }}
+                            >
+                              {errorMessage}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -920,6 +1011,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
               questions={questions}
               setQuestions={setQuestions}
               inputFileRef={inputFileRef}
+              isUpdate={!isDuplicate}
             />
           )}
           {+assignmentInfo.assignmentType === AssignmentType.quiz && (
@@ -927,6 +1019,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
               questions={questions}
               setQuestions={setQuestions}
               inputFileRef={inputFileRef}
+              isUpdate={!isDuplicate}
             />
           )}
           <button className="btn circle-btn" onClick={handleAddQuestion}>

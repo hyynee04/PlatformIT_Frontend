@@ -1,3 +1,4 @@
+import { AssignmentType } from "../constants/constants";
 import axios from "../utils/axiosCustomize";
 
 const getAllCourseCards = () => {
@@ -293,6 +294,98 @@ const deleteAssignment = async (idAssignment) => {
     throw error;
   }
 };
+const postUpdateAssignment = async (dataToSubmit) => {
+  const updatedBy = +localStorage.getItem("idUser");
+  try {
+    const formData = new FormData();
+    formData.append("IdAssignment", dataToSubmit.idAssignment);
+    formData.append("Title", dataToSubmit.title);
+    formData.append("StartDate", dataToSubmit.startDate);
+    formData.append("DueDate", dataToSubmit.endDate);
+    formData.append("Duration", dataToSubmit.duration);
+    formData.append("IsPublish", dataToSubmit.isPublish ? 1 : 0);
+
+    formData.append(
+      "IsShufflingQuestion",
+      dataToSubmit.isShufflingQuestion ? 1 : 0
+    );
+    formData.append(
+      "IsShufflingAnswer",
+      dataToSubmit.isShufflingAnswer ? 1 : 0
+    );
+    formData.append("ShowAnswer", dataToSubmit.isShowAnswer ? 1 : 0);
+    formData.append("AssignmentStatus", dataToSubmit.assignmentStatus);
+    // Duyệt qua từng câu hỏi trong mảng questions
+
+    dataToSubmit.questions.forEach((question, index) => {
+      formData.append(
+        `AssignmentItems[${index}].idAssignmentItem`,
+        question.idAssignmentItem
+      );
+      formData.append(`AssignmentItems[${index}].question`, question.question);
+      formData.append(`AssignmentItems[${index}].mark`, question.mark);
+
+      formData.append(
+        `AssignmentItems[${index}].assignmentItemStatus`,
+        question.assignmentItemStatus
+      );
+      if (question.attachedFile) {
+        formData.append(
+          `AssignmentItems[${index}].attachedFile`,
+          question.attachedFile
+        );
+      }
+      if (dataToSubmit.assignmentType === AssignmentType.manual) {
+        formData.append(
+          `AssignmentItems[${index}].assignmentItemAnswerType`,
+          question.assignmentItemAnswerType
+        );
+      }
+
+      if (dataToSubmit.assignmentType === AssignmentType.quiz) {
+        formData.append(
+          `AssignmentItems[${index}].explanation`,
+          question.explanation ?? ""
+        );
+        formData.append(
+          `AssignmentItems[${index}].isMultipleAnswer`,
+          question.isMultipleAnswer ? 1 : 0
+        );
+
+        // Duyệt qua các item của câu hỏi (các lựa chọn đáp án)
+        question.items.forEach((item, itemIndex) => {
+          formData.append(
+            `AssignmentItems[${index}].Items[${itemIndex}].idMultipleAssignmentItem`,
+            item.idMultipleAssignmentItem
+          );
+          formData.append(
+            `AssignmentItems[${index}].Items[${itemIndex}].content`,
+            item.content
+          );
+          formData.append(
+            `AssignmentItems[${index}].Items[${itemIndex}].isCorrect`,
+            item.isCorrect ? 1 : 0
+          );
+          formData.append(
+            `AssignmentItems[${index}].Items[${itemIndex}].multipleAssignmentItemStatus`,
+            item.multipleAssignmentItemStatus
+          );
+        });
+      }
+    });
+    return await axios.post(
+      `api/Assignment/UpdateAssignment?updatedBy=${updatedBy}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error add course:", error.response?.data || error.message);
+  }
+};
 
 const postAddSection = (sectionName, idCourse, idCreatedBy) => {
   return axios.post(`api/Course/AddSection`, null, {
@@ -363,13 +456,14 @@ const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
 const getCourseProgress = (idCourse) => {
   return axios.get("api/Course/GetCourseProgress", {
     params: {
-      idCourse: idCourse
-    }
-  })
-}
+      idCourse: idCourse,
+    },
+  });
+};
 
 export {
-  deleteAssignment, deleteAssignment, getAllActiveCourseOfTeacher,
+  deleteAssignment,
+  getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,
@@ -377,14 +471,19 @@ export {
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
-  getAllTagModel, getAssignmentInfo, getCourseDetail, getCourseProgress, getIsEnRolledCourse,
+  getAllTagModel,
+  getAssignmentInfo,
+  getCourseDetail,
+  getCourseProgress,
+  getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
-  postAddLecture, postAddManualAssignment,
+  postAddLecture,
+  postAddManualAssignment,
   postAddQuizAssignment,
+  postUpdateAssignment,
   postAddSection,
   postEnrollCourse,
-  postPublishAssignment
+  postPublishAssignment,
 };
-

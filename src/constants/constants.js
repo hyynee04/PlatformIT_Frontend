@@ -48,3 +48,7 @@ export const AssignmentStatus = {
   unpublish: 0,
   pastDue: 2,
 };
+export const AssignmentItemStatus = {
+  active: 1,
+  inactive: 0,
+};

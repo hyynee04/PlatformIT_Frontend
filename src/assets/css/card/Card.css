@@ -7,7 +7,7 @@
     position: absolute;
     top: 0.8rem;
     right: 0.8rem;
-    color: #DF8786;
+    color: var(--red-color);
     font-size: 1.3rem;
     z-index: 1;
 }
@@ -15,7 +15,7 @@
     position: absolute;
     top: 0.25rem;
     right: 0.6rem;
-    color: #DF8786;
+    color: var(--red-color);
     font-size: 1.3rem;
     z-index: 3;
 }

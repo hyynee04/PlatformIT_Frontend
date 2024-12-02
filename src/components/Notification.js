@@ -5,13 +5,14 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/Notification.css";
 import default_ava from "../assets/img/default_ava.png";
-import { NotificationType } from "../constants/constants";
+import { APIStatus } from "../constants/constants";
+import { handleNotificationNavigate } from "../functions/function";
+import { postChangeReadStatus } from "../services/notificationService";
 
 
 const Notification = (props) => {
-    const { isOpen, onClose, notiButtonRef, notifications } = props;
+    const { idUser, isOpen, onClose, notiButtonRef, notifications, fetchUserNotification } = props;
     const navigate = useNavigate();
-    console.log(">>> received notifications bell:", notifications)
 
     const [isOptionOpen, setIsOptionOpen] = useState(false);
     const optionBoxRef = useRef(null);
@@ -21,11 +22,15 @@ const Notification = (props) => {
     // This state will help with the delay before removing the notification from the DOM
     const [isExiting, setIsExiting] = useState(false);
 
-    const handleNotificationNavigate = (notification) => {
-        if (notification.notificationType === NotificationType.qualification) {
-            navigate("./pi");
+    const changeReadStatus = async (idNotification, idUpdatedBy) => {
+        let response = await postChangeReadStatus(idNotification, idUpdatedBy)
+        if (response.status === APIStatus.success) {
+            fetchUserNotification();
+        } else {
+            console.log(response.data);
         }
     }
+
     useEffect(() => {
         if (!isOpen) {
             setIsExiting(true);
@@ -97,7 +102,9 @@ const Notification = (props) => {
                                 key={index}
                                 className={`notification-item ${notification.isRead ? "" : "unread"}`}
                                 onClick={() => {
-                                    handleNotificationNavigate(notification);
+                                    changeReadStatus(notification.idNotification, idUser);
+                                    handleNotificationNavigate(notification, navigate);
+                                    onClose();
                                 }}
                             >
                                 <div className="noti-ava-container">

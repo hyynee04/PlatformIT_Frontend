@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import { ImSpinner2 } from "react-icons/im";
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
     LuCalendar,
+    LuCheck,
     LuCheckSquare,
     LuClock,
     LuFileEdit,
@@ -11,16 +11,17 @@ import {
     LuMinus,
     LuPenLine,
     LuPlus,
-    LuTrash2
+    LuTrash2,
+    LuX
 } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import "../../assets/css/Detail.css";
 
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
-import DiagAddSectionForm from "../../components/diag/DiagAddSectionForm";
 import { APIStatus } from "../../constants/constants";
-import { getCourseProgress, postAddBoardNotificationForCourse } from "../../services/courseService";
+import { getCourseProgress, postAddBoardNotificationForCourse, postAddSection } from "../../services/courseService";
 
 
 const CourseDetailTeacher = (props) => {
@@ -33,10 +34,13 @@ const CourseDetailTeacher = (props) => {
 
     const [notificationContent, setNotificationContent] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
+    const [newSectionTitle, setNewSectionTitle] = useState("");
+    const [newSection, setNewSection] = useState("");
     const [attendanceList, setAttendanceList] = useState([]);
 
     const [popupAdd, setPopupAdd] = useState(false);
     const [addSection, setAddSection] = useState(false);
+
     const [menuIndex, setMenuIndex] = useState(1);
     useEffect(() => {
         const savedMenuIndex = localStorage.getItem("menuIndex");
@@ -57,19 +61,7 @@ const CourseDetailTeacher = (props) => {
     ]
 
     const [showedSections, setShowedSections] = useState({});
-    const handleIsShowed = (index) => {
-        setShowedSections((prev) => ({
-            ...prev,
-            [index]: !prev[index], // Toggle the current section's visibility
-        }));
-    };
-
-    const formatDate = (dateString) =>
-        new Date(dateString).toLocaleDateString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            year: "numeric",
-        });
+    const [isEdit, setIsEdit] = useState({});
 
     // Number of lectures
     const numberOfLectures = courseInfo.sectionsWithCourses
@@ -96,6 +88,18 @@ const CourseDetailTeacher = (props) => {
             console.error("Error posting data:", error);
         } finally {
             setLoading(true)
+        }
+    }
+
+    const addNewSection = async (sectionTitle) => {
+        try {
+            let response = await postAddSection(sectionTitle, courseInfo.idCourse, idUser)
+            if (response.status === APIStatus.success) {
+                fetchCourseDetail(courseInfo.idCourse);
+            }
+            else console.log(response.data);
+        } catch (error) {
+            console.error("Error posting data:", error);
         }
     }
 
@@ -161,26 +165,51 @@ const CourseDetailTeacher = (props) => {
                                             className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
                                                 } `}
                                         >
-                                            <span className="section-name">
-                                                <button><LuPenLine /></button>
-                                                {section.sectionName}
-                                            </span>
-                                            <div className="section-info">
-                                                <span className="section-name">
-                                                    {section.lectures
-                                                        ? `${section.lectures.length} ${section.lectures.length > 1
-                                                            ? "lectures"
-                                                            : "lecture"
-                                                        }`
-                                                        : "0 lecture"}
-                                                </span>
-                                                <button
-                                                    className="showhide-button"
-                                                    onClick={() => handleIsShowed(index)}
-                                                >
-                                                    {showedSections[index] ? <IoIosArrowUp /> : <IoIosArrowDown />}
-                                                </button>
-                                            </div>
+                                            {!isEdit[index] ? (
+                                                <>
+                                                    <span className="section-name">
+                                                        <button
+                                                            onClick={() => setIsEdit({ ...isEdit, [index]: !isEdit[index] })}
+                                                        ><LuPenLine /></button>
+                                                        {section.sectionName}
+                                                    </span>
+                                                    <div className="section-info">
+                                                        <span>
+                                                            {section.lectures
+                                                                ? `${section.lectures.length} ${section.lectures.length > 1
+                                                                    ? "lectures"
+                                                                    : "lecture"
+                                                                }`
+                                                                : "0 lecture"}
+                                                        </span>
+                                                        <button
+                                                            className="showhide-button"
+                                                            onClick={() => setShowedSections({ ...showedSections, [index]: !showedSections[index] })}
+                                                        >
+                                                            {showedSections[index] ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="edit-section-container">
+                                                    <input
+                                                        className="edit-section"
+                                                        value={newSectionTitle}
+                                                        type="text"
+                                                        placeholder={section.sectionName}
+                                                        onChange={(e) => setNewSectionTitle(e.target.value)}
+                                                    />
+                                                    <div className="edit-button-container">
+                                                        <button><LuCheck /></button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setNewSectionTitle("");
+                                                                setIsEdit({ ...isEdit, [index]: !isEdit[index] })
+                                                            }}
+                                                        ><LuX /></button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                         {section.lectures && (
                                             <div
@@ -237,27 +266,51 @@ const CourseDetailTeacher = (props) => {
                                                         </button>
                                                     </div>
                                                 </div>
-
-
                                             </div>
                                         )}
                                     </div>
                                 ))}
                             </div>
                         )}
-                        <button
-                            className="add-section-btn"
-                            onClick={() => setAddSection(true)}
-                        >
-                            <LuPlus /> Add new section
-                        </button>
-                        <DiagAddSectionForm
-                            isOpen={addSection}
-                            onClose={() => setAddSection(false)}
-                            idCourse={courseInfo.idCourse}
-                            idTeacher={idUser}
-                            fetchData={fetchCourseDetail}
-                        />
+                        {addSection ?
+                            (
+                                <div>
+                                    <div className="add-section-container change-border-radius">
+                                        <div className="edit-section-container">
+                                            <input
+                                                className="edit-section"
+                                                value={newSection}
+                                                type="text"
+                                                placeholder="Section Name"
+                                                onChange={(e) => setNewSection(e.target.value)}
+                                            />
+                                            <div className="edit-button-container">
+                                                <button
+                                                    disabled={!newSection}
+                                                    onClick={() => addNewSection(newSection)}
+                                                ><LuCheck /></button>
+                                                <button
+                                                    onClick={() => {
+                                                        setNewSectionTitle("");
+                                                        setAddSection(!addSection);
+                                                    }}
+                                                ><LuX /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            )
+                            :
+                            (
+                                <button
+                                    className="add-section-btn"
+                                    onClick={() => setAddSection(!addSection)}
+                                >
+                                    <LuPlus /> Add new section
+                                </button>
+                            )
+                        }
                     </div>
 
                     <div className="block-container">

@@ -19,6 +19,7 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import "../assets/css/PI.css";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
@@ -41,6 +42,8 @@ import {
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
 
 const TeacherPI = () => {
+  const location = useLocation();
+  const targetDivRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const idUser = +localStorage.getItem("idUser");
   const idRole = +localStorage.getItem("idRole");
@@ -158,6 +161,21 @@ const TeacherPI = () => {
       description: userPI.description,
     });
   }, [userPI]);
+
+  useEffect(() => {
+    if (!loading) { // Check if loading is complete
+      const state = location.state;
+      if (state && state.action) {
+        setActiveAction(state.action);
+        if (targetDivRef.current) {
+          targetDivRef.current.scrollIntoView({
+            behavior: "smooth", // Makes the scrolling smooth
+            block: "start",     // Aligns the top of the element with the top of the viewport
+          });
+        }
+      }
+    }
+  }, [loading, location.state]);
 
   const handleInputChange = (field, value) => {
     setTempUserPI({ ...tempUserPI, [field]: value });
@@ -686,7 +704,9 @@ const TeacherPI = () => {
                 </div>
               </div>
             </div>
-            <div className="container-info auto">
+            <div
+              ref={targetDivRef}
+              className="container-info auto">
               <span className="title-span">Professional Qualifications</span>
               <div className="info">
                 {qualificationModels.map((qualification, index) => (

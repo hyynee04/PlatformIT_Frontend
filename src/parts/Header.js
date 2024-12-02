@@ -237,10 +237,6 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(">> whenever set: ", notifications)
-  }, [notifications])
-
   const optionButtonRef = useRef(null);
   const notiButtonRef = useRef(null);
   // console.log(notifications)
@@ -315,10 +311,12 @@ const Header = () => {
                   </button>
                   {unreadCount && (<div className='number-unseen'>{unreadCount}</div>)}
                   <Notification
+                    idUser={idUser}
                     isOpen={isNotificationOpen}
                     onClose={() => setIsNotificationOpen(false)}
                     notiButtonRef={notiButtonRef}
                     notifications={notifications}
+                    fetchUserNotification={() => fetchUserNotification(idUser)}
                   />
                   <button
                     ref={optionButtonRef}

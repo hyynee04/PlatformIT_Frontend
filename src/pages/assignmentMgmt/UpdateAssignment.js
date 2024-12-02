@@ -1,18 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaCalendar, FaTrashAlt, FaSave } from "react-icons/fa";
-import { TiPlus } from "react-icons/ti";
+import { FaCalendar, FaChevronDown, FaSave, FaTrashAlt } from "react-icons/fa";
+import { HiRefresh } from "react-icons/hi";
+import { ImSpinner2 } from "react-icons/im";
+import { IoDuplicateSharp } from "react-icons/io5";
 import {
   LuAlignJustify,
-  LuChevronRight,
   LuChevronLeft,
-  LuX,
+  LuChevronRight,
   LuMinusCircle,
+  LuX,
 } from "react-icons/lu";
-import { HiRefresh } from "react-icons/hi";
-import { IoDuplicateSharp } from "react-icons/io5";
 import { MdPublish } from "react-icons/md";
-import { ImSpinner2 } from "react-icons/im";
+import { TiPlus } from "react-icons/ti";
 import { useLocation, useNavigate } from "react-router-dom";
+import ManualQuestion from "../../components/assigment/ManualQuestion";
+import QuizQuestion from "../../components/assigment/QuizQuestion";
+import {
+  APIStatus,
+  AssignmentItemAnswerType,
+  AssignmentType,
+} from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import {
   deleteAssignment,
   getAllActiveCourseOfTeacher,
@@ -22,13 +30,6 @@ import {
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/courseService";
-import {
-  APIStatus,
-  AssignmentItemAnswerType,
-  AssignmentType,
-} from "../../constants/constants";
-import ManualQuestion from "../../components/assigment/ManualQuestion";
-import QuizQuestion from "../../components/assigment/QuizQuestion";
 const UpdateAssignment = ({ isDuplicate }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -122,10 +123,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       return "Ended";
     }
   };
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US"); // Định dạng theo month/day/year
-  };
+
   //SECTION
   const [listSection, setListSection] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
@@ -331,21 +329,21 @@ const UpdateAssignment = ({ isDuplicate }) => {
 
   const totalMarks = assignmentInfo.assignmentItems
     ? assignmentInfo.assignmentItems.reduce(
-        (acc, question) => acc + Number(question.mark),
-        0
-      )
+      (acc, question) => acc + Number(question.mark),
+      0
+    )
     : 0;
   const handleAddQuestion = () => {
     const newQuestion =
       +assignmentInfo.assignmentType === AssignmentType.manual
         ? {
-            question: "",
-            mark: "",
-            assignmentItemAnswerType: AssignmentItemAnswerType.text,
-            attachedFile: null,
-          }
+          question: "",
+          mark: "",
+          assignmentItemAnswerType: AssignmentItemAnswerType.text,
+          attachedFile: null,
+        }
         : +assignmentInfo.assignmentType === AssignmentType.quiz
-        ? {
+          ? {
             question: "",
             mark: "",
             explanation: "",
@@ -359,7 +357,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
               },
             ],
           }
-        : {};
+          : {};
 
     setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
     // handleUpdateAssignment("assignmentItems", [...questions, newQuestion]);
@@ -462,9 +460,8 @@ const UpdateAssignment = ({ isDuplicate }) => {
               onClick={() => navigate(-1)}
             />{" "}
             {isDuplicate
-              ? `Create new ${
-                  assignmentInfo.isTest === 1 ? "test" : "exercise"
-                }`
+              ? `Create new ${assignmentInfo.isTest === 1 ? "test" : "exercise"
+              }`
               : `Edit ${assignmentInfo.isTest === 1 ? "test" : "exercise"}`}
           </span>
           <div className="name-container">
@@ -626,14 +623,13 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         </div>
                         {course.isLimitedTime === 1 && (
                           <span
-                            className={`status-time-course ${
-                              formatTimeCourse(
-                                course.courseStartDate,
-                                course.courseEndDate
-                              ) === "Ongoing"
+                            className={`status-time-course ${formatTimeCourse(
+                              course.courseStartDate,
+                              course.courseEndDate
+                            ) === "Ongoing"
                                 ? "on-going"
                                 : "starting-soon"
-                            }`}
+                              }`}
                           >
                             {formatTimeCourse(
                               course.courseStartDate,
@@ -759,18 +755,18 @@ const UpdateAssignment = ({ isDuplicate }) => {
                     {isDuplicate
                       ? selectedCourse && isLimitedTimeCourse
                       : assignmentInfo.isLimitedTime === 1 && (
-                          <div className="info">
-                            <div className="container-validate">
-                              <span>Start date</span>
-                            </div>
-                            <input
-                              type="datetime-local"
-                              className="input-form-pi"
-                              value={assignmentInfo.startDate || ""}
-                              onChange={handleStartDateChange}
-                            />
+                        <div className="info">
+                          <div className="container-validate">
+                            <span>Start date</span>
                           </div>
-                        )}
+                          <input
+                            type="datetime-local"
+                            className="input-form-pi"
+                            value={assignmentInfo.startDate || ""}
+                            onChange={handleStartDateChange}
+                          />
+                        </div>
+                      )}
                   </div>
                   <div className="container-gap"></div>
                   <div className="container-right">
@@ -797,34 +793,34 @@ const UpdateAssignment = ({ isDuplicate }) => {
                     {isDuplicate
                       ? selectedCourse && isLimitedTimeCourse
                       : assignmentInfo.isLimitedTime === 1 && (
-                          <div className="info">
-                            <div className="container-validate">
-                              <span>Due date</span>
-                            </div>
-
-                            <input
-                              type="datetime-local"
-                              className="input-form-pi"
-                              value={assignmentInfo.dueDate || ""}
-                              onChange={handleEndDateChange}
-                              // disabled={!startDate}
-                            />
-                            <div className="container-validate">
-                              {" "}
-                              {!isValid.registTimeValidate && (
-                                <span
-                                  className={"warning-error"}
-                                  style={{
-                                    color: "var(--red-color)",
-                                    marginLeft: "auto",
-                                  }}
-                                >
-                                  {errorMessage}
-                                </span>
-                              )}
-                            </div>
+                        <div className="info">
+                          <div className="container-validate">
+                            <span>Due date</span>
                           </div>
-                        )}
+
+                          <input
+                            type="datetime-local"
+                            className="input-form-pi"
+                            value={assignmentInfo.dueDate || ""}
+                            onChange={handleEndDateChange}
+                          // disabled={!startDate}
+                          />
+                          <div className="container-validate">
+                            {" "}
+                            {!isValid.registTimeValidate && (
+                              <span
+                                className={"warning-error"}
+                                style={{
+                                  color: "var(--red-color)",
+                                  marginLeft: "auto",
+                                }}
+                              >
+                                {errorMessage}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>

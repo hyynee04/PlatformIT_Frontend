@@ -12,6 +12,7 @@ import {
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
@@ -89,10 +90,6 @@ const AddNewAssign = () => {
     } else {
       return "Ended";
     }
-  };
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US"); // Định dạng theo month/day/year
   };
 
   //SECTION
@@ -509,8 +506,8 @@ const AddNewAssign = () => {
                               course.courseStartDate,
                               course.courseEndDate
                             ) === "Ongoing"
-                                ? "on-going"
-                                : "starting-soon"
+                              ? "on-going"
+                              : "starting-soon"
                               }`}
                           >
                             {formatTimeCourse(

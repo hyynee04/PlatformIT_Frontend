@@ -167,6 +167,7 @@ const TeacherPI = () => {
       const state = location.state;
       if (state && state.action) {
         setActiveAction(state.action);
+        dispatch(fetchUserProfile(idUser));
         if (targetDivRef.current) {
           targetDivRef.current.scrollIntoView({
             behavior: "smooth", // Makes the scrolling smooth

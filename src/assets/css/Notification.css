@@ -143,8 +143,8 @@
     transition: opacity 0.2s ease, z-index 0s linear 0.2s;
 }
 .all-notification-option {
-    top: 10.5rem;
-    right: 25rem;
+    top: 3.3rem;
+    right: 1.8rem;
 }
 .notification-option.active, .all-notification-option.active {
     z-index: 1;
@@ -173,6 +173,11 @@
 .notification-option > button:hover,
 .all-notification-option > button:hover {
     background-color: rgba(217, 217, 217, 0.7);
+}
+.notification-option > button:disabled:hover,
+.all-notification-option > button:disabled:hover {
+    background-color: transparent;
+    cursor: not-allowed;
 }
 
 /* Custom scrollbar styling */

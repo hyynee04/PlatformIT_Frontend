@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { IoMdCheckmark, IoMdOpen } from "react-icons/io";
+import { ImSpinner2 } from "react-icons/im";
+import { IoMdCheckmark } from "react-icons/io";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/Notification.css";
 import { APIStatus } from "../constants/constants";
-import { formatDate, handleNotificationNavigate, setAvaNotification } from "../functions/function";
-import { getAllNotificationOfUser, postChangeReadStatus } from "../services/notificationService";
+import FetchDataUpdated from "../functions/FetchDataUpdated";
+import { calculateRelativeTime, formatDate, handleNotificationNavigate, parseRelativeTime, setAvaNotification } from "../functions/function";
+import { getAllNotificationOfUser, postChangeReadStatus, postReadAllNotification } from "../services/notificationService";
 
 const AllNotifications = () => {
     const navigate = useNavigate();
@@ -16,6 +18,8 @@ const AllNotifications = () => {
     const [isOptionOpen, setIsOptionOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [notificationGrouped, setNotificationGrouped] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(null);
+    const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(idUser);
 
     const groupNotificationsByDate = (notifications) => {
         // Formatter for day of the week
@@ -33,10 +37,13 @@ const AllNotifications = () => {
                     acc[date] = { date, dayOfWeek, notificationList: [] };
                 }
                 // Add the notification to the corresponding date's list
-                acc[date].notificationList.push(notification);
+                acc[date].notificationList.push({
+                    ...notification,
+                    timestamp: parseRelativeTime(notification.relativeTime),
+                });
                 return acc;
             }, {})
-        );
+        )
     }
 
     const changeReadStatus = async (idNotification, idUpdatedBy) => {
@@ -46,19 +53,22 @@ const AllNotifications = () => {
         }
     }
 
+    const markAllAsRead = async (idUpdatedBy) => {
+        let response = await postReadAllNotification(idUpdatedBy)
+        if (response.status === APIStatus.success) {
+            fetchUserNotification(idUser);
+        } else {
+            console.error("Error posting data: ", response.data)
+        }
+    }
+
     const fetchUserNotification = async (idUser) => {
         setLoading(true);
         try {
             let response = await getAllNotificationOfUser(idUser)
             if (response.status === APIStatus.success) {
-                const processedData = groupNotificationsByDate(response.data).map((item) => ({
-                    ...item, // Preserve the date field
-                    notificationList: item.notificationList.map((notification) => ({
-                        ...notification,
-                        timestamp: parseRelativeTime(notification.relativeTime), // Add timestamp to each notification
-                    })),
-                }));
-                setNotificationGrouped(processedData)
+                setUnreadCount(response.data.filter((notification) => notification.isRead === 0).length)
+                setNotificationGrouped(groupNotificationsByDate(response.data))
             }
         } catch (error) {
             console.log("Error fetching data: ", error)
@@ -66,33 +76,6 @@ const AllNotifications = () => {
             setLoading(false);
         }
     }
-
-    const parseRelativeTime = (relativeTime) => {
-        const now = new Date();
-        const parts = relativeTime.split(" ");
-
-        if (parts.includes("seconds")) {
-            return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
-        } else if (parts.includes("minutes")) {
-            return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
-        } else if (parts.includes("hours")) {
-            return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
-        } else if (parts.includes("days")) {
-            return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
-        }
-        return now; // Default to current time if unrecognized format
-    };
-
-    const calculateRelativeTime = (timestamp) => {
-        const now = new Date();
-        const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
-
-        if (difference === 0) return "just now"; // Handle 0 seconds
-        if (difference < 60) return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
-        if (difference < 3600) return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"} ago`;
-        if (difference < 86400) return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"} ago`;
-        return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"} ago`;
-    };
 
     useEffect(() => {
         fetchUserNotification(idUser);
@@ -112,9 +95,13 @@ const AllNotifications = () => {
     }, [])
 
     useEffect(() => {
-        console.log(notificationGrouped)
-    }, [notificationGrouped])
-
+        if (Array.isArray(updatedNotifications)) { // Ensure it's a valid array
+            setNotificationGrouped(groupNotificationsByDate(updatedNotifications))
+            setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
+        } else {
+            console.warn('updatedNotifications is not an array or is undefined:', updatedNotifications);
+        }
+    }, [updatedNotifications, updatedUnreadCount]);
 
     useEffect(() => {
         const handleClickOutsideOptionBox = (event) => {
@@ -135,53 +122,64 @@ const AllNotifications = () => {
 
     return (
         <div className="all-notification-container">
-            <div className="notification-display-block">
-                <div className="container-header">
-                    <div className="header-content">
-                        <span className="container-title">Notifications</span>
+            {loading ? (
+                <div className="loading-page">
+                    <ImSpinner2 color="#397979" />
+                </div>
+            ) : (
+                <div className={`notification-display-block ${!loading ? "slide-in" : ""}`}>
+                    <div className="container-header">
+                        <div className="header-content">
+                            <span className="container-title">Notifications</span>
+                            <button
+                                ref={optionButtonRef}
+                                onClick={() => setIsOptionOpen(!isOptionOpen)}
+                            ><IoEllipsisHorizontal /></button>
+                        </div>
+                    </div>
+                    <div className="notification-display-body">
+                        {notificationGrouped && notificationGrouped.map((item, index) => (
+                            <div key={index} className="notification-day">
+                                <span>{item.dayOfWeek}, {formatDate(item.date)}</span>
+                                <div className="notifications">
+                                    {item.notificationList && item.notificationList.length > 0 &&
+                                        item.notificationList.map((notification, index) => (
+                                            <div
+                                                key={index}
+                                                className={`notification-item ${notification.isRead ? "" : "unread"}`}
+                                                onClick={() => {
+                                                    handleNotificationNavigate(notification, navigate);
+                                                    changeReadStatus(notification.idNotification, idUser)
+                                                }}
+                                            >
+                                                <div className="noti-ava-container">
+                                                    <img src={setAvaNotification(notification)} alt="ava" />
+                                                </div>
+                                                <div className="noti-body">
+                                                    <span className="noti-content">{notification.content}</span>
+                                                    <span className="noti-time">{notification.relativeTime}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                </div>
+                            </div>
+                        ))}
+
+                    </div>
+                    <div
+                        ref={optionBoxRef}
+                        className={`all-notification-option ${isOptionOpen ? "active" : ""}`}
+                    >
                         <button
-                            ref={optionButtonRef}
-                            onClick={() => setIsOptionOpen(!isOptionOpen)}
-                        ><IoEllipsisHorizontal /></button>
+                            disabled={!unreadCount}
+                            onClick={() => markAllAsRead(idUser)}
+                        ><IoMdCheckmark />Mark all as read</button>
                     </div>
                 </div>
-                <div className="notification-display-body">
-                    {notificationGrouped && notificationGrouped.map((item, index) => (
-                        <div key={index} className="notification-day">
-                            <span>{item.dayOfWeek}, {formatDate(item.date)}</span>
-                            <div className="notifications">
-                                {item.notificationList && item.notificationList.length > 0 &&
-                                    item.notificationList.map((notification, index) => (
-                                        <div
-                                            key={index}
-                                            className={`notification-item ${notification.isRead ? "" : "unread"}`}
-                                            onClick={() => {
-                                                handleNotificationNavigate(notification, navigate);
-                                                changeReadStatus(notification.idNotification, idUser)
-                                            }}
-                                        >
-                                            <div className="noti-ava-container">
-                                                <img src={setAvaNotification(notification)} alt="ava" />
-                                            </div>
-                                            <div className="noti-body">
-                                                <span className="noti-content">{notification.content}</span>
-                                                <span className="noti-time">{notification.relativeTime}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                            </div>
-                        </div>
-                    ))}
+            )
+            }
 
-                </div>
-                <div
-                    ref={optionBoxRef}
-                    className={`all-notification-option ${isOptionOpen ? "active" : ""}`}
-                >
-                    <button><IoMdCheckmark />Mark all as read</button>
-                    <button><IoMdOpen />See all</button>
-                </div>
-            </div>
+
         </div>
     )
 }

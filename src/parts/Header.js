@@ -1,4 +1,3 @@
-import * as signalR from '@microsoft/signalr';
 import { useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -18,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
 import Notification from "../components/Notification";
+import FetchDataUpdated from "../functions/FetchDataUpdated";
+import { calculateRelativeTime, parseRelativeTime } from "../functions/function";
 import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
@@ -38,6 +39,7 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(null);
+  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(idUser);
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -68,41 +70,12 @@ const Header = () => {
         timestamp: parseRelativeTime(notification.relativeTime),
       }));
       let unread = processedData.filter((notification) => notification.isRead === 0).length;
-      setUnreadCount(unreadCount > 99 ? "99+" : unread)
+      setUnreadCount(unread > 99 ? "99+" : unread)
       setNotifications(processedData);
     } else {
       console.log(response.data)
     }
   }
-
-  // Helper to calculate relative time
-  const calculateRelativeTime = (timestamp) => {
-    const now = new Date();
-    const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
-
-    if (difference === 0) return "just now"; // Handle 0 seconds
-    if (difference < 60) return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
-    if (difference < 3600) return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"} ago`;
-    if (difference < 86400) return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"} ago`;
-    return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"} ago`;
-  };
-
-  // Helper to parse "relativeTime" into a timestamp
-  const parseRelativeTime = (relativeTime) => {
-    const now = new Date();
-    const parts = relativeTime.split(" ");
-
-    if (parts.includes("seconds")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
-    } else if (parts.includes("minutes")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
-    } else if (parts.includes("hours")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
-    } else if (parts.includes("days")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
-    }
-    return now; // Default to current time if unrecognized format
-  };
 
   useEffect(() => {
     const fetchAvatar = async () => {
@@ -128,6 +101,20 @@ const Header = () => {
 
     return () => clearInterval(interval);
   }, [dispatch, idUser]);
+
+  useEffect(() => {
+    if (Array.isArray(updatedNotifications)) { // Ensure it's a valid array
+      const processedData = updatedNotifications.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
+      setNotifications(processedData);
+    } else {
+      console.warn('updatedNotifications is not an array or is undefined:', updatedNotifications);
+    }
+  }, [updatedNotifications, updatedUnreadCount]);
+
   const navLinks = {
     [Role.platformAdmin]: [
       { title: "Dashboard", path: "/platformAdDashboard" },
@@ -190,52 +177,6 @@ const Header = () => {
       setShowOptionAva(false);
     }
   };
-
-  useEffect(() => {
-    console.log('Attempting to connect to SignalR hub...');
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:5000/notificationHub?userId=${idUser}`)
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    const startConnection = async () => {
-      try {
-        await connection.start();
-        console.log('Connected to SignalR hub.');
-
-        connection.on('UpdateNotifications', (updatedNotifications) => {
-          console.log('Received UpdateNotifications event:', updatedNotifications);
-          let processedData = updatedNotifications.map((notification) => {
-            try {
-              return {
-                ...notification,
-                timestamp: parseRelativeTime(notification.relativeTime),
-              };
-            } catch (error) {
-              console.error('Error parsing notification:', notification, error);
-              return notification; // Fallback
-            }
-          });
-          let unread = processedData.filter((notification) => notification.isRead === 0).length;
-          setUnreadCount(unreadCount > 99 ? "99+" : unread)
-          setNotifications(processedData);
-        });
-      } catch (error) {
-        console.error('SignalR Connection Error:', error);
-      }
-    };
-    startConnection();
-
-    connection.onclose((error) => {
-      console.error('SignalR connection closed:', error);
-      setTimeout(() => startConnection(), 5000); // Retry every 5 seconds
-    });
-
-    return () => {
-      console.log('Stopping SignalR connection...');
-      connection.stop().then(() => console.log('SignalR connection stopped.'));
-    };
-  }, []);
 
   const optionButtonRef = useRef(null);
   const notiButtonRef = useRef(null);
@@ -300,22 +241,23 @@ const Header = () => {
                   )}
                   <button
                     ref={notiButtonRef}
+                    disabled={location.pathname === buttonPaths["bell"]}
                     className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
                       }`}
                     onClick={() => {
-                      // handleButtonClick("bell");
                       setIsNotificationOpen(!isNotificationOpen);
                     }}
                   >
                     <LuBell className="header-icon" />
                   </button>
-                  {unreadCount && (<div className='number-unseen'>{unreadCount}</div>)}
+                  {unreadCount ? (<div className='number-unseen'>{unreadCount}</div>) : null}
                   <Notification
                     idUser={idUser}
                     isOpen={isNotificationOpen}
                     onClose={() => setIsNotificationOpen(false)}
                     notiButtonRef={notiButtonRef}
                     notifications={notifications}
+                    unreadCount={unreadCount}
                     fetchUserNotification={() => fetchUserNotification(idUser)}
                   />
                   <button

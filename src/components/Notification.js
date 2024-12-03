@@ -7,11 +7,11 @@ import "../assets/css/Notification.css";
 import default_ava from "../assets/img/default_ava.png";
 import { APIStatus } from "../constants/constants";
 import { handleNotificationNavigate } from "../functions/function";
-import { postChangeReadStatus } from "../services/notificationService";
+import { postChangeReadStatus, postReadAllNotification } from "../services/notificationService";
 
 
 const Notification = (props) => {
-    const { idUser, isOpen, onClose, notiButtonRef, notifications, fetchUserNotification } = props;
+    const { idUser, isOpen, onClose, notiButtonRef, notifications, unreadCount, fetchUserNotification } = props;
     const navigate = useNavigate();
 
     const [isOptionOpen, setIsOptionOpen] = useState(false);
@@ -28,6 +28,15 @@ const Notification = (props) => {
             fetchUserNotification();
         } else {
             console.log(response.data);
+        }
+    }
+
+    const markAllAsRead = async (idUpdatedBy) => {
+        let response = await postReadAllNotification(idUpdatedBy)
+        if (response.status === APIStatus.success) {
+            fetchUserNotification();
+        } else {
+            console.error("Error posting data: ", response.data)
         }
     }
 
@@ -125,8 +134,19 @@ const Notification = (props) => {
                     ref={optionBoxRef}
                     className={`notification-option ${isOptionOpen ? "active" : ""}`}
                 >
-                    <button><IoMdCheckmark />Mark all as read</button>
-                    <button><IoMdOpen />See all</button>
+                    <button
+                        disabled={!unreadCount}
+                        onClick={() => {
+                            markAllAsRead(idUser)
+                            setIsOptionOpen(!isOptionOpen)
+                        }}
+                    ><IoMdCheckmark />Mark all as read</button>
+                    <button
+                        onClick={() => {
+                            onClose();
+                            navigate("/allNotifications");
+                        }}
+                    ><IoMdOpen />See all</button>
                 </div>
             </div>
         </>

@@ -76,16 +76,19 @@ const Home = (props) => {
   };
 
   useEffect(() => {
-    setLoading(true);
-    try {
-      getTeacherCards();
-      getCenterCards();
-      getCourseCards();
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false); // Set loading to false after request completes
-    }
+    const fetchAllCards = async () => {
+      setLoading(true);
+      try {
+        await getTeacherCards();
+        await getCenterCards();
+        await getCourseCards();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false); // Set loading to false after request completes
+      }
+    };
+    fetchAllCards();
   }, []);
 
   if (loading) {

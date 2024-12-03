@@ -74,8 +74,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                 mark: item.mark,
                 explanation: item.explanation,
                 isMultipleAnswer: item.isMultipleAnswer,
-                fileUrl: item.fileUrl,
-                attachedFile: null,
+                attachedFile: item.attachedFile,
                 nameFile: item.nameFile,
                 assignmentItemAnswerType: item.assignmentItemAnswerType,
                 assignmentItemStatus: item.assignmentItemStatus,
@@ -483,6 +482,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       assignmentStatus: assignmentInfo.assignmentStatus,
       questions: questions,
     };
+    setLoading(true);
     try {
       const response = await postUpdateAssignment(dataToSubmit);
 
@@ -510,6 +510,18 @@ const UpdateAssignment = ({ isDuplicate }) => {
       throw error;
     }
   };
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 100); // Cố định khi cuộn qua 100px
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
   if (loading) {
     return (
       <div className="loading-page">
@@ -561,7 +573,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
           </div>
         </div>
 
-        <div className="action-btns-form">
+        <div className={`action-btns-form ${isSticky ? "sticky" : ""}`}>
           <div className="container-button">
             {!isDuplicate && (
               <div
@@ -594,8 +606,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         mark: item.mark,
                         explanation: item.explanation,
                         isMultipleAnswer: item.isMultipleAnswer,
-                        fileUrl: item.fileUrl,
-                        attachedFile: null,
+                        attachedFile: item.attachedFile,
                         nameFile: item.nameFile,
                         assignmentItemAnswerType: item.assignmentItemAnswerType,
                         assignmentItemStatus: item.assignmentItemStatus,
@@ -772,7 +783,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                       <select
                         className="input-form-pi"
                         onChange={handleSectionChange}
-                        disabled={isTest}
+                        // disabled={isTest}
                       >
                         <option value="" disabled selected hidden>
                           {selectedLecture

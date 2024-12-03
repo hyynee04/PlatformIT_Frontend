@@ -1,0 +1,68 @@
+.main-contain-assign {
+  margin: 48px 64px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+}
+.main-contain-assign .assign-info {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.main-contain-assign .assign-info .info-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.main-contain-assign .assign-info .info-row .detail-info {
+  display: flex;
+  flex-direction: row;
+}
+.main-contain-assign .assign-info .info-row .name {
+  display: flex;
+  flex-direction: column;
+}
+.main-contain-assign .assign-info .info-row .name > label {
+  font-size: 20px;
+  font-weight: 800;
+}
+.main-contain-assign .assign-info .info-row .name-container {
+  font-size: 14px;
+}
+.main-contain-assign .assign-info .info-row .detail-info .marks-questions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.main-contain-assign
+  .assign-info
+  .info-row
+  .detail-info
+  .marks-questions
+  > svg {
+  height: 8px;
+  width: auto;
+}
+.main-contain-assign .assign-info .info-row .field-value-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 40px;
+}
+.assign-info .info-row .field-value-container .field-value {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 16px;
+}
+.assign-info .info-row .field-value-container .field-value .field {
+  color: var(--text-gray);
+}

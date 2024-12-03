@@ -31,6 +31,7 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
     if (updatedQuestions[idx].attachedFilePreview) {
       URL.revokeObjectURL(updatedQuestions[idx].attachedFilePreview);
     }
+    updatedQuestions[idx].isDeletedFile = 1;
     updatedQuestions[idx].attachedFile = null;
     updatedQuestions[idx].attachedFilePreview = null;
     setQuestions(updatedQuestions);
@@ -64,6 +65,7 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
       // updatedQuestions[idx].attachedFile = URL.createObjectURL(file); // Gắn URL của ảnh để hiển thị
       updatedQuestions[idx].attachedFilePreview = fileUrl;
       updatedQuestions[idx].attachedFile = file;
+      updatedQuestions[idx].isDeletedFile = 0;
       setQuestions(updatedQuestions);
     }
   };
@@ -201,7 +203,7 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
                   <span className="choices-setting">
                     <span>Choices</span>
                     <span>|</span>
-                    <span>Multiple answer</span>
+                    <span>Multiple answers</span>
                     <label className="switch-mul-anw">
                       <input
                         type="checkbox"
@@ -212,6 +214,16 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
                             "isMultipleAnswer",
                             e.target.checked
                           );
+                          if (!question.isMultipleAnswer) {
+                            // Nếu chuyển sang chế độ "Single Answer", đảm bảo chỉ có 1 đáp án đúng
+                            const updatedItems = question.items.map(
+                              (choice, choiceIdx) => ({
+                                ...choice,
+                                isCorrect: choiceIdx === 0, // Đặt đáp án đầu tiên là đúng
+                              })
+                            );
+                            handleQuestionChange(idx, "items", updatedItems);
+                          }
                         }}
                       />
                       <span className="slider-mul-anw"></span>

@@ -42,7 +42,7 @@ const postAddCourse = async (dataToSubmit) => {
     const formData = new FormData();
     formData.append("IdCenter", idCenter);
     formData.append("Title", dataToSubmit.title);
-    formData.append("Description", dataToSubmit.description);
+    formData.append("Introduction", dataToSubmit.introduction);
     formData.append("CourseAvatar", dataToSubmit.coverImg);
 
     if (dataToSubmit.isLimitedTime) {
@@ -144,6 +144,7 @@ const getAssignmentInfo = async (idAssignment) => {
     },
   });
 };
+
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -179,10 +180,21 @@ const postAddManualAssignment = async (dataToSubmit) => {
 
       // Nếu có file đính kèm
       if (question.attachedFile) {
-        formData.append(
-          `AssignmentItems[${index}].AttachedFile`,
-          question.attachedFile
-        );
+        if (question.attachedFile instanceof File) {
+          formData.append(
+            `AssignmentItems[${index}].AttachedFile`,
+            question.attachedFile
+          );
+        } else if (typeof question.attachedFile === "string") {
+          formData.append(
+            `AssignmentItems[${index}].PathFile`,
+            question.attachedFile
+          );
+          formData.append(
+            `AssignmentItems[${index}].FileName`,
+            question.nameFile
+          );
+        }
       }
     });
     formData.append("CreatedBy", idCreatedBy);
@@ -226,17 +238,34 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     );
     formData.append("ShowAnswer", dataToSubmit.isShowAnswer ? 1 : 0);
     // Duyệt qua từng câu hỏi trong mảng questions
-    dataToSubmit.questions.forEach((question, index) => {
+    for (const [index, question] of dataToSubmit.questions.entries()) {
       formData.append(`AssignmentItems[${index}].Question`, question.question);
       formData.append(`AssignmentItems[${index}].Mark`, question.mark);
       formData.append(
         `AssignmentItems[${index}].Explanation`,
-        question.explanation
+        question.explanation ?? ""
       );
       formData.append(
         `AssignmentItems[${index}].IsMultipleAnswer`,
         question.isMultipleAnswer ? 1 : 0
       );
+      if (question.attachedFile) {
+        if (question.attachedFile instanceof File) {
+          formData.append(
+            `AssignmentItems[${index}].AttachedFile`,
+            question.attachedFile
+          );
+        } else if (typeof question.attachedFile === "string") {
+          formData.append(
+            `AssignmentItems[${index}].PathFile`,
+            question.attachedFile
+          );
+          formData.append(
+            `AssignmentItems[${index}].FileName`,
+            question.nameFile
+          );
+        }
+      }
 
       // Duyệt qua các item của câu hỏi (các lựa chọn đáp án)
       question.items.forEach((item, itemIndex) => {
@@ -249,15 +278,7 @@ const postAddQuizAssignment = async (dataToSubmit) => {
           item.isCorrect ? 1 : 0
         );
       });
-
-      // Nếu có file đính kèm
-      if (question.attachedFile) {
-        formData.append(
-          `AssignmentItems[${index}].AttachedFile`,
-          question.attachedFile
-        );
-      }
-    });
+    }
     formData.append("CreatedBy", idCreatedBy);
     return await axios.post("api/Assignment/CreateQuizAssignment", formData, {
       headers: {
@@ -317,7 +338,7 @@ const postUpdateAssignment = async (dataToSubmit) => {
     formData.append("AssignmentStatus", dataToSubmit.assignmentStatus);
     // Duyệt qua từng câu hỏi trong mảng questions
 
-    dataToSubmit.questions.forEach((question, index) => {
+    for (const [index, question] of dataToSubmit.questions.entries()) {
       formData.append(
         `AssignmentItems[${index}].idAssignmentItem`,
         question.idAssignmentItem
@@ -329,12 +350,20 @@ const postUpdateAssignment = async (dataToSubmit) => {
         `AssignmentItems[${index}].assignmentItemStatus`,
         question.assignmentItemStatus
       );
+      formData.append(
+        `AssignmentItems[${index}].isDeletedFile`,
+        question?.isDeletedFile || 0
+      );
+
       if (question.attachedFile) {
-        formData.append(
-          `AssignmentItems[${index}].attachedFile`,
-          question.attachedFile
-        );
+        if (question.attachedFile instanceof File) {
+          formData.append(
+            `AssignmentItems[${index}].attachedFile`,
+            question.attachedFile
+          );
+        }
       }
+
       if (dataToSubmit.assignmentType === AssignmentType.manual) {
         formData.append(
           `AssignmentItems[${index}].assignmentItemAnswerType`,
@@ -352,8 +381,7 @@ const postUpdateAssignment = async (dataToSubmit) => {
           question.isMultipleAnswer ? 1 : 0
         );
 
-        // Duyệt qua các item của câu hỏi (các lựa chọn đáp án)
-        question.items.forEach((item, itemIndex) => {
+        for (const [itemIndex, item] of question.items.entries()) {
           formData.append(
             `AssignmentItems[${index}].Items[${itemIndex}].idMultipleAssignmentItem`,
             item.idMultipleAssignmentItem
@@ -370,9 +398,9 @@ const postUpdateAssignment = async (dataToSubmit) => {
             `AssignmentItems[${index}].Items[${itemIndex}].multipleAssignmentItemStatus`,
             item.multipleAssignmentItemStatus
           );
-        });
+        }
       }
-    });
+    }
     return await axios.post(
       `api/Assignment/UpdateAssignment?updatedBy=${updatedBy}`,
       formData,

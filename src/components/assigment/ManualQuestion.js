@@ -32,6 +32,7 @@ const ManualQuestion = ({
     const updatedQuestions = [...questions];
     updatedQuestions[idx].attachedFile = null;
     updatedQuestions[idx].fileUrl = null;
+    updatedQuestions[idx].isDeletedFile = 1;
     updatedQuestions[idx].nameFile = "";
     setQuestions(updatedQuestions);
     if (inputFileRef.current[idx]) {
@@ -46,6 +47,7 @@ const ManualQuestion = ({
   const handleReferenceFileChange = (e, idx) => {
     const updatedQuestions = [...questions];
     updatedQuestions[idx].attachedFile = e.target.files[0];
+    updatedQuestions[idx].isDeletedFile = 0;
     setQuestions(updatedQuestions);
   };
 
@@ -111,7 +113,13 @@ const ManualQuestion = ({
                                 ).slice(0, 54) + "..."
                               : question.attachedFile?.name || question.nameFile
                           }
-                          onClick={() => window.open(question.attachedFile)}
+                          onClick={() => {
+                            if (typeof question.attachedFile === "string") {
+                              // Kiểm tra nếu attachedFile là URL
+                              const fileUrl = question.attachedFile;
+                              window.open(fileUrl, "_blank");
+                            }
+                          }}
                           readOnly
                         />
                         <FaTrashAlt

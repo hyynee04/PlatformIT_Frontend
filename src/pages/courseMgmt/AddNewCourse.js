@@ -16,7 +16,7 @@ import { getAllTagModel, postAddCourse } from "../../services/courseService";
 const AddNewCourse = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [introduction, setIntroduction] = useState("");
   // const [formValues, setFormValues] = useState({
   //   maxAttendees: null,
   //   price: null,
@@ -310,7 +310,7 @@ const AddNewCourse = () => {
   const handleAddCourse = async () => {
     const dataToSubmit = {
       title: title,
-      description: description,
+      introduction: introduction,
       coverImg: coverImage.coverImgFile || null,
       startDate: formValues.startDate,
       endDate: formValues.endDate,
@@ -363,12 +363,12 @@ const AddNewCourse = () => {
                   />
                 </div>
                 <div className="info">
-                  <span>Description</span>
+                  <span>Introduction</span>
                   <Form.Control
                     as="textarea"
                     className="input-area-form-pi"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={introduction}
+                    onChange={(e) => setIntroduction(e.target.value)}
                   />
                 </div>
                 <div className="info">

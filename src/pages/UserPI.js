@@ -348,16 +348,25 @@ const TeacherPI = () => {
     await dispatch(fetchUserProfile(idUser));
   };
   const removeQualification = async (idQualification) => {
-    const response = await deleteQualification(idQualification);
-    if (response.status === APIStatus.success) {
-      await dispatch(fetchUserProfile(idUser));
+    // setLoading(true);
+    try {
+      const response = await deleteQualification(idQualification);
+      if (response.status === APIStatus.success) {
+        await dispatch(fetchUserProfile(idUser));
+      }
+    } catch (error) {
+      throw error;
     }
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleChangePassword = async () => {
     if (oldPassword && newPassword && confirmPassword) {
       if (newPassword === confirmPassword) {
         const idAccount = +localStorage.getItem("idAccount");
+        // setLoading(true);
         try {
           const response = await postChangePassword(
             oldPassword,
@@ -380,6 +389,9 @@ const TeacherPI = () => {
         } catch (error) {
           setChangePWError(error.message);
         }
+        // finally {
+        //   setLoading(false);
+        // }
       } else {
         setChangePWError("New password and confirmation do not match.");
       }
@@ -421,8 +433,9 @@ const TeacherPI = () => {
               </div>
               {idRole === Role.teacher && (
                 <div
-                  className={`btn ${activeAction === "specializedPI" ? "active" : ""
-                    }`}
+                  className={`btn ${
+                    activeAction === "specializedPI" ? "active" : ""
+                  }`}
                   onClick={() => handleActionClick("specializedPI")}
                 >
                   <FaUserGraduate className="icon" />
@@ -705,18 +718,19 @@ const TeacherPI = () => {
                       />
                       <div className="status-action">
                         <span
-                          className={`span ${qualification.status === UserStatus.active
+                          className={`span ${
+                            qualification.status === UserStatus.active
                               ? "approved"
                               : qualification.status === UserStatus.pending
-                                ? "pending"
-                                : "rejected"
-                            }`}
+                              ? "pending"
+                              : "rejected"
+                          }`}
                         >
                           {qualification.status === UserStatus.active
                             ? "Approved"
                             : qualification.status === UserStatus.pending
-                              ? "Pending"
-                              : `Rejected. Reason: ${qualification.reason}`}
+                            ? "Pending"
+                            : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
@@ -734,7 +748,7 @@ const TeacherPI = () => {
                     </div>
                     <div className="quali-image">
                       {qualification.path &&
-                        qualification.path.endsWith(".pdf") ? (
+                      qualification.path.endsWith(".pdf") ? (
                         <div
                           onClick={() =>
                             window.open(qualification.path, "_blank")

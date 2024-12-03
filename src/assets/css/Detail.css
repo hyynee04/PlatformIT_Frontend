@@ -12,7 +12,7 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    width: 30%;
+    width: 382px;
 }
 
 .detail-container > .right-container {
@@ -20,7 +20,7 @@
     flex-direction: column;
     gap: 1.5rem;
 
-    width: 70%;
+    width: 890px;
 }
 
 
@@ -30,6 +30,7 @@
     flex-direction: column;
     gap: 1rem;
 
+    background-color: var(--white-color);
     width: 100%;
     min-height: 9rem;
     padding: 1.5rem;
@@ -79,6 +80,7 @@
 .detail-container .left-container 
 .block-container .biography-block > .biography-name.center {
     display: flex;
+    text-align: left;
     justify-content: flex-start;
 }
 
@@ -127,6 +129,7 @@
 
     font-size: 1rem;
     color: var(--text-gray);
+    text-align: justify;
 }
 
 .detail-container .left-container .block-container .biography-block .teacher-information span > svg {
@@ -153,11 +156,17 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: var(--white-color);
+    cursor: pointer;
 }
 
 .detail-container .left-container 
 .block-container .biography-block > button:hover {
     background-color: rgba(57, 121, 121, 0.8);
+}
+
+.detail-container .left-container 
+.block-container .biography-block > button:disabled {
+    background-color: var(--border-gray);
 }
 
 .detail-container .left-container .block-container > .block-container-header,
@@ -269,6 +278,14 @@
     font-size: .875rem;
     color: var(--text-gray);
     font-weight: 400;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;   /* Show only 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;      
+    text-align: justify;
 }
 
 
@@ -304,11 +321,15 @@
 .block-container .block-container-col > .qualification,
 .detail-container .right-container 
 .block-container .block-container-col > .qualification {
-    padding: 20px;
+    padding: 1rem;
     border: 1px solid var(--border-gray);
-    border-radius: .75rem;
+    border-radius: .5rem;
 }
-
+.detail-container .right-container 
+.block-container .block-container-col > .qualification.test {
+    padding: 1rem .5rem;
+    border: none;
+}
 .detail-container .left-container .block-container 
 .block-container-col .qualification > .qualification-body,
 .detail-container .right-container .block-container 
@@ -321,7 +342,48 @@
 
 .detail-container .right-container .block-container > .carousel-block {
     width: 100%;
+    display: flex;
+    flex-direction: column;
     height: fit-content;
+}
+
+.detail-container .right-container .block-container .carousel-block > .carousel-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > span {
+    font-size: 1.3rem;
+    color: var(--main-color);
+    font-weight: 600;
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+
+    padding: 8px 12px;
+    border: none;
+    border-radius: .5rem;
+    background-color: rgba(217, 217, 217, 0.3);
+
+    color: var(--main-color);
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header > button:hover {
+    background-color: var(--border-gray);
+}
+
+.detail-container .right-container .block-container .carousel-block .carousel-header button > svg {
+    width: .9rem;
+    height: .9rem;
 }
 
 .detail-container .right-container .block-container .carousel-block  > .carousel {
@@ -338,6 +400,7 @@
 .detail-container .right-container .block-container 
 .carousel-block .carousel .carousel-header > button {
     margin-right: -2.5rem;
+    cursor: pointer;
 }
 
 
@@ -404,6 +467,7 @@
 
     border: 1px solid var(--main-color);
     border-radius: .5rem;
+    cursor: pointer;
 
     width: fit-content;
     height: fit-content;
@@ -496,22 +560,29 @@
     display: flex;
     flex-direction: column;
 
-    border: 1px solid var(--border-gray);
+    border-left: 1px solid var(--border-gray);
+    border-right: 1px solid var(--border-gray);
     border-radius: 0 0 .5rem .5rem;
     height: fit-content;
 
     overflow: hidden;
     height: auto;
+    transition: opacity 0.2s ease-out;
+
+    opacity: 1;
 }
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture > .lecture-block.adjust-lecture-block {
     height: 0;
     border: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 .detail-container .right-container .block-container 
-.block-container-col .lecture > .lecture-header {
+.block-container-col .lecture > .lecture-header,
+.add-section-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -524,6 +595,31 @@
 
     background-color: rgba(57, 121, 121, 0.3);
     border-radius: .5rem .5rem 0 0;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-header > span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-header  span > button {
+    background-color: transparent;
+    border: none;
+    border-radius: .25rem;
+    outline: none;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-header  span > button:hover {
+    background-color: rgba(57, 121, 121, 0.5);
 }
 
 .detail-container .right-container .block-container 
@@ -546,6 +642,7 @@
     background-color: transparent;
     border: none;
     border-left: 3px solid black;
+    cursor: pointer;
 }
 
 .detail-container .right-container .block-container 
@@ -562,13 +659,18 @@
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content {
     padding: 1.3rem 2.3rem;
-    border-top: 1px solid var(--border-gray);
+    border-bottom: 1px solid var(--border-gray);
 }
 
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content.remove-border {
     border: none;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block > .lecture-content.nohover:hover {
+    background-color: var(--white-color);
 }
 
 .detail-container .right-container .block-container 
@@ -586,27 +688,86 @@
 .block-container-col .lecture .lecture-block .lecture-content .lecture-name > .lecture-title {
     font-size: 1.2rem;
 }
-
 .detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content > .add-lecture-container {
+.block-container-col .lecture .lecture-block .lecture-content > .option-container {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    gap: 5px;
     justify-content: flex-start;
+    gap: 10px;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 3px;
+    align-items: center;
+    position: relative;
+    border: none;
+    border-radius: .25rem;
+    font-size: .8rem;
+    padding: 4px 6px;
+    cursor: pointer;
+    width: 1.8rem;
+    height: fit-content;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container button .icon > svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container button > span {
+    display: flex;
     align-items: center;
 }
-
 .detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > svg {
-    height: 1.1rem;
-    width: 1.1rem;
-}
-
-.detail-container .right-container .block-container 
-.block-container-col .lecture .lecture-block .lecture-content .add-lecture-container > .add-lecture {
-    font-size: 1rem;
+.block-container-col .lecture .lecture-block .lecture-content .option-container button > .text {
     font-weight: 600;
+    font-size: .8rem;
+    transform: translateX(10px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button:hover {
+    width: fit-content;
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button:hover .text {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    transform: translateX(0px);
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.add-lecture {
+    color: var(--main-color);
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.remove-section {
+    color: var(--red-color);
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.add-lecture:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.add-lecture:hover .icon {
+    color: var(--main-color);
+}
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.remove-section:hover {
+    background-color: rgba(192, 15, 12, 0.3);
+} 
+.detail-container .right-container .block-container 
+.block-container-col .lecture .lecture-block .lecture-content .option-container > button.remove-section:hover .icon {
+    color: var(--red-color);
+} 
 
 .detail-container .right-container .block-container 
 .block-container-col .lecture .lecture-block > .lecture-content:hover {
@@ -630,7 +791,8 @@
     padding: .3rem .5rem;
 
     border: none;
-    border-radius: .5rem;
+    border-radius: .25rem;
+    cursor: pointer;
 }
 
 .detail-container .right-container .block-container .add-section-btn > svg,
@@ -733,11 +895,29 @@
 }
 
 .detail-container .right-container .block-container 
-.block-container-col .qualification > .test-status {
+.block-container-col .qualification > .test-status{
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
+    width: 25%;
+}
+
+.detail-container .right-container .block-container 
+.block-container-col .qualification .test-status > span {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: .9rem;
+}
+.detail-container .right-container .block-container 
+.block-container-col .qualification .test-status span > svg {
+    width: 1rem;
+    height: 1rem;
+    stroke-width: 1px;
 }
 
 .detail-container .right-container .block-container 
@@ -874,6 +1054,7 @@ svg > .CircularProgressbar-text {
     border: none;
     background-color: transparent;
     color: var(--black-color);
+    cursor: pointer;
 }
 
 .block-container-col .pagination-controls > button:hover {
@@ -893,7 +1074,8 @@ svg > .CircularProgressbar-text {
     color: gray;
 }
 
-.detail-container .right-container > .block-container.course-progress-container {
+.detail-container .right-container > .block-container.course-progress-container,
+.detail-container .right-container > .block-container.course-teacher-attendance {
     background-color: transparent;
     border: none;
     box-shadow: none;
@@ -962,6 +1144,7 @@ svg > .CircularProgressbar-text {
     border-radius: 90px;
     opacity: 0;
     transition: opacity 0.2s ease;
+    cursor: pointer;
 }
 
 .detail-container .right-container .block-container .block-container-col .notification .delete-button > button:hover {
@@ -980,7 +1163,7 @@ svg > .CircularProgressbar-text {
     display: flex;
     flex-direction: column;
     gap: 3px;
-
+    width: 100%;
     padding-left: .5rem;
     border-left: 3px solid var(--border-gray);
 
@@ -991,21 +1174,19 @@ svg > .CircularProgressbar-text {
     color: var(--black-color);
     font-size: 1.3rem;
     font-weight: 600;
+    min-height: 1.5rem;
 }
 
 .detail-container .right-container .block-container .block-container-col .notification .notification-body > .notification-content {
-    color: var(--text-gray);
+    color: var(--black-color);
     font-size: 1rem;
+    width: 100%;;
 }
 
 .detail-container .right-container .block-container .block-container-col .notification .notification-body > .noti-time {
     color: var(--text-gray);
-    font-size: 1rem;
+    font-size: .8rem;
     font-weight: 600;
-
-    position: absolute;
-    top: .3rem;
-    right: 1rem;
 }
 
 .detail-container .right-container .block-container > .add-notification-button {
@@ -1023,6 +1204,7 @@ svg > .CircularProgressbar-text {
     height: 2rem;
 
     border-radius: 90px;
+    cursor: pointer;
     
     position: absolute;
     top: 1.5rem;
@@ -1041,21 +1223,25 @@ svg > .CircularProgressbar-text {
 }
 
 /* Custom scrollbar styling */
-.block-container-col.noti-size::-webkit-scrollbar  {
+.block-container-col.noti-size::-webkit-scrollbar,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar  {
   width: 10px;           /* Set the scrollbar width */
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-track {
+.block-container-col.noti-size::-webkit-scrollbar-track,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   background: var(--border-gray);  /* Background color of the scrollbar track */
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-thumb {
+.block-container-col.noti-size::-webkit-scrollbar-thumb,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   background-color: var(--text-gray); /* Scrollbar thumb color */
   border-radius: 4px;     /* Rounded corners for a flatter look */
   cursor: grab;
 }
 
-.block-container-col.noti-size::-webkit-scrollbar-thumb:active {
+.block-container-col.noti-size::-webkit-scrollbar-thumb:active,
+.detail-container .right-container > .course-teacher-attendance::-webkit-scrollbar {
   cursor: grabbing; /* Changes cursor when thumb is clicked and held */
 }
 
@@ -1067,7 +1253,8 @@ svg > .CircularProgressbar-text {
 }
 
 .detail-container .right-container .teacher-menu > .teacher-menu-btn {
-    padding: .6rem 5.5rem;
+    width: calc(90%/3);
+    padding: .6rem 0;
     font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-gray);
@@ -1105,7 +1292,7 @@ svg > .CircularProgressbar-text {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     opacity: 0;
     transition: opacity 0.1s linear;
-
+    z-index: -1;
     position: absolute;
     top: 4rem;
     right: 2rem;
@@ -1117,14 +1304,21 @@ svg > .CircularProgressbar-text {
     transition: opacity 0.1s linear;
 }
 
-.detail-container .right-container .block-container .add-notification-popup > span {
+.detail-container .right-container .block-container .add-notification-popup > .popup-title {
     width: 100%;
     text-align: left;
 
     color: var(--main-color);
     font-size: 1.2rem;
     font-weight: 600;
+}
 
+.detail-container .right-container .block-container .add-notification-popup > .add-noti-error {
+    font-size: .8rem;
+    color: var(--red-color);
+    text-align: left;
+    width: 100%;
+    font-weight: 600;
 }
 
 .detail-container .right-container .block-container .add-notification-popup > textarea {
@@ -1174,14 +1368,16 @@ svg > .CircularProgressbar-text {
 
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button {
     padding: 4px 15px;
     border: none;
-    border-radius: .5rem;
+    border-radius: .25rem;
     background-color: transparent;
+    cursor: pointer;
+    font-size: .8rem;
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.post {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button.post {
     background-color: var(--main-color);
     color: var(--white-color);
     font-weight: 500;
@@ -1191,11 +1387,165 @@ svg > .CircularProgressbar-text {
     background-color: rgba(57, 121, 121, 0.8);
 }
 
-.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-noification-button.cancel {
+.detail-container .right-container .block-container .add-notification-popup .post-button-container > .post-notification-button.cancel {
     color: var(--text-gray);
 }
 
 .detail-container .right-container .block-container .add-notification-popup .post-button-container > .cancel:hover {
     background-color: rgba(217, 217, 217, 0.3);
     color: var(--black-color);
+}
+
+.detail-container .right-container > .course-teacher-attendance {
+   padding: 0.5rem 1rem 0.5rem 0.5rem !important;
+   max-height: 100vh;
+   overflow-y: auto;
+}
+
+.detail-container .right-container .course-teacher-attendance > .attendance-progress-container {
+    width: 100%;
+    height: fit-content;
+    padding: .5rem;
+
+    background-color: var(--white-color);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 5px 1px;
+    border-radius: .5rem;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container > .attendance-progress-content {
+    width: 100%;
+    height: fit-content;
+    padding: .5rem;
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+
+    border: none;
+    border-radius: .5rem;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container > .attendance-progress-content:hover {
+    background-color: rgba(217, 217, 217, 0.2);
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content > .attendance-ava {
+    width: 5rem;
+    display: flex;
+    align-items: center;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-ava > img {
+    width: 4.5rem;
+    height: 4.5rem;
+
+    border: none;
+    border-radius: 50%;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content > .attendance-progress-body {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: fit-content;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-name {
+    font-weight: 600;
+    color: var(--second-main-color);
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-mail {
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body > .attendance-progress {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > label {
+    width: 100px;
+    font-size: .9rem;
+    font-weight: 500;
+}
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > .progress-line {
+    width: 90%;
+    height: 8px;
+
+    border: none;
+    background-color: rgba(217, 217, 217, 0.4);
+    border-radius: 10px;
+}
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress .progress-line > .progress-line-inner {
+    height: 100%;
+
+    border: none;
+    background-color: var(--second-main-color);
+    border-radius: 10px;
+    transition: width 0.6s ease;;
+}
+.detail-container .right-container .course-teacher-attendance .attendance-progress-container 
+.attendance-progress-content .attendance-progress-body .attendance-progress > span {
+    font-size: .9rem;
+    font-weight: 500;
+}
+.edit-section-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.edit-section-container > .edit-section {
+    width: 90%;
+    border: none;
+    border-bottom: 1px solid var(--black-color);
+    background-color: transparent;
+    font-size: .9rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.edit-section-container > .edit-button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    height: fit-content;
+}
+.edit-section-container .edit-button-container > button {
+    border: none;
+    border-radius: .25rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 1.75rem;
+    aspect-ratio: 1;
+}
+.edit-section-container .edit-button-container > button:disabled,
+.edit-section-container .edit-button-container > button:disabled:hover {
+    background-color: rgba(217, 217, 217, 0.5);
+    color: var(--text-gray);
+    cursor:not-allowed;
+}
+.edit-section-container .edit-button-container > button:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+.add-section-container {
+    border-radius: .5rem;
 }

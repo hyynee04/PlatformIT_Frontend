@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { LuClipboardCheck, LuClipboardX, LuX } from "react-icons/lu";
-import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
+import { LuClipboardCheck, LuClipboardX, LuX } from "react-icons/lu";
 import { useDispatch } from "react-redux";
 import {
   approveQualification,
@@ -49,7 +49,7 @@ const DiagActionQualiForm = ({
       setErrorRejectString("Please enter reason for rejection");
       setTimeout(() => {
         setErrorRejectString("");
-      }, 3000);
+      }, 1000);
     }
   };
   if (!isOpen) return null;
@@ -68,7 +68,7 @@ const DiagActionQualiForm = ({
             <span>Are you sure to Approve this qualification?</span>
             <div className="str-btns">
               <div className="act-btns">
-                <button className="btn diag-btn cancle" onClick={onClose}>
+                <button className="btn diag-btn cancel" onClick={onClose}>
                   No
                 </button>
                 <button
@@ -115,7 +115,7 @@ const DiagActionQualiForm = ({
                 </Alert>
               )}
               <div className="act-btns">
-                <button className="btn diag-btn cancle" onClick={onClose}>
+                <button className="btn diag-btn cancel" onClick={onClose}>
                   Cancel
                 </button>
                 <button

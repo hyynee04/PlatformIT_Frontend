@@ -3,6 +3,7 @@ export const Role = {
   centerAdmin: 2,
   student: 3,
   teacher: 4,
+  guest: 5,
 };
 export const UserGender = {
   male: 0,
@@ -25,12 +26,34 @@ export const CenterStatus = {
   pending: 2,
   locked: 3,
 };
-export const CarouselObject = {
+export const Object = {
   course: 1,
   teacher: 2,
   center: 3,
 };
 export const APIStatus = {
   success: 200,
-
-}
+};
+export const AssignmentType = {
+  manual: 1,
+  quiz: 2,
+  code: 3,
+};
+export const AssignmentItemAnswerType = {
+  text: 1,
+  attached_file: 2,
+};
+export const AssignmentStatus = {
+  publish: 1,
+  unpublish: 0,
+  pastDue: 2,
+};
+export const AssignmentItemStatus = {
+  active: 1,
+  inactive: 0,
+};
+export const NotificationType = {
+  qualification: 1,
+  assignedTeacher: 2,
+  notificationBoard: 3,
+};

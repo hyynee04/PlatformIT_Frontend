@@ -1,19 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown } from "react-icons/fa";
-import { LuX, LuMoveRight } from "react-icons/lu";
-import { FiSettings } from "react-icons/fi";
-import { FaRegFile } from "react-icons/fa6";
 import Form from "react-bootstrap/Form";
+import { FaChevronDown } from "react-icons/fa";
+import { FaRegFile } from "react-icons/fa6";
+import { FiSettings } from "react-icons/fi";
+import { LuMoveRight, LuX } from "react-icons/lu";
 import TeacherCard from "../../components/Card/TeacherCard";
 
-import { getAllTags, postAddCourse } from "../../services/courseService";
-import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
+import { useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
+import { APIStatus } from "../../constants/constants";
+import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
+import { getAllTagModel, postAddCourse } from "../../services/courseService";
 const AddNewCourse = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [introduction, setIntroduction] = useState("");
   // const [formValues, setFormValues] = useState({
   //   maxAttendees: null,
   //   price: null,
@@ -52,7 +55,7 @@ const AddNewCourse = () => {
   useEffect(() => {
     const fetchTags = async () => {
       try {
-        const response = await getAllTags();
+        const response = await getAllTagModel();
         setTagOptions(response.data);
       } catch (error) {
         console.error("Error fetching tags:", error);
@@ -63,7 +66,7 @@ const AddNewCourse = () => {
   }, []);
   const capitalizeWords = (str) =>
     str
-      .toLowerCase()
+      // .toLowerCase()
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
@@ -152,17 +155,43 @@ const AddNewCourse = () => {
   const validateDates = (values) => {
     let registTimeValidate = "";
     let durationValidate = "";
+    const today = new Date().setHours(0, 0, 0, 0);
+    // Kiểm tra không được trước ngày hôm nay
+    if (new Date(values.registStartDate) < today) {
+      registTimeValidate = "Registration start date cannot be before today";
+    }
+    if (new Date(values.registEndDate) < today) {
+      registTimeValidate = "Registration end date cannot be before today";
+    }
+    if (new Date(values.startDate) < today) {
+      durationValidate = "Course start date cannot be before today";
+    }
+    if (new Date(values.endDate) < today) {
+      durationValidate = "Course end date cannot be before today";
+    }
+
     if (new Date(values.registEndDate) < new Date(values.registStartDate)) {
       registTimeValidate =
         "Registration end date cannot be earlier than registration start date";
     }
-    if (new Date(values.registEndDate) > new Date(values.startDate)) {
+    if (
+      new Date(values.registEndDate) >= new Date(values.startDate) ||
+      new Date(values.registStartDate) >= new Date(values.startDate)
+    ) {
       registTimeValidate =
-        "Registration end date must be before the course start date";
+        "Course start date must be after the registration period";
     }
     if (new Date(values.endDate) < new Date(values.startDate)) {
       durationValidate = "End date cannot be earlier than start date";
     }
+
+    // if (values.startDate && !values.endDate) {
+    //   durationValidate = "Please enter an end date for the course";
+    // }
+    // if (values.endDate && !values.startDate) {
+    //   durationValidate = "Please enter a start date for the course";
+    // }
+
     setFormValues((prev) => ({
       ...prev,
       registTimeValidate,
@@ -264,10 +293,10 @@ const AddNewCourse = () => {
       return false;
     if (
       formValues.isTimeLimited &&
-      (formValues.startDate === null ||
-        formValues.endDate === null ||
-        formValues.registStartDate === null ||
-        formValues.registEndDate === null ||
+      (formValues.startDate === "" ||
+        formValues.endDate === "" ||
+        formValues.registStartDate === "" ||
+        formValues.registEndDate === "" ||
         formValues.registTimeValidate !== "" ||
         formValues.durationValidate !== "")
     )
@@ -281,8 +310,8 @@ const AddNewCourse = () => {
   const handleAddCourse = async () => {
     const dataToSubmit = {
       title: title,
-      description: description,
-      coverImg: coverImage || null,
+      introduction: introduction,
+      coverImg: coverImage.coverImgFile || null,
       startDate: formValues.startDate,
       endDate: formValues.endDate,
       price: formValues.price,
@@ -298,9 +327,11 @@ const AddNewCourse = () => {
       tags: selectedTags,
       idTeacher: selectedTeacher.idUser,
     };
-    console.log(dataToSubmit);
     try {
-      await postAddCourse(dataToSubmit);
+      const response = await postAddCourse(dataToSubmit);
+      if (response.status === APIStatus.success) {
+        navigate("/centerAdCourse");
+      }
       // await dispatchInfo(fetchCenterProfile());
       // setUpdateStr("Center information has been updated successfully!");
 
@@ -321,7 +352,9 @@ const AddNewCourse = () => {
             <div className="container-field">
               <div className="container-left">
                 <div className="info">
-                  <span>Course Name*</span>
+                  <span>
+                    Course Name <span className="required">*</span>
+                  </span>
                   <input
                     type="text"
                     className="input-form-pi"
@@ -330,17 +363,17 @@ const AddNewCourse = () => {
                   />
                 </div>
                 <div className="info">
-                  <span>Description</span>
+                  <span>Introduction</span>
                   <Form.Control
                     as="textarea"
                     className="input-area-form-pi"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={introduction}
+                    onChange={(e) => setIntroduction(e.target.value)}
                   />
                 </div>
                 <div className="info">
                   <span>
-                    Tag of Course
+                    Tag of Course <span className="required">*</span>
                     <br />
                     <span className="note-span">
                       You can add a new tag if you can't find the tag you need
@@ -538,7 +571,7 @@ const AddNewCourse = () => {
                   type="file"
                   ref={inputFileRef}
                   style={{ display: "none" }}
-                  accept=".png, .jpg, .jpeg"
+                  accept=".png, .jpg, .jpeg, .jfif"
                   onChange={handleImgChange}
                 />
               </div>
@@ -548,7 +581,14 @@ const AddNewCourse = () => {
                 <FiSettings className="icon" />
               </button>
               <div className="container-button">
-                <button className="discard-changes">Cancel</button>
+                <button
+                  className="discard-changes"
+                  onClick={() => {
+                    navigate("/centerAdCourse");
+                  }}
+                >
+                  Cancel
+                </button>
                 <button
                   className="save-change create-course"
                   disabled={!isFormValid()}
@@ -560,7 +600,9 @@ const AddNewCourse = () => {
             </div>
           </div>
           <div className="container-info auto">
-            <span className="title-span">Teacher</span>
+            <span className="title-span">
+              Teacher <span className="required">*</span>
+            </span>
             {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
             {!showTeacherList && (
               <div className="alert-option">

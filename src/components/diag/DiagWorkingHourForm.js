@@ -4,6 +4,7 @@ import {
   getWorkingHours,
   postAddOrUpdateWorkingHours,
 } from "../../services/centerService";
+import { APIStatus } from "../../constants/constants";
 const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   const daysOfWeek = [
     "Monday",
@@ -26,8 +27,17 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   const fetchWorkingHours = async () => {
     try {
       const response = await getWorkingHours();
-      if (response !== "Center not found or no working hours available.") {
-        setWorkingHours(response);
+      if (response.status === APIStatus.success) {
+        setWorkingHours(response.data);
+      } else {
+        setWorkingHours(
+          daysOfWeek.map((day) => ({
+            day: day,
+            startTime: "08:30",
+            closeTime: "16:00",
+            isOpen: true,
+          }))
+        );
       }
     } catch (error) {
       throw error;
@@ -69,7 +79,10 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   };
   const handleSaveWorkingHour = async () => {
     try {
-      await postAddOrUpdateWorkingHours(workingHours);
+      const response = await postAddOrUpdateWorkingHours(workingHours);
+      if (response.status === APIStatus.success) {
+        onClose();
+      }
     } catch (error) {
       throw error;
     }
@@ -126,14 +139,13 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
           <div className="str-btns">
             {errorString && <span className="error-str">{errorString}</span>}
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                Cancle
+              <button className="btn diag-btn cancel" onClick={onClose}>
+                Cancel
               </button>
               <button
                 className="btn diag-btn signout"
                 onClick={() => {
                   handleSaveWorkingHour();
-                  onClose();
                 }}
                 disabled={!!errorString}
               >

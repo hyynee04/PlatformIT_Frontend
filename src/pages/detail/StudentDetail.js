@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { BsGenderTrans } from "react-icons/bs";
+import { IoMdOpen } from "react-icons/io";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
 import { LuGlobe2, LuMail, LuPhone } from "react-icons/lu";
 import { RiChat3Line } from "react-icons/ri";
+import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
-import "../../assets/scss/Detail.css";
 import Carousel from "../../components/Carousel";
 import { getAllCourseCards } from "../../services/courseService";
 
@@ -101,11 +102,14 @@ const StudentDetail = (props) => {
 
                 <div className="block-container">
                     <div className="carousel-block">
+                        <div className='carousel-header'>
+                            <span>Courses</span>
+                            <button>View more <IoMdOpen /></button>
+                        </div>
                         <Carousel
                             object={1} //course
                             totalTracks={totalCourseTracks}
                             itemsPerTrack={2}
-                            header={"Courses"}
                             listInfo={listCourse}
                         />
                     </div>

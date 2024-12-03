@@ -14,9 +14,10 @@
 
 * {
   font-family: "Inter", sans-serif;
+  outline: none;
 }
 
-@keyframes slideIn {
+@keyframes slideToLeft {
   from {
     transform: translateX(25%);
     opacity: 0;
@@ -29,7 +30,7 @@
 
 /* Slide-in CSS class */
 .slide-in {
-  animation: slideIn 0.75s ease-in-out forwards;
+  animation: slideToLeft 0.75s ease-in-out forwards;
 }
 
 .app-container {
@@ -40,15 +41,19 @@
   flex-direction: column;
   min-height: 100vh;
 }
+input {
+  outline: none;
+}
+button {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
 
 .app-container::-webkit-scrollbar {
   display: none;
 }
-
-.header-container {
-  .bg-body-tertiary {
+.header-container >  .bg-body-tertiary {
     background-color: var(--main-color) !important;
-  }
 }
 .main-container {
   flex: 1;
@@ -59,7 +64,33 @@
   background-color: var(--main-color);
 }
 
-// .App-logo {
+.loading-page {
+  /* width: 100%;
+  margin: 0 5px 3px 0;
+  animation: spin 1s infinite linear; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.loading-page > svg,
+.icon-spin {
+  animation: spin 1s infinite linear;
+}
+.loading-page > svg {
+  width: 40px;
+  height: 40px;
+}
+@keyframes spin {
+  from {
+      transform: scale(1) rotate(0deg);
+  }
+  to {
+      transform: scale(1) rotate(360deg);
+  }
+}
+
+/* // .App-logo {
 //   height: 40vmin;
 //   pointer-events: none;
 // }
@@ -92,4 +123,4 @@
 //   to {
 //     transform: rotate(360deg);
 //   }
-// }
+// } */

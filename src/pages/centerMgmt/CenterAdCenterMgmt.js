@@ -3,6 +3,7 @@ import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { FaGlobe, FaInfoCircle, FaRegFilePdf } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
 import { LuCheck, LuFile, LuLock, LuTrash2 } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,13 +18,14 @@ import {
 import { fetchCenterProfile } from "../../store/profileCenterSlice";
 import CenterAdAdminMgmt from "../userMgmt/CenterAdAdminMgmt";
 
+import "../../assets/css/PI.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/PI.css";
 import AvatarImageOption from "../../components/AvatarImageOption";
 import DiagLockCenterForm from "../../components/diag/DiagLockCenterForm";
 import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
 import { APIStatus } from "../../constants/constants";
 const CenterAdCenterMgmt = () => {
+  const [loading, setLoading] = useState(false);
   //Center Infomation
   const dispatchInfo = useDispatch();
   const centerInfo = useSelector((state) => state.profileCenter);
@@ -91,10 +93,13 @@ const CenterAdCenterMgmt = () => {
   };
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         await dispatchInfo(fetchCenterProfile());
       } catch (error) {
         console.error("Error getting center info", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -166,7 +171,6 @@ const CenterAdCenterMgmt = () => {
     if (response.status === APIStatus.success) {
       await dispatchInfo(fetchCenterProfile());
     }
-
   };
   const handleNameProfileLinkChange = (e) => {
     setNewProfileLink({ ...newProfileLink, name: e.target.value });
@@ -176,12 +180,14 @@ const CenterAdCenterMgmt = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      const response = await postAddCenterLink(newProfileLink.name, newProfileLink.url);
+      const response = await postAddCenterLink(
+        newProfileLink.name,
+        newProfileLink.url
+      );
       if (response.status === APIStatus.success) {
         await dispatchInfo(fetchCenterProfile());
         setNewProfileLink({ name: "", url: "" });
       }
-
     }
   };
 
@@ -191,7 +197,6 @@ const CenterAdCenterMgmt = () => {
     if (response.status === APIStatus.success) {
       await dispatchInfo(fetchCenterProfile());
     }
-
   };
   const handleNameQualificationChange = (e) => {
     setNewQualification({
@@ -273,7 +278,6 @@ const CenterAdCenterMgmt = () => {
         }));
         await setQualiPDFCheck(false);
       }
-
     } else {
       setQualiWarning(
         "Please enter all required fields for the qualification."
@@ -282,6 +286,13 @@ const CenterAdCenterMgmt = () => {
     await dispatchInfo(fetchCenterProfile());
   };
 
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <>
       <div className="center-info">

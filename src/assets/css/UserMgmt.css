@@ -1,8 +1,15 @@
-.page-user-container {
+.page-list-container {
   padding: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+}
+.loading-container {
+  width: 100vh;
+  height: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filter-search {
@@ -31,14 +38,14 @@
   font-size: 16px;
   color: var(--text-gray);
   min-width: 100px;
+  border-radius: 0.5rem 0.5rem 0 0;
+  text-align: center;
 }
 .role-users-group > .role-btn:hover {
-  color: var(--border-gray);
-  text-align: center;
+  background-color: rgba(57, 121, 121, 0.1);
 }
 .role-users-group > .role-btn.active {
   color: var(--main-color);
-  text-align: center;
   border-bottom: 3px solid var(--main-color);
 }
 .filter-search {
@@ -77,6 +84,16 @@
 }
 .filter-sort-btns .save-filter {
   color: var(--white-color);
+}
+.filter-sort-btns > .filter-sort-box {
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+.filter-sort-btns > .filter-sort-box.active {
+  opacity: 1;
+  z-index: 1;
+  transition: opacity 0.1s linear;
 }
 .add-btn {
   margin: 12px 72px;

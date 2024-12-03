@@ -16,7 +16,8 @@
   width: 100%;
   border: none;
   background-color: var(--white-color);
-  padding: 2px;
+  padding: 2px 4px;
+  font-size: .9rem;
 }
 .container-options .op-buts:hover {
   background-color: rgba(217, 217, 217, 0.4);
@@ -39,4 +40,33 @@
   position: absolute;
   right: -100px;
   bottom: -62px;
+}
+.assign-setting-option {
+  position: absolute;
+  right: 24px;
+  top: 36px;
+}
+.assign-setting-option .item {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  gap: 50px;
+  width: 100%;
+  /* border-bottom: 1px solid var(--border-gray); */
+}
+.assignment-option {
+  position: absolute;
+  right: 24px;
+  top: 36px;
+  width: 150px;
+}
+.assignment-option .op-buts {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }

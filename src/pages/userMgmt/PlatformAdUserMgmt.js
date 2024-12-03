@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
-  LuChevronRight,
   LuChevronLeft,
+  LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
 } from "react-icons/lu";
+import { useDispatch, useSelector } from "react-redux";
+import FilterUser from "../../components/FilterUser";
+import UserOption from "../../components/option/UserOption";
+import SortByUser from "../../components/SortByUser";
 import {
   CenterAdminLevel,
   CenterStatus,
   Role,
-  UserStatus,
   UserGender,
+  UserStatus,
 } from "../../constants/constants";
-import UserOption from "../../components/option/UserOption";
-import FilterUser from "../../components/FilterUser";
-import SortByUser from "../../components/SortByUser";
-import { useDispatch, useSelector } from "react-redux";
 import { fetchAllUsers } from "../../store/userSlice";
 
-import "../../assets/scss/UserMgmt.css";
+import "../../assets/css/UserMgmt.css";
 
 const PlatformAdUserMgmt = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const {
-    users = [],
-    loading,
-    error,
-  } = useSelector((state) => state.users || {});
+  const { users = [], error } = useSelector((state) => state.users || {});
   const [activeRole, setActiveRole] = useState(Role.centerAdmin);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,9 +40,19 @@ const PlatformAdUserMgmt = () => {
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
 
+  const fetchListUser = async () => {
+    setLoading(true);
+    try {
+      await dispatch(fetchAllUsers());
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
+  };
   useEffect(() => {
-    dispatch(fetchAllUsers());
-  }, [dispatch]);
+    fetchListUser();
+  }, []);
 
   useEffect(() => {
     if (users && users.length > 0) {
@@ -99,13 +107,13 @@ const PlatformAdUserMgmt = () => {
         ? "Main"
         : "Sub"
       : user.status === UserStatus.inactive
-      ? "Rejected"
-      : "Pending";
+        ? "Rejected"
+        : "Pending";
   };
 
   const filteredUser = listUser
     .filter((user) => {
-      const searchTermLower = searchTerm.toLowerCase();
+      const searchTermLower = searchTerm.trim().toLowerCase();
       const roleDescription = String(getRoleDescription(user)).toLowerCase();
       const matchesSearchTerm =
         (user.fullName &&
@@ -114,8 +122,8 @@ const PlatformAdUserMgmt = () => {
           (user.gender === UserGender.female
             ? "Female"
             : user.gender === UserGender.male
-            ? "Male"
-            : "Other"
+              ? "Male"
+              : "Other"
           )
             .toLowerCase()
             .includes(searchTermLower)) ||
@@ -174,8 +182,8 @@ const PlatformAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -194,37 +202,46 @@ const PlatformAdUserMgmt = () => {
     setFilterVisble(false);
     setSortByVisible(false);
   };
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   // return <div>Loading...</div>;
+  //   return (
+  //     <div className="loading-container">
+  //       <Spinner animation="border" />;
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return <div>Error: {error}</div>;
   }
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <>
-      <div className="page-user-container">
+      <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeRole === Role.centerAdmin ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.centerAdmin ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.centerAdmin)}
           >
             Center Administrator
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.teacher ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${
-              activeRole === Role.student ? "active" : ""
-            }`}
+            className={`role-btn ${activeRole === Role.student ? "active" : ""
+              }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -242,7 +259,12 @@ const PlatformAdUserMgmt = () => {
               <LuFilter className="icon" />
               <span>Filter</span>
             </div>
-            {filterVisble && <FilterUser onFilterChange={handleFilterChange} />}
+            {filterVisble && (
+              <FilterUser
+                onFilterChange={handleFilterChange}
+                onClose={() => setFilterVisble(false)}
+              />
+            )}
             <div
               className="btn"
               onClick={() => {
@@ -277,7 +299,7 @@ const PlatformAdUserMgmt = () => {
                 <th>Full Name</th>
                 <th>Gender</th>
                 <th>Email</th>
-                {activeRole !== Role.student && <th>Center</th>}
+                {activeRole !== Role.student && <th>Affiliated Center</th>}
                 {activeRole === Role.centerAdmin && <th>Level</th>}
                 <th>Date Joined</th>
                 <th>Status</th>
@@ -299,8 +321,8 @@ const PlatformAdUserMgmt = () => {
                           ? "Main"
                           : "Sub"
                         : user.status === UserStatus.inactive
-                        ? "Rejected"
-                        : "Pending"}
+                          ? "Rejected"
+                          : "Pending"}
                     </td>
                   )}
                   <td>
@@ -319,26 +341,25 @@ const PlatformAdUserMgmt = () => {
                   </td>
                   <td>
                     <span
-                      className={`status ${
-                        user.status === UserStatus.active
+                      className={`status ${user.status === UserStatus.active
                           ? "active"
                           : user.status === UserStatus.pending
-                          ? "pending"
-                          : user.status === UserStatus.inactive ||
-                            user.status === UserStatus.locked
-                          ? "inactive"
-                          : ""
-                      }`}
+                            ? "pending"
+                            : user.status === UserStatus.inactive ||
+                              user.status === UserStatus.locked
+                              ? "inactive"
+                              : ""
+                        }`}
                     >
                       {user.status === UserStatus.active
                         ? "Active"
                         : user.status === UserStatus.pending
-                        ? "Pending"
-                        : user.status === UserStatus.inactive
-                        ? "Inactive"
-                        : user.status === UserStatus.locked
-                        ? "Locked"
-                        : ""}
+                          ? "Pending"
+                          : user.status === UserStatus.inactive
+                            ? "Inactive"
+                            : user.status === UserStatus.locked
+                              ? "Locked"
+                              : ""}
                     </span>
                   </td>
                   <td className="table-cell" style={{ cursor: "pointer" }}>
@@ -354,10 +375,10 @@ const PlatformAdUserMgmt = () => {
                           : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
                         {...(user.centerStatus === CenterStatus.active ||
-                        user.idRole === Role.student
+                          user.idRole === Role.student
                           ? {
-                              isReactivatable: true,
-                            }
+                            isReactivatable: true,
+                          }
                           : {})}
                         roleUserSelected={user.idRole}
                       />

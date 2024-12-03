@@ -98,7 +98,7 @@ const CenterAdPendingTask = () => {
   const closeActionModal = () => setIsModalActionOpen(false);
   return (
     <>
-      <div className="page-user-container">
+      <div className="page-list-container">
         <div className="title-info">
           <b>Admin Tasks Overview</b>
         </div>

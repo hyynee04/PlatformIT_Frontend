@@ -131,7 +131,7 @@
   height: 43px;
   padding: 4px 40px;
   border-radius: .5rem;
-  border-color: rgba(217, 217, 217, 0.3);
+  border: none;
   background-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
 }
@@ -266,6 +266,13 @@
       margin-left: auto;
       margin-top: 5%;
   }
+}
+.modal-dialog > .modal-content {
+  width: fit-content;
+}
+.modal-dialog > .modal-content > .modal-header {
+  background-color: var(--main-color);
+  color: var(--white-color);
 }
 .btn-close:focus {
   box-shadow: none;

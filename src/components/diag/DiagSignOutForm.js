@@ -1,10 +1,10 @@
 import React from "react";
 import { LuLogOut, LuX } from "react-icons/lu";
-import "../../assets/scss/card/DiagForm.scss";
-import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { resetUserPI } from "../../store/profileUserSlice";
+import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/DiagForm.css";
 import { resetCenterPI } from "../../store/profileCenterSlice";
+import { resetUserPI } from "../../store/profileUserSlice";
 
 const DiagSignOutForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -31,8 +31,8 @@ const DiagSignOutForm = ({ isOpen, onClose }) => {
           <span>Are you sure you want to sign out?</span>
           <div className="str-btns">
             <div className="act-btns">
-              <button className="btn diag-btn cancle" onClick={onClose}>
-                Cancle
+              <button className="btn diag-btn cancel" onClick={onClose}>
+                Cancel
               </button>
               <button
                 className="btn diag-btn signout"

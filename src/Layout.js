@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 
 import App from "./App";
-import PrivateRoute from "./PrivateRoute";
 import GuestRoute from "./GuestRoute";
+import PrivateRoute from "./PrivateRoute";
 
 import AboutUs from "./pages/AboutUs";
 import Home from "./pages/Home";
@@ -10,28 +10,40 @@ import Login from "./pages/Login";
 import LoginResponse from "./pages/LoginResponse";
 import Register from "./pages/Register";
 
-import UserPI from "./pages/UserPI";
-import TeacherDetail from "./pages/detail/TeacherDetail";
 import CenterDetail from "./pages/detail/CenterDetail";
 import CourseDetail from "./pages/detail/CourseDetail";
 import StudentDetail from "./pages/detail/StudentDetail";
+import TeacherDetail from "./pages/detail/TeacherDetail";
+import UserPI from "./pages/UserPI";
 
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
+import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
 
+import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
+import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
+import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
+import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
-import CenterAdPendingTask from "./pages/CenterAdPendingTask";
-import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 
-import TeacherHome from "./pages/home/TeacherHome";
+import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
+import DuplicateAssign from "./pages/assignmentMgmt/DuplicateAssign";
+import TeacherAssignDetail from "./pages/assignmentMgmt/TeacherAssignDetail";
+import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
+import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
+import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
+import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
 
-import StudentHome from "./pages/home/StudentHome";
-
-import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
+import AllNotifications from "./pages/AllNotifications";
+import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
+import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
+
+import { Role } from "./constants/constants";
+
 
 const Layout = (props) => {
   return (
@@ -43,7 +55,7 @@ const Layout = (props) => {
             index
             element={
               <GuestRoute>
-                <Home />
+                <Home role={Role.guest} />
               </GuestRoute>
             }
           />
@@ -77,7 +89,11 @@ const Layout = (props) => {
           <Route path="/courseDetail" element={<CourseDetail />} />
           <Route path="/studentDetail" element={<StudentDetail />} />
 
+          <Route path="/addNewLecture" element={<AddNewLecture />} />
+          <Route path="/viewLecture" element={<Lecture />} />
+
           <Route path="/viewAll" element={<ViewAll />} />
+          <Route path="/allNotifications" element={<AllNotifications />} />
 
           {/* Platform Admin */}
           <Route
@@ -101,6 +117,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <PlatformAdCenterMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/platformAdCourse"
+            element={
+              <PrivateRoute>
+                <PlatformAdCourseMgmt />
               </PrivateRoute>
             }
           />
@@ -139,7 +163,15 @@ const Layout = (props) => {
             }
           />
           <Route
-            path="/addNewCourse"
+            path="/centerAdCourse"
+            element={
+              <PrivateRoute>
+                <CenterAdCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/addCourse"
             element={
               <PrivateRoute>
                 <AddNewCourse />
@@ -151,7 +183,55 @@ const Layout = (props) => {
             path="/teacherHome"
             element={
               <PrivateRoute>
-                <TeacherHome />
+                <Home role={Role.teacher} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teacherAssignment"
+            element={
+              <PrivateRoute>
+                <TeacherAssignMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/addAssignment"
+            element={
+              <PrivateRoute>
+                <AddNewAssign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/duplicateAssignment"
+            element={
+              <PrivateRoute>
+                <DuplicateAssign />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/updateAssignment"
+            element={
+              <PrivateRoute>
+                <UpdateAssignment />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teacherAssignDetail"
+            element={
+              <PrivateRoute>
+                <TeacherAssignDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/teacherCourse"
+            element={
+              <PrivateRoute>
+                <TeacherCourseMgmt />
               </PrivateRoute>
             }
           />
@@ -161,7 +241,15 @@ const Layout = (props) => {
             path="/studentHome"
             element={
               <PrivateRoute>
-                <StudentHome />
+                <Home role={Role.student} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/studentCourse"
+            element={
+              <PrivateRoute>
+                <StudentCourseMgmt />
               </PrivateRoute>
             }
           />

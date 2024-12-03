@@ -1,8 +1,8 @@
 import { LuFile } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
-import "../../assets/scss/card/Card.css";
 
 const CenterCard = (props) => {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ const CenterCard = (props) => {
             }}
         >
             <div className='center-card-container'>
-                <img src={center.avatarPath !== "" ? center.avatarPath : default_image} alt="center image" />
+                <img src={center.avatarPath || default_image} alt="center image" />
                 <div className='center-card-body'>
                     <span className="center-card-title">{center.centerName !== null ? center.centerName : ""}</span>
                     <span className="center-card-quote">

@@ -3,7 +3,7 @@ import { LuLock, LuX } from "react-icons/lu";
 import { postLockCenter } from "../../services/centerService";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { CenterStatus, Role } from "../../constants/constants";
+import { APIStatus, CenterStatus, Role } from "../../constants/constants";
 import { fetchCenters } from "../../store/listCenterSlice";
 import { resetUserPI } from "../../store/profileUserSlice";
 import { resetCenterPI } from "../../store/profileCenterSlice";
@@ -19,16 +19,21 @@ const DiagLockCenterForm = ({
   const handleLockCenter = async () => {
     try {
       if (idRole === Role.centerAdmin) {
-        const idCenter = +localStorage.getItem("idCenter");
-        await postLockCenter(idCenter);
-        localStorage.clear();
-        dispatch(resetUserPI());
-        dispatch(resetCenterPI());
-        navigate("/");
+        let idCenter = +localStorage.getItem("idCenter");
+        let response = await postLockCenter(idCenter);
+        if (response.status === APIStatus.success) {
+          localStorage.clear();
+          dispatch(resetUserPI());
+          dispatch(resetCenterPI());
+          navigate("/");
+        }
       } else if (idRole === Role.platformAdmin) {
-        await postLockCenter(idCenterSelected);
-        dispatch(fetchCenters(CenterStatus.inactive));
-        onCenterOption();
+        let response = await postLockCenter(idCenterSelected);
+        if (response.status === APIStatus.success) {
+          dispatch(fetchCenters(CenterStatus.inactive));
+          onClose();
+          onCenterOption();
+        }
       }
     } catch (error) {
       throw error;
@@ -163,11 +168,11 @@ const DiagLockCenterForm = ({
           <div className="str-btns">
             <div className="act-btns">
               <button
-                className="btn diag-btn cancle"
-                style={{
-                  color: "var(--red-color)",
-                  border: "1px solid var(--red-color)",
-                }}
+                className="btn diag-btn"
+                // style={{
+                //   color: "var(--red-color)",
+                //   border: "1px solid var(--red-color)",
+                // }}
                 onClick={onClose}
               >
                 Cancel
@@ -177,7 +182,6 @@ const DiagLockCenterForm = ({
                 style={{ backgroundColor: "var(--red-color)" }}
                 onClick={() => {
                   handleLockCenter();
-                  onClose();
                 }}
               >
                 Confirm

@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuFilter,
-  LuSearch,
-  LuMoreHorizontal,
   LuChevronLeft,
   LuChevronRight,
+  LuFilter,
+  LuMoreHorizontal,
+  LuSearch,
 } from "react-icons/lu";
-import { CenterStatus } from "../../constants/constants";
-import CenterOption from "../../components/option/CenterOption";
 import DiagActionCenterForm from "../../components/diag/DiagActionCenterForm";
 import FilterCenter from "../../components/FilterCenter";
+import CenterOption from "../../components/option/CenterOption";
 import SortByCenter from "../../components/SortByCenter";
+import { CenterStatus } from "../../constants/constants";
 
-import "../../assets/scss/UserMgmt.css";
 import { useDispatch, useSelector } from "react-redux";
+import "../../assets/css/UserMgmt.css";
 import {
   fetchCenters,
   setActiveStatusCenter,
 } from "../../store/listCenterSlice";
 
 const PlatformAdCenterMgmt = () => {
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const {
-    centers = [],
-    loading,
-    error,
-  } = useSelector((state) => state.centers || {});
+  const { centers = [] } = useSelector((state) => state.centers || {});
 
   const activeStatusCenter = useSelector(
     (state) => state.centers.activeStatusCenter
@@ -44,9 +42,19 @@ const PlatformAdCenterMgmt = () => {
 
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
+  const fetchListCenter = async () => {
+    setLoading(true);
+    try {
+      await dispatch(fetchCenters(activeStatusCenter));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false); // Set loading to false after request completes
+    }
+  };
   useEffect(() => {
-    dispatch(fetchCenters(activeStatusCenter));
-  }, [dispatch, activeStatusCenter]);
+    fetchListCenter();
+  }, [activeStatusCenter]);
 
   useEffect(() => {
     setListCenter(centers);
@@ -118,8 +126,8 @@ const PlatformAdCenterMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
 
   //pagination
@@ -162,30 +170,34 @@ const PlatformAdCenterMgmt = () => {
   const openActionModal = () => setIsModalActionOpen(true);
   const closeActionModal = () => setIsModalActionOpen(false);
 
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <>
-      <div className="page-user-container">
+      <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.active ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.active ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.active)}
           >
             Approval
           </button>
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.pending ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.pending ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.pending)}
           >
             Pending Approval
           </button>
           <button
-            className={`role-btn ${
-              activeStatusCenter === CenterStatus.inactive ? "active" : ""
-            }`}
+            className={`role-btn ${activeStatusCenter === CenterStatus.inactive ? "active" : ""
+              }`}
             onClick={() => handleStatusCenterClick(CenterStatus.inactive)}
           >
             Inactive
@@ -241,6 +253,7 @@ const PlatformAdCenterMgmt = () => {
                   <th>Center Admin Name</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
+                  <th>Description</th>
                   <th>Submission Date</th>
                   <th></th>
                 </tr>
@@ -252,6 +265,7 @@ const PlatformAdCenterMgmt = () => {
                     <td>{center.centerAdminName}</td>
                     <td>{center.centerAdminEmail}</td>
                     <td>{center.tin}</td>
+                    <td>{center.description}</td>
                     <td>
                       {center.submissionDate &&
                         (() => {
@@ -266,11 +280,10 @@ const PlatformAdCenterMgmt = () => {
                         })()}
                     </td>
                     <td
-                      className={`table-cell ${
-                        activeStatusCenter === CenterStatus.pending
+                      className={`table-cell ${activeStatusCenter === CenterStatus.pending
                           ? "pending"
                           : ""
-                      }`}
+                        }`}
                       style={{ cursor: "pointer" }}
                     >
                       <button
@@ -321,6 +334,7 @@ const PlatformAdCenterMgmt = () => {
                   <th style={{ textAlign: "center" }}>No.</th>
                   <th>Center Name</th>
                   <th>Center Email</th>
+                  {/* <th>Center Admin Name</th> */}
                   <th>Center Admin Email</th>
                   <th>TIN</th>
                   <th>Established Date</th>
@@ -349,6 +363,7 @@ const PlatformAdCenterMgmt = () => {
                             <td style={{ textAlign: "center" }}>{count}</td>
                             <td>{center.centerName}</td>
                             <td>{center.centerEmail}</td>
+                            {/* <td>{center.centerAdminName}</td> */}
                             <td>{center.centerAdminEmail}</td>
                             <td>{center.tin}</td>
                             <td>
@@ -378,16 +393,15 @@ const PlatformAdCenterMgmt = () => {
                                 {center.reason
                                   ? center.reason
                                   : center.centerStatus === CenterStatus.locked
-                                  ? "Locked"
-                                  : ""}
+                                    ? "Locked"
+                                    : ""}
                               </td>
                             )}
                             <td
-                              className={`table-cell ${
-                                center.centerStatus === CenterStatus.pending
+                              className={`table-cell ${center.centerStatus === CenterStatus.pending
                                   ? "pending"
                                   : ""
-                              }`}
+                                }`}
                               style={{ cursor: "pointer" }}
                             >
                               <LuMoreHorizontal

@@ -1,23 +1,27 @@
+import { useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LuBell,
-  LuMessageCircle,
   LuClipboardCheck,
   LuLogOut,
+  LuMessageCircle,
 } from "react-icons/lu";
-import { APIStatus, Role } from "../constants/constants";
-import { useEffect, useState } from "react";
-import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../assets/img/default_ava.png";
+import HeaderAvatarOption from "../components/HeaderAvatarOption";
+import { APIStatus, Role } from "../constants/constants";
 
-import "../assets/scss/Header.css";
-import { getAvaImg } from "../services/userService";
 import { useDispatch, useSelector } from "react-redux";
-import { setAvatar } from "../store/profileUserSlice";
+import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
+import Notification from "../components/Notification";
+import FetchDataUpdated from "../functions/FetchDataUpdated";
+import { calculateRelativeTime, parseRelativeTime } from "../functions/function";
+import { getAllNotificationOfUser } from "../services/notificationService";
+import { getAvaImg } from "../services/userService";
+import { setAvatar } from "../store/profileUserSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -32,6 +36,10 @@ const Header = () => {
   const currentPath = location.pathname; //current path
   const [activeButton, setActiveButton] = useState(null);
   const [isModalSignoutOpen, setIsModalSignoutOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(null);
+  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(idUser);
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -45,23 +53,68 @@ const Header = () => {
       } else if (idRole === Role.centerAdmin && currentPath === "/") {
         navigate("/centerAdDashboard");
       } else if (idRole === Role.teacher && currentPath === "/") {
+        console.log("zo day");
+
         navigate("/teacherHome");
       } else if (idRole === Role.student && currentPath === "/") {
         navigate("/studentHome");
       }
     }
   }, [idRole, currentPath, navigate]);
+
+  const fetchUserNotification = async (idUser) => {
+    let response = await getAllNotificationOfUser(idUser)
+    if (response.status === APIStatus.success) {
+      const processedData = response.data.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      let unread = processedData.filter((notification) => notification.isRead === 0).length;
+      setUnreadCount(unread > 99 ? "99+" : unread)
+      setNotifications(processedData);
+    } else {
+      console.log(response.data)
+    }
+  }
+
   useEffect(() => {
     const fetchAvatar = async () => {
       if (idUser) {
-        const data = await getAvaImg(idUser);
-        let response = data.data;
-        if (response !== APIStatus.success)
-          dispatch(setAvatar(response));
+        const response = await getAvaImg(idUser);
+        if (response.status === APIStatus.success) {
+          dispatch(setAvatar(response.data));
+        } else {
+          dispatch(setAvatar(null));
+        }
       }
     };
     fetchAvatar();
+    fetchUserNotification(idUser);
+    const interval = setInterval(() => {
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          relativeTime: calculateRelativeTime(notification.timestamp),
+        }))
+      );
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
   }, [dispatch, idUser]);
+
+  useEffect(() => {
+    if (Array.isArray(updatedNotifications)) { // Ensure it's a valid array
+      const processedData = updatedNotifications.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
+      setNotifications(processedData);
+    } else {
+      console.warn('updatedNotifications is not an array or is undefined:', updatedNotifications);
+    }
+  }, [updatedNotifications, updatedUnreadCount]);
+
   const navLinks = {
     [Role.platformAdmin]: [
       { title: "Dashboard", path: "/platformAdDashboard" },
@@ -71,14 +124,14 @@ const Header = () => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },
-      { title: "Course Management", path: "/addNewCourse" }, //centerAdCourse
+      { title: "Course Management", path: "/centerAdCourse" }, //centerAdCourse
       { title: "User Management", path: "/centerAdUser" },
       { title: "Center Management", path: "/centerAdCenter" },
     ],
     [Role.teacher]: [
       { title: "Home", path: "/teacherHome" },
       { title: "Course Management", path: "/teacherCourse" },
-      { title: "Lecture Management", path: "/teacherLecture" },
+      { title: "Assignment Management", path: "/teacherAssignment" },
     ],
     [Role.student]: [
       { title: "Home", path: "/studentHome" },
@@ -106,7 +159,7 @@ const Header = () => {
   };
   const buttonPaths = {
     clipboard: "/centerAdPendingTask",
-    bell: "/notifications",
+    bell: "/allNotifications",
   };
   const toggleVisibility = () => {
     setShowOptionAva(!showOptionAva);
@@ -125,6 +178,9 @@ const Header = () => {
     }
   };
 
+  const optionButtonRef = useRef(null);
+  const notiButtonRef = useRef(null);
+  // console.log(notifications)
   return (
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -165,9 +221,8 @@ const Header = () => {
                 <>
                   {(idRole === Role.student || idRole === Role.teacher) && (
                     <button
-                      className={`circle-buts ${
-                        activeButton === "message" ? "clicked" : ""
-                      }`}
+                      className={`circle-buts ${activeButton === "message" ? "clicked" : ""
+                        }`}
                       onClick={() => handleButtonClick("message")}
                     >
                       <LuMessageCircle className="header-icon" />
@@ -175,29 +230,40 @@ const Header = () => {
                   )}
                   {idRole === Role.centerAdmin && (
                     <button
-                      className={`circle-buts ${
-                        location.pathname === buttonPaths["clipboard"]
-                          ? "clicked"
-                          : ""
-                      }`}
+                      className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
+                        ? "clicked"
+                        : ""
+                        }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >
                       <LuClipboardCheck className="header-icon" />
                     </button>
                   )}
                   <button
-                    className={`circle-buts ${
-                      location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                    }`}
-                    onClick={() => handleButtonClick("bell")}
+                    ref={notiButtonRef}
+                    disabled={location.pathname === buttonPaths["bell"]}
+                    className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                      }`}
+                    onClick={() => {
+                      setIsNotificationOpen(!isNotificationOpen);
+                    }}
                   >
                     <LuBell className="header-icon" />
                   </button>
-
+                  {unreadCount ? (<div className='number-unseen'>{unreadCount}</div>) : null}
+                  <Notification
+                    idUser={idUser}
+                    isOpen={isNotificationOpen}
+                    onClose={() => setIsNotificationOpen(false)}
+                    notiButtonRef={notiButtonRef}
+                    notifications={notifications}
+                    unreadCount={unreadCount}
+                    fetchUserNotification={() => fetchUserNotification(idUser)}
+                  />
                   <button
-                    className={`circle-buts ${
-                      isAvatarPage || showOptionAva ? "clicked" : ""
-                    }`}
+                    ref={optionButtonRef}
+                    className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
+                      }`}
                     onClick={() => handleButtonClick("avatar")}
                   >
                     <img
@@ -209,7 +275,11 @@ const Header = () => {
                 </>
               )}
             </div>
-            {showOptionAva && <HeaderAvatarOption />}
+            <HeaderAvatarOption
+              optionButtonRef={optionButtonRef}
+              isOpen={showOptionAva}
+              onClose={() => setShowOptionAva(false)}
+            />
           </Navbar.Collapse>
         </Container>
       </Navbar>

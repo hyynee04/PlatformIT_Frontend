@@ -12,14 +12,14 @@ import {
   LuUser
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import "../assets/scss/Register.css";
+import "../assets/css/Register.css";
+import { APIStatus } from "../constants/constants";
 import {
   postCheckEmail,
   postRegister,
   postSendOTP,
   postVerifyOtp,
 } from "../services/authService";
-import { APIStatus } from "../constants/constants";
 
 const Register = () => {
   const navigate = useNavigate();

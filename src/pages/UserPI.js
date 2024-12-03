@@ -9,6 +9,7 @@ import {
   FaUser,
   FaUserGraduate,
 } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuCamera,
   LuCheck,
@@ -18,11 +19,17 @@ import {
   LuTrash2,
 } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import "../assets/css/PI.css";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
-import "../assets/scss/PI.css";
 import AvatarImageOption from "../components/AvatarImageOption";
-import { APIStatus, Role, UserGender, UserStatus } from "../constants/constants";
+import {
+  APIStatus,
+  Role,
+  UserGender,
+  UserStatus,
+} from "../constants/constants";
 import {
   deleteProfileLink,
   deleteQualification,
@@ -35,6 +42,9 @@ import {
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
 
 const TeacherPI = () => {
+  const location = useLocation();
+  const targetDivRef = useRef(null);
+  const [loading, setLoading] = useState(false);
   const idUser = +localStorage.getItem("idUser");
   const idRole = +localStorage.getItem("idRole");
 
@@ -117,6 +127,7 @@ const TeacherPI = () => {
     }
 
     const fetchData = async () => {
+      setLoading(true);
       try {
         await dispatch(fetchUserProfile(idUser));
         if (idRole === Role.platformAdmin) {
@@ -130,6 +141,8 @@ const TeacherPI = () => {
         }
       } catch (error) {
         console.error("Có lỗi xảy ra khi lấy thông tin cá nhân:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -148,6 +161,24 @@ const TeacherPI = () => {
       description: userPI.description,
     });
   }, [userPI]);
+
+  useEffect(() => {
+    if (!loading) {
+      // Check if loading is complete
+      const state = location.state;
+      if (state && state.action) {
+        setActiveAction(state.action);
+        dispatch(fetchUserProfile(idUser));
+        if (targetDivRef.current) {
+          targetDivRef.current.scrollIntoView({
+            behavior: "smooth", // Makes the scrolling smooth
+            block: "start", // Aligns the top of the element with the top of the viewport
+          });
+        }
+      }
+    }
+  }, [loading, location.state]);
+
   const handleInputChange = (field, value) => {
     setTempUserPI({ ...tempUserPI, [field]: value });
   };
@@ -176,7 +207,6 @@ const TeacherPI = () => {
             setUpdateSuccess("");
           }, 3000);
         }
-
       } catch (error) {
         console.error("Error updating profile:", error);
         setUpdateSuccess("There was an error updating your profile.");
@@ -226,7 +256,10 @@ const TeacherPI = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      const response = await postAddProfileLink(newProfileLink.name, newProfileLink.url);
+      const response = await postAddProfileLink(
+        newProfileLink.name,
+        newProfileLink.url
+      );
       if (response.status === APIStatus.success) {
         await dispatch(fetchUserProfile(idUser));
         setNewProfileLink({ name: "", url: "" });
@@ -238,7 +271,6 @@ const TeacherPI = () => {
     if (response.status === APIStatus.success) {
       await dispatch(fetchUserProfile(idUser));
     }
-
   };
   const handleURLProfileLinkChange = (e) => {
     setNewProfileLink({ ...newProfileLink, url: e.target.value });
@@ -326,7 +358,7 @@ const TeacherPI = () => {
           qualificationFile: null,
           qualificationUrl: "",
         }));
-        await setQualiPDFCheck(false);        
+        await setQualiPDFCheck(false);
       }
     } else {
       setQualiWarning(
@@ -337,17 +369,25 @@ const TeacherPI = () => {
     await dispatch(fetchUserProfile(idUser));
   };
   const removeQualification = async (idQualification) => {
-    const response = await deleteQualification(idQualification);
-    if (response.status === APIStatus.success) {
-      await dispatch(fetchUserProfile(idUser));      
+    // setLoading(true);
+    try {
+      const response = await deleteQualification(idQualification);
+      if (response.status === APIStatus.success) {
+        await dispatch(fetchUserProfile(idUser));
+      }
+    } catch (error) {
+      throw error;
     }
-
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
   const handleChangePassword = async () => {
     if (oldPassword && newPassword && confirmPassword) {
       if (newPassword === confirmPassword) {
         const idAccount = +localStorage.getItem("idAccount");
+        // setLoading(true);
         try {
           const response = await postChangePassword(
             oldPassword,
@@ -370,12 +410,21 @@ const TeacherPI = () => {
         } catch (error) {
           setChangePWError(error.message);
         }
+        // finally {
+        //   setLoading(false);
+        // }
       } else {
         setChangePWError("New password and confirmation do not match.");
       }
     }
   };
-
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
   return (
     <div>
       <div className="container-pi">
@@ -405,8 +454,9 @@ const TeacherPI = () => {
               </div>
               {idRole === Role.teacher && (
                 <div
-                  className={`btn ${activeAction === "specializedPI" ? "active" : ""
-                    }`}
+                  className={`btn ${
+                    activeAction === "specializedPI" ? "active" : ""
+                  }`}
                   onClick={() => handleActionClick("specializedPI")}
                 >
                   <FaUserGraduate className="icon" />
@@ -615,6 +665,8 @@ const TeacherPI = () => {
                       <Form.Control
                         className="main-link"
                         value={profile.url || ""}
+                        onClick={() => window.open(profile.url)}
+                        style={{ cursor: "pointer" }}
                         readOnly
                       />
                     </InputGroup>
@@ -667,7 +719,7 @@ const TeacherPI = () => {
                 </div>
               </div>
             </div>
-            <div className="container-info auto">
+            <div ref={targetDivRef} className="container-info auto">
               <span className="title-span">Professional Qualifications</span>
               <div className="info">
                 {qualificationModels.map((qualification, index) => (
@@ -687,18 +739,19 @@ const TeacherPI = () => {
                       />
                       <div className="status-action">
                         <span
-                          className={`span ${qualification.status === UserStatus.active
+                          className={`span ${
+                            qualification.status === UserStatus.active
                               ? "approved"
                               : qualification.status === UserStatus.pending
-                                ? "pending"
-                                : "rejected"
-                            }`}
+                              ? "pending"
+                              : "rejected"
+                          }`}
                         >
                           {qualification.status === UserStatus.active
                             ? "Approved"
                             : qualification.status === UserStatus.pending
-                              ? "Pending"
-                              : `Rejected. Reason: ${qualification.reason}`}
+                            ? "Pending"
+                            : `Rejected. Reason: ${qualification.reason}`}
                         </span>
                         <div className="icon-btn-container">
                           <div
@@ -716,7 +769,7 @@ const TeacherPI = () => {
                     </div>
                     <div className="quali-image">
                       {qualification.path &&
-                        qualification.path.endsWith(".pdf") ? (
+                      qualification.path.endsWith(".pdf") ? (
                         <div
                           onClick={() =>
                             window.open(qualification.path, "_blank")

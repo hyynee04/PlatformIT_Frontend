@@ -8,5 +8,14 @@ const getAllNotificationOfUser = (idUser) => {
     });
 }
 
-export { getAllNotificationOfUser };
+const postChangeReadStatus = (idNotification, idUpdatedBy) => {
+    return axios.post(`api/Notification/ChangeReadStatus`, null, {
+        params: {
+            idNotification: idNotification,
+            idUpdatedBy: idUpdatedBy,
+        },
+    })
+}
+
+export { getAllNotificationOfUser, postChangeReadStatus };
 

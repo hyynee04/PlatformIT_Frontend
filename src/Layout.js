@@ -17,9 +17,9 @@ import TeacherDetail from "./pages/detail/TeacherDetail";
 import UserPI from "./pages/UserPI";
 
 import PlatformAdCenterMgmt from "./pages/centerMgmt/PlatformAdCenterMgmt";
+import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 import PlatformAdminDashboard from "./pages/home/PlatformAdminDashboard";
 import PlatformAdUserMgmt from "./pages/userMgmt/PlatformAdUserMgmt";
-import PlatformAdCourseMgmt from "./pages/courseMgmt/PlarformAdCourseMgmt";
 
 import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
@@ -29,19 +29,21 @@ import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
-import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 import DuplicateAssign from "./pages/assignmentMgmt/DuplicateAssign";
-import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherAssignDetail from "./pages/assignmentMgmt/TeacherAssignDetail";
+import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
+import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
 
+import AllNotifications from "./pages/AllNotifications";
 import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
+
 
 const Layout = (props) => {
   return (
@@ -91,6 +93,7 @@ const Layout = (props) => {
           <Route path="/viewLecture" element={<Lecture />} />
 
           <Route path="/viewAll" element={<ViewAll />} />
+          <Route path="/allNotifications" element={<AllNotifications />} />
 
           {/* Platform Admin */}
           <Route

@@ -52,3 +52,8 @@ export const AssignmentItemStatus = {
   active: 1,
   inactive: 0,
 };
+export const NotificationType = {
+  qualification: 1,
+  assignedTeacher: 2,
+  notificationBoard: 3,
+};

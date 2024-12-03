@@ -12,6 +12,7 @@ import {
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,

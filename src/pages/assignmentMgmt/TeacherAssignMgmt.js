@@ -27,6 +27,7 @@ import {
   getAllAssignmentCardOfTeacher,
 } from "../../services/courseService";
 import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
+import { formatDateTime } from "../../functions/function";
 
 const TeacherAssignMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -94,17 +95,7 @@ const TeacherAssignMgmt = () => {
   useEffect(() => {
     fetchAssignment();
   }, []);
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false, // Hiển thị giờ theo định dạng 24h
-    });
-  };
+
   const filteredAssignments = listAssignment
     .filter((assignment) => {
       if (activeStatus === AssignmentStatus.publish) {

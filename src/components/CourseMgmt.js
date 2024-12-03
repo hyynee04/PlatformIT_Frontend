@@ -542,8 +542,8 @@ const CourseMgmt = (props) => {
       <div className="viewall-main-section">
         <div className="all-cards-container course">
           {currentCourses.length !== 0 &&
-            currentItemsPage.map((course) => (
-              <div className="one-card-container">
+            currentItemsPage.map((course, index) => (
+              <div key={index} className="one-card-container">
                 <CourseCard key={"course" + course.idCourse} course={course} />
                 {role === Role.centerAdmin && (
                   <div className="edit-course-btn">

@@ -6,6 +6,7 @@ import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
+import { formatDate } from "../../functions/function";
 
 const CourseCard = (props) => {
   const navigate = useNavigate();
@@ -19,14 +20,6 @@ const CourseCard = (props) => {
       )
       : "";
   const remain_tag_number = course.tags ? course.tags.length - 1 : 0;
-
-  // format date
-  const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
 
   const [status, setStatus] = useState(null);
   const courseStatus = {
@@ -134,6 +127,7 @@ const CourseCard = (props) => {
           className="card-container card-container-hover"
           onMouseLeave={() => setIsHover(false)}
         >
+          <BsPinAngleFill className="pin-hover" />
           <div className="course-card-container course-card-hover">
             {course.isLimitedTime === 1 && (
               <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>

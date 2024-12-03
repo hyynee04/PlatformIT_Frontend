@@ -1,3 +1,4 @@
+import * as signalR from '@microsoft/signalr';
 import { useEffect, useRef, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -36,6 +37,7 @@ const Header = () => {
   const [isModalSignoutOpen, setIsModalSignoutOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(null);
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -65,6 +67,8 @@ const Header = () => {
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
       }));
+      let unread = processedData.filter((notification) => notification.isRead === 0).length;
+      setUnreadCount(unreadCount > 99 ? "99+" : unread)
       setNotifications(processedData);
     } else {
       console.log(response.data)
@@ -76,7 +80,8 @@ const Header = () => {
     const now = new Date();
     const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
 
-    if (difference < 60) return `${difference} seconds ago`;
+    if (difference === 0) return "just now"; // Handle 0 seconds
+    if (difference < 60) return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
     if (difference < 3600) return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"} ago`;
     if (difference < 86400) return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"} ago`;
     return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"} ago`;
@@ -186,7 +191,55 @@ const Header = () => {
     }
   };
 
+  useEffect(() => {
+    console.log('Attempting to connect to SignalR hub...');
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`http://localhost:5000/notificationHub?userId=${idUser}`)
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    const startConnection = async () => {
+      try {
+        await connection.start();
+        console.log('Connected to SignalR hub.');
+
+        connection.on('UpdateNotifications', (updatedNotifications) => {
+          console.log('Received UpdateNotifications event:', updatedNotifications);
+          let processedData = updatedNotifications.map((notification) => {
+            try {
+              return {
+                ...notification,
+                timestamp: parseRelativeTime(notification.relativeTime),
+              };
+            } catch (error) {
+              console.error('Error parsing notification:', notification, error);
+              return notification; // Fallback
+            }
+          });
+          let unread = processedData.filter((notification) => notification.isRead === 0).length;
+          setUnreadCount(unreadCount > 99 ? "99+" : unread)
+          setNotifications(processedData);
+        });
+      } catch (error) {
+        console.error('SignalR Connection Error:', error);
+      }
+    };
+    startConnection();
+
+    connection.onclose((error) => {
+      console.error('SignalR connection closed:', error);
+      setTimeout(() => startConnection(), 5000); // Retry every 5 seconds
+    });
+
+    return () => {
+      console.log('Stopping SignalR connection...');
+      connection.stop().then(() => console.log('SignalR connection stopped.'));
+    };
+  }, []);
+
+  const optionButtonRef = useRef(null);
   const notiButtonRef = useRef(null);
+  // console.log(notifications)
   return (
     <>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -256,13 +309,17 @@ const Header = () => {
                   >
                     <LuBell className="header-icon" />
                   </button>
+                  {unreadCount && (<div className='number-unseen'>{unreadCount}</div>)}
                   <Notification
+                    idUser={idUser}
                     isOpen={isNotificationOpen}
                     onClose={() => setIsNotificationOpen(false)}
                     notiButtonRef={notiButtonRef}
                     notifications={notifications}
+                    fetchUserNotification={() => fetchUserNotification(idUser)}
                   />
                   <button
+                    ref={optionButtonRef}
                     className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
                       }`}
                     onClick={() => handleButtonClick("avatar")}
@@ -276,7 +333,11 @@ const Header = () => {
                 </>
               )}
             </div>
-            {showOptionAva && <HeaderAvatarOption />}
+            <HeaderAvatarOption
+              optionButtonRef={optionButtonRef}
+              isOpen={showOptionAva}
+              onClose={() => setShowOptionAva(false)}
+            />
           </Navbar.Collapse>
         </Container>
       </Navbar>

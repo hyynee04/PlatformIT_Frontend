@@ -22,6 +22,7 @@ import default_image from "../../assets/img/default_image.png";
 
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import {
   getCourseDetail,
   getIsEnRolledCourse,
@@ -109,13 +110,6 @@ const CourseDetail = (props) => {
     }
     return now; // Default to current time if unrecognized format
   };
-
-  const formatDate = (dateString) =>
-    new Date(dateString).toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
-    });
 
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
@@ -472,7 +466,7 @@ const CourseDetail = (props) => {
       </div>
 
       <div className="right-container">
-        {idUser && idRole === Role.teacher ? (
+        {idUser && idRole === Role.teacher && courseInfo.idTeacher === idUser ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
             idUser={idUser}
@@ -530,7 +524,7 @@ const CourseDetail = (props) => {
           </>
         ) : null}
 
-        {idRole !== Role.teacher ? (
+        {idRole !== Role.teacher || idUser !== courseInfo.idTeacher ? (
           <>
             {courseInfo.sectionsWithCourses &&
               courseInfo.sectionsWithCourses.length > 0 && (
@@ -668,9 +662,7 @@ const CourseDetail = (props) => {
         <DiagSuccessfully
           isOpen={isModalSuccessOpen}
           onClose={closeSuccessModal}
-          notification={
-            "Congratulations! You have successfully enrolled in the course."
-          }
+          notification={"Congratulations! You have successfully enrolled in the course."}
         />
         <DiagSuccessfully
           isOpen={addedNotification}

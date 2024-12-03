@@ -1,18 +1,26 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaCalendar, FaTrashAlt, FaSave } from "react-icons/fa";
-import { TiPlus } from "react-icons/ti";
+import { FaCalendar, FaChevronDown, FaSave, FaTrashAlt } from "react-icons/fa";
+import { HiRefresh } from "react-icons/hi";
+import { ImSpinner2 } from "react-icons/im";
+import { IoDuplicateSharp } from "react-icons/io5";
 import {
   LuAlignJustify,
-  LuChevronRight,
   LuChevronLeft,
-  LuX,
+  LuChevronRight,
   LuMinusCircle,
+  LuX,
 } from "react-icons/lu";
-import { HiRefresh } from "react-icons/hi";
-import { IoDuplicateSharp } from "react-icons/io5";
 import { MdPublish } from "react-icons/md";
-import { ImSpinner2 } from "react-icons/im";
+import { TiPlus } from "react-icons/ti";
 import { useLocation, useNavigate } from "react-router-dom";
+import ManualQuestion from "../../components/assigment/ManualQuestion";
+import QuizQuestion from "../../components/assigment/QuizQuestion";
+import {
+  APIStatus,
+  AssignmentItemAnswerType,
+  AssignmentType,
+} from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import {
   deleteAssignment,
   getAllActiveCourseOfTeacher,
@@ -23,13 +31,6 @@ import {
   postAddQuizAssignment,
   postUpdateAssignment,
 } from "../../services/courseService";
-import {
-  APIStatus,
-  AssignmentItemAnswerType,
-  AssignmentType,
-} from "../../constants/constants";
-import ManualQuestion from "../../components/assigment/ManualQuestion";
-import QuizQuestion from "../../components/assigment/QuizQuestion";
 const UpdateAssignment = ({ isDuplicate }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -143,10 +144,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       return "Ended";
     }
   };
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US"); // Định dạng theo month/day/year
-  };
+
   //SECTION
   const [listSection, setListSection] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);

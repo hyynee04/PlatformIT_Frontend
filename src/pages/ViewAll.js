@@ -807,10 +807,12 @@ const ViewAll = () => {
                         <>
                             <div className="all-cards-container course">
                                 {currentCourses.length !== 0 && currentItemsPage.coursePage.map((course) => (
-                                    <CourseCard
-                                        key={"course" + course.idCourse}
-                                        course={course}
-                                    />
+                                    <div className="one-card-container">
+                                        <CourseCard
+                                            key={"course" + course.idCourse}
+                                            course={course}
+                                        />
+                                    </div>
                                 ))}
                             </div>
                             <div className="pagination">
@@ -832,10 +834,12 @@ const ViewAll = () => {
                             <>
                                 <div className="all-cards-container teacher">
                                     {currentTeachers.length !== 0 && currentItemsPage.teacherPage.map((teacher) => (
-                                        <TeacherCard
-                                            key={"teacher" + teacher.idUser}
-                                            teacher={teacher}
-                                        />
+                                        <div className="one-card-container">
+                                            <TeacherCard
+                                                key={"teacher" + teacher.idUser}
+                                                teacher={teacher}
+                                            />
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="pagination">
@@ -856,10 +860,12 @@ const ViewAll = () => {
                             <>
                                 <div className="all-cards-container center">
                                     {currentCenters.length !== 0 && currentItemsPage.centerPage.map((center) => (
-                                        <CenterCard
-                                            key={"center" + center.idCenter}
-                                            center={center}
-                                        />
+                                        <div className="one-card-container">
+                                            <CenterCard
+                                                key={"center" + center.idCenter}
+                                                center={center}
+                                            />
+                                        </div>
                                     ))}
                                 </div>
                                 <div className="pagination">

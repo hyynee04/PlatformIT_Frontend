@@ -12,6 +12,7 @@ import {
 import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
 import "../../assets/css/AssignmentDetail.css";
+import { formatDate, formatDateTime } from "../../functions/function";
 
 const TeacherAssignDetail = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const TeacherAssignDetail = () => {
   // const [assignmentInfo, setAssignmentInfo] = useState({});
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [questions, setQuestions] = useState([]);
-
+  const [activeChoice, setActiveChoice] = useState("question");
   useEffect(() => {
     const fetchAssignmentData = async (idAssignment) => {
       setLoading(true);
@@ -51,6 +52,10 @@ const TeacherAssignDetail = () => {
     (acc, question) => acc + Number(question.mark),
     0
   );
+
+  const handleChoiceClick = (choice) => {
+    setActiveChoice(choice);
+  };
   if (loading) {
     return (
       <div className="loading-page">
@@ -131,19 +136,46 @@ const TeacherAssignDetail = () => {
               {assignmentInfo.startDate && (
                 <div className="field-value">
                   <label className="field">Start date</label>
-                  <label className="value">{}</label>
+                  <label className="value">
+                    {formatDateTime(assignmentInfo.startDate)}
+                  </label>
                 </div>
               )}
 
-              <div className="field-value">
-                <label className="field">Due date</label>
-                <label className="value"></label>
-              </div>
+              {assignmentInfo.dueDate && (
+                <div className="field-value">
+                  <label className="field">Due date</label>
+                  <label className="value">
+                    {formatDateTime(assignmentInfo.dueDate)}
+                  </label>
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <div className="handle-button"></div>
-        <div className="question-overview-container"></div>
+        <div className="handle-button">
+          <button
+            className={`btn ${activeChoice === "question" ? "active" : ""}`}
+            onClick={() => handleChoiceClick("question")}
+          >
+            Questions
+          </button>
+          <button
+            className={`btn ${activeChoice === "overview" ? "active" : ""}`}
+            onClick={() => handleChoiceClick("overview")}
+          >
+            Overview
+          </button>
+        </div>
+        <div className="questions-overview-container">
+          {activeChoice === "question" && (
+            <div className="questions-container">
+              {questions.map((question, index) => (
+                <div className="question-item" key={index}></div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

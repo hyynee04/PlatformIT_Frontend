@@ -13,6 +13,7 @@ import default_image from "../../assets/img/default_image.png";
 
 import Carousel from "../../components/Carousel";
 import { Object } from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import { getCenterDetail } from "../../services/centerService";
 
 const CenterDetail = (props) => {
@@ -73,12 +74,6 @@ const CenterDetail = (props) => {
             fetchCenterDetail(state.idCenter);
         }
     }, []);
-
-    const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric"
-    });
 
     return (
         <div className="detail-container">

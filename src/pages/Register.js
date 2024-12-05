@@ -70,7 +70,7 @@ const Register = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedPolicy, setIsCheckedPolicy] = useState(false);
-  const [showVerifyEmail, setShowVerifyEmail] = useState(true);
+  const [showVerifyEmail, setShowVerifyEmail] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
 
   const [error, setError] = useState(0);

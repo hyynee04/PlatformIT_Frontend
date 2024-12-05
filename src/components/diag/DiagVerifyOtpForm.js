@@ -10,7 +10,7 @@ const DiagVerifyOtpForm = (props) => {
     const [loading, setLoading] = useState(false);
     const [countDownTime, setCountDownTime] = useState({ minutes: 2, seconds: 0 })
     const [OTP, setOTP] = useState("");
-    const [verifyMessage, setVerifyMessage] = useState("OTP has been sent to your email. It will expire in 2 minutes!");
+    const [verifyMessage, setVerifyMessage] = useState("OTP has been sent to your email.");
 
     const handleVerify = async (email, OTP) => {
         if (!OTP) {
@@ -101,11 +101,11 @@ const DiagVerifyOtpForm = (props) => {
                                 }
                             }}
                         />
-                        <div className="count-down-otp">
-                            {formatTime(countDownTime.minutes)}:{formatTime(countDownTime.seconds)}
-                        </div>
                     </div>
-                    <span className="error-noti">{verifyMessage}</span>
+                    <div className="error-message-container">
+                        <span className="error-noti">{verifyMessage} &nbsp;</span>
+                        <span>Time remaining {formatTime(countDownTime.minutes)}:{formatTime(countDownTime.seconds)}</span>
+                    </div>
                     <div className="str-btns">
                         <div className="act-btns">
                             <button

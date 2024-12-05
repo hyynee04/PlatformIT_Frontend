@@ -20,18 +20,25 @@ import {
   APIStatus,
   AssignmentStatus,
   AssignmentType,
+  Role,
 } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
 import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
+  getAllTestCardOfStudent,
 } from "../../services/courseService";
 import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
-import { formatDateTime } from "../../functions/function";
+import { formatDateTime, formatTime } from "../../functions/function";
 
-const TeacherAssignMgmt = () => {
+const ListAssignMgmt = () => {
+  const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
   const [loading, setLoading] = useState(false);
-  const [activeStatus, setActiveStatus] = useState(AssignmentStatus.publish);
+  const [activeStatus, setActiveStatus] = useState(
+    idRole === Role.teacher
+      ? AssignmentStatus.publish
+      : AssignmentStatus.upComing
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -82,9 +89,16 @@ const TeacherAssignMgmt = () => {
   const fetchAssignment = async () => {
     setLoading(true);
     try {
-      const response = await getAllAssignmentCardOfTeacher();
-      if (response.status === APIStatus.success) {
-        setListAssigment(response.data);
+      if (idRole === Role.teacher) {
+        let response = await getAllAssignmentCardOfTeacher();
+        if (response.status === APIStatus.success) {
+          setListAssigment(response.data);
+        }
+      } else if (idRole === Role.student) {
+        let response = await getAllTestCardOfStudent();
+        if (response.status === APIStatus.success) {
+          setListAssigment(response.data);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -98,18 +112,31 @@ const TeacherAssignMgmt = () => {
 
   const filteredAssignments = listAssignment
     .filter((assignment) => {
-      if (activeStatus === AssignmentStatus.publish) {
-        return assignment.isPublish === 1;
+      if (idRole === Role.teacher) {
+        if (activeStatus === AssignmentStatus.publish) {
+          return assignment.isPublish === 1;
+        }
+        if (activeStatus === AssignmentStatus.unpublish) {
+          return assignment.isPublish === 0;
+        }
+        if (activeStatus === AssignmentStatus.pastDue) {
+          return (
+            assignment.isPastDue === 1 ||
+            (assignment.endDate && new Date(assignment.endDate) < new Date())
+          );
+        }
+      } else if (idRole === Role.student) {
+        if (activeStatus === AssignmentStatus.upComing) {
+          return assignment.isPastDue === 0 && assignment.isCompleted === 0;
+        }
+        if (activeStatus === AssignmentStatus.pastDue) {
+          return assignment.isPastDue === 1;
+        }
+        if (activeStatus === AssignmentStatus.completed) {
+          return assignment.isCompleted === 1;
+        }
       }
-      if (activeStatus === AssignmentStatus.unpublish) {
-        return assignment.isPublish === 0;
-      }
-      if (activeStatus === AssignmentStatus.pastDue) {
-        return (
-          assignment.isPastDue === 1 ||
-          (assignment.endDate && new Date(assignment.endDate) < new Date())
-        );
-      }
+
       return true;
     })
     .filter((assignment) => {
@@ -178,6 +205,9 @@ const TeacherAssignMgmt = () => {
       } else if (sortField === "dueDate") {
         aValue = new Date(a.dueDate) || new Date(0);
         bValue = new Date(b.dueDate) || new Date(0);
+      } else if (sortField === "title") {
+        aValue = a.title.toLowerCase() || "";
+        bValue = b.title.toLowerCase() || "";
       }
 
       return sortOrder === "asc"
@@ -204,29 +234,40 @@ const TeacherAssignMgmt = () => {
   const groupedAssignments = useMemo(() => {
     if (filteredAssignments.length === 0) return [];
 
-    // Nhóm assignments theo ngày
+    // Nhóm assignments theo ngày (giữ nguyên timestamp để sắp xếp trong từng nhóm)
     const grouped = filteredAssignments.reduce((acc, assignment) => {
-      const formattedDate = formatDate(
-        assignment.updatedDate || assignment.createdDate
-      ); // Định dạng ngày
-      if (!acc[formattedDate]) {
-        acc[formattedDate] = [];
+      let dateValue;
+      if (idRole === Role.teacher) {
+        dateValue = assignment.updatedDate || assignment.createdDate;
+      } else if (idRole === Role.student) {
+        if (activeStatus === AssignmentStatus.upComing) {
+          dateValue = assignment.updatedDate || assignment.createdDate;
+        } else if (activeStatus === AssignmentStatus.pastDue) {
+          dateValue = assignment.dueDate || assignment.courseEndDate;
+        } else if (activeStatus === AssignmentStatus.completed) {
+          dateValue = assignment.submittedDate;
+        }
       }
-      acc[formattedDate].push(assignment); // Thêm assignment vào nhóm có ngày giống nhau
+      const formattedDate = formatDate(dateValue);
+      if (!acc[formattedDate]) acc[formattedDate] = [];
+      acc[formattedDate].push(assignment);
       return acc;
     }, {});
 
-    // Chuyển grouped thành mảng có thứ tự theo ngày
+    // Chuyển grouped thành mảng và sắp xếp từng nhóm
     return Object.entries(grouped)
       .map(([date, assignments]) => ({
         date,
-        assignments,
+        assignments: assignments.sort(
+          (a, b) =>
+            new Date(b.updatedDate || b.createdDate) -
+            new Date(a.updatedDate || a.createdDate)
+        ),
+        timestamp: new Date(
+          assignments[0].updatedDate || assignments[0].createdDate
+        ).getTime(),
       }))
-      .sort((a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return dateB - dateA; // Sắp xếp từ ngày gần nhất đến xa nhất
-      });
+      .sort((a, b) => b.timestamp - a.timestamp);
   }, [filteredAssignments]);
 
   const handleStatusClick = (status) => {
@@ -308,30 +349,62 @@ const TeacherAssignMgmt = () => {
       <div className="page-list-container">
         <div className="handle-page-container">
           <div className="status-assign-btns">
-            <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.publish ? "active" : ""
-              }`}
-              onClick={() => handleStatusClick(AssignmentStatus.publish)}
-            >
-              Publish
-            </button>
-            <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.unpublish ? "active" : ""
-              }`}
-              onClick={() => handleStatusClick(AssignmentStatus.unpublish)}
-            >
-              Unpublish
-            </button>
-            <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.pastDue ? "active" : ""
-              }`}
-              onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
-            >
-              Past due
-            </button>
+            {idRole === Role.teacher && (
+              <>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.publish ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.publish)}
+                >
+                  Publish
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.unpublish ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.unpublish)}
+                >
+                  Unpublish
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.pastDue ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
+                >
+                  Past due
+                </button>
+              </>
+            )}
+            {idRole === Role.student && (
+              <>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.upComing ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.upComing)}
+                >
+                  Up coming
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.pastDue ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
+                >
+                  Past due
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.completed ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.completed)}
+                >
+                  Completed
+                </button>
+              </>
+            )}
           </div>
           <div className="filter-search-assign">
             <div className="filter-sort-btns">
@@ -350,37 +423,39 @@ const TeacherAssignMgmt = () => {
                     <span>Filter</span>
                   </div>
                   <div className="main-filter">
-                    <div className="field-filter">
-                      <span className="label-field">Test/Assignment</span>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="exercise"
-                          checked={tempIsTest === 0}
-                          onChange={() => setTempIsTest(0)}
-                        />
-                        Exercise
-                      </label>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="test"
-                          checked={tempIsTest === 1}
-                          onChange={() => setTempIsTest(1)}
-                        />
-                        Test
-                      </label>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="all"
-                          checked={tempIsTest === "all"}
-                          onChange={() => setTempIsTest("all")}
-                          selected
-                        />
-                        All
-                      </label>
-                    </div>
+                    {idRole === Role.teacher && (
+                      <div className="field-filter">
+                        <span className="label-field">Test/Assignment</span>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="exercise"
+                            checked={tempIsTest === 0}
+                            onChange={() => setTempIsTest(0)}
+                          />
+                          Exercise
+                        </label>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="test"
+                            checked={tempIsTest === 1}
+                            onChange={() => setTempIsTest(1)}
+                          />
+                          Test
+                        </label>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="all"
+                            checked={tempIsTest === "all"}
+                            onChange={() => setTempIsTest("all")}
+                            selected
+                          />
+                          All
+                        </label>
+                      </div>
+                    )}
 
                     <div className="field-filter">
                       <span className="label-field">Assignment type</span>
@@ -471,6 +546,7 @@ const TeacherAssignMgmt = () => {
                           value={tempSortField}
                           onChange={(e) => setTempSortField(e.target.value)}
                         >
+                          <option value="title">Name</option>
                           <option value="startDate">Start date</option>
                           <option value="dueDate">Due date</option>
                         </select>
@@ -518,12 +594,14 @@ const TeacherAssignMgmt = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button
-              className="circle-btn"
-              onClick={() => navigate("/addAssignment")}
-            >
-              <TiPlus className="icon" />
-            </button>
+            {idRole === Role.teacher && (
+              <button
+                className="circle-btn"
+                onClick={() => navigate("/addAssignment")}
+              >
+                <TiPlus className="icon" />
+              </button>
+            )}
           </div>
         </div>
         <div className="list-assign-container">
@@ -536,14 +614,22 @@ const TeacherAssignMgmt = () => {
                     className="assign-item"
                     key={idx}
                     onClick={() => {
-                      if (assignment.isPublish === 1) {
+                      if (idRole === Role.teacher) {
+                        if (assignment.isPublish === 1) {
+                          navigate("/teacherAssignDetail", {
+                            state: {
+                              idAssignment: assignment.idAssignment,
+                            },
+                          });
+                        } else {
+                          navigate("/updateAssignment", {
+                            state: {
+                              idAssignment: assignment.idAssignment,
+                            },
+                          });
+                        }
+                      } else if (idRole === Role.student) {
                         navigate("/teacherAssignDetail", {
-                          state: {
-                            idAssignment: assignment.idAssignment,
-                          },
-                        });
-                      } else {
-                        navigate("/updateAssignment", {
                           state: {
                             idAssignment: assignment.idAssignment,
                           },
@@ -558,15 +644,17 @@ const TeacherAssignMgmt = () => {
                       >
                         {assignment.title}
                       </span>
-                      <button
-                        className="btn-option"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoreIconClick(assignment);
-                        }}
-                      >
-                        <LuMoreHorizontal className="icon" />
-                      </button>
+                      {idRole === Role.teacher && (
+                        <button
+                          className="btn-option"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMoreIconClick(assignment);
+                          }}
+                        >
+                          <LuMoreHorizontal className="icon" />
+                        </button>
+                      )}
                     </div>
                     <div className="attribute-container">
                       <div className="attribute-item">
@@ -596,7 +684,7 @@ const TeacherAssignMgmt = () => {
                             : "question"}
                         </label>
                       </div>
-                      {assignment.startDate && (
+                      {idRole === Role.teacher && assignment.startDate && (
                         <div className="attribute-item">
                           <LuCalendar className="icon-attribute-assign" />
                           <label htmlFor="">
@@ -604,7 +692,7 @@ const TeacherAssignMgmt = () => {
                           </label>
                         </div>
                       )}
-                      {assignment.dueDate && (
+                      {idRole === Role.teacher && assignment.dueDate && (
                         <div className="attribute-item">
                           <LuCalendar className="icon-attribute-assign" />
                           <label htmlFor="">
@@ -632,9 +720,26 @@ const TeacherAssignMgmt = () => {
                           </>
                         )}
                       </span>
-                      <span className="isExam-label">
-                        {assignment.isTest ? "Test" : "Exercise"}
-                      </span>
+                      {idRole === Role.teacher && (
+                        <span className="isExam-label">
+                          {assignment.isTest ? "Test" : "Exercise"}
+                        </span>
+                      )}
+                      {idRole === Role.student &&
+                        (assignment.submittedDate ? (
+                          <span className="submitted-label">
+                            {`Submitted at: ${formatTime(
+                              assignment.submittedDate
+                            )}`}
+                            <LuCheckSquare />
+                          </span>
+                        ) : (
+                          assignment.dueDate && (
+                            <span className="dueDate-label">
+                              {`Due: ${formatDateTime(assignment.dueDate)}`}
+                            </span>
+                          )
+                        ))}
                     </div>
                     {selectedAssignment.idAssignment ===
                       assignment.idAssignment && (
@@ -758,4 +863,4 @@ const TeacherAssignMgmt = () => {
   );
 };
 
-export default TeacherAssignMgmt;
+export default ListAssignMgmt;

@@ -137,6 +137,13 @@ const getAllAssignmentCardOfTeacher = async () => {
     },
   });
 };
+const getAllTestCardOfStudent = async () => {
+  return await axios.get("api/Assignment/GetAllTestCardOfStudent", {
+    params: {
+      idStudent: +localStorage.getItem("idUser"),
+    },
+  });
+};
 const getAssignmentInfo = async (idAssignment) => {
   return await axios.get("api/Assignment/GetAssignmentInfo", {
     params: {
@@ -495,6 +502,7 @@ export {
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
   getAllAssignmentCardOfTeacher,
+  getAllTestCardOfStudent,
   getAllCourseCards,
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,

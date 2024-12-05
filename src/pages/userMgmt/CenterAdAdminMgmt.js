@@ -219,10 +219,10 @@ const CenterAdAdminMgmt = () => {
           </div>
           {isCurrentUserMainAdmin && (
             <div className="add-btn">
-              <div className="btn" onClick={() => openAddAdminModal()}>
+              <button className="btn" onClick={() => openAddAdminModal()}>
                 <LuUserPlus className="icon" />
                 <span>Add admin</span>
-              </div>
+              </button>
               <DiagAddUserForm
                 isOpen={isModalAddAdminOpen}
                 onClose={closeAddAdminModal}

@@ -107,8 +107,8 @@ const PlatformAdUserMgmt = () => {
         ? "Main"
         : "Sub"
       : user.status === UserStatus.inactive
-        ? "Rejected"
-        : "Pending";
+      ? "Rejected"
+      : "Pending";
   };
 
   const filteredUser = listUser
@@ -122,8 +122,8 @@ const PlatformAdUserMgmt = () => {
           (user.gender === UserGender.female
             ? "Female"
             : user.gender === UserGender.male
-              ? "Male"
-              : "Other"
+            ? "Male"
+            : "Other"
           )
             .toLowerCase()
             .includes(searchTermLower)) ||
@@ -182,8 +182,8 @@ const PlatformAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
 
   //pagination
@@ -226,22 +226,25 @@ const PlatformAdUserMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${activeRole === Role.centerAdmin ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.centerAdmin ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.centerAdmin)}
           >
             Center Administrator
           </button>
           <button
-            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.teacher ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${activeRole === Role.student ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.student ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -321,8 +324,8 @@ const PlatformAdUserMgmt = () => {
                           ? "Main"
                           : "Sub"
                         : user.status === UserStatus.inactive
-                          ? "Rejected"
-                          : "Pending"}
+                        ? "Rejected"
+                        : "Pending"}
                     </td>
                   )}
                   <td>
@@ -341,25 +344,26 @@ const PlatformAdUserMgmt = () => {
                   </td>
                   <td>
                     <span
-                      className={`status ${user.status === UserStatus.active
+                      className={`status ${
+                        user.status === UserStatus.active
                           ? "active"
                           : user.status === UserStatus.pending
-                            ? "pending"
-                            : user.status === UserStatus.inactive ||
-                              user.status === UserStatus.locked
-                              ? "inactive"
-                              : ""
-                        }`}
+                          ? "pending"
+                          : user.status === UserStatus.inactive ||
+                            user.status === UserStatus.locked
+                          ? "inactive"
+                          : ""
+                      }`}
                     >
                       {user.status === UserStatus.active
                         ? "Active"
                         : user.status === UserStatus.pending
-                          ? "Pending"
-                          : user.status === UserStatus.inactive
-                            ? "Inactive"
-                            : user.status === UserStatus.locked
-                              ? "Locked"
-                              : ""}
+                        ? "Pending"
+                        : user.status === UserStatus.inactive
+                        ? "Inactive"
+                        : user.status === UserStatus.locked
+                        ? "Locked"
+                        : ""}
                     </span>
                   </td>
                   <td className="table-cell" style={{ cursor: "pointer" }}>
@@ -375,10 +379,10 @@ const PlatformAdUserMgmt = () => {
                           : {})}
                         onUserInactivated={() => setSelectedUserId(null)}
                         {...(user.centerStatus === CenterStatus.active ||
-                          user.idRole === Role.student
+                        user.idRole === Role.student
                           ? {
-                            isReactivatable: true,
-                          }
+                              isReactivatable: true,
+                            }
                           : {})}
                         roleUserSelected={user.idRole}
                       />
@@ -392,11 +396,6 @@ const PlatformAdUserMgmt = () => {
         <div className="pagination-container">
           <nav>
             <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
               {numbers.map((n, i) => (
                 <li
                   className={`page-item ${currentPage === n ? "active" : ""}`}
@@ -410,29 +409,14 @@ const PlatformAdUserMgmt = () => {
                   </button>
                 </li>
               ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
             </ul>
           </nav>
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

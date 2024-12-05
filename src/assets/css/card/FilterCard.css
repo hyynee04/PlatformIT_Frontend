@@ -16,6 +16,11 @@
   left: 72px;
   top: 72px;
 }
+.attendees {
+  position: absolute;
+  right: 440px;
+  top: 50px;
+}
 .title-filter {
   font-size: 20px;
   font-weight: 700;
@@ -75,7 +80,7 @@
 .date-picker,
 .input-sortby {
   padding: 4px 12px;
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   border: 1px solid var(--border-gray);
   width: 140px;
 }

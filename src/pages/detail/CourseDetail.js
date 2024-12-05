@@ -44,7 +44,6 @@ const CourseDetail = (props) => {
   const [idRole, setIDRole] = useState(0);
   const [idUser, setIDUser] = useState("");
   const [courseInfo, setCourseInfo] = useState({});
-  const [listTestCards, setListTestCards] = useState([]);
   const [notificationBoard, setNotificationBoard] = useState([]);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);

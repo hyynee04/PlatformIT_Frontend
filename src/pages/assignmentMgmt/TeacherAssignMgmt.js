@@ -1,36 +1,37 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
+import { IoDuplicateSharp } from "react-icons/io5";
 import {
+  LuCalendar,
+  LuCheckSquare,
   LuChevronDown,
-  LuFilter,
-  LuMoreHorizontal,
+  LuChevronRight,
   LuClock4,
   LuFileEdit,
-  LuCheckSquare,
-  LuCalendar,
-  LuChevronRight,
+  LuFilter,
   LuMinusCircle,
+  LuMoreHorizontal,
   LuX,
 } from "react-icons/lu";
-import { FaTrashAlt } from "react-icons/fa";
-import { TiPlus } from "react-icons/ti";
 import { MdPublish } from "react-icons/md";
-import { IoDuplicateSharp } from "react-icons/io5";
-import { ImSpinner2 } from "react-icons/im";
+import { TiPlus } from "react-icons/ti";
+import { useNavigate } from "react-router-dom";
+import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
 import {
   APIStatus,
   AssignmentStatus,
   AssignmentType,
 } from "../../constants/constants";
-import { useNavigate } from "react-router-dom";
+import { formatDateTime } from "../../functions/function";
 import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
 } from "../../services/courseService";
-import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
-import { formatDateTime } from "../../functions/function";
 
 const TeacherAssignMgmt = () => {
   const [loading, setLoading] = useState(false);
+  const [className, setClassName] = useState("");
   const [activeStatus, setActiveStatus] = useState(AssignmentStatus.publish);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -96,6 +97,18 @@ const TeacherAssignMgmt = () => {
     fetchAssignment();
   }, []);
 
+  useEffect(() => {
+    if (activeStatus === 0 || activeStatus) {
+      setClassName("slide-to-right");
+      // Reset the class after 1 second
+      const timer = setTimeout(() => {
+        setClassName("");
+      }, 850);
+      // Cleanup timer in case activeStatus changes before timeout
+      return () => clearTimeout(timer);
+    }
+  }, [activeStatus]);
+
   const filteredAssignments = listAssignment
     .filter((assignment) => {
       if (activeStatus === AssignmentStatus.publish) {
@@ -139,8 +152,8 @@ const TeacherAssignMgmt = () => {
             (assignment.assignmentType === AssignmentType.manual
               ? "Manual"
               : assignment.assignmentType === AssignmentType.quiz
-              ? "Quiz"
-              : "Code"
+                ? "Quiz"
+                : "Code"
             )
               .toLowerCase()
               .includes(searchTerm)) ||
@@ -185,8 +198,8 @@ const TeacherAssignMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-        ? 1
-        : -1;
+          ? 1
+          : -1;
     });
   const formatDate = (date) => {
     const options = { weekday: "long" };
@@ -309,25 +322,22 @@ const TeacherAssignMgmt = () => {
         <div className="handle-page-container">
           <div className="status-assign-btns">
             <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.publish ? "active" : ""
-              }`}
+              className={`status-btn ${activeStatus === AssignmentStatus.publish ? "active" : ""
+                }`}
               onClick={() => handleStatusClick(AssignmentStatus.publish)}
             >
               Publish
             </button>
             <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.unpublish ? "active" : ""
-              }`}
+              className={`status-btn ${activeStatus === AssignmentStatus.unpublish ? "active" : ""
+                }`}
               onClick={() => handleStatusClick(AssignmentStatus.unpublish)}
             >
               Unpublish
             </button>
             <button
-              className={`status-btn ${
-                activeStatus === AssignmentStatus.pastDue ? "active" : ""
-              }`}
+              className={`status-btn ${activeStatus === AssignmentStatus.pastDue ? "active" : ""
+                }`}
               onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
             >
               Past due
@@ -526,11 +536,11 @@ const TeacherAssignMgmt = () => {
             </button>
           </div>
         </div>
-        <div className="list-assign-container">
+        <div className={`list-assign-container ${className}`}>
           {groupedAssignments.map(({ date, assignments }, index) => {
             return (
               <div className="time-assign-container" key={index}>
-                <span className="create-time-assign">{date}</span>
+                <span className="create-time-assign ">{date}</span>
                 {assignments.map((assignment, idx) => (
                   <div
                     className="assign-item"
@@ -575,8 +585,8 @@ const TeacherAssignMgmt = () => {
                           {assignment.assignmentType === AssignmentType.code
                             ? "Code"
                             : assignment.assignmentType === AssignmentType.quiz
-                            ? "Quiz"
-                            : "Manual"}
+                              ? "Quiz"
+                              : "Manual"}
                         </label>
                       </div>
                       {assignment.duration > 0 && (
@@ -638,49 +648,49 @@ const TeacherAssignMgmt = () => {
                     </div>
                     {selectedAssignment.idAssignment ===
                       assignment.idAssignment && (
-                      <div
-                        ref={optionRef}
-                        className="container-options assignment-option"
-                      >
-                        {assignment.isPublish === 0 && (
+                        <div
+                          ref={optionRef}
+                          className="container-options assignment-option"
+                        >
+                          {assignment.isPublish === 0 && (
+                            <button
+                              className="op-buts"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openPublishModal();
+                              }}
+                            >
+                              <span>Publish</span>
+                              <MdPublish />
+                            </button>
+                          )}
+                          <button
+                            className="op-buts"
+                            //onClick={handleOpenDeleteDiag}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate("/duplicateAssignment", {
+                                state: {
+                                  idAssignment: assignment.idAssignment,
+                                },
+                              });
+                            }}
+                          >
+                            <span>Duplicate</span>
+                            <IoDuplicateSharp />
+                          </button>
                           <button
                             className="op-buts"
                             onClick={(e) => {
                               e.stopPropagation();
-                              openPublishModal();
+                              handleOpenDeleteDiag();
                             }}
                           >
-                            <span>Publish</span>
-                            <MdPublish />
+                            <span>Delete</span>
+                            <FaTrashAlt />
                           </button>
-                        )}
-                        <button
-                          className="op-buts"
-                          //onClick={handleOpenDeleteDiag}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/duplicateAssignment", {
-                              state: {
-                                idAssignment: assignment.idAssignment,
-                              },
-                            });
-                          }}
-                        >
-                          <span>Duplicate</span>
-                          <IoDuplicateSharp />
-                        </button>
-                        <button
-                          className="op-buts"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDeleteDiag();
-                          }}
-                        >
-                          <span>Delete</span>
-                          <FaTrashAlt />
-                        </button>
-                      </div>
-                    )}
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>

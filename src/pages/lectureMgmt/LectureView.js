@@ -8,14 +8,15 @@ import {
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
-import default_image from "../../assets/img/default_image.png";
+import { getVideoType } from "../../functions/function";
 
-const LectureView = (props) => {
+const LectureView = ({ lectureDetail }) => {
     const [index, setIndex] = useState(1);
     const menuItems = [
-        { label: "Content", index: 1 },
-        { label: "Exercise", index: 2 },
-        { label: "Comment", index: 3 }
+        { label: "Introduction", index: 1 },
+        { label: "Support Materials", index: 2 },
+        { label: "Exercise", index: 3 },
+        { label: "Comment", index: 4 }
     ];
 
     const [value, setValue] = useState("");
@@ -66,16 +67,44 @@ const LectureView = (props) => {
             setIsLongContent(contentHeight > containerHeight);
         }
     }, [isExpanded]);
+
     return (
         <>
-            <div className="course-background">
-                <img src={default_image} alt="course background" />
+            <div className="lecture-header slide-to-bottom">
+                <span className="lecture-title">{lectureDetail.lectureTitle}</span>
+                <span className="time-created">{lectureDetail.relativeTime}</span>
             </div>
-            <div className="lecture-header">
-                <span className="lecture-title">Lecture Title: ...</span>
-                <span className="time-created">13 hr. ago</span>
-            </div>
-            <div className="lecture-main">
+            {lectureDetail.videoMaterial ? (
+                <div className={`video-container slide-to-bottom ${lectureDetail.videoMaterial ? "" : "no-video"}`}>
+                    <video className="video-player" controls>
+                        {lectureDetail?.videoMaterial?.path ? (
+                            <source
+                                src={lectureDetail.videoMaterial.path}
+                                type={getVideoType(lectureDetail.videoMaterial.path)}
+                            />
+                        ) : (
+                            <p>Error: Invalid file</p>
+                        )}
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            ) : null}
+            {lectureDetail.mainMaterials && lectureDetail.mainMaterials.length > 0 && (
+                <div className="main-material slide-to-right slide-to-bottom">
+                    <span className="title">Main Material</span>
+                    <span className="material-content">
+                        <div
+                            onClick={() => window.open(lectureDetail.mainMaterials[0].path)}
+                            className="content-file"
+                        >
+                            <span>{lectureDetail.mainMaterials[0].fileName}</span>
+                        </div>
+                    </span>
+                </div>
+            )}
+
+
+            <div className="lecture-main slide-to-bottom">
                 <div className="lecture-main-menu">
                     {menuItems.map(item => (
                         <button
@@ -88,126 +117,165 @@ const LectureView = (props) => {
                     ))}
                 </div>
                 <div className="menu-part">
-                    {index === 1 ?
-                        (<>
-
-                            <div className="part-item">
-                                <span className="item-title">Introduction</span>
+                    {index === 1 && (
+                        <div className="part-item">
+                            {lectureDetail.lectureIntroduction && (
                                 <span className="intro-content">
-                                    Body text for whatever you’d like to say.
-                                    Add main takeaway points,quotes, anecdotes, or even a very very short story.
+                                    {lectureDetail.lectureIntroduction}
                                 </span>
+                            )}
+                        </div>
+                    )}
+                    {index === 2 && (
+                        <div className="part-item">
+                            {lectureDetail.supportMaterials && lectureDetail.supportMaterials.length > 0 && (
+                                <span className="intro-content">
+                                    {lectureDetail.supportMaterials.map((material, index) => (
+                                        <div
+                                            key={index}
+                                            className="content-file"
+                                            onClick={() => window.open(material.path)}>
+                                            <span>{material.fileName}</span>
+                                        </div>
+                                    ))}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                    {index === 3 && (
+                        <>
+                            <div className="part-item">
+                                <div className="exercise-display">
+                                    <div className="exercise-body">
+                                        <span className="item-title">Title</span>
+                                        <div className="exercise-description">
+                                            <span>
+                                                <LuFileEdit color="#003B57" /> Manual
+                                            </span>
+                                            <span>
+                                                <LuClock color="#003B57" /> 45 mins
+                                            </span>
+                                            <span>
+                                                <LuFileQuestion color="#003B57" /> 40 questions
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="exercise-sideinfo">
+                                        <span className="inform">Due: 12/09/2025, 23:59</span>
+                                    </div>
+                                </div>
                             </div>
                             <div className="part-item">
-                                <span className="item-title">Materials</span>
-                                <span className="intro-content">
-                                    Body text for whatever you’d like to say.
-                                    Add main takeaway points,quotes, anecdotes, or even a very very short story.
-                                </span>
+                                <div className="exercise-display">
+                                    <div className="exercise-body">
+                                        <span className="item-title">Title</span>
+                                        <div className="exercise-description">
+                                            <span>
+                                                <LuFileEdit color="#003B57" /> Manual
+                                            </span>
+                                            <span>
+                                                <LuClock color="#003B57" /> 45 mins
+                                            </span>
+                                            <span>
+                                                <LuFileQuestion color="#003B57" /> 40 questions
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="exercise-sideinfo">
+                                        <span className="complete">Complete <LuCheckSquare /></span>
+                                    </div>
+                                </div>
                             </div>
                             <div className="part-item">
-                                <span className="item-title">Supporting Materials</span>
-                                <span className="intro-content">
-                                    Body text for whatever you’d like to say.
-                                    Add main takeaway points,quotes, anecdotes, or even a very very short story.
-                                </span>
+                                <div className="exercise-display">
+                                    <div className="exercise-body">
+                                        <span className="item-title">Title</span>
+                                        <div className="exercise-description">
+                                            <span>
+                                                <LuFileEdit color="#003B57" /> Manual
+                                            </span>
+                                            <span>
+                                                <LuClock color="#003B57" /> 45 mins
+                                            </span>
+                                            <span>
+                                                <LuFileQuestion color="#003B57" /> 40 questions
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="exercise-sideinfo">
+                                        <span className="pastdue">Past due</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    {index === 4 && (
+                        <>
+                            <div className="part-item">
+                                <div className="comment-display">
+                                    <div className="ava-holder">
+                                        <img src={default_ava} />
+                                    </div>
+                                    <div className="comment-content">
+                                        <textarea
+                                            ref={textareaRef}
+                                            style={{ height: `${textAreaHeight}px` }}
+                                            placeholder="Write your comment..."
+                                            className="comment-entering"
+                                            value={value}
+                                            onChange={(e) => setValue(e.target.value)}
+                                        >
+                                        </textarea>
+                                        <div className="button-container">
+                                            <button className="cancel">Cancel</button>
+                                            <button className="comment">Comment</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                        </>)
-                        :
-                        (index === 2 ?
-                            (<>
-                                <div className="part-item">
-                                    <div className="exercise-display">
-                                        <div className="exercise-body">
-                                            <span className="item-title">Title</span>
-                                            <div className="exercise-description">
-                                                <span>
-                                                    <LuFileEdit color="#003B57" /> Manual
-                                                </span>
-                                                <span>
-                                                    <LuClock color="#003B57" /> 45 mins
-                                                </span>
-                                                <span>
-                                                    <LuFileQuestion color="#003B57" /> 40 questions
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="exercise-sideinfo">
-                                            <span className="inform">Due: 12/09/2025, 23:59</span>
-                                        </div>
+                            <div className="part-item">
+                                <div className="comment-display">
+                                    <div className="ava-holder">
+                                        <img src={default_ava} />
                                     </div>
-                                </div>
-                                <div className="part-item">
-                                    <div className="exercise-display">
-                                        <div className="exercise-body">
-                                            <span className="item-title">Title</span>
-                                            <div className="exercise-description">
-                                                <span>
-                                                    <LuFileEdit color="#003B57" /> Manual
-                                                </span>
-                                                <span>
-                                                    <LuClock color="#003B57" /> 45 mins
-                                                </span>
-                                                <span>
-                                                    <LuFileQuestion color="#003B57" /> 40 questions
-                                                </span>
+                                    <div className="comment-content">
+                                        <div className="comment-header">
+                                            <span className="commentator-name">Commentator name</span>
+                                            <span className="comment-time">13 hr. ago</span>
+                                        </div>
+                                        <div
+                                            ref={contentRef}
+                                            className={`comment-body ${isExpanded ? "expanded" : ""}`}
+                                        >
+                                            <span>
+                                                Today's lecture was incredibly insightful!
+                                                The explanation was clear and well-structured, especially the examples that tied theory to practical applications.
+                                            </span>
+                                            <div className={`blur-bottom ${(isLongContent && !isExpanded) ? "show" : ""}`}></div>
+                                        </div>
+                                        {isLongContent && (
+                                            <div className="view-more-container">
+                                                <hr className="line-1" />
+                                                <button
+                                                    className="view-more-comment"
+                                                    onClick={() => toggleComment()}
+                                                >
+                                                    {isExpanded ?
+                                                        (<>View Less <IoIosArrowUp /></>) : (<>View More <IoIosArrowDown /></>)
+                                                    }
+                                                </button>
+                                                <hr className="line-2" />
                                             </div>
-                                        </div>
-                                        <div className="exercise-sideinfo">
-                                            <span className="complete">Complete <LuCheckSquare /></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="part-item">
-                                    <div className="exercise-display">
-                                        <div className="exercise-body">
-                                            <span className="item-title">Title</span>
-                                            <div className="exercise-description">
-                                                <span>
-                                                    <LuFileEdit color="#003B57" /> Manual
-                                                </span>
-                                                <span>
-                                                    <LuClock color="#003B57" /> 45 mins
-                                                </span>
-                                                <span>
-                                                    <LuFileQuestion color="#003B57" /> 40 questions
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="exercise-sideinfo">
-                                            <span className="pastdue">Past due</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>)
-                            :
-                            (<>
-                                <div className="part-item">
-                                    <div className="comment-display">
-                                        <div className="ava-holder">
-                                            <img src={default_ava} />
-                                        </div>
-                                        <div className="comment-content">
-                                            <textarea
-                                                ref={textareaRef}
-                                                style={{ height: `${textAreaHeight}px` }}
-                                                placeholder="Write your comment..."
-                                                className="comment-entering"
-                                                value={value}
-                                                onChange={(e) => setValue(e.target.value)}
-                                            >
-                                            </textarea>
-                                            <div className="button-container">
-                                                <button className="cancel">Cancel</button>
-                                                <button className="comment">Comment</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                        )}
 
-                                <div className="part-item">
-                                    <div className="comment-display">
+                                    </div>
+                                </div>
+                                <div className="comment-responses-container">
+                                    <div className="more-responses">
+                                        <button><IoIosArrowDown /> 3 replies</button>
+                                    </div>
+                                    <div className="comment-response">
                                         <div className="ava-holder">
                                             <img src={default_ava} />
                                         </div>
@@ -217,83 +285,42 @@ const LectureView = (props) => {
                                                 <span className="comment-time">13 hr. ago</span>
                                             </div>
                                             <div
-                                                ref={contentRef}
+                                                // ref={contentRef}
                                                 className={`comment-body ${isExpanded ? "expanded" : ""}`}
                                             >
                                                 <span>
                                                     Today's lecture was incredibly insightful!
                                                     The explanation was clear and well-structured, especially the examples that tied theory to practical applications.
                                                 </span>
-                                                <div className={`blur-bottom ${(isLongContent && !isExpanded) ? "show" : ""}`}></div>
                                             </div>
-                                            {isLongContent && (
-                                                <div className="view-more-container">
-                                                    <hr className="line-1" />
-                                                    <button
-                                                        className="view-more-comment"
-                                                        onClick={() => toggleComment()}
-                                                    >
-                                                        {isExpanded ?
-                                                            (<>View Less <IoIosArrowUp /></>) : (<>View More <IoIosArrowDown /></>)
-                                                        }
-                                                    </button>
-                                                    <hr className="line-2" />
-                                                </div>
-                                            )}
-
                                         </div>
                                     </div>
-                                    <div className="comment-responses-container">
-                                        <div className="more-responses">
-                                            <button><IoIosArrowDown /> 3 replies</button>
+                                    <div className="comment-response">
+                                        <div className="ava-holder">
+                                            <img src={default_ava} />
                                         </div>
-                                        <div className="comment-response">
-                                            <div className="ava-holder">
-                                                <img src={default_ava} />
-                                            </div>
+                                        <div className="comment-content">
                                             <div className="comment-content">
-                                                <div className="comment-header">
-                                                    <span className="commentator-name">Commentator name</span>
-                                                    <span className="comment-time">13 hr. ago</span>
-                                                </div>
-                                                <div
-                                                    // ref={contentRef}
-                                                    className={`comment-body ${isExpanded ? "expanded" : ""}`}
+                                                <textarea
+                                                    ref={textareaRef}
+                                                    style={{ height: `${textAreaHeight}px` }}
+                                                    placeholder="Write your comment..."
+                                                    className="comment-entering"
+                                                    value={value}
+                                                    onChange={(e) => setValue(e.target.value)}
                                                 >
-                                                    <span>
-                                                        Today's lecture was incredibly insightful!
-                                                        The explanation was clear and well-structured, especially the examples that tied theory to practical applications.
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="comment-response">
-                                            <div className="ava-holder">
-                                                <img src={default_ava} />
-                                            </div>
-                                            <div className="comment-content">
-                                                <div className="comment-content">
-                                                    <textarea
-                                                        ref={textareaRef}
-                                                        style={{ height: `${textAreaHeight}px` }}
-                                                        placeholder="Write your comment..."
-                                                        className="comment-entering"
-                                                        value={value}
-                                                        onChange={(e) => setValue(e.target.value)}
-                                                    >
-                                                    </textarea>
-                                                    <div className="button-container">
-                                                        <button className="cancel">Cancel</button>
-                                                        <button className="comment">Comment</button>
-                                                    </div>
+                                                </textarea>
+                                                <div className="button-container">
+                                                    <button className="cancel">Cancel</button>
+                                                    <button className="comment">Comment</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </>)
-                        )}
-
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         </>

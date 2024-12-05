@@ -7,6 +7,7 @@ import "../../assets/css/LectureAdd.css";
 import default_image from "../../assets/img/default_image.png";
 import DiagCreateSuccessfully from "../../components/diag/DiagCreateSuccessfully";
 import { APIStatus } from "../../constants/constants";
+import { getVideoType } from "../../functions/function";
 import { postAddLecture } from "../../services/courseService";
 
 const AddNewLecture = () => {
@@ -46,19 +47,6 @@ const AddNewLecture = () => {
         // Implement your deletion logic here
         const updatedFiles = lectureData.SupportMaterials.filter((_, i) => i !== index);
         setLectureData({ ...lectureData, SupportMaterials: updatedFiles });
-    };
-
-    const getVideoType = (fileName) => {
-        // Check if the file name ends with a specific extension
-        if (fileName.endsWith('.mp4')) {
-            return 'video/mp4';
-        } else if (fileName.endsWith('.webm')) {
-            return 'video/webm';
-        } else if (fileName.endsWith('.ogg')) {
-            return 'video/ogg';
-        } else {
-            return ''; // If the type is not recognized
-        }
     };
 
     const createNewLecture = async (idList, lectureData) => {

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+
 import { BsFiletypePdf } from "react-icons/bs";
 import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { ImSpinner2 } from "react-icons/im";
 import { IoMdOpen } from "react-icons/io";
 import { RiChat3Line } from "react-icons/ri";
 import "../../assets/css/Detail.css";
@@ -17,6 +19,8 @@ const TeacherDetail = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [loading, setLoading] = useState(false);
+
     const [listCourse, setListCourse] = useState([])
     const [totalCourseTracks, setTotalCourseTracks] = useState(0)
     const [idRole, setIDRole] = useState("")
@@ -25,16 +29,24 @@ const TeacherDetail = (props) => {
 
 
     const fetchTeacherDetail = async (idTeacher) => {
-        let response = await getTeacherDetail(idTeacher);
-        let data = response.data;
-        setTeacherInfo(data);
-        data.courses.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-        if (data.courses.length > 6) {
-            setTotalCourseTracks(3);
+        setLoading(true);
+        try {
+            let response = await getTeacherDetail(idTeacher);
+            let data = response.data;
+            setTeacherInfo(data);
+            data.courses.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+            if (data.courses.length > 6) {
+                setTotalCourseTracks(3);
+            }
+            else
+                setTotalCourseTracks(Math.ceil(data.courses.length / 2))
+            setListCourse(data.courses)
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
         }
-        else
-            setTotalCourseTracks(Math.ceil(data.courses.length / 2))
-        setListCourse(data.courses)
+
     };
 
     useEffect(() => {
@@ -47,9 +59,17 @@ const TeacherDetail = (props) => {
         }
     }, []);
 
+    if (loading) {
+        return (
+            <div className="loading-page">
+                <ImSpinner2 color="#397979" />
+            </div>
+        ); // Show loading while waiting for API response
+    }
+
     return (
         <div className="detail-container">
-            <div className="left-container">
+            <div className="left-container slide-to-right">
                 <div className="block-container">
                     <img className="biography-ava teacher" src={teacherInfo.teacherAvatar !== null ? teacherInfo.teacherAvatar : default_ava} alt="teacher avatar" />
                     <div className="biography-block">
@@ -122,7 +142,7 @@ const TeacherDetail = (props) => {
 
             </div>
 
-            <div className="right-container">
+            <div className="right-container slide-to-left">
 
                 {teacherInfo.qualificationModels && teacherInfo.qualificationModels.length !== 0 && (
                     <div className="block-container">

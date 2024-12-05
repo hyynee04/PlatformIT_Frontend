@@ -27,6 +27,7 @@ const CenterCard = (props) => {
                     }
                 });
             }}
+            style={{ cursor: "pointer" }}
         >
             <div className='center-card-container'>
                 <img src={center.avatarPath || default_image} alt="center image" />

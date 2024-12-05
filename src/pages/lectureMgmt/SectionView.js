@@ -7,7 +7,7 @@ const SectionView = (props) => {
     const [isShowed, setIsShowed] = useState(false)
     const idRole = localStorage.getItem("idRole")
     return (
-        <div className="section-view-container">
+        <div className="section-view-container slide-to-bottom">
             <div className="section-header">
                 <span className="header-title">Course Content</span>
                 <span className="header-info">4 sections - 10 lectures</span>

@@ -49,11 +49,14 @@ const CourseCard = (props) => {
 
   useEffect(() => {
     getCourseStatus(course);
-  }, [])
+  }, [course])
 
   return (
     <div className="outside-card">
-      <BsPinAngleFill />
+      {(course.isEnrolled || course.idTeacher === +localStorage.getItem("idUser")) && (
+        <BsPinAngleFill />
+      )}
+
       <div className="card-container">
         <div
           className="course-card-container"
@@ -66,7 +69,7 @@ const CourseCard = (props) => {
           )}
           <img
             src={course.pathImg !== null ? course.pathImg : default_image}
-            alt="course image"
+            alt="course background"
           />
 
           <div className="course-card-body">
@@ -127,7 +130,9 @@ const CourseCard = (props) => {
           className="card-container card-container-hover"
           onMouseLeave={() => setIsHover(false)}
         >
-          <BsPinAngleFill className="pin-hover" />
+          {(course.isEnrolled || course.idTeacher === +localStorage.getItem("idUser")) && (
+            <BsPinAngleFill className="pin-hover" />
+          )}
           <div className="course-card-container course-card-hover">
             {course.isLimitedTime === 1 && (
               <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>
@@ -136,7 +141,7 @@ const CourseCard = (props) => {
             )}
             <img
               src={course.pathImg !== null ? course.pathImg : default_image}
-              alt="course image"
+              alt="course background"
             />
 
             <div className="course-card-body course-card-body-hover">

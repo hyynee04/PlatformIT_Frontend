@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
     LuArrowRight,
     LuChevronDown,
@@ -13,12 +14,14 @@ import CenterCard from "../components/Card/CenterCard";
 import CourseCard from "../components/Card/CourseCard";
 import TeacherCard from "../components/Card/TeacherCard";
 import { Object } from "../constants/constants";
+import { getPagination } from "../functions/function";
 import { getAllCenterCards } from "../services/centerService";
 import { getAllCourseCards, getAllTagModel } from "../services/courseService";
 import { getAllTeacherCards } from "../services/userService";
 
 const ViewAll = () => {
     const location = useLocation();
+    const [loading, setLoading] = useState(false);
     const [statusPage, setStatusPage] = useState(1)
     const [menuIndex, setMenuIndex] = useState(1)
     const menuItems = [
@@ -65,10 +68,16 @@ const ViewAll = () => {
         "teacherPage": 1,
         "centerPage": 1
     });
-    const itemsPerPage = 12;
+    const itemsPerPage = 24;
     const [currentCourses, setCurrentCourses] = useState([])
     const [currentTeachers, setCurrentTeachers] = useState([])
     const [currentCenters, setCurrentCenters] = useState([])
+
+    const paginationNumbers = {
+        course: getPagination(currentPage.coursePage, Math.ceil(currentCourses.length / itemsPerPage)),
+        teacher: getPagination(currentPage.teacherPage, Math.ceil(currentTeachers.length / itemsPerPage)),
+        center: getPagination(currentPage.centerPage, Math.ceil(currentCenters.length / itemsPerPage)),
+    }
 
     useEffect(() => {
         handleChangeData(
@@ -287,7 +296,18 @@ const ViewAll = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
         fetchAllTagModels();
-
+        setLoading(true);
+        const fetchAllCards = async () => {
+            try {
+                await fetchAllCourseCards();
+                await fetchAllTeacherCards();
+                await fetchAllCenterCards();
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
         const state = location.state;
         if (state && state.listContent && state.object) {
             setStatusPage(2)
@@ -306,6 +326,7 @@ const ViewAll = () => {
                 setCenterList(state.listContent);
                 setCurrentCenters(state.listContent);
             }
+            setLoading(false);
         } else if (state && state.object) {
             setStatusPage(1)
             if (state.object === Object.course) {
@@ -320,10 +341,7 @@ const ViewAll = () => {
                 setMenuIndex(3);
                 localStorage.setItem("menuIndex", 3);
             }
-
-            fetchAllCourseCards();
-            fetchAllTeacherCards();
-            fetchAllCenterCards();
+            fetchAllCards();
         }
     }, [])
 
@@ -691,7 +709,6 @@ const ViewAll = () => {
                                 </div>
                             </div>
                         )
-
                     }
 
                     <div className="box-footer">
@@ -801,87 +818,103 @@ const ViewAll = () => {
             </div>
 
             <div className="viewall-main-section">
-                {menuIndex &&
-                    menuIndex === 1 ?
-                    (
-                        <>
-                            <div className="all-cards-container course">
-                                {currentCourses.length !== 0 && currentItemsPage.coursePage.map((course) => (
-                                    <div className="one-card-container">
-                                        <CourseCard
-                                            key={"course" + course.idCourse}
-                                            course={course}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="pagination">
-                                {Array.from({ length: Math.ceil(currentCourses.length / itemsPerPage) }, (_, index) => (
-                                    <button
-                                        key={index + 1}
-                                        onClick={() => setCurrentPage({ ...currentPage, "coursePage": index + 1 })}
-                                        className={currentPage.coursePage === index + 1 ? 'active' : ''}
-                                    >
-                                        {index + 1}
-                                    </button>
-                                ))}
-                            </div>
-                        </>
-                    )
-                    :
-                    (menuIndex === 2 ?
+                {loading ? (
+                    <div className="loading-page component">
+                        <ImSpinner2 color="#397979" />
+                    </div>
+                ) : (<>
+                    {menuIndex &&
+                        menuIndex === 1 ?
                         (
                             <>
-                                <div className="all-cards-container teacher">
-                                    {currentTeachers.length !== 0 && currentItemsPage.teacherPage.map((teacher) => (
+                                <div key={menuIndex} className="all-cards-container course slide-to-right">
+                                    {currentCourses.length !== 0 && currentItemsPage.coursePage.map((course) => (
                                         <div className="one-card-container">
-                                            <TeacherCard
-                                                key={"teacher" + teacher.idUser}
-                                                teacher={teacher}
+                                            <CourseCard
+                                                key={"course" + course.idCourse}
+                                                course={course}
                                             />
                                         </div>
                                     ))}
                                 </div>
                                 <div className="pagination">
-                                    {Array.from({ length: Math.ceil(currentTeachers.length / itemsPerPage) }, (_, index) => (
+                                    {paginationNumbers.course.map((number, index) => (
                                         <button
-                                            key={index + 1}
-                                            onClick={() => setCurrentPage({ ...currentPage, "teacherPage": index + 1 })}
-                                            className={currentPage.teacherPage === index + 1 ? 'active' : ''}
+                                            key={index}
+                                            onClick={() =>
+                                                typeof number === "number" && setCurrentPage({ ...currentPage, "coursePage": number })
+                                            }
+                                            className={number === currentPage.coursePage ? "active" : ""}
+                                            disabled={number === "..."}
                                         >
-                                            {index + 1}
+                                            {number}
                                         </button>
                                     ))}
                                 </div>
                             </>
                         )
                         :
-                        (
-                            <>
-                                <div className="all-cards-container center">
-                                    {currentCenters.length !== 0 && currentItemsPage.centerPage.map((center) => (
-                                        <div className="one-card-container">
-                                            <CenterCard
-                                                key={"center" + center.idCenter}
-                                                center={center}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="pagination">
-                                    {Array.from({ length: Math.ceil(currentCenters.length / itemsPerPage) }, (_, index) => (
-                                        <button
-                                            key={index + 1}
-                                            onClick={() => setCurrentPage({ ...currentPage, "centerPage": index + 1 })}
-                                            className={currentPage.centerPage === index + 1 ? 'active' : ''}
-                                        >
-                                            {index + 1}
-                                        </button>
-                                    ))}
-                                </div>
-                            </>
-                        )
-                    )}
+                        (menuIndex === 2 ?
+                            (
+                                <>
+                                    <div key={menuIndex} className="all-cards-container teacher slide-to-right">
+                                        {currentTeachers.length !== 0 && currentItemsPage.teacherPage.map((teacher) => (
+                                            <div className="one-card-container">
+                                                <TeacherCard
+                                                    key={"teacher" + teacher.idUser}
+                                                    teacher={teacher}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="pagination">
+                                        {paginationNumbers.teacher.map((number, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() =>
+                                                    typeof number === "number" && setCurrentPage({ ...currentPage, "teacherPage": number })
+                                                }
+                                                className={number === currentPage.teacherPage ? "active" : ""}
+                                                disabled={number === "..."}
+                                            >
+                                                {number}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )
+                            :
+                            (
+                                <>
+                                    <div key={menuIndex} className="all-cards-container center slide-to-right">
+                                        {currentCenters.length !== 0 && currentItemsPage.centerPage.map((center) => (
+                                            <div className="one-card-container">
+                                                <CenterCard
+                                                    key={"center" + center.idCenter}
+                                                    center={center}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="pagination">
+                                        {paginationNumbers.center.map((number, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() =>
+                                                    typeof number === "number" && setCurrentPage({ ...currentPage, "centerPage": number })
+                                                }
+                                                className={number === currentPage.centerPage ? "active" : ""}
+                                                disabled={number === "..."}
+                                            >
+                                                {number}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )
+                        )}
+                </>)
+                }
             </div>
         </div>
     )

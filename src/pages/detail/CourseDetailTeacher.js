@@ -4,9 +4,9 @@ import { ImSpinner2 } from "react-icons/im";
 import {
     LuCalendar,
     LuCheck,
-    LuCheckSquare,
     LuClock,
     LuFileEdit,
+    LuFileQuestion,
     LuMail,
     LuMinus,
     LuPenLine,
@@ -14,13 +14,14 @@ import {
     LuTrash2,
     LuX
 } from "react-icons/lu";
-import { RiGroupLine } from "react-icons/ri";
 import "../../assets/css/Detail.css";
 
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { RiGroupLine } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
 import { APIStatus } from "../../constants/constants";
+import { formatDate } from "../../functions/function";
 import { getCourseProgress, postAddBoardNotificationForCourse, postAddSection } from "../../services/courseService";
 
 
@@ -315,36 +316,53 @@ const CourseDetailTeacher = (props) => {
 
                     <div className="block-container">
                         <span className="block-container-title">Test</span>
-                        <div className="block-container-col">
-                            <div className="qualification test">
-                                <div className="qualification-body">
-                                    <div className="test-header">
-                                        <span className="test-name teacher-view">Title</span>
-                                    </div>
+                        {courseInfo.tests && courseInfo.tests.length !== 0 && (
+                            <div className="block-container-col">
+                                {courseInfo.tests.map((test, index) => (
+                                    <div key={index} className="qualification test">
+                                        <div className="qualification-body">
+                                            <div className="test-header">
+                                                <span className="test-name teacher-view">{test.assignmentTitle}</span>
+                                            </div>
 
-                                    <div className="test-description">
-                                        <span>
-                                            <LuFileEdit /> Manual
-                                        </span>
-                                        <span>
-                                            <LuClock /> 45 mins
-                                        </span>
-                                        <span>
-                                            <LuCheckSquare /> 40 marks
-                                        </span>
-                                        <span>
-                                            <LuCalendar />
-                                            Due date: 11/20/2025
-                                        </span>
-                                    </div>
-                                </div>
+                                            <div className="test-description">
+                                                {test.assignmentType && (
+                                                    <span>
+                                                        <LuFileEdit /> {test.assignmentTypeDesc}
+                                                    </span>
+                                                )}
 
-                                <div className="test-status">
-                                    <span>4/15 <RiGroupLine /></span>
-                                    <div className="test-status-text">Unpublish</div>
-                                </div>
+                                                {test.duration > 0 && (
+                                                    <span>
+                                                        <LuClock /> {test.duration} mins
+                                                    </span>
+                                                )}
+                                                {test.questionQuantity > 0 && (
+                                                    <span>
+                                                        <LuFileQuestion /> {test.questionQuantity} questions
+                                                    </span>
+                                                )}
+                                                {test.dueDate && (
+                                                    <span>
+                                                        <LuCalendar />
+                                                        {formatDate(test.dueDate)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="test-status">
+                                            <span>{test.finishedStudentCount}/{courseInfo.studentCount} <RiGroupLine /></span>
+                                            <div className={`test-status-text ${courseInfo.isPublish ? "is-published" : "unpublish"}`}>
+                                                {courseInfo.isPublish ? "Published" : "Unpublish"}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
                             </div>
-                        </div>
+                        )}
+
                         <button
                             className="add-section-btn"
                             onClick={() => {

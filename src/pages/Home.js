@@ -60,8 +60,9 @@ const Home = (props) => {
 
   const getCourseCards = async () => {
     setLoading(true);
+    const idStudent = +localStorage.getItem("idUser")
     try {
-      let response = await getAllCourseCards();
+      let response = await getAllCourseCards(idStudent);
       let courses = response.data;
       //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
       if (courses.length > 12) {
@@ -102,7 +103,7 @@ const Home = (props) => {
     <div>
       <div className="home-main-container">
         {role && (role === Role.guest || role === Role.student) && (
-          <div className="introduction-container">
+          <div className="introduction-container slide-to-bottom">
             <div className="left-introduction">
               <span className="introduction-brand-title">
                 WELCOME TO <b>PLAIT</b>
@@ -124,7 +125,7 @@ const Home = (props) => {
             </div>
           </div>
         )}
-        <div className="carousel-container">
+        <div className="carousel-container slide-to-right">
           <div className="carousel-header">
             <span>Newest Courses</span>
             <button
@@ -147,7 +148,7 @@ const Home = (props) => {
             listInfo={listCourse}
           />
         </div>
-        <div className="carousel-container">
+        <div className="carousel-container slide-to-right">
           <div className="carousel-header">
             <span>Top Teachers</span>
             <button
@@ -170,7 +171,7 @@ const Home = (props) => {
             listInfo={listTeacher}
           />
         </div>
-        <div className="carousel-container">
+        <div className="carousel-container slide-to-left">
           <div className="carousel-header">
             <span>Top Centers</span>
             <button

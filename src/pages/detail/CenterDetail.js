@@ -1,5 +1,6 @@
 import { BsFiletypePdf } from "react-icons/bs";
 import { GrLocation } from "react-icons/gr";
+import { ImSpinner2 } from "react-icons/im";
 import { IoMdOpen } from "react-icons/io";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
 import { LuFile, LuMail, LuPhone } from "react-icons/lu";
@@ -20,6 +21,8 @@ const CenterDetail = (props) => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [loading, setLoading] = useState(false);
+
     const [listTeacher, setListTeacher] = useState([]);
     const [totalTeacherTracks, setTotalTeacherTracks] = useState(0);
 
@@ -32,36 +35,44 @@ const CenterDetail = (props) => {
     const [centerInfo, setCenterInfo] = useState({});
 
     const fetchCenterDetail = async (idCenter) => {
-        let response = await getCenterDetail(idCenter);
-        let data = response.data;
-        setCenterInfo(data);
+        setLoading(true);
+        try {
+            let response = await getCenterDetail(idCenter);
+            let data = response.data;
+            setCenterInfo(data);
 
-        // Set center's Courses Carousel
-        if (data.courseCards && data.courseCards.length > 0) {
-            data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-            setTotalCourseTracks(data.courseCards.length > 6 ? 3 : Math.ceil(data.courseCards.length / 2));
-            setListCourse(data.courseCards);
-        } else {
-            console.warn("No courseCards data available");
+            // Set center's Courses Carousel
+            if (data.courseCards && data.courseCards.length > 0) {
+                data.courseCards.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+                setTotalCourseTracks(data.courseCards.length > 6 ? 3 : Math.ceil(data.courseCards.length / 2));
+                setListCourse(data.courseCards);
+            } else {
+                console.warn("No courseCards data available");
+            }
+
+            // Set center's Teachers Carousel
+            if (data.teacherCards && data.teacherCards.length > 0) {
+                data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
+                setTotalTeacherTracks(data.teacherCards.length > 6 ? 3 : Math.ceil(data.teacherCards.length / 2));
+                setListTeacher(data.teacherCards);
+            } else {
+                console.warn("No teacherCards data available");
+            }
+
+            // Set top tags
+            if (data.listTagCourses && data.listTagCourses.length > 0) {
+                const tagList = data.listTagCourses
+                    .sort((a, b) => b.courseCount - a.courseCount) // Sort descending by courseCount
+                    .slice(0, 20); // Take first 20 elements
+
+                setTopTags(tagList)
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
         }
 
-        // Set center's Teachers Carousel
-        if (data.teacherCards && data.teacherCards.length > 0) {
-            data.teacherCards.sort((a, b) => b.coursesCount - a.coursesCount);
-            setTotalTeacherTracks(data.teacherCards.length > 6 ? 3 : Math.ceil(data.teacherCards.length / 2));
-            setListTeacher(data.teacherCards);
-        } else {
-            console.warn("No teacherCards data available");
-        }
-
-        // Set top tags
-        if (data.listTagCourses && data.listTagCourses.length > 0) {
-            const tagList = data.listTagCourses
-                .sort((a, b) => b.courseCount - a.courseCount) // Sort descending by courseCount
-                .slice(0, 20); // Take first 20 elements
-
-            setTopTags(tagList)
-        }
     };
 
     useEffect(() => {
@@ -75,9 +86,17 @@ const CenterDetail = (props) => {
         }
     }, []);
 
+    if (loading) {
+        return (
+            <div className="loading-page">
+                <ImSpinner2 color="#397979" />
+            </div>
+        ); // Show loading while waiting for API response
+    }
+
     return (
         <div className="detail-container">
-            <div className="left-container">
+            <div className="left-container slide-to-right">
                 <div className="block-container">
                     <img className="biography-ava center" src={centerInfo.avatarPath ? centerInfo.avatarPath : default_image} alt="center background" />
                     <div className="biography-block">
@@ -182,7 +201,7 @@ const CenterDetail = (props) => {
 
             </div>
 
-            <div className="right-container">
+            <div className="right-container slide-to-left">
                 {centerInfo.workingHourModel && centerInfo.workingHourModel.length !== 0 && (
                     <div className="block-container">
                         <span className="block-container-title">Working hours</span>

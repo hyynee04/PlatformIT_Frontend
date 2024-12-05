@@ -2,6 +2,40 @@ import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
 import { NotificationType } from "../constants/constants";
 
+export const getPagination = (currentPage, totalPages) => {
+  if (totalPages <= 5) {
+    // Show all pages if there are 5 or fewer
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  } else {
+    // Logic for more than 5 pages
+    if (currentPage <= 3) {
+      // Show first few pages if current page is near the start
+      return [1, 2, 3, 4, "...", totalPages];
+    } else if (currentPage >= totalPages - 2) {
+      // Show last few pages if current page is near the end
+      return [
+        1,
+        "...",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    } else {
+      // Show current page in the middle with surrounding pages
+      return [
+        1,
+        "...",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "...",
+        totalPages,
+      ];
+    }
+  }
+};
+
 export const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString("en-US", {
     month: "2-digit",
@@ -79,16 +113,13 @@ export const calculateRelativeTime = (timestamp) => {
   if (difference < 60)
     return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
   if (difference < 3600)
-    return `${Math.floor(difference / 60)} ${
-      Math.floor(difference / 60) > 1 ? "minutes" : "minute"
-    } ago`;
+    return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"
+      } ago`;
   if (difference < 86400)
-    return `${Math.floor(difference / 3600)} ${
-      Math.floor(difference / 3600) > 1 ? "hours" : "hour"
+    return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"
+      } ago`;
+  return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"
     } ago`;
-  return `${Math.floor(difference / 86400)} ${
-    Math.floor(difference / 86400) > 1 ? "days" : "day"
-  } ago`;
 };
 
 // Helper to parse "relativeTime" into a timestamp
@@ -106,4 +137,24 @@ export const parseRelativeTime = (relativeTime) => {
     return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
   }
   return now; // Default to current time if unrecognized format
+};
+
+export const getVideoType = (fileName) => {
+  // Check if the file name ends with a specific extension
+  if (fileName.endsWith('.mp4')) {
+    return 'video/mp4';
+  } else if (fileName.endsWith('.webm')) {
+    return 'video/webm';
+  } else if (fileName.endsWith('.ogg')) {
+    return 'video/ogg';
+  } else {
+    return ''; // If the type is not recognized
+  }
+};
+
+export const handleKeyDown = (event, handler) => {
+  console.log(event.key);
+  if (event.key === 'Enter') {
+    handler(); // Trigger passed handler function on Enter key press
+  }
 };

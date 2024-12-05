@@ -1,35 +1,39 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
+import { IoDuplicateSharp } from "react-icons/io5";
 import {
+  LuCalendar,
+  LuCheckSquare,
   LuChevronDown,
-  LuFilter,
-  LuMoreHorizontal,
+  LuChevronRight,
   LuClock4,
   LuFileEdit,
-  LuCheckSquare,
-  LuCalendar,
-  LuChevronRight,
+  LuFilter,
   LuMinusCircle,
+  LuMoreHorizontal,
   LuX,
 } from "react-icons/lu";
-import { FaTrashAlt } from "react-icons/fa";
-import { TiPlus } from "react-icons/ti";
 import { MdPublish } from "react-icons/md";
-import { IoDuplicateSharp } from "react-icons/io5";
-import { ImSpinner2 } from "react-icons/im";
+import { TiPlus } from "react-icons/ti";
+import { useNavigate } from "react-router-dom";
 import {
   APIStatus,
   AssignmentStatus,
   AssignmentType,
   Role,
 } from "../../constants/constants";
-import { useNavigate } from "react-router-dom";
 import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
   getAllTestCardOfStudent,
 } from "../../services/courseService";
 import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
-import { formatDateTime, formatTime } from "../../functions/function";
+import {
+  formatDateTime,
+  formatTime,
+  getPagination,
+} from "../../functions/function";
 
 const ListAssignMgmt = () => {
   const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
@@ -231,10 +235,9 @@ const ListAssignMgmt = () => {
   };
 
   //CREATED DATE
-  const groupedAssignments = useMemo(() => {
+  const flatAssignments = useMemo(() => {
     if (filteredAssignments.length === 0) return [];
 
-    // Nhóm assignments theo ngày (giữ nguyên timestamp để sắp xếp trong từng nhóm)
     const grouped = filteredAssignments.reduce((acc, assignment) => {
       let dateValue;
       if (idRole === Role.teacher) {
@@ -248,30 +251,62 @@ const ListAssignMgmt = () => {
           dateValue = assignment.submittedDate;
         }
       }
+
       const formattedDate = formatDate(dateValue);
       if (!acc[formattedDate]) acc[formattedDate] = [];
       acc[formattedDate].push(assignment);
       return acc;
     }, {});
 
-    // Chuyển grouped thành mảng và sắp xếp từng nhóm
+    // Chuyển grouped thành danh sách phẳng với ngày
     return Object.entries(grouped)
-      .map(([date, assignments]) => ({
-        date,
-        assignments: assignments.sort(
-          (a, b) =>
-            new Date(b.updatedDate || b.createdDate) -
-            new Date(a.updatedDate || a.createdDate)
-        ),
-        timestamp: new Date(
-          assignments[0].updatedDate || assignments[0].createdDate
-        ).getTime(),
-      }))
-      .sort((a, b) => b.timestamp - a.timestamp);
+      .map(([date, assignments]) =>
+        assignments.map((assignment) => ({
+          date,
+          ...assignment,
+        }))
+      )
+      .flat();
   }, [filteredAssignments]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 20; // Số lượng assignment trên mỗi trang
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const paginatedAssignments = flatAssignments.slice(firstIndex, lastIndex);
 
+  // Số trang
+  const npage = Math.ceil(flatAssignments.length / recordsPerPage);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
+
+  // Nhóm assignments theo ngày
+  const groupedAssignments = paginatedAssignments.reduce(
+    (groups, assignment) => {
+      const date = assignment.date; // Thuộc tính `date` của assignment
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(assignment);
+      return groups;
+    },
+    {}
+  );
+  //ANIMATION
+  const [className, setClassName] = useState("slide-to-right");
+  useEffect(() => {
+    if (activeStatus === 0 || activeStatus) {
+      setClassName("slide-to-right");
+      // Reset the class after 1 second
+      const timer = setTimeout(() => {
+        setClassName("");
+      }, 850);
+      // Cleanup timer in case activeStatus changes before timeout
+      return () => clearTimeout(timer);
+    }
+  }, [activeStatus]);
   const handleStatusClick = (status) => {
     setActiveStatus(status);
+    // setClassName("");
+    // setClassName("slide-to-right");
     setSearchTerm("");
     setSortField("createdDate");
     setTempSortField("createdDate");
@@ -604,193 +639,200 @@ const ListAssignMgmt = () => {
             )}
           </div>
         </div>
-        <div className="list-assign-container">
-          {groupedAssignments.map(({ date, assignments }, index) => {
-            return (
-              <div className="time-assign-container" key={index}>
-                <span className="create-time-assign">{date}</span>
-                {assignments.map((assignment, idx) => (
-                  <div
-                    className="assign-item"
-                    key={idx}
-                    onClick={() => {
-                      if (idRole === Role.teacher) {
-                        if (assignment.isPublish === 1) {
-                          navigate("/teacherAssignDetail", {
-                            state: {
-                              idAssignment: assignment.idAssignment,
-                            },
-                          });
-                        } else {
-                          navigate("/updateAssignment", {
-                            state: {
-                              idAssignment: assignment.idAssignment,
-                            },
-                          });
-                        }
-                      } else if (idRole === Role.student) {
+        <div className={`list-assign-container ${className}`}>
+          {Object.entries(groupedAssignments).map(([date, assignments]) => (
+            <div className="time-assign-container" key={date}>
+              <span className="create-time-assign ">{date}</span>
+              {assignments.map((assignment, idx) => (
+                <div
+                  className="assign-item"
+                  key={idx}
+                  onClick={() => {
+                    if (idRole === Role.teacher) {
+                      if (assignment.isPublish === 1) {
                         navigate("/teacherAssignDetail", {
                           state: {
                             idAssignment: assignment.idAssignment,
                           },
                         });
+                      } else {
+                        navigate("/updateAssignment", {
+                          state: {
+                            idAssignment: assignment.idAssignment,
+                          },
+                        });
                       }
-                    }}
-                  >
-                    <div className="row-item">
-                      <span
-                        className="title-assign"
-                        style={{ fontWeight: "bold" }}
-                      >
-                        {assignment.title}
-                      </span>
-                      {idRole === Role.teacher && (
-                        <button
-                          className="btn-option"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMoreIconClick(assignment);
-                          }}
-                        >
-                          <LuMoreHorizontal className="icon" />
-                        </button>
-                      )}
-                    </div>
-                    <div className="attribute-container">
-                      <div className="attribute-item">
-                        <LuFileEdit className="icon-attribute-assign" />
-                        <label htmlFor="">
-                          {assignment.assignmentType === AssignmentType.code
-                            ? "Code"
-                            : assignment.assignmentType === AssignmentType.quiz
-                            ? "Quiz"
-                            : "Manual"}
-                        </label>
-                      </div>
-                      {assignment.duration > 0 && (
-                        <div className="attribute-item">
-                          <LuClock4 className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            {assignment.duration} minutes
-                          </label>
-                        </div>
-                      )}
-                      <div className="attribute-item">
-                        <LuCheckSquare className="icon-attribute-assign" />
-                        <label htmlFor="">
-                          {assignment.questionQuantity}{" "}
-                          {assignment.questionQuantity > 1
-                            ? " questions"
-                            : "question"}
-                        </label>
-                      </div>
-                      {idRole === Role.teacher && assignment.startDate && (
-                        <div className="attribute-item">
-                          <LuCalendar className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            Start date: {formatDateTime(assignment.startDate)}
-                          </label>
-                        </div>
-                      )}
-                      {idRole === Role.teacher && assignment.dueDate && (
-                        <div className="attribute-item">
-                          <LuCalendar className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            Due date: {formatDateTime(assignment.dueDate)}
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                    <div className="row-item">
-                      <span
-                        style={{
-                          fontWeight: "400",
-                          color: "var(--text-gray)",
-                          fontSize: "15px",
+                    } else if (idRole === Role.student) {
+                      navigate("/teacherAssignDetail", {
+                        state: {
+                          idAssignment: assignment.idAssignment,
+                        },
+                      });
+                    }
+                  }}
+                >
+                  <div className="row-item">
+                    <span
+                      className="title-assign"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      {assignment.title}
+                    </span>
+                    {idRole === Role.teacher && (
+                      <button
+                        className="btn-option"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMoreIconClick(assignment);
                         }}
                       >
-                        Course: {assignment.nameCourse}
-                        {assignment.nameLecture && (
-                          <>
-                            <LuChevronRight
-                              className="icon"
-                              style={{ width: "18px", height: "auto" }}
-                            />
-                            {assignment.nameLecture}
-                          </>
-                        )}
-                      </span>
-                      {idRole === Role.teacher && (
-                        <span className="isExam-label">
-                          {assignment.isTest ? "Test" : "Exercise"}
-                        </span>
-                      )}
-                      {idRole === Role.student &&
-                        (assignment.submittedDate ? (
-                          <span className="submitted-label">
-                            {`Submitted at: ${formatTime(
-                              assignment.submittedDate
-                            )}`}
-                            <LuCheckSquare />
-                          </span>
-                        ) : (
-                          assignment.dueDate && (
-                            <span className="dueDate-label">
-                              {`Due: ${formatDateTime(assignment.dueDate)}`}
-                            </span>
-                          )
-                        ))}
+                        <LuMoreHorizontal className="icon" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="attribute-container">
+                    <div className="attribute-item">
+                      <LuFileEdit className="icon-attribute-assign" />
+                      <label htmlFor="">
+                        {assignment.assignmentType === AssignmentType.code
+                          ? "Code"
+                          : assignment.assignmentType === AssignmentType.quiz
+                          ? "Quiz"
+                          : "Manual"}
+                      </label>
                     </div>
-                    {selectedAssignment.idAssignment ===
-                      assignment.idAssignment && (
-                      <div
-                        ref={optionRef}
-                        className="container-options assignment-option"
-                      >
-                        {assignment.isPublish === 0 && (
-                          <button
-                            className="op-buts"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openPublishModal();
-                            }}
-                          >
-                            <span>Publish</span>
-                            <MdPublish />
-                          </button>
-                        )}
-                        <button
-                          className="op-buts"
-                          //onClick={handleOpenDeleteDiag}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/duplicateAssignment", {
-                              state: {
-                                idAssignment: assignment.idAssignment,
-                              },
-                            });
-                          }}
-                        >
-                          <span>Duplicate</span>
-                          <IoDuplicateSharp />
-                        </button>
-                        <button
-                          className="op-buts"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenDeleteDiag();
-                          }}
-                        >
-                          <span>Delete</span>
-                          <FaTrashAlt />
-                        </button>
+                    {assignment.duration > 0 && (
+                      <div className="attribute-item">
+                        <LuClock4 className="icon-attribute-assign" />
+                        <label htmlFor="">{assignment.duration} minutes</label>
+                      </div>
+                    )}
+                    <div className="attribute-item">
+                      <LuCheckSquare className="icon-attribute-assign" />
+                      <label htmlFor="">
+                        {assignment.questionQuantity}{" "}
+                        {assignment.questionQuantity > 1
+                          ? " questions"
+                          : "question"}
+                      </label>
+                    </div>
+                    {idRole === Role.teacher && assignment.startDate && (
+                      <div className="attribute-item">
+                        <LuCalendar className="icon-attribute-assign" />
+                        <label htmlFor="">
+                          Start date: {formatDateTime(assignment.startDate)}
+                        </label>
+                      </div>
+                    )}
+                    {idRole === Role.teacher && assignment.dueDate && (
+                      <div className="attribute-item">
+                        <LuCalendar className="icon-attribute-assign" />
+                        <label htmlFor="">
+                          Due date: {formatDateTime(assignment.dueDate)}
+                        </label>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                  <div className="row-item">
+                    <span
+                      style={{
+                        fontWeight: "400",
+                        color: "var(--text-gray)",
+                        fontSize: "15px",
+                      }}
+                    >
+                      Course: {assignment.nameCourse}
+                      {assignment.nameLecture && (
+                        <>
+                          <LuChevronRight
+                            className="icon"
+                            style={{ width: "18px", height: "auto" }}
+                          />
+                          {assignment.nameLecture}
+                        </>
+                      )}
+                    </span>
+                    {idRole === Role.teacher && (
+                      <span className="isExam-label">
+                        {assignment.isTest ? "Test" : "Exercise"}
+                      </span>
+                    )}
+                    {idRole === Role.student &&
+                      (assignment.submittedDate ? (
+                        <span className="submitted-label">
+                          {`Submitted at: ${formatTime(
+                            assignment.submittedDate
+                          )}`}
+                          <LuCheckSquare />
+                        </span>
+                      ) : (
+                        assignment.dueDate && (
+                          <span className="dueDate-label">
+                            {`Due: ${formatDateTime(assignment.dueDate)}`}
+                          </span>
+                        )
+                      ))}
+                  </div>
+                  {selectedAssignment.idAssignment ===
+                    assignment.idAssignment && (
+                    <div
+                      ref={optionRef}
+                      className="container-options assignment-option"
+                    >
+                      {assignment.isPublish === 0 && (
+                        <button
+                          className="op-buts"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openPublishModal();
+                          }}
+                        >
+                          <span>Publish</span>
+                          <MdPublish />
+                        </button>
+                      )}
+                      <button
+                        className="op-buts"
+                        //onClick={handleOpenDeleteDiag}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/duplicateAssignment", {
+                            state: {
+                              idAssignment: assignment.idAssignment,
+                            },
+                          });
+                        }}
+                      >
+                        <span>Duplicate</span>
+                        <IoDuplicateSharp />
+                      </button>
+                      <button
+                        className="op-buts"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDeleteDiag();
+                        }}
+                      >
+                        <span>Delete</span>
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
       {diagDeleteVisible && (
@@ -861,6 +903,9 @@ const ListAssignMgmt = () => {
       />
     </div>
   );
+  function changeCPage(id) {
+    setCurrentPage(id);
+  }
 };
 
 export default ListAssignMgmt;

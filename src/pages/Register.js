@@ -52,7 +52,7 @@ const Register = () => {
     setIsVisible(true);
     localStorage.setItem("verifiedEmail", "email");
 
-    fetch('\policy.txt')
+    fetch('/policy.txt')
       .then((response) => response.text())
       .then((text) => setFileContent(text))
       .catch((error) => console.error('Error loading text file:', error));
@@ -182,7 +182,7 @@ const Register = () => {
 
   return (
     <>
-      <div className={`register-container ${isVisible ? "slide-in" : ""}`}>
+      <div className={`register-container ${isVisible ? "slide-to-left" : ""}`}>
         <div className="mainpart-container">
           <div className="holder">
             <div className="mainpart-content">

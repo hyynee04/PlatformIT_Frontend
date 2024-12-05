@@ -14,14 +14,14 @@ const AboutUs = () => {
 
   return (
     <>
-      <div className="logo-aboutus-container">
+      <div className="logo-aboutus-container slide-to-top">
         <img className="fade-effect" src={logoPlait} />
         <img className="" src={logoPlait2} />
       </div>
-      <div className="horizontal-line">
+      <div className="horizontal-line slide-to-top">
         <span className="white-shadow-effect">WELCOME TO <span className="second-main-color-text white-shadow-effect">PLAIT</span> </span>
       </div>
-      <div className="frame">
+      <div className="frame slide-to-top">
         <span className="quote-sentence">An information technology learning platform that connects students and businesses for growth.</span>
         <span className="quote-sentence">We are committed to providing high-quality courses that enhance skills and knowledge in the IT field.</span>
       </div>

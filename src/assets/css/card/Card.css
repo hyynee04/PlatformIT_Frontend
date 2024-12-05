@@ -31,7 +31,8 @@
     height: fit-content;
 
     background-color: var(--white-color);
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    transition: width 0.3s ease, height 0.3s ease;
 }
 
 .card-container.hover:hover {
@@ -248,6 +249,8 @@
     left: 0;
     padding: 1rem 1.5rem;
     z-index: 2;
+    width: 275px;
+    transition: width 0.3s ease, height 0.3s ease;
 }
 
 .card-container > .course-card-container.course-card-hover {
@@ -289,7 +292,8 @@
 
 .card-container .course-card-container 
 .course-card-footer > .view-detail-btn:hover {
-    background-color: rgba(57, 121, 121, 0.8)
+    background-color: rgba(57, 121, 121, 0.8);
+    scale: 1.1;
 }
 
 /* Teacher Card */

@@ -6,12 +6,17 @@ import {
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
-import { LuChevronRight, LuFilter, LuChevronDown } from "react-icons/lu";
+import {
+  LuChevronRight,
+  LuFilter,
+  LuChevronDown,
+  LuMoreHorizontal,
+} from "react-icons/lu";
 import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/css/AssignmentDetail.css";
-import { formatDateTime } from "../../functions/function";
+import { formatDateTime, getPagination } from "../../functions/function";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -121,6 +126,38 @@ const AssignDetail = () => {
 
   const [tempSortField, setTempSortField] = useState("createdDate");
   const [tempSortOrder, setTempSortOrder] = useState("desc");
+  //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const records = questions.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(questions.length / recordsPerPage);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
+
+  //OPTION QUIZ
+  const [showOption, setShowOption] = useState(false);
+  const optionRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      // Kiểm tra nếu nhấp bên ngoài cả optionRef và buttonRef
+      if (
+        optionRef.current &&
+        !optionRef.current.contains(e.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target)
+      ) {
+        setShowOption(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   if (loading) {
     return (
       <div className="loading-page">
@@ -148,8 +185,70 @@ const AssignDetail = () => {
                     {totalQuestions}{" "}
                     {totalQuestions <= 1 ? "question" : "questions"}
                   </label>
+                  <button
+                    ref={buttonRef}
+                    className="btn"
+                    onClick={() => setShowOption(!showOption)}
+                  >
+                    <LuMoreHorizontal />
+                  </button>
                 </span>
               </div>
+              {showOption && (
+                <div
+                  className="container-options assign-setting-option published"
+                  ref={optionRef}
+                >
+                  <div className="item">
+                    <span>Question shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.isShufflingQuestion === 1}
+                        // onChange={(e) =>
+                        //   handleUpdateAssignment(
+                        //     "isShufflingQuestion",
+                        //     e.target.checked ? 1 : 0
+                        //   )
+                        // }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Answer shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.isShufflingAnswer === 1}
+                        // onChange={(e) =>
+                        //   handleUpdateAssignment(
+                        //     "isShufflingAnswer",
+                        //     e.target.checked ? 1 : 0
+                        //   )
+                        // }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Show answer on submission</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.showAnswer === 1}
+                        // onChange={(e) =>
+                        //   handleUpdateAssignment(
+                        //     "showAnswer",
+                        //     e.target.checked ? 1 : 0
+                        //   )
+                        // }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="info-row">
               <div className="name-container">
@@ -234,7 +333,7 @@ const AssignDetail = () => {
         <div className="questions-overview-container">
           {activeChoice === "question" && (
             <div className="questions-container">
-              {questions.map((question, index) => (
+              {records.map((question, index) => (
                 <div className="question-item" key={index}>
                   <div className="info-row">
                     <label className="question-idx">{`Question ${
@@ -753,9 +852,23 @@ const AssignDetail = () => {
             </div>
           )}
         </div>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
+  function changeCPage(id) {
+    setCurrentPage(id);
+  }
 };
 
 export default AssignDetail;

@@ -16,6 +16,7 @@ import SortByUserOfCenter from "../../components/SortByUserOfCenter";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
 import DiagAddUserForm from "../../components/diag/DiagAddUserForm";
 import UserOption from "../../components/option/UserOption";
+import { getPagination } from "../../functions/function";
 
 const CenterAdAdminMgmt = () => {
   const idUser = +localStorage.getItem("idUser");
@@ -312,51 +313,23 @@ const CenterAdAdminMgmt = () => {
               </tbody>
             </table>
           </div>
-          <div className="pagination-container">
-            <nav>
-              <ul className="pagination">
-                <li className="page-item">
-                  <button className="page-link" onClick={prePage}>
-                    <LuChevronLeft />
-                  </button>
-                </li>
-                {numbers.map((n, i) => (
-                  <li
-                    className={`page-item ${currentPage === n ? "active" : ""}`}
-                    key={i}
-                  >
-                    <button
-                      className="page-link btn"
-                      onClick={() => changeCPage(n)}
-                    >
-                      {n}
-                    </button>
-                  </li>
-                ))}
-                <li className="page-item">
-                  <button className="page-link" onClick={nextPage}>
-                    <LuChevronRight />
-                  </button>
-                </li>
-              </ul>
-            </nav>
+          <div className="pagination">
+            {getPagination(currentPage, npage).map((n, i) => (
+              <button
+                key={i}
+                className={`page-item ${currentPage === n ? "active" : ""}`}
+                onClick={() => changeCPage(n)}
+              >
+                {n}
+              </button>
+            ))}
           </div>
         </div>
       </div>
     </div>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

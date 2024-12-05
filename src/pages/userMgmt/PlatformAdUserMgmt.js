@@ -22,6 +22,7 @@ import {
 import { fetchAllUsers } from "../../store/userSlice";
 
 import "../../assets/css/UserMgmt.css";
+import { getPagination } from "../../functions/function";
 
 const PlatformAdUserMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -393,24 +394,16 @@ const PlatformAdUserMgmt = () => {
             </tbody>
           </table>
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>

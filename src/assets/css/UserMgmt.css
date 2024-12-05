@@ -32,9 +32,12 @@
 }
 .role-users-group > .role-btn {
   background-color: #fafafa;
-  border: none;
+  border-bottom: 3px solid #fafafa;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   padding: 6px;
-  font-weight: 580;
+  font-weight: 600;
   font-size: 16px;
   color: var(--text-gray);
   min-width: 100px;
@@ -43,6 +46,7 @@
 }
 .role-users-group > .role-btn:hover {
   background-color: rgba(57, 121, 121, 0.1);
+  border-bottom: 3px solid rgba(57, 121, 121, 0.1);
 }
 .role-users-group > .role-btn.active {
   color: var(--main-color);
@@ -301,7 +305,7 @@ td {
     rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;
   border: none;
 }
-.pagination-container {
+/* .pagination-container {
   margin: 12px 72px;
   display: flex;
   flex-direction: row;
@@ -322,7 +326,7 @@ td {
   border-radius: 8px;
   color: var(--main-color);
   text-justify: center;
-}
+} */
 .user-option {
   position: absolute;
   top: 100%;

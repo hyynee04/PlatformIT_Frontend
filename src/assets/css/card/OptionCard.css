@@ -17,7 +17,7 @@
   border: none;
   background-color: var(--white-color);
   padding: 2px 4px;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 .container-options .op-buts:hover {
   background-color: rgba(217, 217, 217, 0.4);
@@ -45,6 +45,11 @@
   position: absolute;
   right: 24px;
   top: 36px;
+}
+.assign-setting-option.published {
+  position: absolute;
+  right: 0;
+  top: 30px;
 }
 .assign-setting-option .item {
   padding: 8px 12px;

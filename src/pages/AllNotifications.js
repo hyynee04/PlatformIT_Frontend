@@ -127,7 +127,7 @@ const AllNotifications = () => {
                     <ImSpinner2 color="#397979" />
                 </div>
             ) : (
-                <div className={`notification-display-block ${!loading ? "slide-in" : ""}`}>
+                <div className={`notification-display-block ${!loading ? "slide-to-left" : ""}`}>
                     <div className="container-header">
                         <div className="header-content">
                             <span className="container-title">Notifications</span>

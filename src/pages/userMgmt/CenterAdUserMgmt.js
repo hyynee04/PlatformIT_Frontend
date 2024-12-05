@@ -20,6 +20,7 @@ import {
 } from "../../store/listUserOfCenter";
 
 import "../../assets/css/UserMgmt.css";
+import { getPagination } from "../../functions/function";
 
 const CenterAdUserMgmt = () => {
   const dispatch = useDispatch();
@@ -313,50 +314,22 @@ const CenterAdUserMgmt = () => {
             </tbody>
           </table>
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

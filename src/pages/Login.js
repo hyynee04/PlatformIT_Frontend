@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
 import { FaGooglePlusG } from "react-icons/fa";
@@ -99,7 +99,7 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (username, password) => {
     let response = await postLogin(username, password);
     let data = response.data;
     if (data && data.idUser) {
@@ -166,16 +166,36 @@ const Login = () => {
   const handleLoginThirdParty = async (base) => {
     if (base === "Google")
       window.location.href = "http://localhost:5000/api/Authen/login-google";
-    // else if (base === "Facebook")
-    //   window.location.href = "http://localhost:5000/api/Authen/login-facebook";
     else window.location.href = "http://localhost:5000/api/Authen/login-github";
-
-    // window.open("http://localhost:5000/api/Authen/login-google")
   };
+
+  const usernameRef = useRef(username);
+  const passwordRef = useRef(password);
+
+  useEffect(() => {
+    usernameRef.current = username;
+    passwordRef.current = password;
+  }, [username, password]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Enter') {
+        handleLogin(usernameRef.current, passwordRef.current); // Access refs instead of state
+      }
+    };
+
+    // Add the event listener for keydown
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
-      <div className={`login-container ${isVisible ? "slide-in" : ""}`}>
+      <div className={`login-container ${isVisible ? "slide-to-left" : ""}`}>
         <div className="sidepart-container">
           <div className="sidepart-header">
             <div className="header">
@@ -264,7 +284,7 @@ const Login = () => {
             <div className="mainpart-content">
               <button
                 className="signin-button"
-                onClick={() => handleLogin()}
+                onClick={() => handleLogin(username, password)}
                 disabled={isFailed}
               >
                 Sign in

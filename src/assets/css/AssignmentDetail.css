@@ -17,6 +17,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 .main-contain-assign .assign-info .info-row .detail-info {
   display: flex;
@@ -43,6 +44,33 @@
   font-size: 14px;
   font-weight: 700;
 }
+.main-contain-assign
+  .assign-info
+  .info-row
+  .detail-info
+  .marks-questions
+  > .btn {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  padding: 4px;
+  color: var(--text-gray);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.main-contain-assign
+  .assign-info
+  .info-row
+  .detail-info
+  .marks-questions
+  > .btn:hover {
+  background-color: var(--border-gray);
+}
+
 .main-contain-assign
   .assign-info
   .info-row

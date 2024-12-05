@@ -88,7 +88,7 @@
 .block-container .biography-block > .course-card-price {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .detail-container .left-container 
@@ -102,16 +102,34 @@
     font-size: 2rem;
     font-weight: 800;
     color: var(--second-main-color);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.detail-container .left-container 
+.block-container .biography-block .course-card-price .discount-price > svg {
+    margin-left: -5px;
 }
 
 .detail-container .left-container 
 .block-container .biography-block .course-card-price > .initial-price {
     font-size: 1rem;
     font-weight: 500;
+    height: fit-content;
     color: var(--text-gray);
     text-decoration: line-through;
     text-decoration-color: var(--red-color);
     align-self: normal;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.detail-container .left-container 
+.block-container .biography-block .course-card-price .initial-price > svg {
+    margin-left: -3px;
 }
 
 .detail-container .left-container .block-container .biography-block > .teacher-information,
@@ -461,12 +479,12 @@
     gap: 5px;
 
     font-size: 1rem;
-    font-weight: 400;
-    color: var(--main-color);
-    background-color: var(--white-color);
+    font-weight: 600;
+    color: var(--black-color);
+    background-color: rgba(57, 121, 121, 0.4);
 
-    border: 1px solid var(--main-color);
-    border-radius: .5rem;
+    border: none;
+    border-radius: .25rem;
     cursor: pointer;
 
     width: fit-content;
@@ -479,12 +497,22 @@
 }
 
 .detail-container .left-container .block-container > .chat-button:hover {
-    background-color: rgba(57, 121, 121, 0.2);
+    background-color: rgba(57, 121, 121, 0.3);
+    scale: 1.1;
+    animation: wobble 0.5s linear; 
 }
 
 .detail-container .left-container .block-container .chat-button > svg {
     width: 1.2rem;
     height: 1.2rem;
+}
+
+@keyframes wobble {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(-5deg); } /* Slight tilt to the left */
+    50% { transform: rotate(5deg); }  /* Slight tilt to the right */
+    75% { transform: rotate(-3deg); } /* Slight correction to the left */
+    100% { transform: rotate(0); }    /* Back to neutral */
 }
 
 .detail-container .left-container .block-container 
@@ -567,7 +595,7 @@
 
     overflow: hidden;
     height: auto;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.5s ease-out;
 
     opacity: 1;
 }
@@ -577,7 +605,7 @@
     height: 0;
     border: none;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.5s ease;
 }
 
 .detail-container .right-container .block-container 
@@ -623,8 +651,10 @@
 }
 
 .detail-container .right-container .block-container 
-.block-container-col .lecture > .lecture-header.change-border-radius {
+.block-container-col .lecture > .lecture-header.change-header {
     border-radius: .5rem;
+    background-color: rgba(217, 217, 217, 0.5);
+
 }
 
 .detail-container .right-container .block-container 
@@ -855,6 +885,10 @@
     width: 20%;
     height: fit-content;
 }
+.detail-container .right-container .block-container 
+.block-container-col .qualification .qualification-body .test-header > .test-info.submitted {
+    color: var(--green-color);
+}
 
 .detail-container .right-container .block-container 
 .block-container-col .qualification .qualification-body .test-header > .test-info.past-due {
@@ -924,11 +958,18 @@
 .block-container-col .qualification .test-status > .test-status-text {
     padding: .3rem 1.8rem;
     background-color: var(--border-gray);
-    color: var(--text-gray);
     font-size: .8rem;
 
     border: none;
     border-radius: .5rem;
+}
+.detail-container .right-container .block-container 
+.block-container-col .qualification .test-status > .test-status-text.unpublish {
+    color: var(--text-gray);
+}
+.detail-container .right-container .block-container 
+.block-container-col .qualification .test-status > .test-status-text.is-published {
+    color: var(--green-color);
 }
 
 .detail-container .left-container .block-container 

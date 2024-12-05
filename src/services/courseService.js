@@ -1,8 +1,12 @@
 import { AssignmentType } from "../constants/constants";
 import axios from "../utils/axiosCustomize";
 
-const getAllCourseCards = () => {
-  return axios.get("api/Course/GetAllCourseCards");
+const getAllCourseCards = (idStudent) => {
+  return axios.get("api/Course/GetAllCourseCards", {
+    params: {
+      idStudent: idStudent
+    }
+  });
 };
 const getAllCourseCardsByIdCenter = (idCenter) => {
   return axios.get("api/Course/GetAllCourseCardsByIdCenter", {
@@ -470,6 +474,14 @@ const postAddLecture = async (idList, lectureData) => {
   }
 };
 
+const getLectureDetail = (idLecture) => {
+  return axios.get("api/Lecture/GetLectureDetail", {
+    params: {
+      idLecture: idLecture,
+    }
+  })
+}
+
 const getNotificationBoardOfCourse = (idCourse) => {
   return axios.get("api/Notification/GetNotificationBoardOfCourse", {
     params: {
@@ -511,15 +523,13 @@ export {
   getAssignmentInfo,
   getCourseDetail,
   getCourseProgress,
-  getIsEnRolledCourse,
-  getNotificationBoardOfCourse,
+  getIsEnRolledCourse, getLectureDetail, getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
   postAddLecture,
   postAddManualAssignment,
-  postAddQuizAssignment,
-  postUpdateAssignment,
-  postAddSection,
+  postAddQuizAssignment, postAddSection,
   postEnrollCourse,
-  postPublishAssignment,
+  postPublishAssignment, postUpdateAssignment
 };
+

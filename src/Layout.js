@@ -86,13 +86,32 @@ const Layout = (props) => {
           <Route path="/teacherDetail" element={<TeacherDetail />} />
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
-          <Route path="/studentDetail" element={<StudentDetail />} />
 
-          <Route path="/addNewLecture" element={<AddNewLecture />} />
-          <Route path="/viewLecture" element={<Lecture />} />
+          <Route
+            path="/studentDetail"
+            element={
+              <PrivateRoute>
+                <StudentDetail />
+              </PrivateRoute>}
+          />
+
+          <Route
+            path="/viewLecture"
+            element={
+              <PrivateRoute>
+                <Lecture />
+              </PrivateRoute>}
+          />
 
           <Route path="/viewAll" element={<ViewAll />} />
-          <Route path="/allNotifications" element={<AllNotifications />} />
+
+          <Route
+            path="/allNotifications"
+            element={
+              <PrivateRoute>
+                <AllNotifications />
+              </PrivateRoute>}
+          />
 
           {/* Platform Admin */}
           <Route
@@ -233,6 +252,13 @@ const Layout = (props) => {
                 <TeacherCourseMgmt />
               </PrivateRoute>
             }
+          />
+          <Route
+            path="/addNewLecture"
+            element={
+              <PrivateRoute>
+                <AddNewLecture />
+              </PrivateRoute>}
           />
 
           {/* Student */}

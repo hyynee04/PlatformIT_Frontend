@@ -4,7 +4,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/Detail.css";
 
-import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
@@ -15,14 +15,16 @@ import {
   LuPlus,
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
+import { TbCurrencyDong } from "react-icons/tb";
 
 import StarRatings from "react-star-ratings";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
+import { FiCheckSquare } from "react-icons/fi";
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
-import { formatDate } from "../../functions/function";
+import { formatDate, getPagination } from "../../functions/function";
 import {
   getCourseDetail,
   getIsEnRolledCourse,
@@ -111,11 +113,20 @@ const CourseDetail = (props) => {
     return now; // Default to current time if unrecognized format
   };
 
+  const isPastDateTime = (dateTimeString) => {
+    // Parse the input date-time string into a Date object
+    const inputDateTime = new Date(dateTimeString);
+    // Get the current date and time
+    const now = new Date();
+    // Compare the dates
+    return inputDateTime < now;
+  };
+
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
     ? courseInfo.sectionsWithCourses.reduce((total, section) => {
-      return total + (section.lectures ? section.lectures.length : 0);
-    }, 0)
+        return total + (section.lectures ? section.lectures.length : 0);
+      }, 0)
     : 0;
 
   const getCourseStatus = (course) => {
@@ -188,41 +199,8 @@ const CourseDetail = (props) => {
   const startIndex = (currentPage - 1) * reviewsPerPage;
   const currentReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
   // Generate pagination display numbers
-  const getPagination = () => {
-    if (totalPages <= 5) {
-      // Show all pages if there are 5 or fewer
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
-    } else {
-      // Logic for more than 5 pages
-      if (currentPage <= 3) {
-        // Show first few pages if current page is near the start
-        return [1, 2, 3, 4, "...", totalPages];
-      } else if (currentPage >= totalPages - 2) {
-        // Show last few pages if current page is near the end
-        return [
-          1,
-          "...",
-          totalPages - 3,
-          totalPages - 2,
-          totalPages - 1,
-          totalPages,
-        ];
-      } else {
-        // Show current page in the middle with surrounding pages
-        return [
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages,
-        ];
-      }
-    }
-  };
 
-  const paginationNumbers = getPagination();
+  const paginationNumbers = getPagination(currentPage, totalPages);
 
   //REGIST COURSE
   const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
@@ -245,7 +223,6 @@ const CourseDetail = (props) => {
     }
   };
 
-  console.log(idRole);
   if (loading) {
     return (
       <div className="loading-page">
@@ -255,7 +232,7 @@ const CourseDetail = (props) => {
   }
   return (
     <div className="detail-container">
-      <div className="left-container">
+      <div className="left-container slide-to-right">
         <div className="block-container">
           <img
             className="biography-ava center"
@@ -267,10 +244,28 @@ const CourseDetail = (props) => {
               {courseInfo.courseTitle}
             </span>
             <div className="course-card-price">
-              <FaDollarSign color="#003B57" />
               <span className="discount-price">
-                {courseInfo.price || "Free"}
+                {courseInfo.discountedPrice
+                  ? `${courseInfo.discountedPrice
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : courseInfo.price
+                  ? `${courseInfo.price
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : "Free"}
+                {courseInfo.price && <TbCurrencyDong />}
               </span>
+              {courseInfo.discountedPrice && (
+                <span className="initial-price">
+                  {courseInfo.price
+                    ? `${courseInfo.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                    : "Free"}
+                  {courseInfo.price && <TbCurrencyDong />}
+                </span>
+              )}
               {/* <span className='initial-price'>300</span> */}
             </div>
             {courseInfo.tags && courseInfo.tags.length > 0 && (
@@ -304,8 +299,9 @@ const CourseDetail = (props) => {
 
               <span className="">
                 <RiGroupLine color="#757575" />
-                {`${courseInfo.studentCount} ${courseInfo.studentCount > 1 ? "students" : "student"
-                  }`}
+                {`${courseInfo.studentCount} ${
+                  courseInfo.studentCount > 1 ? "students" : "student"
+                }`}
               </span>
               <span>{courseInfo.introduction}</span>
             </div>
@@ -387,8 +383,9 @@ const CourseDetail = (props) => {
                 </span>
                 <span className="number-course">
                   <FaRegFile color="#757575" />
-                  {`${courseInfo.teacherCourseCount} ${courseInfo.teacherCourseCount > 1 ? "courses" : "course"
-                    }`}
+                  {`${courseInfo.teacherCourseCount} ${
+                    courseInfo.teacherCourseCount > 1 ? "courses" : "course"
+                  }`}
                 </span>
               </div>
             </div>
@@ -435,7 +432,7 @@ const CourseDetail = (props) => {
                   </div>
                 </div>
               ))}
-              <div className="pagination-controls">
+              <div className="pagination">
                 {paginationNumbers.map((number, index) => (
                   <button
                     key={index}
@@ -465,15 +462,18 @@ const CourseDetail = (props) => {
         )}
       </div>
 
-      <div className="right-container">
-        {idUser && idRole === Role.teacher && courseInfo.idTeacher === idUser ? (
+      <div className="right-container slide-to-left">
+        {idUser &&
+        idRole === Role.teacher &&
+        courseInfo.idTeacher === idUser ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
             idUser={idUser}
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
             fetchCourseDetail={fetchCourseDetail}
-          />) : null}
+          />
+        ) : null}
 
         {/* Student View */}
         {idUser && idRole === Role.student && isEnrolledCourse ? (
@@ -535,14 +535,16 @@ const CourseDetail = (props) => {
                     </span>
                     <span className="block-container-sub-title">
                       {courseInfo.sectionsWithCourses
-                        ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
-                          ? "section"
-                          : "sections"
-                        }`
+                        ? `${courseInfo.sectionsWithCourses.length} ${
+                            courseInfo.sectionsWithCourses.length === 1
+                              ? "section"
+                              : "sections"
+                          }`
                         : "0 section"}{" "}
                       -{" "}
-                      {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
-                        }`}
+                      {`${numberOfLectures} ${
+                        numberOfLectures >= 1 ? "lecture" : "lectures"
+                      }`}
                     </span>
                   </div>
 
@@ -550,8 +552,9 @@ const CourseDetail = (props) => {
                     {courseInfo.sectionsWithCourses.map((section, index) => (
                       <div key={index} className="lecture">
                         <div
-                          className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
-                            } `}
+                          className={`lecture-header ${
+                            showedSections[index] ? "" : "change-header"
+                          } `}
                         >
                           <span className="section-name">
                             {section.sectionName}
@@ -559,10 +562,11 @@ const CourseDetail = (props) => {
                           <div className="section-info">
                             <span className="section-name">
                               {section.lectures
-                                ? `${section.lectures.length} ${section.lectures.length > 1
-                                  ? "lectures"
-                                  : "lecture"
-                                }`
+                                ? `${section.lectures.length} ${
+                                    section.lectures.length > 1
+                                      ? "lectures"
+                                      : "lecture"
+                                  }`
                                 : "0 lecture"}
                             </span>
                             <button
@@ -580,22 +584,38 @@ const CourseDetail = (props) => {
                         </div>
                         {section.lectures && (
                           <div
-                            className={`lecture-block ${showedSections[index]
-                              ? ""
-                              : "adjust-lecture-block"
-                              }`}
+                            className={`lecture-block ${
+                              showedSections[index]
+                                ? ""
+                                : "adjust-lecture-block"
+                            }`}
                           >
                             {section.lectures.map((lecture, index) => (
-                              <div key={index} className="lecture-content">
+                              <div
+                                key={index}
+                                className={`lecture-content ${
+                                  isEnrolledCourse ? "" : "nohover"
+                                } `}
+                                onClick={() => {
+                                  if (isEnrolledCourse)
+                                    navigate("/viewLecture", {
+                                      state: {
+                                        idLecture: lecture.idLecture,
+                                        idCourse: courseInfo.idCourse,
+                                      },
+                                    });
+                                }}
+                              >
                                 <div className="lecture-name">
                                   <span className="lecture-title">
                                     {lecture.lectureTitle}
                                   </span>
                                   <span className="lecture-exercise-num">
-                                    {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                      ? "exercises"
-                                      : "exercise"
-                                      }`}
+                                    {`${lecture.exerciseCount} ${
+                                      lecture.exerciseCount > 1
+                                        ? "exercises"
+                                        : "exercise"
+                                    }`}
                                   </span>
                                 </div>
                                 <span className="lecture-description">
@@ -623,30 +643,48 @@ const CourseDetail = (props) => {
                             {test.assignmentTitle}
                           </span>
                           {idUser && idRole === Role.student ? (
-                            <div className="test-info">
-                              Due: 09/15/2024, 23:59
-                            </div>
-                          ) : // <div className="test-info">Submitted <FiCheckSquare /></div>
-                            // <div className="test-info past-due">Past Due</div>
-                            null}
+                            <>
+                              {test.isSubmitted ? (
+                                <div className="test-info submitted">
+                                  Submitted <FiCheckSquare />
+                                </div>
+                              ) : isPastDateTime(test.dueDate) ? (
+                                <div className="test-info past-due">
+                                  Past Due
+                                </div>
+                              ) : (
+                                <div className="test-info">
+                                  Due: 09/15/2024, 23:59
+                                </div>
+                              )}
+                            </>
+                          ) : null}
                         </div>
 
                         <div className="test-description">
-                          <span>
-                            <LuFileEdit /> Manual
-                          </span>
-                          {test.duration && (
+                          {test.assignmentType && (
+                            <span>
+                              <LuFileEdit /> {test.assignmentTypeDesc}
+                            </span>
+                          )}
+
+                          {test.duration > 0 && (
                             <span>
                               <LuClock /> {test.duration} mins
                             </span>
                           )}
-                          <span>
-                            <LuFileQuestion /> {test.maxScore} questions
-                          </span>
-                          <span>
-                            <LuCalendar />
-                            Due date: 11/20/2024
-                          </span>
+                          {test.questionQuantity > 0 && (
+                            <span>
+                              <LuFileQuestion /> {test.questionQuantity}{" "}
+                              questions
+                            </span>
+                          )}
+                          {test.dueDate && (
+                            <span>
+                              <LuCalendar />
+                              {formatDate(test.dueDate)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -662,7 +700,9 @@ const CourseDetail = (props) => {
         <DiagSuccessfully
           isOpen={isModalSuccessOpen}
           onClose={closeSuccessModal}
-          notification={"Congratulations! You have successfully enrolled in the course."}
+          notification={
+            "Congratulations! You have successfully enrolled in the course."
+          }
         />
         <DiagSuccessfully
           isOpen={addedNotification}

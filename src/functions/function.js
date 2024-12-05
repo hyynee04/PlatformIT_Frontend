@@ -43,6 +43,14 @@ export const formatDate = (dateString) => {
     year: "numeric",
   });
 };
+export const formatTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
 export const formatDateTime = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString("en-US", {
@@ -51,7 +59,7 @@ export const formatDateTime = (dateString) => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // Hiển thị giờ theo định dạng 24h
+    hour12: false,
   });
 };
 export const handleNotificationNavigate = (notification, navigate) => {

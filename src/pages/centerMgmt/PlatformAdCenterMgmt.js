@@ -20,6 +20,7 @@ import {
   fetchCenters,
   setActiveStatusCenter,
 } from "../../store/listCenterSlice";
+import { getPagination } from "../../functions/function";
 
 const PlatformAdCenterMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -126,8 +127,8 @@ const PlatformAdCenterMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
 
   //pagination
@@ -182,22 +183,25 @@ const PlatformAdCenterMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.active ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.active ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.active)}
           >
             Approval
           </button>
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.pending ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.pending ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.pending)}
           >
             Pending Approval
           </button>
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.inactive ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.inactive ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.inactive)}
           >
             Inactive
@@ -280,10 +284,11 @@ const PlatformAdCenterMgmt = () => {
                         })()}
                     </td>
                     <td
-                      className={`table-cell ${activeStatusCenter === CenterStatus.pending
+                      className={`table-cell ${
+                        activeStatusCenter === CenterStatus.pending
                           ? "pending"
                           : ""
-                        }`}
+                      }`}
                       style={{ cursor: "pointer" }}
                     >
                       <button
@@ -393,15 +398,16 @@ const PlatformAdCenterMgmt = () => {
                                 {center.reason
                                   ? center.reason
                                   : center.centerStatus === CenterStatus.locked
-                                    ? "Locked"
-                                    : ""}
+                                  ? "Locked"
+                                  : ""}
                               </td>
                             )}
                             <td
-                              className={`table-cell ${center.centerStatus === CenterStatus.pending
+                              className={`table-cell ${
+                                center.centerStatus === CenterStatus.pending
                                   ? "pending"
                                   : ""
-                                }`}
+                              }`}
                               style={{ cursor: "pointer" }}
                             >
                               <LuMoreHorizontal
@@ -435,50 +441,22 @@ const PlatformAdCenterMgmt = () => {
             </table>
           )}
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

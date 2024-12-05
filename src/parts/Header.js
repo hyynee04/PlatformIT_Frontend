@@ -18,7 +18,10 @@ import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
 import Notification from "../components/Notification";
 import FetchDataUpdated from "../functions/FetchDataUpdated";
-import { calculateRelativeTime, parseRelativeTime } from "../functions/function";
+import {
+  calculateRelativeTime,
+  parseRelativeTime,
+} from "../functions/function";
 import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
@@ -63,19 +66,21 @@ const Header = () => {
   }, [idRole, currentPath, navigate]);
 
   const fetchUserNotification = async (idUser) => {
-    let response = await getAllNotificationOfUser(idUser)
+    let response = await getAllNotificationOfUser(idUser);
     if (response.status === APIStatus.success) {
       const processedData = response.data.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
       }));
-      let unread = processedData.filter((notification) => notification.isRead === 0).length;
-      setUnreadCount(unread > 99 ? "99+" : unread)
+      let unread = processedData.filter(
+        (notification) => notification.isRead === 0
+      ).length;
+      setUnreadCount(unread > 99 ? "99+" : unread);
       setNotifications(processedData);
     } else {
-      console.log(response.data)
+      console.log(response.data);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchAvatar = async () => {
@@ -103,7 +108,8 @@ const Header = () => {
   }, [dispatch, idUser]);
 
   useEffect(() => {
-    if (Array.isArray(updatedNotifications)) { // Ensure it's a valid array
+    if (Array.isArray(updatedNotifications)) {
+      // Ensure it's a valid array
       const processedData = updatedNotifications.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
@@ -111,7 +117,10 @@ const Header = () => {
       setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
       setNotifications(processedData);
     } else {
-      console.warn('updatedNotifications is not an array or is undefined:', updatedNotifications);
+      console.warn(
+        "updatedNotifications is not an array or is undefined:",
+        updatedNotifications
+      );
     }
   }, [updatedNotifications, updatedUnreadCount]);
 
@@ -136,7 +145,7 @@ const Header = () => {
     [Role.student]: [
       { title: "Home", path: "/studentHome" },
       { title: "My Course", path: "/studentCourse" },
-      { title: "Assignment", path: "/studentAssignment" },
+      { title: "My Test", path: "/studentTest" },
     ],
     default: [
       { title: "Home", path: "/" },
@@ -221,8 +230,9 @@ const Header = () => {
                 <>
                   {(idRole === Role.student || idRole === Role.teacher) && (
                     <button
-                      className={`circle-buts ${activeButton === "message" ? "clicked" : ""
-                        }`}
+                      className={`circle-buts ${
+                        activeButton === "message" ? "clicked" : ""
+                      }`}
                       onClick={() => handleButtonClick("message")}
                     >
                       <LuMessageCircle className="header-icon" />
@@ -230,10 +240,11 @@ const Header = () => {
                   )}
                   {idRole === Role.centerAdmin && (
                     <button
-                      className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
-                        ? "clicked"
-                        : ""
-                        }`}
+                      className={`circle-buts ${
+                        location.pathname === buttonPaths["clipboard"]
+                          ? "clicked"
+                          : ""
+                      }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >
                       <LuClipboardCheck className="header-icon" />
@@ -242,15 +253,18 @@ const Header = () => {
                   <button
                     ref={notiButtonRef}
                     disabled={location.pathname === buttonPaths["bell"]}
-                    className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                      }`}
+                    className={`circle-buts ${
+                      location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                    }`}
                     onClick={() => {
                       setIsNotificationOpen(!isNotificationOpen);
                     }}
                   >
                     <LuBell className="header-icon" />
                   </button>
-                  {unreadCount ? (<div className='number-unseen'>{unreadCount}</div>) : null}
+                  {unreadCount ? (
+                    <div className="number-unseen">{unreadCount}</div>
+                  ) : null}
                   <Notification
                     idUser={idUser}
                     isOpen={isNotificationOpen}
@@ -262,8 +276,9 @@ const Header = () => {
                   />
                   <button
                     ref={optionButtonRef}
-                    className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
-                      }`}
+                    className={`circle-buts ${
+                      isAvatarPage || showOptionAva ? "clicked" : ""
+                    }`}
                     onClick={() => handleButtonClick("avatar")}
                   >
                     <img

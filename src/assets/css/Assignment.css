@@ -136,6 +136,30 @@
   background-color: var(--border-gray);
   color: var(--text-gray);
 }
+.list-assign-container .assign-item .row-item .submitted-label {
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: rgba(20, 174, 92, 0.3);
+  color: var(--green-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.list-assign-container .assign-item .row-item .submitted-label > svg {
+  stroke-width: 3;
+  font-size: 16px;
+}
+.list-assign-container .assign-item .row-item .dueDate-label {
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: rgba(57, 121, 121, 0.3);
+  color: var(--black-color);
+  font-weight: bold;
+}
 .list-assign-container .assign-item .attribute-container {
   width: 100%;
   display: flex;

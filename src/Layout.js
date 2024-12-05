@@ -31,8 +31,8 @@ import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 import DuplicateAssign from "./pages/assignmentMgmt/DuplicateAssign";
-import TeacherAssignDetail from "./pages/assignmentMgmt/TeacherAssignDetail";
-import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
+import AssignDetail from "./pages/assignmentMgmt/AssignDetail";
+import ListAssignMgmt from "./pages/assignmentMgmt/ListAssignMgmt";
 import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
@@ -43,7 +43,6 @@ import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
-
 
 const Layout = (props) => {
   return (
@@ -210,7 +209,7 @@ const Layout = (props) => {
             path="/teacherAssignment"
             element={
               <PrivateRoute>
-                <TeacherAssignMgmt />
+                <ListAssignMgmt />
               </PrivateRoute>
             }
           />
@@ -242,7 +241,7 @@ const Layout = (props) => {
             path="/teacherAssignDetail"
             element={
               <PrivateRoute>
-                <TeacherAssignDetail />
+                <AssignDetail />
               </PrivateRoute>
             }
           />
@@ -276,6 +275,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <StudentCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/studentTest"
+            element={
+              <PrivateRoute>
+                <ListAssignMgmt />
               </PrivateRoute>
             }
           />

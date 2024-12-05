@@ -17,22 +17,32 @@ import {
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
 import { useNavigate } from "react-router-dom";
-import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
 import {
   APIStatus,
   AssignmentStatus,
   AssignmentType,
+  Role,
 } from "../../constants/constants";
-import { formatDateTime } from "../../functions/function";
 import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
+  getAllTestCardOfStudent,
 } from "../../services/courseService";
+import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
+import {
+  formatDateTime,
+  formatTime,
+  getPagination,
+} from "../../functions/function";
 
-const TeacherAssignMgmt = () => {
+const ListAssignMgmt = () => {
+  const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
   const [loading, setLoading] = useState(false);
-  const [className, setClassName] = useState("");
-  const [activeStatus, setActiveStatus] = useState(AssignmentStatus.publish);
+  const [activeStatus, setActiveStatus] = useState(
+    idRole === Role.teacher
+      ? AssignmentStatus.publish
+      : AssignmentStatus.upComing
+  );
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -83,9 +93,16 @@ const TeacherAssignMgmt = () => {
   const fetchAssignment = async () => {
     setLoading(true);
     try {
-      const response = await getAllAssignmentCardOfTeacher();
-      if (response.status === APIStatus.success) {
-        setListAssigment(response.data);
+      if (idRole === Role.teacher) {
+        let response = await getAllAssignmentCardOfTeacher();
+        if (response.status === APIStatus.success) {
+          setListAssigment(response.data);
+        }
+      } else if (idRole === Role.student) {
+        let response = await getAllTestCardOfStudent();
+        if (response.status === APIStatus.success) {
+          setListAssigment(response.data);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -97,32 +114,33 @@ const TeacherAssignMgmt = () => {
     fetchAssignment();
   }, []);
 
-  useEffect(() => {
-    if (activeStatus === 0 || activeStatus) {
-      setClassName("slide-to-right");
-      // Reset the class after 1 second
-      const timer = setTimeout(() => {
-        setClassName("");
-      }, 850);
-      // Cleanup timer in case activeStatus changes before timeout
-      return () => clearTimeout(timer);
-    }
-  }, [activeStatus]);
-
   const filteredAssignments = listAssignment
     .filter((assignment) => {
-      if (activeStatus === AssignmentStatus.publish) {
-        return assignment.isPublish === 1;
+      if (idRole === Role.teacher) {
+        if (activeStatus === AssignmentStatus.publish) {
+          return assignment.isPublish === 1;
+        }
+        if (activeStatus === AssignmentStatus.unpublish) {
+          return assignment.isPublish === 0;
+        }
+        if (activeStatus === AssignmentStatus.pastDue) {
+          return (
+            assignment.isPastDue === 1 ||
+            (assignment.endDate && new Date(assignment.endDate) < new Date())
+          );
+        }
+      } else if (idRole === Role.student) {
+        if (activeStatus === AssignmentStatus.upComing) {
+          return assignment.isPastDue === 0 && assignment.isCompleted === 0;
+        }
+        if (activeStatus === AssignmentStatus.pastDue) {
+          return assignment.isPastDue === 1;
+        }
+        if (activeStatus === AssignmentStatus.completed) {
+          return assignment.isCompleted === 1;
+        }
       }
-      if (activeStatus === AssignmentStatus.unpublish) {
-        return assignment.isPublish === 0;
-      }
-      if (activeStatus === AssignmentStatus.pastDue) {
-        return (
-          assignment.isPastDue === 1 ||
-          (assignment.endDate && new Date(assignment.endDate) < new Date())
-        );
-      }
+
       return true;
     })
     .filter((assignment) => {
@@ -152,8 +170,8 @@ const TeacherAssignMgmt = () => {
             (assignment.assignmentType === AssignmentType.manual
               ? "Manual"
               : assignment.assignmentType === AssignmentType.quiz
-                ? "Quiz"
-                : "Code"
+              ? "Quiz"
+              : "Code"
             )
               .toLowerCase()
               .includes(searchTerm)) ||
@@ -191,6 +209,9 @@ const TeacherAssignMgmt = () => {
       } else if (sortField === "dueDate") {
         aValue = new Date(a.dueDate) || new Date(0);
         bValue = new Date(b.dueDate) || new Date(0);
+      } else if (sortField === "title") {
+        aValue = a.title.toLowerCase() || "";
+        bValue = b.title.toLowerCase() || "";
       }
 
       return sortOrder === "asc"
@@ -198,8 +219,8 @@ const TeacherAssignMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
   const formatDate = (date) => {
     const options = { weekday: "long" };
@@ -214,36 +235,78 @@ const TeacherAssignMgmt = () => {
   };
 
   //CREATED DATE
-  const groupedAssignments = useMemo(() => {
+  const flatAssignments = useMemo(() => {
     if (filteredAssignments.length === 0) return [];
 
-    // Nhóm assignments theo ngày
     const grouped = filteredAssignments.reduce((acc, assignment) => {
-      const formattedDate = formatDate(
-        assignment.updatedDate || assignment.createdDate
-      ); // Định dạng ngày
-      if (!acc[formattedDate]) {
-        acc[formattedDate] = [];
+      let dateValue;
+      if (idRole === Role.teacher) {
+        dateValue = assignment.updatedDate || assignment.createdDate;
+      } else if (idRole === Role.student) {
+        if (activeStatus === AssignmentStatus.upComing) {
+          dateValue = assignment.updatedDate || assignment.createdDate;
+        } else if (activeStatus === AssignmentStatus.pastDue) {
+          dateValue = assignment.dueDate || assignment.courseEndDate;
+        } else if (activeStatus === AssignmentStatus.completed) {
+          dateValue = assignment.submittedDate;
+        }
       }
-      acc[formattedDate].push(assignment); // Thêm assignment vào nhóm có ngày giống nhau
+
+      const formattedDate = formatDate(dateValue);
+      if (!acc[formattedDate]) acc[formattedDate] = [];
+      acc[formattedDate].push(assignment);
       return acc;
     }, {});
 
-    // Chuyển grouped thành mảng có thứ tự theo ngày
+    // Chuyển grouped thành danh sách phẳng với ngày
     return Object.entries(grouped)
-      .map(([date, assignments]) => ({
-        date,
-        assignments,
-      }))
-      .sort((a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return dateB - dateA; // Sắp xếp từ ngày gần nhất đến xa nhất
-      });
+      .map(([date, assignments]) =>
+        assignments.map((assignment) => ({
+          date,
+          ...assignment,
+        }))
+      )
+      .flat();
   }, [filteredAssignments]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 20; // Số lượng assignment trên mỗi trang
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const paginatedAssignments = flatAssignments.slice(firstIndex, lastIndex);
 
+  // Số trang
+  const npage = Math.ceil(flatAssignments.length / recordsPerPage);
+  const numbers = [...Array(npage + 1).keys()].slice(1);
+
+  // Nhóm assignments theo ngày
+  const groupedAssignments = paginatedAssignments.reduce(
+    (groups, assignment) => {
+      const date = assignment.date; // Thuộc tính `date` của assignment
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(assignment);
+      return groups;
+    },
+    {}
+  );
+  //ANIMATION
+  const [className, setClassName] = useState("slide-to-right");
+  useEffect(() => {
+    if (activeStatus === 0 || activeStatus) {
+      setClassName("slide-to-right");
+      // Reset the class after 1 second
+      const timer = setTimeout(() => {
+        setClassName("");
+      }, 850);
+      // Cleanup timer in case activeStatus changes before timeout
+      return () => clearTimeout(timer);
+    }
+  }, [activeStatus]);
   const handleStatusClick = (status) => {
     setActiveStatus(status);
+    // setClassName("");
+    // setClassName("slide-to-right");
     setSearchTerm("");
     setSortField("createdDate");
     setTempSortField("createdDate");
@@ -321,27 +384,62 @@ const TeacherAssignMgmt = () => {
       <div className="page-list-container">
         <div className="handle-page-container">
           <div className="status-assign-btns">
-            <button
-              className={`status-btn ${activeStatus === AssignmentStatus.publish ? "active" : ""
-                }`}
-              onClick={() => handleStatusClick(AssignmentStatus.publish)}
-            >
-              Publish
-            </button>
-            <button
-              className={`status-btn ${activeStatus === AssignmentStatus.unpublish ? "active" : ""
-                }`}
-              onClick={() => handleStatusClick(AssignmentStatus.unpublish)}
-            >
-              Unpublish
-            </button>
-            <button
-              className={`status-btn ${activeStatus === AssignmentStatus.pastDue ? "active" : ""
-                }`}
-              onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
-            >
-              Past due
-            </button>
+            {idRole === Role.teacher && (
+              <>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.publish ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.publish)}
+                >
+                  Publish
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.unpublish ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.unpublish)}
+                >
+                  Unpublish
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.pastDue ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
+                >
+                  Past due
+                </button>
+              </>
+            )}
+            {idRole === Role.student && (
+              <>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.upComing ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.upComing)}
+                >
+                  Up coming
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.pastDue ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.pastDue)}
+                >
+                  Past due
+                </button>
+                <button
+                  className={`status-btn ${
+                    activeStatus === AssignmentStatus.completed ? "active" : ""
+                  }`}
+                  onClick={() => handleStatusClick(AssignmentStatus.completed)}
+                >
+                  Completed
+                </button>
+              </>
+            )}
           </div>
           <div className="filter-search-assign">
             <div className="filter-sort-btns">
@@ -360,37 +458,39 @@ const TeacherAssignMgmt = () => {
                     <span>Filter</span>
                   </div>
                   <div className="main-filter">
-                    <div className="field-filter">
-                      <span className="label-field">Test/Assignment</span>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="exercise"
-                          checked={tempIsTest === 0}
-                          onChange={() => setTempIsTest(0)}
-                        />
-                        Exercise
-                      </label>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="test"
-                          checked={tempIsTest === 1}
-                          onChange={() => setTempIsTest(1)}
-                        />
-                        Test
-                      </label>
-                      <label className="radio-container gender">
-                        <input
-                          type="radio"
-                          value="all"
-                          checked={tempIsTest === "all"}
-                          onChange={() => setTempIsTest("all")}
-                          selected
-                        />
-                        All
-                      </label>
-                    </div>
+                    {idRole === Role.teacher && (
+                      <div className="field-filter">
+                        <span className="label-field">Test/Assignment</span>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="exercise"
+                            checked={tempIsTest === 0}
+                            onChange={() => setTempIsTest(0)}
+                          />
+                          Exercise
+                        </label>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="test"
+                            checked={tempIsTest === 1}
+                            onChange={() => setTempIsTest(1)}
+                          />
+                          Test
+                        </label>
+                        <label className="radio-container gender">
+                          <input
+                            type="radio"
+                            value="all"
+                            checked={tempIsTest === "all"}
+                            onChange={() => setTempIsTest("all")}
+                            selected
+                          />
+                          All
+                        </label>
+                      </div>
+                    )}
 
                     <div className="field-filter">
                       <span className="label-field">Assignment type</span>
@@ -481,6 +581,7 @@ const TeacherAssignMgmt = () => {
                           value={tempSortField}
                           onChange={(e) => setTempSortField(e.target.value)}
                         >
+                          <option value="title">Name</option>
                           <option value="startDate">Start date</option>
                           <option value="dueDate">Due date</option>
                         </select>
@@ -528,24 +629,26 @@ const TeacherAssignMgmt = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <button
-              className="circle-btn"
-              onClick={() => navigate("/addAssignment")}
-            >
-              <TiPlus className="icon" />
-            </button>
+            {idRole === Role.teacher && (
+              <button
+                className="circle-btn"
+                onClick={() => navigate("/addAssignment")}
+              >
+                <TiPlus className="icon" />
+              </button>
+            )}
           </div>
         </div>
         <div className={`list-assign-container ${className}`}>
-          {groupedAssignments.map(({ date, assignments }, index) => {
-            return (
-              <div className="time-assign-container" key={index}>
-                <span className="create-time-assign ">{date}</span>
-                {assignments.map((assignment, idx) => (
-                  <div
-                    className="assign-item"
-                    key={idx}
-                    onClick={() => {
+          {Object.entries(groupedAssignments).map(([date, assignments]) => (
+            <div className="time-assign-container" key={date}>
+              <span className="create-time-assign ">{date}</span>
+              {assignments.map((assignment, idx) => (
+                <div
+                  className="assign-item"
+                  key={idx}
+                  onClick={() => {
+                    if (idRole === Role.teacher) {
                       if (assignment.isPublish === 1) {
                         navigate("/teacherAssignDetail", {
                           state: {
@@ -559,15 +662,23 @@ const TeacherAssignMgmt = () => {
                           },
                         });
                       }
-                    }}
-                  >
-                    <div className="row-item">
-                      <span
-                        className="title-assign"
-                        style={{ fontWeight: "bold" }}
-                      >
-                        {assignment.title}
-                      </span>
+                    } else if (idRole === Role.student) {
+                      navigate("/teacherAssignDetail", {
+                        state: {
+                          idAssignment: assignment.idAssignment,
+                        },
+                      });
+                    }
+                  }}
+                >
+                  <div className="row-item">
+                    <span
+                      className="title-assign"
+                      style={{ fontWeight: "bold" }}
+                    >
+                      {assignment.title}
+                    </span>
+                    {idRole === Role.teacher && (
                       <button
                         className="btn-option"
                         onClick={(e) => {
@@ -577,125 +688,151 @@ const TeacherAssignMgmt = () => {
                       >
                         <LuMoreHorizontal className="icon" />
                       </button>
+                    )}
+                  </div>
+                  <div className="attribute-container">
+                    <div className="attribute-item">
+                      <LuFileEdit className="icon-attribute-assign" />
+                      <label htmlFor="">
+                        {assignment.assignmentType === AssignmentType.code
+                          ? "Code"
+                          : assignment.assignmentType === AssignmentType.quiz
+                          ? "Quiz"
+                          : "Manual"}
+                      </label>
                     </div>
-                    <div className="attribute-container">
+                    {assignment.duration > 0 && (
                       <div className="attribute-item">
-                        <LuFileEdit className="icon-attribute-assign" />
+                        <LuClock4 className="icon-attribute-assign" />
+                        <label htmlFor="">{assignment.duration} minutes</label>
+                      </div>
+                    )}
+                    <div className="attribute-item">
+                      <LuCheckSquare className="icon-attribute-assign" />
+                      <label htmlFor="">
+                        {assignment.questionQuantity}{" "}
+                        {assignment.questionQuantity > 1
+                          ? " questions"
+                          : "question"}
+                      </label>
+                    </div>
+                    {idRole === Role.teacher && assignment.startDate && (
+                      <div className="attribute-item">
+                        <LuCalendar className="icon-attribute-assign" />
                         <label htmlFor="">
-                          {assignment.assignmentType === AssignmentType.code
-                            ? "Code"
-                            : assignment.assignmentType === AssignmentType.quiz
-                              ? "Quiz"
-                              : "Manual"}
+                          Start date: {formatDateTime(assignment.startDate)}
                         </label>
                       </div>
-                      {assignment.duration > 0 && (
-                        <div className="attribute-item">
-                          <LuClock4 className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            {assignment.duration} minutes
-                          </label>
-                        </div>
-                      )}
+                    )}
+                    {idRole === Role.teacher && assignment.dueDate && (
                       <div className="attribute-item">
-                        <LuCheckSquare className="icon-attribute-assign" />
+                        <LuCalendar className="icon-attribute-assign" />
                         <label htmlFor="">
-                          {assignment.questionQuantity}{" "}
-                          {assignment.questionQuantity > 1
-                            ? " questions"
-                            : "question"}
+                          Due date: {formatDateTime(assignment.dueDate)}
                         </label>
                       </div>
-                      {assignment.startDate && (
-                        <div className="attribute-item">
-                          <LuCalendar className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            Start date: {formatDateTime(assignment.startDate)}
-                          </label>
-                        </div>
+                    )}
+                  </div>
+                  <div className="row-item">
+                    <span
+                      style={{
+                        fontWeight: "400",
+                        color: "var(--text-gray)",
+                        fontSize: "15px",
+                      }}
+                    >
+                      Course: {assignment.nameCourse}
+                      {assignment.nameLecture && (
+                        <>
+                          <LuChevronRight
+                            className="icon"
+                            style={{ width: "18px", height: "auto" }}
+                          />
+                          {assignment.nameLecture}
+                        </>
                       )}
-                      {assignment.dueDate && (
-                        <div className="attribute-item">
-                          <LuCalendar className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            Due date: {formatDateTime(assignment.dueDate)}
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                    <div className="row-item">
-                      <span
-                        style={{
-                          fontWeight: "400",
-                          color: "var(--text-gray)",
-                          fontSize: "15px",
-                        }}
-                      >
-                        Course: {assignment.nameCourse}
-                        {assignment.nameLecture && (
-                          <>
-                            <LuChevronRight
-                              className="icon"
-                              style={{ width: "18px", height: "auto" }}
-                            />
-                            {assignment.nameLecture}
-                          </>
-                        )}
-                      </span>
+                    </span>
+                    {idRole === Role.teacher && (
                       <span className="isExam-label">
                         {assignment.isTest ? "Test" : "Exercise"}
                       </span>
-                    </div>
-                    {selectedAssignment.idAssignment ===
-                      assignment.idAssignment && (
-                        <div
-                          ref={optionRef}
-                          className="container-options assignment-option"
-                        >
-                          {assignment.isPublish === 0 && (
-                            <button
-                              className="op-buts"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                openPublishModal();
-                              }}
-                            >
-                              <span>Publish</span>
-                              <MdPublish />
-                            </button>
-                          )}
-                          <button
-                            className="op-buts"
-                            //onClick={handleOpenDeleteDiag}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate("/duplicateAssignment", {
-                                state: {
-                                  idAssignment: assignment.idAssignment,
-                                },
-                              });
-                            }}
-                          >
-                            <span>Duplicate</span>
-                            <IoDuplicateSharp />
-                          </button>
-                          <button
-                            className="op-buts"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDeleteDiag();
-                            }}
-                          >
-                            <span>Delete</span>
-                            <FaTrashAlt />
-                          </button>
-                        </div>
-                      )}
+                    )}
+                    {idRole === Role.student &&
+                      (assignment.submittedDate ? (
+                        <span className="submitted-label">
+                          {`Submitted at: ${formatTime(
+                            assignment.submittedDate
+                          )}`}
+                          <LuCheckSquare />
+                        </span>
+                      ) : (
+                        assignment.dueDate && (
+                          <span className="dueDate-label">
+                            {`Due: ${formatDateTime(assignment.dueDate)}`}
+                          </span>
+                        )
+                      ))}
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                  {selectedAssignment.idAssignment ===
+                    assignment.idAssignment && (
+                    <div
+                      ref={optionRef}
+                      className="container-options assignment-option"
+                    >
+                      {assignment.isPublish === 0 && (
+                        <button
+                          className="op-buts"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openPublishModal();
+                          }}
+                        >
+                          <span>Publish</span>
+                          <MdPublish />
+                        </button>
+                      )}
+                      <button
+                        className="op-buts"
+                        //onClick={handleOpenDeleteDiag}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/duplicateAssignment", {
+                            state: {
+                              idAssignment: assignment.idAssignment,
+                            },
+                          });
+                        }}
+                      >
+                        <span>Duplicate</span>
+                        <IoDuplicateSharp />
+                      </button>
+                      <button
+                        className="op-buts"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDeleteDiag();
+                        }}
+                      >
+                        <span>Delete</span>
+                        <FaTrashAlt />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
       {diagDeleteVisible && (
@@ -766,6 +903,9 @@ const TeacherAssignMgmt = () => {
       />
     </div>
   );
+  function changeCPage(id) {
+    setCurrentPage(id);
+  }
 };
 
-export default TeacherAssignMgmt;
+export default ListAssignMgmt;

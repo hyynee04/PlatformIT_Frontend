@@ -19,7 +19,10 @@ const DiagTransmitForm = ({ isOpen, onClose, idUserSelected }) => {
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container  slide-to-bottom"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="diag-header">
           <div className="container-title">
             <LuUsers className="diag-icon" />

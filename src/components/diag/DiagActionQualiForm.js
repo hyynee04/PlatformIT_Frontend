@@ -56,7 +56,10 @@ const DiagActionQualiForm = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       {isApproveAction === true ? (
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-container  slide-to-bottom"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="diag-header">
             <div className="container-title">
               <LuClipboardCheck className="diag-icon" />
@@ -85,7 +88,10 @@ const DiagActionQualiForm = ({
           </div>
         </div>
       ) : (
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-container  slide-to-bottom"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="diag-header">
             <div className="container-title">
               <LuClipboardX className="diag-icon" />

@@ -146,6 +146,7 @@
   min-width: fit-content;
   font-size: 14px;
   outline: none;
+  border: none;
 }
 .modal-container .diag-body .str-btns .act-btns .diag-btn > svg {
   height: 0.85rem;
@@ -157,15 +158,15 @@
   background-color: var(--white-color);
   /* color: var(--main-color); */
 }
-.modal-container .diag-body .str-btns .act-btns .cancle:active,
-.modal-container .diag-body .str-btns .act-btns .cancle:focus-visible,
-.modal-container .diag-body .str-btns .act-btns .cancle:focus {
+.modal-container .diag-body .str-btns .act-btns .cancel:active,
+.modal-container .diag-body .str-btns .act-btns .cancel:focus-visible,
+.modal-container .diag-body .str-btns .act-btns .cancel:focus {
   background-color: rgba(217, 217, 217, 0.5);
   border: none;
   outline: none;
   color: var(--text-gray);
 }
-.modal-container .diag-body .str-btns .act-btns .cancle:hover {
+.modal-container .diag-body .str-btns .act-btns .cancel:hover {
   background-color: rgba(217, 217, 217, 0.5);
   color: var(--black-color);
 }

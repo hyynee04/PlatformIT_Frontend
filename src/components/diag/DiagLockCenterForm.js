@@ -42,7 +42,10 @@ const DiagLockCenterForm = ({
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container slide-to-bottom"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div
           className="diag-header lock"
           style={{ backgroundColor: "var(--red-color)" }}

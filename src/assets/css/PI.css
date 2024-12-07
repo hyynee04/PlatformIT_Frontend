@@ -188,7 +188,7 @@
   cursor: pointer;
 }
 .container-icon:hover {
-  background-color: rgb(117, 117, 117);
+  background-color: #cfcfcf;
 }
 
 .icon {
@@ -462,6 +462,11 @@
   background-color: var(--white-color);
   border: none;
   font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
 }
 
 .alert-option .container-button .discard-changes {

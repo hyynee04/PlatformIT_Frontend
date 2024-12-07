@@ -37,6 +37,8 @@ import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
 
+import StartAssign from "./pages/assignmentMgmt/StartAssign";
+
 import AllNotifications from "./pages/AllNotifications";
 import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import Lecture from "./pages/lectureMgmt/Lecture";
@@ -92,7 +94,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <StudentDetail />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           <Route
@@ -100,7 +103,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <Lecture />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           <Route path="/viewAll" element={<ViewAll />} />
@@ -110,7 +114,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <AllNotifications />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           {/* Platform Admin */}
@@ -258,7 +263,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <AddNewLecture />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           {/* Student */}
@@ -305,7 +311,14 @@ const Layout = (props) => {
             }
           />
         </Route>
-
+        <Route
+          path="/startAssignment"
+          element={
+            <PrivateRoute>
+              <StartAssign />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login-response" element={<LoginResponse />} />
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />

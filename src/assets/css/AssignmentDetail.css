@@ -107,6 +107,7 @@
 .main-contain-assign .handle-button {
   padding: 0 24px 0 20px;
 }
+
 .main-contain-assign .handle-button .btn {
   padding: 8px 4px 4px;
   border: none;
@@ -128,6 +129,26 @@
   border-bottom: 3px solid var(--main-color);
   border-radius: 4px 4px 0 0;
 }
+.main-contain-assign .handle-button.start {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+.main-contain-assign .handle-button.start .btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  color: var(--white-color);
+  background-color: var(--main-color);
+  font-size: 16px;
+  font-weight: bold;
+}
+.main-contain-assign .handle-button.start .btn:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
 
 .main-contain-assign .questions-overview-container .questions-container,
 .overview-container .attendee-list {
@@ -139,10 +160,17 @@
   gap: 24px;
   width: 100%;
 }
-.main-contain-assign
-  .questions-overview-container
-  .questions-container
-  .question-item {
+.start-assign-container .questions-overview-container .questions-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+}
+
+.questions-overview-container .questions-container .question-item {
   border-radius: 4px;
   padding: 12px;
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
@@ -321,4 +349,71 @@
   border: none;
   justify-content: space-between;
   width: 100%;
+}
+.start-assign-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 64px;
+  gap: 32px;
+}
+.start-assign-container .assign-info,
+.start-assign-container .assign-info .time-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.start-assign-container .assign-info > label,
+.start-assign-container .assign-info .time-btn .timer {
+  font-size: 24px;
+  font-weight: bold;
+}
+.start-assign-container .assign-info .time-btn .btn.submit {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  color: var(--white-color);
+  background-color: var(--main-color);
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.start-assign-container .assign-info .time-btn .btn.submit:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
+.start-assign-container
+  .questions-overview-container
+  .questions-container
+  .question-item {
+  padding: 24px;
+}
+.start-assign-container
+  .questions-overview-container
+  .questions-container
+  .question-item
+  .choices-container {
+  width: 100%;
+}
+.start-assign-container
+  .questions-overview-container
+  .questions-container
+  .question-item
+  .info-row
+  .info {
+  gap: 10px;
+  flex: 1;
+}
+.start-assign-container
+  .questions-overview-container
+  .questions-container
+  .question-item
+  .info-row
+  .info
+  > span {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--black-color);
 }

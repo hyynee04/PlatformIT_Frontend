@@ -640,189 +640,196 @@ const ListAssignMgmt = () => {
           </div>
         </div>
         <div className={`list-assign-container ${className}`}>
-          {Object.entries(groupedAssignments).map(([date, assignments]) => (
-            <div className="time-assign-container" key={date}>
-              <span className="create-time-assign ">{date}</span>
-              {assignments.map((assignment, idx) => (
-                <div
-                  className="assign-item"
-                  key={idx}
-                  onClick={() => {
-                    if (idRole === Role.teacher) {
-                      if (assignment.isPublish === 1) {
-                        navigate("/teacherAssignDetail", {
-                          state: {
-                            idAssignment: assignment.idAssignment,
-                          },
-                        });
-                      } else {
-                        navigate("/updateAssignment", {
-                          state: {
-                            idAssignment: assignment.idAssignment,
-                          },
-                        });
-                      }
-                    } else if (idRole === Role.student) {
-                      navigate("/teacherAssignDetail", {
-                        state: {
-                          idAssignment: assignment.idAssignment,
-                        },
-                      });
-                    }
-                  }}
-                >
-                  <div className="row-item">
-                    <span
-                      className="title-assign"
-                      style={{ fontWeight: "bold" }}
-                    >
-                      {assignment.title}
-                    </span>
-                    {idRole === Role.teacher && (
-                      <button
-                        className="btn-option"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMoreIconClick(assignment);
-                        }}
-                      >
-                        <LuMoreHorizontal className="icon" />
-                      </button>
-                    )}
-                  </div>
-                  <div className="attribute-container">
-                    <div className="attribute-item">
-                      <LuFileEdit className="icon-attribute-assign" />
-                      <label htmlFor="">
-                        {assignment.assignmentType === AssignmentType.code
-                          ? "Code"
-                          : assignment.assignmentType === AssignmentType.quiz
-                          ? "Quiz"
-                          : "Manual"}
-                      </label>
-                    </div>
-                    {assignment.duration > 0 && (
-                      <div className="attribute-item">
-                        <LuClock4 className="icon-attribute-assign" />
-                        <label htmlFor="">{assignment.duration} minutes</label>
-                      </div>
-                    )}
-                    <div className="attribute-item">
-                      <LuCheckSquare className="icon-attribute-assign" />
-                      <label htmlFor="">
-                        {assignment.questionQuantity}{" "}
-                        {assignment.questionQuantity > 1
-                          ? " questions"
-                          : "question"}
-                      </label>
-                    </div>
-                    {idRole === Role.teacher && assignment.startDate && (
-                      <div className="attribute-item">
-                        <LuCalendar className="icon-attribute-assign" />
-                        <label htmlFor="">
-                          Start date: {formatDateTime(assignment.startDate)}
-                        </label>
-                      </div>
-                    )}
-                    {idRole === Role.teacher && assignment.dueDate && (
-                      <div className="attribute-item">
-                        <LuCalendar className="icon-attribute-assign" />
-                        <label htmlFor="">
-                          Due date: {formatDateTime(assignment.dueDate)}
-                        </label>
-                      </div>
-                    )}
-                  </div>
-                  <div className="row-item">
-                    <span
-                      style={{
-                        fontWeight: "400",
-                        color: "var(--text-gray)",
-                        fontSize: "15px",
+          {Object.entries(groupedAssignments)
+            .sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
+            .map(([date, assignments]) => {
+              const sortedAssignments = assignments.sort((a, b) => {
+                const dateA = new Date(a.updatedDate || a.createdDate || 0);
+                const dateB = new Date(b.updatedDate || b.createdDate || 0);
+                return dateB - dateA; // Gần nhất trước
+              });
+
+              return (
+                <div className="time-assign-container" key={date}>
+                  <span className="create-time-assign ">{date}</span>
+                  {sortedAssignments.map((assignment, idx) => (
+                    <div
+                      className="assign-item"
+                      key={idx}
+                      onClick={() => {
+                        if (idRole === Role.teacher) {
+                          if (assignment.isPublish === 1) {
+                            navigate("/teacherAssignDetail", {
+                              state: { idAssignment: assignment.idAssignment },
+                            });
+                          } else {
+                            navigate("/updateAssignment", {
+                              state: { idAssignment: assignment.idAssignment },
+                            });
+                          }
+                        } else if (idRole === Role.student) {
+                          navigate("/teacherAssignDetail", {
+                            state: { idAssignment: assignment.idAssignment },
+                          });
+                        }
                       }}
                     >
-                      Course: {assignment.nameCourse}
-                      {assignment.nameLecture && (
-                        <>
-                          <LuChevronRight
-                            className="icon"
-                            style={{ width: "18px", height: "auto" }}
-                          />
-                          {assignment.nameLecture}
-                        </>
-                      )}
-                    </span>
-                    {idRole === Role.teacher && (
-                      <span className="isExam-label">
-                        {assignment.isTest ? "Test" : "Exercise"}
-                      </span>
-                    )}
-                    {idRole === Role.student &&
-                      (assignment.submittedDate ? (
-                        <span className="submitted-label">
-                          {`Submitted at: ${formatTime(
-                            assignment.submittedDate
-                          )}`}
-                          <LuCheckSquare />
+                      <div className="row-item">
+                        <span
+                          className="title-assign"
+                          style={{ fontWeight: "bold" }}
+                        >
+                          {assignment.title}
                         </span>
-                      ) : (
-                        assignment.dueDate && (
-                          <span className="dueDate-label">
-                            {`Due: ${formatDateTime(assignment.dueDate)}`}
-                          </span>
-                        )
-                      ))}
-                  </div>
-                  {selectedAssignment.idAssignment ===
-                    assignment.idAssignment && (
-                    <div
-                      ref={optionRef}
-                      className="container-options assignment-option"
-                    >
-                      {assignment.isPublish === 0 && (
-                        <button
-                          className="op-buts"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openPublishModal();
+                        {idRole === Role.teacher && (
+                          <button
+                            className="btn-option"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMoreIconClick(assignment);
+                            }}
+                          >
+                            <LuMoreHorizontal className="icon" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="attribute-container">
+                        <div className="attribute-item">
+                          <LuFileEdit className="icon-attribute-assign" />
+                          <label htmlFor="">
+                            {assignment.assignmentType === AssignmentType.code
+                              ? "Code"
+                              : assignment.assignmentType ===
+                                AssignmentType.quiz
+                              ? "Quiz"
+                              : "Manual"}
+                          </label>
+                        </div>
+                        {assignment.duration > 0 && (
+                          <div className="attribute-item">
+                            <LuClock4 className="icon-attribute-assign" />
+                            <label htmlFor="">
+                              {assignment.duration} minutes
+                            </label>
+                          </div>
+                        )}
+                        <div className="attribute-item">
+                          <LuCheckSquare className="icon-attribute-assign" />
+                          <label htmlFor="">
+                            {assignment.questionQuantity}{" "}
+                            {assignment.questionQuantity > 1
+                              ? "questions"
+                              : "question"}
+                          </label>
+                        </div>
+                        {idRole === Role.teacher && assignment.startDate && (
+                          <div className="attribute-item">
+                            <LuCalendar className="icon-attribute-assign" />
+                            <label htmlFor="">
+                              Start date: {formatDateTime(assignment.startDate)}
+                            </label>
+                          </div>
+                        )}
+                        {idRole === Role.teacher && assignment.dueDate && (
+                          <div className="attribute-item">
+                            <LuCalendar className="icon-attribute-assign" />
+                            <label htmlFor="">
+                              Due date: {formatDateTime(assignment.dueDate)}
+                            </label>
+                          </div>
+                        )}
+                      </div>
+                      <div className="row-item">
+                        <span
+                          style={{
+                            fontWeight: "400",
+                            color: "var(--text-gray)",
+                            fontSize: "15px",
                           }}
                         >
-                          <span>Publish</span>
-                          <MdPublish />
-                        </button>
+                          Course: {assignment.nameCourse}
+                          {assignment.nameLecture && (
+                            <>
+                              <LuChevronRight
+                                className="icon"
+                                style={{ width: "18px", height: "auto" }}
+                              />
+                              {assignment.nameLecture}
+                            </>
+                          )}
+                        </span>
+                        {idRole === Role.teacher && (
+                          <span className="isExam-label">
+                            {assignment.isTest ? "Test" : "Exercise"}
+                          </span>
+                        )}
+                        {idRole === Role.student &&
+                          (assignment.submittedDate ? (
+                            <span className="submitted-label">
+                              {`Submitted at: ${formatTime(
+                                assignment.submittedDate
+                              )}`}
+                              <LuCheckSquare />
+                            </span>
+                          ) : (
+                            assignment.dueDate && (
+                              <span className="dueDate-label">
+                                {`Due: ${formatDateTime(assignment.dueDate)}`}
+                              </span>
+                            )
+                          ))}
+                      </div>
+                      {selectedAssignment.idAssignment ===
+                        assignment.idAssignment && (
+                        <div
+                          ref={optionRef}
+                          className="container-options assignment-option"
+                        >
+                          {assignment.isPublish === 0 && (
+                            <button
+                              className="op-buts"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openPublishModal();
+                              }}
+                            >
+                              <span>Publish</span>
+                              <MdPublish />
+                            </button>
+                          )}
+                          <button
+                            className="op-buts"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate("/duplicateAssignment", {
+                                state: {
+                                  idAssignment: assignment.idAssignment,
+                                },
+                              });
+                            }}
+                          >
+                            <span>Duplicate</span>
+                            <IoDuplicateSharp />
+                          </button>
+                          <button
+                            className="op-buts"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDeleteDiag();
+                            }}
+                          >
+                            <span>Delete</span>
+                            <FaTrashAlt />
+                          </button>
+                        </div>
                       )}
-                      <button
-                        className="op-buts"
-                        //onClick={handleOpenDeleteDiag}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/duplicateAssignment", {
-                            state: {
-                              idAssignment: assignment.idAssignment,
-                            },
-                          });
-                        }}
-                      >
-                        <span>Duplicate</span>
-                        <IoDuplicateSharp />
-                      </button>
-                      <button
-                        className="op-buts"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDeleteDiag();
-                        }}
-                      >
-                        <span>Delete</span>
-                        <FaTrashAlt />
-                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          ))}
+              );
+            })}
         </div>
+
         <div className="pagination">
           {getPagination(currentPage, npage).map((n, i) => (
             <button
@@ -840,7 +847,10 @@ const ListAssignMgmt = () => {
           className="modal-overlay"
           onClick={() => setDiagDeleteVisible(false)}
         >
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-container slide-to-bottom"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div
               className="diag-header"
               style={{ backgroundColor: "var(--red-color)" }}

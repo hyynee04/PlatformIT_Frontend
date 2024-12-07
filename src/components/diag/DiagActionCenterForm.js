@@ -61,7 +61,10 @@ const DiagActionCenterForm = ({
   return (
     <div className="modal-overlay" onClick={onClose}>
       {isApproveAction === true ? (
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-container slide-to-bottom"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="diag-header">
             <div className="container-title">
               <LuBuilding2 className="diag-icon" />
@@ -89,7 +92,10 @@ const DiagActionCenterForm = ({
           </div>
         </div>
       ) : (
-        <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-container slide-to-bottom"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="diag-header">
             <div className="container-title">
               <LuBuilding2 className="diag-icon" />

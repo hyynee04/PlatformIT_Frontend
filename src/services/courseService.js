@@ -4,8 +4,8 @@ import axios from "../utils/axiosCustomize";
 const getAllCourseCards = (idStudent) => {
   return axios.get("api/Course/GetAllCourseCards", {
     params: {
-      idStudent: idStudent
-    }
+      idStudent: idStudent,
+    },
   });
 };
 const getAllCourseCardsByIdCenter = (idCenter) => {
@@ -155,7 +155,21 @@ const getAssignmentInfo = async (idAssignment) => {
     },
   });
 };
-
+const getDetailAssignmentForStudent = async (idAssignment) => {
+  return await axios.get("api/Assignment/GetDetailAssignmentForStudent", {
+    params: {
+      idAssignment: idAssignment,
+      idStudent: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
+const getDetailAssignmentItemForStudent = async (idAssignment) => {
+  return await axios.get("api/Assignment/GetDetailAssignmentItemForStudent", {
+    params: {
+      idAssignment: idAssignment,
+    },
+  });
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -426,6 +440,23 @@ const postUpdateAssignment = async (dataToSubmit) => {
   }
 };
 
+const postSubmitQuizAssignment = async (requestData) => {
+  try {
+    console.log(requestData);
+
+    // return await axios.post(
+    //   "api/Assignment/SubmitQuizAssignment",
+    //   requestData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   }
+    // );
+  } catch (error) {
+    throw error;
+  }
+};
 const postAddSection = (sectionName, idCourse, idCreatedBy) => {
   return axios.post(`api/Course/AddSection`, null, {
     params: {
@@ -478,9 +509,9 @@ const getLectureDetail = (idLecture) => {
   return axios.get("api/Lecture/GetLectureDetail", {
     params: {
       idLecture: idLecture,
-    }
-  })
-}
+    },
+  });
+};
 
 const getNotificationBoardOfCourse = (idCourse) => {
   return axios.get("api/Notification/GetNotificationBoardOfCourse", {
@@ -521,15 +552,21 @@ export {
   getAllCourseCardsByIdTeacher,
   getAllTagModel,
   getAssignmentInfo,
+  getDetailAssignmentForStudent,
+  getDetailAssignmentItemForStudent,
   getCourseDetail,
   getCourseProgress,
-  getIsEnRolledCourse, getLectureDetail, getNotificationBoardOfCourse,
+  getIsEnRolledCourse,
+  getLectureDetail,
+  getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
   postAddLecture,
   postAddManualAssignment,
-  postAddQuizAssignment, postAddSection,
+  postAddQuizAssignment,
+  postAddSection,
   postEnrollCourse,
-  postPublishAssignment, postUpdateAssignment
+  postPublishAssignment,
+  postUpdateAssignment,
+  postSubmitQuizAssignment,
 };
-

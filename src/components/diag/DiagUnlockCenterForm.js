@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuUnlock, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import { postUnlockCenter } from "../../services/centerService";
 import { fetchCenters } from "../../store/listCenterSlice";
@@ -11,13 +12,17 @@ const DiagUnlockCenterForm = ({
   onCenterOption,
 }) => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const handleUnlockCenter = async () => {
+    setLoading(true);
     try {
       await postUnlockCenter(idCenterSelected);
       dispatch(fetchCenters(CenterStatus.active));
       onCenterOption();
     } catch (error) {
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
   if (!isOpen) return null;
@@ -59,6 +64,9 @@ const DiagUnlockCenterForm = ({
                   handleUnlockCenter();
                 }}
               >
+                {loading && (
+                  <ImSpinner2 className="icon-spin" color="#393979" />
+                )}
                 Yes
               </button>
             </div>

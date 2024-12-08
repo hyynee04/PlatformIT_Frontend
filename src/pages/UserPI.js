@@ -201,7 +201,7 @@ const TeacherPI = () => {
       setPhoneNumWarning("");
       setLoadingBtn((prevState) => ({
         ...prevState,
-        basicPI: true, // Đúng key, bật loading cho nút
+        basicPI: true,
       }));
       try {
         const response = await postUpdateUserBasicPI(
@@ -226,7 +226,7 @@ const TeacherPI = () => {
       } finally {
         setLoadingBtn((prevState) => ({
           ...prevState,
-          basicPI: false, // Đúng key, bật loading cho nút
+          basicPI: false,
         }));
       }
     }

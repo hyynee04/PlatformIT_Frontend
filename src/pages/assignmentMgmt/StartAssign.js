@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+import { format, fromZonedTime } from "date-fns-tz";
 import {
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
@@ -9,10 +9,11 @@ import {
 import {
   APIStatus,
   AssignmentItemAnswerType,
+  AssignmentResultStatus,
   AssignmentType,
 } from "../../constants/constants";
 import { getPagination } from "../../functions/function";
-
+import { LuCheckCircle, LuX } from "react-icons/lu";
 import { ImSpinner2 } from "react-icons/im";
 import Form from "react-bootstrap/Form";
 import default_image from "../../assets/img/default_image.png";
@@ -90,85 +91,140 @@ const StartAssign = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const [diagSubmitVisible, setDiagSubmitVisible] = useState(false);
+  const [isQuestionsValid, setIsQuestionsValid] = useState(false); // Kiểm tra câu hỏi hợp lệ
+  const [diagMessage, setDiagMessage] = useState(
+    "Are you sure you want to submit?"
+  ); // Thông báo
+
+  const handleOpenDiag = () => {
+    const hasInvalidQuestions = questions.some((question) => {
+      return !question.items.some((item) => item.isSelected === true); // Không có đáp án nào được chọn
+    });
+
+    if (hasInvalidQuestions) {
+      setIsQuestionsValid(false);
+      setDiagMessage(
+        "Please ensure all questions have at least one answer selected."
+      );
+    } else {
+      setIsQuestionsValid(true);
+      setDiagMessage("Are you sure you want to submit?");
+    }
+    setDiagSubmitVisible(true); // Hiển thị modal
+  };
   //HANDLE OUT OF PAGE
-  const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
 
-  // Hàm hiển thị dialog tùy chỉnh khi người dùng cố gắng thoát trang
-  const handleExitDialog = (event) => {
-    if (!showExitDialog) {
-      event.preventDefault();
-      event.returnValue = ""; // Cần thiết cho một số trình duyệt
-      setShowExitDialog(true);
+  // useEffect(() => {
+  //   const handleBeforeUnload = (event) => {
+  //     event.preventDefault();
+  //     event.returnValue =
+  //       "Are you sure you want to leave? Your progress may not be saved!";
+
+  //     // Nộp bài khi tắt trình duyệt hoặc reload
+  //     handleSubmitAssignment();
+  //   };
+
+  //   const handlePopState = () => {
+  //     // Kiểm tra hành động Back/Forward
+  //     if (
+  //       window.confirm("Are you sure you want to leave without submitting?")
+  //     ) {
+  //       handleSubmitAssignment(); // Nộp bài trước khi rời trang
+  //       navigate(-1); // Quay lại trang trước
+  //     } else {
+  //       // Giữ nguyên trạng thái hiện tại
+  //       window.history.pushState(null, null, window.location.href);
+  //     }
+  //   };
+
+  //   // Đẩy trạng thái vào lịch sử để phát hiện sự kiện popstate
+  //   window.history.pushState(null, null, window.location.href);
+
+  //   // Thêm sự kiện xử lý
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   window.addEventListener("popstate", handlePopState);
+
+  //   // Cleanup
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //     window.removeEventListener("popstate", handlePopState);
+  //   };
+  // }, [navigate]);
+
+  // SUBMIT ASSIGNMENT
+  const handleAssignmentResultStatus = (
+    dueDate,
+    courseEndDate,
+    submittedDateObj
+  ) => {
+    if (isNaN(dueDate) || (courseEndDate && isNaN(courseEndDate))) {
+      console.error("Invalid dueDate or courseEndDate");
+      return AssignmentResultStatus.submitted;
     }
+
+    if (!assignmentInfo.courseEndDate) {
+      return AssignmentResultStatus.submitted;
+    }
+
+    if (!assignmentInfo.duration) {
+      if (submittedDateObj > dueDate || submittedDateObj > courseEndDate) {
+        return AssignmentResultStatus.late;
+      }
+      return AssignmentResultStatus.onTime;
+    }
+
+    return AssignmentResultStatus.onTime;
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      event.returnValue =
-        "Are you sure you want to leave? Your progress may not be saved!";
-
-      // Nộp bài khi tắt trình duyệt hoặc reload
-      handleSubmitAssignment();
-    };
-
-    const handlePopState = () => {
-      // Kiểm tra hành động Back/Forward
-      if (
-        window.confirm("Are you sure you want to leave without submitting?")
-      ) {
-        handleSubmitAssignment(); // Nộp bài trước khi rời trang
-        navigate(-1); // Quay lại trang trước
-      } else {
-        // Giữ nguyên trạng thái hiện tại
-        window.history.pushState(null, null, window.location.href);
-      }
-    };
-
-    // Đẩy trạng thái vào lịch sử để phát hiện sự kiện popstate
-    window.history.pushState(null, null, window.location.href);
-
-    // Thêm sự kiện xử lý
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("popstate", handlePopState);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [navigate]);
-
-  // Hàm nộp bài
   const handleSubmitAssignment = async () => {
     const timeSpent = totalDuration - timeLeft;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const localDate = new Date();
+    const utcDate = fromZonedTime(localDate, timezone);
+
+    const submittedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
+
+    const dueDate = new Date(assignmentInfo.dueDate); // Ngày hết hạn bài tập
+    const courseEndDate = assignmentInfo.courseEndDate
+      ? new Date(assignmentInfo.courseEndDate)
+      : null; // Ngày kết thúc khóa học (nếu có)
+    const submittedDateObj = new Date(submittedDate);
+
     const answers = questions.map((question) => {
-      // Lọc các choice có isSelected === true
       const selectedOptions = question.items
         .filter((item) => item.isSelected === true)
         .map((item) => item.idMultipleAssignmentItem);
 
       return {
         idAssignmentItem: question.idAssignmentItem,
-        selectedOptions, // Danh sách idMultipleAssignmentItem đã chọn
+        selectedOptions,
       };
     });
+
+    const assignmentResultStatus = handleAssignmentResultStatus(
+      dueDate,
+      courseEndDate,
+      submittedDateObj
+    );
+
     const requestData = {
       idAssignment: assignmentInfo.idAssignment,
       idStudent: Number(localStorage.getItem("idUser")),
-      duration: timeSpent, // Thời gian thực tế
-      assignmentResultStatus: 1, // Trạng thái thực tế
-      submittedDate: new Date().toISOString(),
+      duration: timeSpent,
+      assignmentResultStatus, // Trạng thái kết quả bài nộp
+      submittedDate: submittedDate,
       answers: answers,
     };
+
     try {
       setLoading(true);
-      const response = await postSubmitQuizAssignment({
-        requestData,
-      });
+      const response = await postSubmitQuizAssignment(requestData);
       if (response.status === APIStatus.success) {
         console.log("Assignment submitted successfully.");
+        navigate("/studentTest");
       } else {
         console.error("Failed to submit assignment:", response);
       }
@@ -242,10 +298,7 @@ const StartAssign = () => {
               {minutes < 10 ? `0${minutes}` : minutes}:
               {seconds < 10 ? `0${seconds}` : seconds}
             </label>
-            <button
-              className="btn submit"
-              onClick={() => handleSubmitAssignment()}
-            >
+            <button className="btn submit" onClick={() => handleOpenDiag()}>
               Submit
             </button>
           </div>
@@ -399,18 +452,43 @@ const StartAssign = () => {
         </div>
       </div>
       {/* Dialog thông báo nếu người dùng chưa nộp bài */}
-      {showExitDialog && (
-        <div className="exit-dialog">
-          <div className="dialog-content">
-            <p>
-              You haven't submitted your assignment yet. Are you sure you want
-              to leave?
-            </p>
-            <button onClick={() => navigate("/another-page")}>
-              Leave anyway
-            </button>{" "}
-            {/* Use navigate */}
-            <button onClick={() => setShowExitDialog(false)}>Stay here</button>
+      {diagSubmitVisible && (
+        <div
+          className="modal-overlay"
+          onClick={() => setDiagSubmitVisible(false)}
+        >
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="diag-header">
+              <div className="container-title">
+                <LuCheckCircle className="diag-icon" />
+                <span className="diag-title">Confirmation</span>
+              </div>
+              <LuX
+                className="diag-icon"
+                onClick={() => setDiagSubmitVisible(false)}
+              />
+            </div>
+            <div className="diag-body">
+              <span>{diagMessage}</span>
+
+              <div className="str-btns">
+                <div className="act-btns">
+                  <button
+                    className="btn diag-btn cancel"
+                    onClick={() => setDiagSubmitVisible(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn diag-btn signout"
+                    onClick={() => handleSubmitAssignment()}
+                    disabled={!isQuestionsValid}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { LuBuilding2, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import {
   approveCenter,
@@ -21,8 +22,16 @@ const DiagActionCenterForm = ({
   const idUserUpdated = +localStorage.getItem("idUser");
   const [reasonReject, setReasonReject] = useState(null);
   const [errorRejectString, setErrorRejectString] = useState("");
+  const [loadingBtn, setLoadingBtn] = useState({
+    approve: false,
+    reject: false,
+  });
 
   const handleApproveCenter = async () => {
+    setLoadingBtn((prevState) => ({
+      ...prevState,
+      approve: true,
+    }));
     try {
       const resultAction = await dispatch(
         approveCenter({ idCenterSelected: idCenterSelected, idUserUpdated })
@@ -34,6 +43,10 @@ const DiagActionCenterForm = ({
     } catch (error) {
       console.error("Error while approving center: ", error);
     }
+    setLoadingBtn((prevState) => ({
+      ...prevState,
+      approve: false,
+    }));
   };
 
   const handleRejectCenter = async () => {
@@ -85,6 +98,9 @@ const DiagActionCenterForm = ({
                     await handleApproveCenter();
                   }}
                 >
+                  {loadingBtn.approve && (
+                    <ImSpinner2 className="icon-spin" color="#397979" />
+                  )}
                   Yes
                 </button>
               </div>

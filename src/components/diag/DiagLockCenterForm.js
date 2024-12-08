@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuLock, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { postLockCenter } from "../../services/centerService";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +17,9 @@ const DiagLockCenterForm = ({
   const dispatch = useDispatch();
   const idRole = +localStorage.getItem("idRole");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const handleLockCenter = async () => {
+    setLoading(true);
     try {
       if (idRole === Role.centerAdmin) {
         let idCenter = +localStorage.getItem("idCenter");
@@ -37,6 +40,8 @@ const DiagLockCenterForm = ({
       }
     } catch (error) {
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
   if (!isOpen) return null;
@@ -187,6 +192,12 @@ const DiagLockCenterForm = ({
                   handleLockCenter();
                 }}
               >
+                {loading && (
+                  <ImSpinner2
+                    className="icon-spin"
+                    color="var(--border-gray)"
+                  />
+                )}
                 Confirm
               </button>
             </div>

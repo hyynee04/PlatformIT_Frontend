@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { LuUserPlus, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import { APIStatus, Role } from "../../constants/constants";
 import { fetchListUserOfCenter } from "../../store/listUserOfCenter";
@@ -18,8 +19,10 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [errorString, setErrorString] = useState("");
+  const [loading, setLoading] = useState(false);
   const handleAddUser = async () => {
     if (roleAdded === Role.teacher) {
+      setLoading(true);
       try {
         const response = await postAddTeacher(
           fullName,
@@ -38,8 +41,11 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
         }
       } catch (error) {
         console.error("Error while add teacher center: ", error);
+      } finally {
+        setLoading(false);
       }
     } else if (roleAdded === Role.centerAdmin) {
+      setLoading(true);
       try {
         const response = await postAddCenterAmin(
           fullName,
@@ -58,6 +64,8 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
         }
       } catch (error) {
         console.error("Error while approving center: ", error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -138,8 +146,12 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
                 disabled={!email || !fullName || !username || !password}
                 onClick={async () => {
                   await handleAddUser();
+                  setErrorString("");
                 }}
               >
+                {loading && (
+                  <ImSpinner2 className="icon-spin" color="#393979" />
+                )}
                 Submit
               </button>
             </div>

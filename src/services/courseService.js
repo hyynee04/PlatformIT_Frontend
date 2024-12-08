@@ -155,6 +155,16 @@ const getAssignmentInfo = async (idAssignment) => {
     },
   });
 };
+const getOverviewAssignment = async (idAssignment, idCourse) => {
+  console.log("idCourse", idCourse);
+
+  return await axios.get("api/Assignment/GetOverviewAssignment", {
+    params: {
+      idAssignment: idAssignment,
+      idCourse: idCourse,
+    },
+  });
+};
 const getDetailAssignmentForStudent = async (idAssignment) => {
   return await axios.get("api/Assignment/GetDetailAssignmentForStudent", {
     params: {
@@ -444,15 +454,15 @@ const postSubmitQuizAssignment = async (requestData) => {
   try {
     console.log(requestData);
 
-    // return await axios.post(
-    //   "api/Assignment/SubmitQuizAssignment",
-    //   requestData,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
+    return await axios.post(
+      "api/Assignment/SubmitQuizAssignment",
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     throw error;
   }
@@ -552,6 +562,7 @@ export {
   getAllCourseCardsByIdTeacher,
   getAllTagModel,
   getAssignmentInfo,
+  getOverviewAssignment,
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
   getCourseDetail,

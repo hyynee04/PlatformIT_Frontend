@@ -62,6 +62,16 @@ export const formatDateTime = (dateString) => {
     hour12: false,
   });
 };
+export const formatDuration = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  // Đảm bảo định dạng luôn 2 chữ số với padding
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedSeconds = remainingSeconds.toString().padStart(2, "0");
+
+  return `${formattedMinutes}:${formattedSeconds}`;
+};
 export const handleNotificationNavigate = (notification, navigate) => {
   if (notification.notificationType === NotificationType.qualification) {
     navigate("/pi", {
@@ -113,13 +123,16 @@ export const calculateRelativeTime = (timestamp) => {
   if (difference < 60)
     return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
   if (difference < 3600)
-    return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"
-      } ago`;
-  if (difference < 86400)
-    return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"
-      } ago`;
-  return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"
+    return `${Math.floor(difference / 60)} ${
+      Math.floor(difference / 60) > 1 ? "minutes" : "minute"
     } ago`;
+  if (difference < 86400)
+    return `${Math.floor(difference / 3600)} ${
+      Math.floor(difference / 3600) > 1 ? "hours" : "hour"
+    } ago`;
+  return `${Math.floor(difference / 86400)} ${
+    Math.floor(difference / 86400) > 1 ? "days" : "day"
+  } ago`;
 };
 
 // Helper to parse "relativeTime" into a timestamp
@@ -141,20 +154,20 @@ export const parseRelativeTime = (relativeTime) => {
 
 export const getVideoType = (fileName) => {
   // Check if the file name ends with a specific extension
-  if (fileName.endsWith('.mp4')) {
-    return 'video/mp4';
-  } else if (fileName.endsWith('.webm')) {
-    return 'video/webm';
-  } else if (fileName.endsWith('.ogg')) {
-    return 'video/ogg';
+  if (fileName.endsWith(".mp4")) {
+    return "video/mp4";
+  } else if (fileName.endsWith(".webm")) {
+    return "video/webm";
+  } else if (fileName.endsWith(".ogg")) {
+    return "video/ogg";
   } else {
-    return ''; // If the type is not recognized
+    return ""; // If the type is not recognized
   }
 };
 
 export const handleKeyDown = (event, handler) => {
   console.log(event.key);
-  if (event.key === 'Enter') {
+  if (event.key === "Enter") {
     handler(); // Trigger passed handler function on Enter key press
   }
 };

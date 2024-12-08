@@ -3,11 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   getAssignmentInfo,
   getDetailAssignmentForStudent,
+  getOverviewAssignment,
   postUpdateAssignment,
 } from "../../services/courseService";
 import {
   APIStatus,
   AssignmentItemAnswerType,
+  AssignmentResultStatus,
   AssignmentType,
   Role,
 } from "../../constants/constants";
@@ -22,10 +24,16 @@ import {
 import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
 
-import { formatDateTime, getPagination } from "../../functions/function";
+import {
+  formatDate,
+  formatDateTime,
+  formatDuration,
+  getPagination,
+} from "../../functions/function";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import default_image from "../../assets/img/default_image.png";
+import default_ava from "../../assets/img/default_ava.png";
 import "../../assets/css/AssignmentDetail.css";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -36,6 +44,7 @@ const AssignDetail = () => {
   const [loading, setLoading] = useState(false);
   const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
   const [assignmentInfo, setAssignmentInfo] = useState({});
+  const [overviewAssignment, setOverviewAssignment] = useState({});
   const [questions, setQuestions] = useState([]);
   const [activeChoice, setActiveChoice] = useState("question");
   useEffect(() => {
@@ -43,12 +52,14 @@ const AssignDetail = () => {
       setLoading(true);
       try {
         let response;
+
         if (idRole === Role.teacher) {
           response = await getAssignmentInfo(idAssignment);
         } else if (idRole === Role.student) {
           response = await getDetailAssignmentForStudent(idAssignment);
         }
-        if (response.status === APIStatus.success) {
+
+        if (response?.status === APIStatus.success) {
           const fetchedAssignmentInfo = response.data;
           setAssignmentInfo(fetchedAssignmentInfo);
           if (idRole === Role.teacher) {
@@ -61,13 +72,36 @@ const AssignDetail = () => {
         setLoading(false);
       }
     };
+
     const state = location.state;
-    if (state) {
-      if (state.idAssignment) {
-        fetchAssignmentData(state.idAssignment);
-      }
+    if (state?.idAssignment) {
+      fetchAssignmentData(state.idAssignment);
     }
   }, [location]);
+
+  useEffect(() => {
+    const fetchOverviewData = async () => {
+      if (idRole === Role.teacher && assignmentInfo?.idCourse) {
+        setLoading(true);
+        try {
+          const responseOverview = await getOverviewAssignment(
+            assignmentInfo.idAssignment,
+            assignmentInfo.idCourse
+          );
+          if (responseOverview.status === APIStatus.success) {
+            setOverviewAssignment(responseOverview.data);
+          }
+        } catch (error) {
+          console.error("Error fetching overview assignment data", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchOverviewData();
+  }, [assignmentInfo?.idCourse, idRole]);
+
   const totalQuestions = questions.length;
 
   const totalMarks = questions.reduce(
@@ -79,11 +113,14 @@ const AssignDetail = () => {
     setActiveChoice(choice);
   };
   const data = {
-    labels: ["Not Submitted", "Submitted Late", "Submitted on Time"], // Labels for your chart
+    labels: ["Not Submitted", "Submitted"], // Labels for your chart
     datasets: [
       {
-        data: [8, 10, 30], // Data for each category
-        backgroundColor: ["#d9d9d9", "#ffcc00", "#14ae5c"], // Colors for the segments
+        data: [
+          overviewAssignment.notSubmittedCount,
+          overviewAssignment.submittedCount,
+        ], // Data for each category
+        backgroundColor: ["#d9d9d9", "#14ae5c"], // Colors for the segments
         borderWidth: 1,
       },
     ],
@@ -100,6 +137,14 @@ const AssignDetail = () => {
   };
   const [searchTerm, setSearchTerm] = useState("");
 
+  //LIST SUBMISSIONS
+  const sortedSubmissions = overviewAssignment?.submissions
+    ?.slice()
+    .sort((a, b) => {
+      const dateA = new Date(a.submittedDate).getTime();
+      const dateB = new Date(b.submittedDate).getTime();
+      return dateB - dateA;
+    });
   //FILTER
   const [filterVisble, setFilterVisble] = useState(false);
   const filterRef = useRef(null);
@@ -546,7 +591,9 @@ const AssignDetail = () => {
                         <Doughnut data={data} options={options} />
                       </div>
                       <span>
-                        <label className="number">48</label>
+                        <label className="number">
+                          {overviewAssignment.totalStudents}
+                        </label>
                         <label style={{ color: "var(--text-gray)" }}>
                           Attendees
                         </label>
@@ -554,34 +601,71 @@ const AssignDetail = () => {
                     </div>
 
                     <div className="chart-detail">
-                      <div className="detail">
-                        <label className="number">48</label>
-                        <label>
-                          <GoDotFill className="status-submit-dot not-submitted" />
-                          Not submitted
-                        </label>
-                      </div>
-                      <div className="detail">
-                        <label className="number">48</label>
-                        <label>
-                          <GoDotFill className="status-submit-dot submitted" />
-                          Submmitted
-                        </label>
-                      </div>
-                      <div className="detail">
-                        <label className="number">48</label>
-                        <label>
-                          <GoDotFill className="status-submit-dot submitted-late" />
-                          Submitted late
-                        </label>
-                      </div>
-                      <div className="detail">
-                        <label className="number">48</label>
-                        <label>
-                          <GoDotFill className="status-submit-dot submitted" />
-                          Submitted on time
-                        </label>
-                      </div>
+                      {overviewAssignment.isPastDue === 1 ? (
+                        <>
+                          <div className="detail">
+                            <label className="number">
+                              {overviewAssignment.notSubmittedCount}
+                            </label>
+                            <label>
+                              <GoDotFill className="status-submit-dot not-submitted" />
+                              Not submitted
+                            </label>
+                          </div>
+                          <div className="detail">
+                            <label className="number">
+                              {
+                                overviewAssignment.submissions.filter(
+                                  (submission) =>
+                                    submission.status ===
+                                    AssignmentResultStatus.late
+                                ).length
+                              }
+                            </label>
+                            <label>
+                              <GoDotFill className="status-submit-dot submitted-late" />
+                              Submitted late
+                            </label>
+                          </div>
+                          <div className="detail" style={{ border: "none" }}>
+                            <label className="number">
+                              {" "}
+                              {
+                                overviewAssignment.submissions.filter(
+                                  (submission) =>
+                                    submission.status ===
+                                    AssignmentResultStatus.onTime
+                                ).length
+                              }
+                            </label>
+                            <label>
+                              <GoDotFill className="status-submit-dot submitted" />
+                              Submitted on time
+                            </label>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="detail">
+                            <label className="number">
+                              {overviewAssignment.notSubmittedCount}
+                            </label>
+                            <label>
+                              <GoDotFill className="status-submit-dot not-submitted" />
+                              Not submitted
+                            </label>
+                          </div>
+                          <div className="detail" style={{ border: "none" }}>
+                            <label className="number">
+                              {overviewAssignment.submittedCount}
+                            </label>
+                            <label>
+                              <GoDotFill className="status-submit-dot submitted" />
+                              Submmitted
+                            </label>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className="attendee-list">
@@ -791,22 +875,63 @@ const AssignDetail = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                          </tr>
-                          <tr>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                            <td>name</td>
-                          </tr>
+                          {sortedSubmissions.map((submission, index) => (
+                            <tr key={index}>
+                              <td></td>
+                              <td>
+                                {" "}
+                                <img
+                                  src={submission.avatarPath || default_ava}
+                                  alt=""
+                                  className="ava-img"
+                                />
+                                {submission.nameStudent}
+                              </td>
+                              <td>
+                                {submission.submittedDate &&
+                                  formatDateTime(submission.submittedDate)}
+                              </td>
+                              <td>
+                                <span
+                                  className={`status assign ${
+                                    submission.status ===
+                                      AssignmentResultStatus.submitted ||
+                                    submission.status ===
+                                      AssignmentResultStatus.onTime
+                                      ? "active"
+                                      : submission.status ===
+                                        AssignmentResultStatus.late
+                                      ? "pending"
+                                      : submission.status ===
+                                        AssignmentResultStatus.inactive
+                                      ? "inactive"
+                                      : ""
+                                  }`}
+                                >
+                                  {submission.status ===
+                                  AssignmentResultStatus.submitted
+                                    ? "Submitted"
+                                    : submission.status ===
+                                      AssignmentResultStatus.onTime
+                                    ? overviewAssignment.isPastDue === 1
+                                      ? "On time"
+                                      : "Submitted"
+                                    : submission.status ===
+                                      AssignmentResultStatus.late
+                                    ? "Late"
+                                    : submission.status ===
+                                      AssignmentResultStatus.locked
+                                    ? "Locked"
+                                    : ""}
+                                </span>
+                              </td>
+                              <td>
+                                {submission.studentDuration &&
+                                  formatDuration(submission.studentDuration)}
+                              </td>
+                              <td>{submission.studentTotalMark}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>

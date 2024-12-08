@@ -508,22 +508,35 @@ const getCourseProgress = (idCourse) => {
   });
 };
 
+const getCourseContentStructure = (idCourse, idStudent) => {
+  return axios.get("api/Course/GetCourseContentStructure", {
+    params: {
+      idCourse: idCourse,
+      ...(idStudent && { idStudent: idStudent }),
+    }
+  })
+}
+
+const getExerciseOfLectureViaStudent = (idLecture, idStudent) => {
+  return axios.get("api/Assignment/GetExerciseOfLectureViaStudent", {
+    params: {
+      idLecture: idLecture,
+      idStudent: idStudent,
+    }
+  })
+}
+
 export {
   deleteAssignment,
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
-  getAllAssignmentCardOfTeacher,
-  getAllTestCardOfStudent,
-  getAllCourseCards,
+  getAllAssignmentCardOfTeacher, getAllCourseCards,
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
-  getAllTagModel,
-  getAssignmentInfo,
-  getCourseDetail,
-  getCourseProgress,
-  getIsEnRolledCourse, getLectureDetail, getNotificationBoardOfCourse,
+  getAllTagModel, getAllTestCardOfStudent, getAssignmentInfo, getCourseContentStructure, getCourseDetail,
+  getCourseProgress, getExerciseOfLectureViaStudent, getIsEnRolledCourse, getLectureDetail, getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
   postAddLecture,

@@ -16,8 +16,8 @@ const CourseCard = (props) => {
   const longest_tag =
     course.tags && course.tags.length > 0
       ? course.tags.reduce((longest, current) =>
-        current.length > longest.length ? current : longest
-      )
+          current.length > longest.length ? current : longest
+        )
       : "";
   const remain_tag_number = course.tags ? course.tags.length - 1 : 0;
 
@@ -27,7 +27,7 @@ const CourseCard = (props) => {
     2: "Registering",
     3: "Starting soon",
     4: "On going",
-  }
+  };
 
   const getCourseStatus = (course) => {
     const currentDate = new Date();
@@ -49,11 +49,12 @@ const CourseCard = (props) => {
 
   useEffect(() => {
     getCourseStatus(course);
-  }, [course])
+  }, [course]);
 
   return (
     <div className="outside-card">
-      {(course.isEnrolled || course.idTeacher === +localStorage.getItem("idUser")) && (
+      {(course.isEnrolled ||
+        course.idTeacher === +localStorage.getItem("idUser")) && (
         <BsPinAngleFill />
       )}
 
@@ -63,7 +64,15 @@ const CourseCard = (props) => {
           onMouseEnter={() => setIsHover(true)}
         >
           {course.isLimitedTime === 1 && (
-            <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>
+            <div
+              className={`course-card-period ${
+                status === 1 || status === 3
+                  ? "soon"
+                  : status === 2
+                  ? "registering"
+                  : "ongoing"
+              }`}
+            >
               {courseStatus[status]}
             </div>
           )}
@@ -86,7 +95,8 @@ const CourseCard = (props) => {
               {course.isLimitedTime === 1 ? (
                 <div className="course-card-info">
                   <LuClock color="#757575" />
-                  {formatDate(course.courseStartDate)} - {formatDate(course.courseEndDate)}
+                  {formatDate(course.courseStartDate)} -{" "}
+                  {formatDate(course.courseEndDate)}
                 </div>
               ) : (
                 <div className="course-card-info">
@@ -100,26 +110,27 @@ const CourseCard = (props) => {
           <div className="course-card-footer">
             <div className="course-card-price">
               <span className="discount-price">
-                {course.discountedPrice ?
-                  `${course.discountedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                  :
-                  (course.price ?
-                    `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                    :
-                    "Free")
-                }
+                {course.discountedPrice
+                  ? `${course.discountedPrice
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : course.price
+                  ? `${course.price
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : "Free"}
                 {course.price && <TbCurrencyDong />}
               </span>
               {course.discountedPrice && (
-                <span className='initial-price'>
+                <span className="initial-price">
                   {course.price
-                    ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                    : "Free"
-                  }
+                    ? `${course.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                    : "Free"}
                   {course.price && <TbCurrencyDong />}
                 </span>
               )}
-
             </div>
           </div>
         </div>
@@ -130,12 +141,21 @@ const CourseCard = (props) => {
           className="card-container card-container-hover"
           onMouseLeave={() => setIsHover(false)}
         >
-          {(course.isEnrolled || course.idTeacher === +localStorage.getItem("idUser")) && (
+          {(course.isEnrolled ||
+            course.idTeacher === +localStorage.getItem("idUser")) && (
             <BsPinAngleFill className="pin-hover" />
           )}
           <div className="course-card-container course-card-hover">
             {course.isLimitedTime === 1 && (
-              <div className={`course-card-period ${(status === 1 || status === 3) ? "soon" : (status === 2 ? "registering" : "ongoing")}`}>
+              <div
+                className={`course-card-period ${
+                  status === 1 || status === 3
+                    ? "soon"
+                    : status === 2
+                    ? "registering"
+                    : "ongoing"
+                }`}
+              >
                 {courseStatus[status]}
               </div>
             )}
@@ -193,9 +213,10 @@ const CourseCard = (props) => {
               <div className="course-card-price">
                 <span className="discount-price">
                   {course.price
-                    ? `${course.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
-                    : "Free"
-                  }
+                    ? `${course.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                    : "Free"}
                   {course.price && <TbCurrencyDong />}
                 </span>
               </div>

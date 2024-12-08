@@ -91,6 +91,7 @@ const DiagVerifyOtpForm = (props) => {
                 <div className="diag-body">
                     <div className="verify-otp-container">
                         <input
+                            type="number"
                             placeholder="Enter OTP here..."
                             value={OTP}
                             onChange={(event) => {

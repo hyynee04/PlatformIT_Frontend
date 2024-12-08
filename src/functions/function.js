@@ -62,6 +62,19 @@ export const formatDateTime = (dateString) => {
     hour12: false,
   });
 };
+export const isPastDateTime = (dateTimeString, courseEndDate) => {
+  let inputDateTime;
+  // Parse the input date-time string into a Date object
+  if (!dateTimeString) {
+    inputDateTime = new Date(courseEndDate);
+  } else {
+    inputDateTime = new Date(dateTimeString);
+  }
+  // Get the current date and time
+  const now = new Date();
+  // Compare the dates
+  return inputDateTime < now;
+};
 export const handleNotificationNavigate = (notification, navigate) => {
   if (notification.notificationType === NotificationType.qualification) {
     navigate("/pi", {

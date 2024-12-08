@@ -146,6 +146,15 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part > .part-item.exercise:hover {
+    cursor: pointer;
+    background-color: rgba(217 , 217, 217, 0.5);
+    transform: scale(1.01);
+    border-radius: .25rem;
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .main-material {
@@ -176,6 +185,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
+    padding: .5rem;
 }
 .lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
 .exercise-display .exercise-body > .exercise-description {
@@ -470,21 +481,34 @@
     padding: .5rem 1rem;
     background-color: rgba(217 , 217, 217, 0.5);
     border-radius: .25rem;
-    transition: background-color 0.3s ease, border-radius 0.3s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 .section-view-container .section-display .each-section > .each-section-header.active {
     background-color: rgba(57, 121, 121, 0.3);
     border-radius: .25rem .25rem 0 0;
-    transition: background-color 0.3s ease, border-radius 0.3s ease;
+    transition: all 0.3s ease;
 }
+
 .section-view-container .section-display .each-section .each-section-header > .each-section-name {
     font-size: 1.1rem;
     font-weight: 600;
-    width: 70%;
     color: var(--black-color);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.section-view-container .section-display .each-section .each-section-header .each-section-name > button {
+    border: none;
+    background-color: transparent;
+    padding: 0 .25rem;
+}
+.section-view-container .section-display .each-section .each-section-header .each-section-name > button:hover {
+    transform: scale(1.1) translate(2px, -2px);
 }
 .section-view-container .section-display .each-section .each-section-header > .each-section-info {
-    width: 25%;
+    width: 7.25rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -505,6 +529,49 @@
 .section-view-container .section-display .each-section .each-section-header .each-section-info > .dropdown-button:hover {
     opacity: 0.5;
 }
+.section-view-container .section-display .each-section .each-section-header > .edit-section-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.section-view-container .section-display .each-section .each-section-header .edit-section-container > input {
+    width: 80%;
+    border: none;
+    border-bottom: 1px solid var(--black-color);
+    background-color: transparent;
+    font-size: 1.06rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.section-view-container .section-display .each-section .each-section-header .edit-section-container > .edit-section-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    height: fit-content;
+}
+.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button {
+    border: none;
+    border-radius: .25rem;
+    width: 1.5rem;
+    aspect-ratio: 1;
+    background-color: transparent;
+}
+.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:disabled,
+.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:disabled:hover {
+    background-color: rgba(217, 217, 217, 0.5);
+    color: var(--text-gray);
+    cursor:not-allowed;
+}
+.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+    scale: 1.2;
+}
+
 .section-view-container .section-display .each-section > .section-lectures {
     display: flex;
     flex-direction: column;
@@ -532,27 +599,17 @@
     padding: .5rem 1rem;
     border-bottom: 1px solid var(--border-gray);
 }
-.section-view-container .section-display .each-section .section-lectures > .lecture-item.contain-button {
-    padding: 0;
-    height: 2.25rem;
-}
-.section-view-container .section-display .each-section .section-lectures .lecture-item > button {
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-    border-radius: .25rem;
-    color: var(--second-main-color);
-    font-size: .8rem;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    margin-left: 1rem;
-}
 .section-view-container .section-display .each-section .section-lectures > .lecture-item:hover {
-    background-color: rgba(217 , 217, 217, 0.3);
+    background-color: rgba(217, 217, 217, 0.3);
+    cursor: pointer;
+}
+.section-view-container .section-display .each-section .section-lectures > .nohover,
+.section-view-container .section-display .each-section .section-lectures > .nohover:hover {
+    background-color: transparent;
+}
+.section-view-container .section-display .each-section .section-lectures > .lecture-item.contain-button {
+    padding: .25rem 1rem;
+    height: 2.25rem;
 }
 .section-view-container .section-display .each-section .section-lectures .lecture-item > .lecture-info {
     display: flex;
@@ -581,11 +638,13 @@
 .section-view-container .section-display > .add-section {
     width: 100%;
     height: fit-content;
+    display: flex;
+    justify-content: flex-end;
 }
 .section-view-container .section-display .add-section > button {
     background-color: rgba(217, 217, 217, 0.2);
     color: var(--main-color);
-    font-size: .9rem;
+    font-size: .8rem;
     font-weight: 500;
 
     display: flex;
@@ -635,3 +694,74 @@
 .content-file:hover {
     background-color: rgba(217, 217, 217, 1);
 }
+
+.section-view-container .section-display .each-section .section-lectures .lecture-item > .option-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    border: none;
+    border-radius: .25rem;
+    font-size: .8rem;
+    padding: 3px;
+    cursor: pointer;
+    width: 1.5rem;
+    height: fit-content;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button .icon > svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button > span {
+    display: flex;
+    align-items: center;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button > .text {
+    font-weight: 600;
+    font-size: .8rem;
+    transform: translateX(10px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button:hover {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button:hover .text {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    transform: translateX(0px);
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture {
+    color: var(--main-color);
+}
+
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section {
+    color: var(--red-color);
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture:hover {
+    background-color: rgba(57, 121, 121, 0.3);
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture:hover .icon {
+    color: var(--main-color);
+}
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section:hover {
+    background-color: rgba(192, 15, 12, 0.3);
+} 
+.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section:hover .icon {
+    color: var(--red-color);
+} 

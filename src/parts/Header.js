@@ -201,95 +201,90 @@ const Header = () => {
           </NavLink>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">{renderNavLinksByRole()}</Nav>
-            <div className="auth-buttons">
-              {!idRole ? (
-                <>
+
+            {!idRole ? (
+              <div className="auth-buttons">
+                <button
+                  className="buts sign-in"
+                  onClick={() => navigate("/login")}
+                >
+                  Sign in
+                </button>
+                <button
+                  className="buts register"
+                  onClick={() => navigate("/register")}
+                >
+                  Register
+                </button>
+              </div>
+            ) : isPendingCenter ? (
+              <div className="auth-buttons">
+                <button
+                  className="circle-buts"
+                  onClick={() => openSignoutModal()}
+                >
+                  <LuLogOut className="header-icon" />
+                </button>
+              </div>
+            ) : (
+              <div className="auth-buttons">
+                {(idRole === Role.student || idRole === Role.teacher) && (
                   <button
-                    className="buts sign-in"
-                    onClick={() => navigate("/login")}
-                  >
-                    Sign in
-                  </button>
-                  <button
-                    className="buts register"
-                    onClick={() => navigate("/register")}
-                  >
-                    Register
-                  </button>
-                </>
-              ) : isPendingCenter ? (
-                <>
-                  <button
-                    className="circle-buts"
-                    onClick={() => openSignoutModal()}
-                  >
-                    <LuLogOut className="header-icon" />
-                  </button>
-                </>
-              ) : (
-                <>
-                  {(idRole === Role.student || idRole === Role.teacher) && (
-                    <button
-                      className={`circle-buts ${
-                        activeButton === "message" ? "clicked" : ""
+                    className={`circle-buts ${activeButton === "message" ? "clicked" : ""
                       }`}
-                      onClick={() => handleButtonClick("message")}
-                    >
-                      <LuMessageCircle className="header-icon" />
-                    </button>
-                  )}
-                  {idRole === Role.centerAdmin && (
-                    <button
-                      className={`circle-buts ${
-                        location.pathname === buttonPaths["clipboard"]
-                          ? "clicked"
-                          : ""
-                      }`}
-                      onClick={() => handleButtonClick("clipboard")}
-                    >
-                      <LuClipboardCheck className="header-icon" />
-                    </button>
-                  )}
+                    onClick={() => handleButtonClick("message")}
+                  >
+                    <LuMessageCircle className="header-icon" />
+                  </button>
+                )}
+                {idRole === Role.centerAdmin && (
                   <button
-                    ref={notiButtonRef}
-                    disabled={location.pathname === buttonPaths["bell"]}
-                    className={`circle-buts ${
-                      location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                    className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
+                        ? "clicked"
+                        : ""
+                      }`}
+                    onClick={() => handleButtonClick("clipboard")}
+                  >
+                    <LuClipboardCheck className="header-icon" />
+                  </button>
+                )}
+                <button
+                  ref={notiButtonRef}
+                  disabled={location.pathname === buttonPaths["bell"]}
+                  className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
                     }`}
-                    onClick={() => {
-                      setIsNotificationOpen(!isNotificationOpen);
-                    }}
-                  >
-                    <LuBell className="header-icon" />
-                  </button>
-                  {unreadCount ? (
-                    <div className="number-unseen">{unreadCount}</div>
-                  ) : null}
-                  <Notification
-                    idUser={idUser}
-                    isOpen={isNotificationOpen}
-                    onClose={() => setIsNotificationOpen(false)}
-                    notiButtonRef={notiButtonRef}
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    fetchUserNotification={() => fetchUserNotification(idUser)}
+                  onClick={() => {
+                    setIsNotificationOpen(!isNotificationOpen);
+                  }}
+                >
+                  <LuBell className="header-icon" />
+                </button>
+                {unreadCount ? (
+                  <div className="number-unseen">{unreadCount}</div>
+                ) : null}
+                <Notification
+                  idUser={idUser}
+                  isOpen={isNotificationOpen}
+                  onClose={() => setIsNotificationOpen(false)}
+                  notiButtonRef={notiButtonRef}
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  fetchUserNotification={() => fetchUserNotification(idUser)}
+                />
+                <button
+                  ref={optionButtonRef}
+                  className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
+                    }`}
+                  onClick={() => handleButtonClick("avatar")}
+                >
+                  <img
+                    src={avaImg || default_ava}
+                    alt=""
+                    className="header-avatar"
                   />
-                  <button
-                    ref={optionButtonRef}
-                    className={`circle-buts ${
-                      isAvatarPage || showOptionAva ? "clicked" : ""
-                    }`}
-                    onClick={() => handleButtonClick("avatar")}
-                  >
-                    <img
-                      src={avaImg || default_ava}
-                      alt=""
-                      className="header-avatar"
-                    />
-                  </button>
-                </>
-              )}
-            </div>
+                </button>
+              </div>
+            )}
             <HeaderAvatarOption
               optionButtonRef={optionButtonRef}
               isOpen={showOptionAva}

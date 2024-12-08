@@ -8,10 +8,12 @@ import {
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
-import { getVideoType } from "../../functions/function";
+import { AssignmentType } from "../../constants/constants";
+import { formatDateTime, getVideoType, isPastDateTime } from "../../functions/function";
 
 const LectureView = ({ lectureDetail }) => {
     const [index, setIndex] = useState(1);
+    console.log(lectureDetail);
     const menuItems = [
         { label: "Introduction", index: 1 },
         { label: "Support Materials", index: 2 },
@@ -144,69 +146,59 @@ const LectureView = ({ lectureDetail }) => {
                     )}
                     {index === 3 && (
                         <>
-                            <div className="part-item">
-                                <div className="exercise-display">
-                                    <div className="exercise-body">
-                                        <span className="item-title">Title</span>
-                                        <div className="exercise-description">
-                                            <span>
-                                                <LuFileEdit color="#003B57" /> Manual
-                                            </span>
-                                            <span>
-                                                <LuClock color="#003B57" /> 45 mins
-                                            </span>
-                                            <span>
-                                                <LuFileQuestion color="#003B57" /> 40 questions
-                                            </span>
+                            {lectureDetail.exercises && lectureDetail.exercises.length > 0
+                                && lectureDetail.exercises.map((exercise, index) => (
+                                    <div key={index} className="part-item exercise">
+                                        <div className="exercise-display">
+                                            <div className="exercise-body">
+                                                <span className="item-title">{exercise.title}</span>
+                                                <div className="exercise-description">
+                                                    {exercise.assignmentType && (
+                                                        <span>
+                                                            <LuFileEdit color="#003B57" />&nbsp;
+                                                            {exercise.assignmentType === AssignmentType.manual ?
+                                                                "MANUAL"
+                                                                :
+                                                                (exercise.assignmentType === AssignmentType.code ? "CODE" : "QUIZ")}
+                                                        </span>
+                                                    )}
+                                                    {exercise.duration && (
+                                                        <span>
+                                                            <LuClock color="#003B57" />&nbsp;
+                                                            {`${exercise.duration} ${exercise.duration > 1 ? "mins" : "min"}`}
+                                                        </span>
+                                                    )}
+                                                    {exercise.questionQuantity && (
+                                                        <span>
+                                                            <LuFileQuestion color="#003B57" />&nbsp;
+                                                            {`${exercise.questionQuantity} ${exercise.questionQuantity > 1 ? "questions" : "question"}`}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            {exercise.isSubmitted ?
+                                                (
+                                                    <div className="exercise-sideinfo">
+                                                        <span className="complete">Complete <LuCheckSquare /></span>
+                                                    </div>
+                                                )
+                                                :
+                                                (isPastDateTime(exercise.dueDate, "2024-12-05T17:05:07.972126") ? (
+                                                    <div className="exercise-sideinfo">
+                                                        <span className="pastdue">Past due</span>
+                                                    </div>
+                                                )
+                                                    :
+                                                    (
+                                                        <div className="exercise-sideinfo">
+                                                            <span className="inform">{formatDateTime(exercise.dueDate)}</span>
+                                                        </div>
+                                                    )
+                                                )
+                                            }
                                         </div>
                                     </div>
-                                    <div className="exercise-sideinfo">
-                                        <span className="inform">Due: 12/09/2025, 23:59</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="part-item">
-                                <div className="exercise-display">
-                                    <div className="exercise-body">
-                                        <span className="item-title">Title</span>
-                                        <div className="exercise-description">
-                                            <span>
-                                                <LuFileEdit color="#003B57" /> Manual
-                                            </span>
-                                            <span>
-                                                <LuClock color="#003B57" /> 45 mins
-                                            </span>
-                                            <span>
-                                                <LuFileQuestion color="#003B57" /> 40 questions
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="exercise-sideinfo">
-                                        <span className="complete">Complete <LuCheckSquare /></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="part-item">
-                                <div className="exercise-display">
-                                    <div className="exercise-body">
-                                        <span className="item-title">Title</span>
-                                        <div className="exercise-description">
-                                            <span>
-                                                <LuFileEdit color="#003B57" /> Manual
-                                            </span>
-                                            <span>
-                                                <LuClock color="#003B57" /> 45 mins
-                                            </span>
-                                            <span>
-                                                <LuFileQuestion color="#003B57" /> 40 questions
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="exercise-sideinfo">
-                                        <span className="pastdue">Past due</span>
-                                    </div>
-                                </div>
-                            </div>
+                                ))}
                         </>
                     )}
                     {index === 4 && (

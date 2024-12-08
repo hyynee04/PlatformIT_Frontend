@@ -24,7 +24,14 @@ import default_image from "../../assets/img/default_image.png";
 import { FiCheckSquare } from "react-icons/fi";
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
-import { formatDate, getPagination } from "../../functions/function";
+import {
+  calculateRelativeTime,
+  formatDate,
+  formatDateTime,
+  getPagination,
+  isPastDateTime,
+  parseRelativeTime,
+} from "../../functions/function";
 import {
   getCourseDetail,
   getIsEnRolledCourse,
@@ -82,43 +89,6 @@ const CourseDetail = (props) => {
     } finally {
       setLoading(false); // Set loading to false after request completes
     }
-  };
-
-  // Helper to calculate relative time
-  const calculateRelativeTime = (timestamp) => {
-    const now = new Date();
-    const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
-
-    if (difference < 60) return `${difference} seconds ago`;
-    if (difference < 3600) return `${Math.floor(difference / 60)} minutes ago`;
-    if (difference < 86400) return `${Math.floor(difference / 3600)} hours ago`;
-    return `${Math.floor(difference / 86400)} days ago`;
-  };
-
-  // Helper to parse "relativeTime" into a timestamp
-  const parseRelativeTime = (relativeTime) => {
-    const now = new Date();
-    const parts = relativeTime.split(" ");
-
-    if (parts.includes("seconds")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
-    } else if (parts.includes("minutes")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
-    } else if (parts.includes("hours")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
-    } else if (parts.includes("days")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
-    }
-    return now; // Default to current time if unrecognized format
-  };
-
-  const isPastDateTime = (dateTimeString) => {
-    // Parse the input date-time string into a Date object
-    const inputDateTime = new Date(dateTimeString);
-    // Get the current date and time
-    const now = new Date();
-    // Compare the dates
-    return inputDateTime < now;
   };
 
   // Number of lectures
@@ -191,7 +161,7 @@ const CourseDetail = (props) => {
   const reviews = courseInfo?.rateModels || [];
 
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 5;
+  const reviewsPerPage = 3;
   // Calculate total pages
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   // Get reviews for the current page
@@ -398,16 +368,16 @@ const CourseDetail = (props) => {
           )}
         </div>
 
-        {reviews && reviews.length !== 0 && (
-          <div className="block-container">
-            <div className="block-container-header">
-              <span className="block-container-title">Review</span>
-              {idUser && idRole === Role.student && isEnrolledCourse && (
-                <button className="add-review-button">
-                  <LuPlus /> Add review
-                </button>
-              )}
-            </div>
+        <div className="block-container">
+          <div className="block-container-header">
+            <span className="block-container-title">Review</span>
+            {idUser && idRole === Role.student && isEnrolledCourse && (
+              <button className="add-review-button">
+                <LuPlus /> Add review
+              </button>
+            )}
+          </div>
+          {reviews && reviews.length !== 0 && (
             <div className="block-container-col">
               {currentReviews.map((review, index) => (
                 <div key={index} className="review-content">
@@ -431,7 +401,7 @@ const CourseDetail = (props) => {
                   </div>
                 </div>
               ))}
-              <div className="pagination">
+              <div className="pagination-controls">
                 {paginationNumbers.map((number, index) => (
                   <button
                     key={index}
@@ -446,19 +416,19 @@ const CourseDetail = (props) => {
                 ))}
               </div>
             </div>
-            <div className="total-rating">
-              {courseInfo.totalRatePoint}/5
-              <StarRatings
-                rating={1}
-                starRatedColor="rgb(255, 204, 0)"
-                // changeRating={this.changeRating}
-                starDimension="1.5rem"
-                numberOfStars={1}
-                name="rating"
-              />
-            </div>
+          )}
+          <div className="total-rating">
+            {courseInfo.totalRatePoint}/5
+            <StarRatings
+              rating={1}
+              starRatedColor="rgb(255, 204, 0)"
+              // changeRating={this.changeRating}
+              starDimension="1.5rem"
+              numberOfStars={1}
+              name="rating"
+            />
           </div>
-        )}
+        </div>
       </div>
 
       <div className="right-container slide-to-left">
@@ -503,7 +473,7 @@ const CourseDetail = (props) => {
               </div>
             </div>
 
-            <div className="block-container">
+            <div className="block-container student">
               <span className="block-container-title">Notification Board</span>
               <div className="block-container-col noti-size">
                 <div className="notification">
@@ -525,28 +495,29 @@ const CourseDetail = (props) => {
 
         {idRole !== Role.teacher || idUser !== courseInfo.idTeacher ? (
           <>
-            {courseInfo.sectionsWithCourses &&
-              courseInfo.sectionsWithCourses.length > 0 && (
-                <div className="block-container">
-                  <div className="block-container-header">
-                    <span className="block-container-title">
-                      Course Content
-                    </span>
-                    <span className="block-container-sub-title">
-                      {courseInfo.sectionsWithCourses
-                        ? `${courseInfo.sectionsWithCourses.length} ${
-                            courseInfo.sectionsWithCourses.length === 1
-                              ? "section"
-                              : "sections"
-                          }`
-                        : "0 section"}{" "}
-                      -{" "}
-                      {`${numberOfLectures} ${
-                        numberOfLectures >= 1 ? "lecture" : "lectures"
-                      }`}
-                    </span>
-                  </div>
-
+            <div
+              className={`block-container ${
+                isEnrolledCourse ? "student" : "content-test"
+              }`}
+            >
+              <div className="block-container-header">
+                <span className="block-container-title">Course Content</span>
+                <span className="block-container-sub-title">
+                  {courseInfo.sectionsWithCourses
+                    ? `${courseInfo.sectionsWithCourses.length} ${
+                        courseInfo.sectionsWithCourses.length > 1
+                          ? "sections"
+                          : "section"
+                      }`
+                    : "0 section"}{" "}
+                  -{" "}
+                  {`${numberOfLectures} ${
+                    numberOfLectures >= 1 ? "lecture" : "lectures"
+                  }`}
+                </span>
+              </div>
+              {courseInfo.sectionsWithCourses &&
+                courseInfo.sectionsWithCourses.length > 0 && (
                   <div className="block-container-col">
                     {courseInfo.sectionsWithCourses.map((section, index) => (
                       <div key={index} className="lecture">
@@ -599,8 +570,9 @@ const CourseDetail = (props) => {
                                   if (isEnrolledCourse)
                                     navigate("/viewLecture", {
                                       state: {
-                                        idLecture: lecture.idLecture,
                                         idCourse: courseInfo.idCourse,
+                                        idSection: section.idSection,
+                                        idLecture: lecture.idLecture,
                                       },
                                     });
                                 }}
@@ -627,70 +599,94 @@ const CourseDetail = (props) => {
                       </div>
                     ))}
                   </div>
+                )}
+            </div>
+
+            {courseInfo.isLimitedTime ? (
+              <div
+                className={`block-container ${
+                  isEnrolledCourse ? "student" : "content-test"
+                }`}
+              >
+                <div className="block-container-header">
+                  <span className="block-container-title">Tests</span>
+                  <span className="block-container-sub-title">
+                    {courseInfo.tests
+                      ? `${courseInfo.tests.length} ${
+                          courseInfo.tests.length > 1 ? "tests" : "test"
+                        }`
+                      : "0 section"}{" "}
+                  </span>
                 </div>
-              )}
+                {courseInfo.tests && courseInfo.tests.length !== 0 && (
+                  <div className="block-container-col">
+                    {courseInfo.tests.map((test, index) => (
+                      <div key={index} className="qualification test">
+                        <div className="qualification-body">
+                          <div className="test-header">
+                            <span className="test-name">
+                              {test.assignmentTitle}
+                            </span>
+                            {idUser &&
+                            isEnrolledCourse &&
+                            idRole === Role.student ? (
+                              <>
+                                {test.isSubmitted ? (
+                                  <div className="test-info submitted">
+                                    Submitted <FiCheckSquare />
+                                  </div>
+                                ) : isPastDateTime(
+                                    test.dueDate,
+                                    courseInfo.courseEndDate
+                                  ) ? (
+                                  <div className="test-info past-due">
+                                    Past Due
+                                  </div>
+                                ) : (
+                                  <div className="test-info">
+                                    {test.dueDate
+                                      ? formatDateTime(test.dueDate)
+                                      : formatDateTime(
+                                          courseInfo.courseEndDate
+                                        )}
+                                  </div>
+                                )}
+                              </>
+                            ) : null}
+                          </div>
 
-            {courseInfo.tests && courseInfo.tests.length !== 0 && (
-              <div className="block-container">
-                <span className="block-container-title">Test</span>
-                <div className="block-container-col">
-                  {courseInfo.tests.map((test, index) => (
-                    <div key={index} className="qualification test">
-                      <div className="qualification-body">
-                        <div className="test-header">
-                          <span className="test-name">
-                            {test.assignmentTitle}
-                          </span>
-                          {idUser && idRole === Role.student ? (
-                            <>
-                              {test.isSubmitted ? (
-                                <div className="test-info submitted">
-                                  Submitted <FiCheckSquare />
-                                </div>
-                              ) : isPastDateTime(test.dueDate) ? (
-                                <div className="test-info past-due">
-                                  Past Due
-                                </div>
-                              ) : (
-                                <div className="test-info">
-                                  Due: 09/15/2024, 23:59
-                                </div>
-                              )}
-                            </>
-                          ) : null}
-                        </div>
+                          <div className="test-description">
+                            {test.assignmentType && (
+                              <span>
+                                <LuFileEdit /> {test.assignmentTypeDesc}
+                              </span>
+                            )}
 
-                        <div className="test-description">
-                          {test.assignmentType && (
-                            <span>
-                              <LuFileEdit /> {test.assignmentTypeDesc}
-                            </span>
-                          )}
-
-                          {test.duration > 0 && (
-                            <span>
-                              <LuClock /> {test.duration} mins
-                            </span>
-                          )}
-                          {test.questionQuantity > 0 && (
-                            <span>
-                              <LuFileQuestion /> {test.questionQuantity}{" "}
-                              questions
-                            </span>
-                          )}
-                          {test.dueDate && (
-                            <span>
-                              <LuCalendar />
-                              {formatDate(test.dueDate)}
-                            </span>
-                          )}
+                            {test.duration > 0 && (
+                              <span>
+                                <LuClock /> {test.duration} mins
+                              </span>
+                            )}
+                            {test.questionQuantity > 0 && (
+                              <span>
+                                <LuFileQuestion /> {test.questionQuantity}{" "}
+                                questions
+                              </span>
+                            )}
+                            {test.dueDate && (
+                              <span>
+                                <LuCalendar />
+                                {formatDate(test.dueDate)}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
           </>
         ) : null}
       </div>

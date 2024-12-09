@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
+  getAssignmentAnswer,
   getAssignmentInfo,
   getDetailAssignmentForStudent,
   getOverviewAssignment,
   postUpdateAssignment,
-} from "../../services/courseService";
+} from "../../services/assignmentService";
 import {
   APIStatus,
   AssignmentItemAnswerType,
@@ -25,7 +26,6 @@ import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
 
 import {
-  formatDate,
   formatDateTime,
   formatDuration,
   getPagination,
@@ -101,6 +101,24 @@ const AssignDetail = () => {
 
     fetchOverviewData();
   }, [assignmentInfo?.idCourse, idRole]);
+  //SHOW ANSWER FOR STUDENT
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [answerSheet, setAnswerSheet] = useState({});
+  useEffect(() => {
+    const handleShowAnswer = async () => {
+      try {
+        const response = await getAssignmentAnswer(assignmentInfo.idAssignment);
+        if (response.status === APIStatus.success) {
+          setQuestions(response.data.detailQuestionResponses);
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+    if (showAnswer) {
+      handleShowAnswer();
+    }
+  }, [showAnswer]);
 
   const totalQuestions = questions.length;
 
@@ -185,14 +203,14 @@ const AssignDetail = () => {
 
   const [tempSortField, setTempSortField] = useState("createdDate");
   const [tempSortOrder, setTempSortOrder] = useState("desc");
-  //pagination
+
+  //PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
   const records = questions.slice(firstIndex, lastIndex);
   const npage = Math.ceil(questions.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   //OPTION QUIZ
   const [showOption, setShowOption] = useState(false);
@@ -232,7 +250,7 @@ const AssignDetail = () => {
       isPublish: 1,
       isShufflingQuestion: updatedAssignmentInfo.isShufflingQuestion,
       isShufflingAnswer: updatedAssignmentInfo.isShufflingAnswer,
-      isShowAnswer: updatedAssignmentInfo.isShowAnswer,
+      showAnswer: updatedAssignmentInfo.showAnswer,
       assignmentStatus: updatedAssignmentInfo.assignmentStatus,
       questions: questions,
     };
@@ -252,6 +270,8 @@ const AssignDetail = () => {
       // setShowOption(false);
     }
   };
+
+  //DO ASSIGNMENT
   const [diagStartAssign, setDiagStartAssign] = useState(false);
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
@@ -327,22 +347,24 @@ const AssignDetail = () => {
                       <span className="slider"></span>
                     </label>
                   </div>
-                  <div className="item">
-                    <span>Answer shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.isShufflingAnswer === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "isShufflingAnswer",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
+                  {assignmentInfo.assignmentType === AssignmentType.quiz && (
+                    <div className="item">
+                      <span>Answer shuffling</span>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={assignmentInfo.isShufflingAnswer === 1}
+                          onChange={(e) =>
+                            handleUpdateAssignment(
+                              "isShufflingAnswer",
+                              e.target.checked ? 1 : 0
+                            )
+                          }
+                        />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  )}
                   <div className="item">
                     <span>Show answer on submission</span>
                     <label className="switch">
@@ -351,7 +373,7 @@ const AssignDetail = () => {
                         checked={assignmentInfo.showAnswer === 1}
                         onChange={(e) =>
                           handleUpdateAssignment(
-                            "isShowAnswer",
+                            "showAnswer",
                             e.target.checked ? 1 : 0
                           )
                         }
@@ -444,20 +466,82 @@ const AssignDetail = () => {
             </button>
           </div>
         )}
-        {idRole === Role.student && !assignmentInfo.submittedDate && (
-          <div className="handle-button start">
-            <button
-              className="btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenStartAssign();
-              }}
-            >
-              Start
-            </button>
-          </div>
-        )}
+        {idRole === Role.student &&
+          (assignmentInfo.submittedDate ? (
+            <>
+              <div className="handle-button result-assign">
+                <div className="detail-info field-value-container">
+                  <div className="field-value">
+                    <label className="field">Submitted Date</label>
+                    <label className="value">
+                      {formatDateTime(assignmentInfo.submittedDate)}
+                    </label>
+                  </div>
+                  <div className="field-value">
+                    <label className="field">Status</label>
+                    <label
+                      className={`value status ${
+                        assignmentInfo.resultStatus ===
+                          AssignmentResultStatus.onTime ||
+                        assignmentInfo.resultStatus ===
+                          AssignmentResultStatus.submitted
+                          ? "active"
+                          : assignmentInfo.resultStatus ===
+                            AssignmentResultStatus.late
+                          ? "pending"
+                          : "inactive"
+                      }`}
+                    >
+                      {assignmentInfo.resultStatus ===
+                      AssignmentResultStatus.onTime
+                        ? "On time"
+                        : assignmentInfo.resultStatus ===
+                          AssignmentResultStatus.late
+                        ? "Late"
+                        : "Submitted"}
+                    </label>
+                  </div>
 
+                  <div className="field-value">
+                    <label className="field">Marks</label>
+                    <label className="value">{assignmentInfo.totalMark}</label>
+                  </div>
+                  <div className="field-value">
+                    <label className="field">Duration</label>
+                    <label className="value">
+                      {assignmentInfo.resultDuration &&
+                        formatDuration(assignmentInfo.resultDuration)}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              {assignmentInfo?.showAnswer === 1 && (
+                <div className="handle-button start">
+                  <button
+                    className="btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAnswer(true);
+                    }}
+                  >
+                    Show my answer
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="handle-button start">
+              <button
+                className="btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenStartAssign();
+                }}
+              >
+                Start
+              </button>
+            </div>
+          ))}
         <div className="questions-overview-container">
           {idRole === Role.teacher && (
             <>
@@ -467,7 +551,7 @@ const AssignDetail = () => {
                     <div className="question-item" key={index}>
                       <div className="info-row">
                         <label className="question-idx">{`Question ${
-                          index + 1
+                          firstIndex + index + 1
                         }`}</label>
                         <label className="question-mark">{`${question.mark} ${
                           question.mark <= 1 ? "mark" : "marks"
@@ -875,63 +959,70 @@ const AssignDetail = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {sortedSubmissions.map((submission, index) => (
-                            <tr key={index}>
-                              <td></td>
-                              <td>
-                                {" "}
-                                <img
-                                  src={submission.avatarPath || default_ava}
-                                  alt=""
-                                  className="ava-img"
-                                />
-                                {submission.nameStudent}
-                              </td>
-                              <td>
-                                {submission.submittedDate &&
-                                  formatDateTime(submission.submittedDate)}
-                              </td>
-                              <td>
-                                <span
-                                  className={`status assign ${
-                                    submission.status ===
-                                      AssignmentResultStatus.submitted ||
-                                    submission.status ===
-                                      AssignmentResultStatus.onTime
-                                      ? "active"
+                          {sortedSubmissions.length > 0 ? (
+                            sortedSubmissions.map((submission, index) => (
+                              <tr key={index}>
+                                <td></td>
+                                <td>
+                                  {" "}
+                                  <img
+                                    src={submission.avatarPath || default_ava}
+                                    alt=""
+                                    className="ava-img"
+                                  />
+                                  {submission.nameStudent}
+                                </td>
+                                <td>
+                                  {submission.submittedDate &&
+                                    formatDateTime(submission.submittedDate)}
+                                </td>
+                                <td>
+                                  <span
+                                    className={`status assign ${
+                                      submission.status ===
+                                        AssignmentResultStatus.submitted ||
+                                      submission.status ===
+                                        AssignmentResultStatus.onTime
+                                        ? "active"
+                                        : submission.status ===
+                                          AssignmentResultStatus.late
+                                        ? "pending"
+                                        : submission.status ===
+                                          AssignmentResultStatus.inactive
+                                        ? "inactive"
+                                        : ""
+                                    }`}
+                                  >
+                                    {submission.status ===
+                                    AssignmentResultStatus.submitted
+                                      ? "Submitted"
+                                      : submission.status ===
+                                        AssignmentResultStatus.onTime
+                                      ? overviewAssignment.isPastDue === 1
+                                        ? "On time"
+                                        : "Submitted"
                                       : submission.status ===
                                         AssignmentResultStatus.late
-                                      ? "pending"
+                                      ? "Late"
                                       : submission.status ===
-                                        AssignmentResultStatus.inactive
-                                      ? "inactive"
-                                      : ""
-                                  }`}
-                                >
-                                  {submission.status ===
-                                  AssignmentResultStatus.submitted
-                                    ? "Submitted"
-                                    : submission.status ===
-                                      AssignmentResultStatus.onTime
-                                    ? overviewAssignment.isPastDue === 1
-                                      ? "On time"
-                                      : "Submitted"
-                                    : submission.status ===
-                                      AssignmentResultStatus.late
-                                    ? "Late"
-                                    : submission.status ===
-                                      AssignmentResultStatus.locked
-                                    ? "Locked"
-                                    : ""}
-                                </span>
-                              </td>
-                              <td>
-                                {submission.studentDuration &&
-                                  formatDuration(submission.studentDuration)}
-                              </td>
-                              <td>{submission.studentTotalMark}</td>
-                            </tr>
-                          ))}
+                                        AssignmentResultStatus.locked
+                                      ? "Locked"
+                                      : ""}
+                                  </span>
+                                </td>
+                                <td>
+                                  {submission.studentDuration &&
+                                    formatDuration(submission.studentDuration)}
+                                </td>
+                                <td>{submission.studentTotalMark}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <td colSpan={6} style={{ textAlign: "center" }}>
+                              "Currently, there are no attendees for this
+                              assignment."
+                            </td>
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -939,6 +1030,145 @@ const AssignDetail = () => {
                 </div>
               )}
             </>
+          )}
+          {idRole === Role.student && (
+            <div className="questions-container">
+              {records.map((question, index) => (
+                <div className="question-item" key={index}>
+                  <div className="info-row">
+                    <label className="question-idx">{`Question ${
+                      firstIndex + index + 1
+                    }`}</label>
+                    <label className="question-mark">{`${
+                      question.studentMark
+                    } / ${question.questionMark}  ${
+                      question.questionMark <= 1 ? "mark" : "marks"
+                    }`}</label>
+                  </div>
+                  <div className="info-row question-text">
+                    <p style={{ whiteSpace: "pre-wrap" }}>
+                      {question.question.trim()}
+                    </p>
+                    {assignmentInfo.assignmentType === AssignmentType.quiz &&
+                      question.attachedFile && (
+                        <img
+                          className="question-img"
+                          src={question.attachedFile || default_image}
+                          alt=""
+                        />
+                      )}
+                  </div>
+                  {assignmentInfo.assignmentType === AssignmentType.manual && (
+                    <>
+                      <div className="info-row">
+                        <div className="info">
+                          {question.attachedFile && (
+                            <>
+                              <span>Reference material:</span>
+
+                              <div className="select-container">
+                                <input
+                                  type="text"
+                                  style={{ cursor: "pointer" }}
+                                  className="input-form-pi"
+                                  title={question.nameFile}
+                                  defaultValue={
+                                    question.nameFile?.length > 54
+                                      ? question.nameFile.slice(0, 54) + "..."
+                                      : question.nameFile
+                                  }
+                                  onClick={() => {
+                                    if (
+                                      typeof question.attachedFile === "string"
+                                    ) {
+                                      // Kiểm tra nếu attachedFile là URL
+                                      const fileUrl = question.attachedFile;
+                                      window.open(fileUrl, "_blank");
+                                    }
+                                  }}
+                                  readOnly
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="info-row answer-manual-type">
+                        <span>
+                          <label style={{ color: "var(--text-gray)" }}>
+                            Type of anwer:{" "}
+                          </label>
+                          <label>
+                            {question.assignmentItemAnswerType ===
+                            AssignmentItemAnswerType.attached_file
+                              ? " Attach file"
+                              : " Text"}
+                          </label>
+                        </span>
+                      </div>
+                    </>
+                  )}
+                  {assignmentInfo.assignmentType === AssignmentType.quiz && (
+                    <div className="info-row choices-container">
+                      <label style={{ fontSize: "14px", fontWeight: 800 }}>
+                        Choices
+                      </label>
+                      {question.items.map(
+                        (choice, choiceIdx) =>
+                          choice.multipleAssignmentItemStatus === 1 && (
+                            <div
+                              className="info-in-row"
+                              key={choiceIdx}
+                              style={{ width: "100%" }}
+                            >
+                              <label className="radio-choice">
+                                <input
+                                  type={
+                                    question.isMultipleAnswer
+                                      ? "checkbox"
+                                      : "radio"
+                                  }
+                                  name={`question_${index}`}
+                                  defaultChecked={question.selectedOptions.includes(
+                                    choice.idMultipleAssignmentItem
+                                  )}
+                                />
+                              </label>
+                              <div className="info" style={{ flex: "1" }}>
+                                <input
+                                  type="text"
+                                  className="input-form-pi"
+                                  placeholder="Type a choice"
+                                  defaultValue={choice.content}
+                                  style={{
+                                    backgroundColor:
+                                      question.selectedOptions.includes(
+                                        choice.idMultipleAssignmentItem
+                                      )
+                                        ? question.selectedOptions.includes(
+                                            choice.idMultipleAssignmentItem
+                                          ) &&
+                                          question.selectedOptions.includes(
+                                            choice.idMultipleAssignmentItem
+                                          ) ===
+                                            question.correctOptions.includes(
+                                              choice.idMultipleAssignmentItem
+                                            )
+                                          ? "#B2E0C8" // Nếu đúng
+                                          : "#E6B1B0"
+                                        : "rgba(217, 217, 217, 0.3)",
+                                  }}
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+                          )
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
         <div className="pagination">

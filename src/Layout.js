@@ -45,6 +45,7 @@ import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
+import UpdateCourse from "./pages/courseMgmt/UpdateCourse";
 
 const Layout = (props) => {
   return (
@@ -201,6 +202,15 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/updateCourse"
+            element={
+              <PrivateRoute>
+                <UpdateCourse />
+              </PrivateRoute>
+            }
+          />
+
           {/* Teacher */}
           <Route
             path="/teacherHome"

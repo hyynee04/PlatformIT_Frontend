@@ -50,6 +50,9 @@
   grid-area: 20px;
   grid-gap: 20px;
 }
+.container-pi.user-pi {
+  align-items: stretch;
+}
 
 .container-ava {
   padding: 12px 0;

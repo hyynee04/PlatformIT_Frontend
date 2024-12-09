@@ -25,6 +25,7 @@ import {
 import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
+import { countTaskOfCenterAd } from "../store/listTaskOfCenterAd";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -123,6 +124,15 @@ const Header = () => {
       );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+  useEffect(() => {
+    dispatch(countTaskOfCenterAd("qualification"));
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (taskOfCenterAd) {
+  //     setListTask(taskOfCenterAd);
+  //   }
+  // }, [taskOfCenterAd]);
 
   const navLinks = {
     [Role.platformAdmin]: [
@@ -239,16 +249,21 @@ const Header = () => {
                     </button>
                   )}
                   {idRole === Role.centerAdmin && (
-                    <button
-                      className={`circle-buts ${
-                        location.pathname === buttonPaths["clipboard"]
-                          ? "clicked"
-                          : ""
-                      }`}
-                      onClick={() => handleButtonClick("clipboard")}
-                    >
-                      <LuClipboardCheck className="header-icon" />
-                    </button>
+                    <>
+                      <button
+                        className={`circle-buts ${
+                          location.pathname === buttonPaths["clipboard"]
+                            ? "clicked"
+                            : ""
+                        }`}
+                        onClick={() => handleButtonClick("clipboard")}
+                      >
+                        <LuClipboardCheck className="header-icon" />
+                      </button>
+                      {unreadCount ? (
+                        <div className="number-unseen">{unreadCount}</div>
+                      ) : null}
+                    </>
                   )}
                   <button
                     ref={notiButtonRef}

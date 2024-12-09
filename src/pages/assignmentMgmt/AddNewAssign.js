@@ -3,6 +3,7 @@ import { FaCalendar, FaChevronDown, FaSave } from "react-icons/fa";
 import { LuAlignJustify, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
+import { ImSpinner2 } from "react-icons/im";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/Assignment.css";
 import ManualQuestion from "../../components/assigment/ManualQuestion";
@@ -14,16 +15,22 @@ import {
 } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
+  postAddManualAssignment,
+  postAddQuizAssignment,
+} from "../../services/assignmentService";
+import {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
-  postAddManualAssignment,
-  postAddQuizAssignment,
 } from "../../services/courseService";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loadingBtn, setLoadingBtn] = useState({
+    save: false,
+    publish: false,
+  });
 
   const [title, setTitle] = useState("");
   //IS TEST
@@ -375,6 +382,15 @@ const AddNewAssign = () => {
       isShowAnswer: isShowAnswer,
       questions: questions,
     };
+    isPublish
+      ? setLoadingBtn((prevState) => ({
+          ...prevState,
+          publish: true,
+        }))
+      : setLoadingBtn((prevState) => ({
+          ...prevState,
+          save: true,
+        }));
     try {
       let response;
 
@@ -401,6 +417,16 @@ const AddNewAssign = () => {
       }
     } catch (error) {
       console.error("Failed to add assignment:", error);
+    } finally {
+      isPublish
+        ? setLoadingBtn((prevState) => ({
+            ...prevState,
+            publish: false,
+          }))
+        : setLoadingBtn((prevState) => ({
+            ...prevState,
+            save: false,
+          }));
     }
   };
 
@@ -438,7 +464,11 @@ const AddNewAssign = () => {
               disabled={!isFormValid()}
               onClick={() => handleAddAssignment(false)}
             >
-              <FaSave />
+              {loadingBtn.save ? (
+                <ImSpinner2 className="icon-spin" color="#397979" />
+              ) : (
+                <FaSave />
+              )}
               Save
             </button>
             <button
@@ -446,7 +476,11 @@ const AddNewAssign = () => {
               disabled={!isFormValid()}
               onClick={() => handleAddAssignment(true)}
             >
-              <MdPublish />
+              {loadingBtn.publish ? (
+                <ImSpinner2 className="icon-spin" color="#f5f5f5" />
+              ) : (
+                <MdPublish />
+              )}
               Publish
             </button>
           </div>

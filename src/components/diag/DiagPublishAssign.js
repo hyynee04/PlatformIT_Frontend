@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuX } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
+import { ImSpinner2 } from "react-icons/im";
 import { useNavigate } from "react-router-dom";
-import { postPublishAssignment } from "../../services/courseService";
+import { postPublishAssignment } from "../../services/assignmentService";
 import { APIStatus } from "../../constants/constants";
 
 const DiagPublishAssign = ({
@@ -12,12 +13,20 @@ const DiagPublishAssign = ({
   onPublishSuccess,
 }) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const handlePublishAssign = async () => {
-    const response = await postPublishAssignment(idAssignment);
-    if (response.status === APIStatus.success) {
-      onClose();
-      onPublishSuccess();
-      navigate("/teacherAssignment");
+    setLoading(true);
+    try {
+      const response = await postPublishAssignment(idAssignment);
+      if (response.status === APIStatus.success) {
+        onClose();
+        onPublishSuccess();
+        navigate("/teacherAssignment");
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
   if (!isOpen) return null;
@@ -48,6 +57,9 @@ const DiagPublishAssign = ({
                   handlePublishAssign();
                 }}
               >
+                {loading && (
+                  <ImSpinner2 className="icon-spin" color="#d9d9d9" />
+                )}
                 Yes
               </button>
             </div>

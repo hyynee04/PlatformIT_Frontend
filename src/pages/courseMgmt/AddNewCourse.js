@@ -6,6 +6,7 @@ import { FaRegFile } from "react-icons/fa6";
 import { FiSettings } from "react-icons/fi";
 import { TbCurrencyDong } from "react-icons/tb";
 import { LuMoveRight, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import TeacherCard from "../../components/Card/TeacherCard";
 
 import { useNavigate } from "react-router-dom";
@@ -17,21 +18,9 @@ import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import { getAllTagModel, postAddCourse } from "../../services/courseService";
 const AddNewCourse = () => {
   const navigate = useNavigate();
+  const [loadingAct, setLoadingAct] = useState(false);
   const [title, setTitle] = useState("");
   const [introduction, setIntroduction] = useState("");
-  // const [formValues, setFormValues] = useState({
-  //   maxAttendees: null,
-  //   price: null,
-  //   discountedPrice: null,
-  //   maxAttendeesValidate: "",
-  //   priceValidate: "",
-  //   registTimeValidate: "",
-  //   durationValidate: "",
-  //   startDate: null,
-  //   endDate: null,
-  //   registStartDate: null,
-  //   registEndDate: null,
-  // });
   const [formValues, setFormValues] = useState({
     price: "",
     discountedPrice: "",
@@ -90,6 +79,7 @@ const AddNewCourse = () => {
   };
 
   const handleOptionSelect = (tagName) => {
+    if (selectedTags.length >= 20) return;
     if (!selectedTags.includes(tagName)) {
       setSelectedTags((prevTags) => [...prevTags, tagName]);
     }
@@ -98,6 +88,7 @@ const AddNewCourse = () => {
   };
 
   const handleInputSubmit = (e) => {
+    if (selectedTags.length >= 20) return;
     if (e.key === "Enter") {
       const trimmedQuery = searchTagQuery.trim();
 
@@ -150,6 +141,10 @@ const AddNewCourse = () => {
           blobFile = file;
         }
 
+        // Hủy URL cũ trước khi tạo URL mới
+        if (coverImage.coverImgUrl) {
+          URL.revokeObjectURL(coverImage.coverImgUrl);
+        }
         const fileUrl = URL.createObjectURL(blobFile);
         setCoverImage((prev) => ({
           ...prev,
@@ -169,6 +164,11 @@ const AddNewCourse = () => {
       coverImgFile: null,
       coverImgUrl: "",
     });
+
+    // Reset input file để cho phép chọn cùng một file lại
+    if (inputFileRef.current) {
+      inputFileRef.current.value = "";
+    }
   };
 
   //FEE
@@ -366,6 +366,7 @@ const AddNewCourse = () => {
       tags: selectedTags,
       idTeacher: selectedTeacher.idUser,
     };
+    setLoadingAct(true);
     try {
       const response = await postAddCourse(dataToSubmit);
       if (response.status === APIStatus.success) {
@@ -380,6 +381,8 @@ const AddNewCourse = () => {
     } catch (error) {
       // setUpdateStr("There was an error updating center information.");
       throw error;
+    } finally {
+      setLoadingAct(false);
     }
   };
   return (
@@ -418,6 +421,13 @@ const AddNewCourse = () => {
                       You can add a new tag if you can't find the tag you need
                       by typing it in and pressing enter.
                     </span>
+                    {selectedTags.length >= 20 && (
+                      <span className="note-span">
+                        <br />
+                        <strong className="required">Note:</strong> You can only
+                        add up to 20 tags for a course.
+                      </span>
+                    )}
                   </span>
 
                   {/* Select Container */}
@@ -440,7 +450,7 @@ const AddNewCourse = () => {
                               .toLowerCase()
                               .includes(searchTagQuery.toLowerCase())
                           )
-                          .slice(0, 10)
+                          .sort((a, b) => a.tagName.localeCompare(b.tagName))
                           .map((tag, index) => (
                             <div
                               key={index}
@@ -693,6 +703,9 @@ const AddNewCourse = () => {
                   disabled={!isFormValid()}
                   onClick={handleAddCourse}
                 >
+                  {loadingAct && (
+                    <ImSpinner2 className="icon-spin" color="#397979" />
+                  )}
                   Create Course
                 </button>
               </div>

@@ -4,8 +4,9 @@ import { format, fromZonedTime } from "date-fns-tz";
 import {
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
+  postSubmitManualQuestion,
   postSubmitQuizAssignment,
-} from "../../services/courseService";
+} from "../../services/assignmentService";
 import {
   APIStatus,
   AssignmentItemAnswerType,
@@ -82,6 +83,7 @@ const StartAssign = () => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1) {
           clearInterval(interval);
+          handleSubmitAssignment();
           return 0;
         }
         return prevTime - 1;
@@ -178,63 +180,6 @@ const StartAssign = () => {
     return AssignmentResultStatus.onTime;
   };
 
-  const handleSubmitAssignment = async () => {
-    const timeSpent = totalDuration - timeLeft;
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    const localDate = new Date();
-    const utcDate = fromZonedTime(localDate, timezone);
-
-    const submittedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
-
-    const dueDate = new Date(assignmentInfo.dueDate); // Ngày hết hạn bài tập
-    const courseEndDate = assignmentInfo.courseEndDate
-      ? new Date(assignmentInfo.courseEndDate)
-      : null; // Ngày kết thúc khóa học (nếu có)
-    const submittedDateObj = new Date(submittedDate);
-
-    const answers = questions.map((question) => {
-      const selectedOptions = question.items
-        .filter((item) => item.isSelected === true)
-        .map((item) => item.idMultipleAssignmentItem);
-
-      return {
-        idAssignmentItem: question.idAssignmentItem,
-        selectedOptions,
-      };
-    });
-
-    const assignmentResultStatus = handleAssignmentResultStatus(
-      dueDate,
-      courseEndDate,
-      submittedDateObj
-    );
-
-    const requestData = {
-      idAssignment: assignmentInfo.idAssignment,
-      idStudent: Number(localStorage.getItem("idUser")),
-      duration: timeSpent,
-      assignmentResultStatus, // Trạng thái kết quả bài nộp
-      submittedDate: submittedDate,
-      answers: answers,
-    };
-
-    try {
-      setLoading(true);
-      const response = await postSubmitQuizAssignment(requestData);
-      if (response.status === APIStatus.success) {
-        console.log("Assignment submitted successfully.");
-        navigate("/studentTest");
-      } else {
-        console.error("Failed to submit assignment:", response);
-      }
-    } catch (error) {
-      console.error("Error during submission:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   //COUNTDOWN
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -279,6 +224,72 @@ const StartAssign = () => {
       }
     }
     setQuestions(updatedQuestions);
+  };
+
+  const handleSubmitAssignment = async () => {
+    //duration
+    const timeSpent = totalDuration - timeLeft;
+
+    //submittedDate
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const localDate = new Date();
+    const utcDate = fromZonedTime(localDate, timezone);
+
+    const submittedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
+
+    const dueDate = new Date(assignmentInfo.dueDate); // Ngày hết hạn bài tập
+    const courseEndDate = assignmentInfo.courseEndDate
+      ? new Date(assignmentInfo.courseEndDate)
+      : null; // Ngày kết thúc khóa học (nếu có)
+    const submittedDateObj = new Date(submittedDate);
+
+    const answers = questions.map((question) => {
+      const selectedOptions = question.items
+        .filter((item) => item.isSelected === true)
+        .map((item) => item.idMultipleAssignmentItem);
+
+      return {
+        idAssignmentItem: question.idAssignmentItem,
+        selectedOptions,
+      };
+    });
+
+    const assignmentResultStatus = handleAssignmentResultStatus(
+      dueDate,
+      courseEndDate,
+      submittedDateObj
+    );
+
+    const requestData = {
+      idAssignment: assignmentInfo.idAssignment,
+      idStudent: Number(localStorage.getItem("idUser")),
+      duration: timeSpent,
+      assignmentResultStatus, // Trạng thái kết quả bài nộp
+      submittedDate: submittedDate,
+      answers: answers,
+    };
+
+    try {
+      setLoading(true);
+      let response;
+      if (assignmentInfo.assignmentType === AssignmentType.quiz) {
+        response = await postSubmitQuizAssignment(requestData);
+      } else if (assignmentInfo.assignmentType === AssignmentType.manual) {
+        response = await postSubmitManualQuestion();
+      }
+
+      if (response.status === APIStatus.success) {
+        console.log("Assignment submitted successfully.");
+        navigate("/studentTest");
+      } else {
+        console.error("Failed to submit assignment:", response);
+      }
+    } catch (error) {
+      console.error("Error during submission:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {

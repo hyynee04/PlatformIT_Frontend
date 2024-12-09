@@ -497,7 +497,7 @@ const TeacherPI = () => {
   }
   return (
     <div>
-      <div className="container-pi">
+      <div className="container-pi user-pi">
         <div className="container-ava slide-to-right">
           <div className="sub-container-ava">
             <img
@@ -663,7 +663,7 @@ const TeacherPI = () => {
           </div>
         ) : activeAction === "specializedPI" ? (
           <div className="container-specialized slide-to-left">
-            <div className="container-info">
+            <div className="container-info auto">
               <span className="title-span">Specialized Infomation</span>
               <div className="info">
                 <span>Center</span>

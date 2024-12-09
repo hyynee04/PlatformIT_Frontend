@@ -27,7 +27,7 @@ import {
   deleteAssignment,
   getAllAssignmentCardOfTeacher,
   getAllTestCardOfStudent,
-} from "../../services/courseService";
+} from "../../services/assignmentService";
 import DiagPublishAssign from "../../components/diag/DiagPublishAssign";
 import {
   formatDateTime,
@@ -38,6 +38,10 @@ import {
 const ListAssignMgmt = () => {
   const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
   const [loading, setLoading] = useState(false);
+  const [loadingBtn, setLoadingBtn] = useState({
+    delete: false,
+    publish: false,
+  });
   const [activeStatus, setActiveStatus] = useState(
     idRole === Role.teacher
       ? AssignmentStatus.publish
@@ -356,6 +360,10 @@ const ListAssignMgmt = () => {
     setDiagDeleteVisible(true);
   };
   const handleDeleteAssignment = async () => {
+    setLoadingBtn((prevState) => ({
+      ...prevState,
+      delete: true,
+    }));
     try {
       const response = await deleteAssignment(selectedAssignment.idAssignment);
       if (response.status === APIStatus.success) {
@@ -365,6 +373,11 @@ const ListAssignMgmt = () => {
       }
     } catch (error) {
       throw error;
+    } finally {
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        delete: false,
+      }));
     }
   };
   const handlePublishSuccess = () => {
@@ -897,6 +910,9 @@ const ListAssignMgmt = () => {
                       handleDeleteAssignment();
                     }}
                   >
+                    {loadingBtn.delete && (
+                      <ImSpinner2 className="icon-spin" color="#d9d9d9" />
+                    )}
                     Delete
                   </button>
                 </div>

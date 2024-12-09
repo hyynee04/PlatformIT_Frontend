@@ -93,8 +93,41 @@
   gap: 4px;
   font-size: 16px;
 }
-.assign-info .info-row .field-value-container .field-value .field {
+.result-assign .field-value-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.result-assign .field-value-container .field-value {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  font-size: 16px;
+}
+.assign-info .info-row .field-value-container .field-value .field,
+.result-assign .field-value-container .field-value .field {
   color: var(--text-gray);
+}
+.result-assign .field-value-container .field-value .field {
+  width: 170px;
+}
+.result-assign .field-value-container .field-value .value {
+  padding: 4px 8px;
+}
+.result-assign .field-value-container .field-value .value.status {
+  /* padding: 4px 8px; */
+  border-radius: 4px;
+  font-weight: bold;
+  color: var(--white-color);
+}
+.result-assign .field-value-container .field-value .status.active {
+  background-color: var(--green-color);
+}
+.result-assign .field-value-container .field-value .status.pending {
+  background-color: var(--yellow-color);
+}
+.result-assign .field-value-container .field-value .status.inactive {
+  background-color: var(--red-color);
 }
 .main-contain-assign .handle-button,
 .overview-container .chart-detail-container {
@@ -106,6 +139,14 @@
 }
 .main-contain-assign .handle-button {
   padding: 0 24px 0 20px;
+}
+.main-contain-assign .handle-button.result-assign {
+  padding: 24px 24px 0 20px;
+  border: none;
+  border-top: 1px solid var(--border-gray);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .main-contain-assign .handle-button .btn {

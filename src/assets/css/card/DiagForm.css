@@ -208,6 +208,24 @@
   flex-direction: column;
   color: var(--text-gray);
 }
+.modal-container
+  .diag-body
+  .container-diag-field
+  .left-diag-container
+  .info
+  > .setting-course,
+.modal-container
+  .diag-body
+  .container-diag-field
+  .right-diag-container
+  .info
+  > .setting-course {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
 
 .modal-container .diag-body .container-diag-field .info > span {
   padding: 0;

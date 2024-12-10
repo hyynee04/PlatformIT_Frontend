@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Form from "react-bootstrap/Form";
-import { FaChevronDown } from "react-icons/fa";
+import { FaTrashAlt, FaChevronDown } from "react-icons/fa";
+import { RiAttachment2 } from "react-icons/ri";
 import { FaRegFile } from "react-icons/fa6";
 import { FiSettings } from "react-icons/fi";
+import { TbCurrencyDong } from "react-icons/tb";
 import { LuMoveRight, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import TeacherCard from "../../components/Card/TeacherCard";
 
 import { useNavigate } from "react-router-dom";
@@ -15,21 +18,9 @@ import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import { getAllTagModel, postAddCourse } from "../../services/courseService";
 const AddNewCourse = () => {
   const navigate = useNavigate();
+  const [loadingAct, setLoadingAct] = useState(false);
   const [title, setTitle] = useState("");
   const [introduction, setIntroduction] = useState("");
-  // const [formValues, setFormValues] = useState({
-  //   maxAttendees: null,
-  //   price: null,
-  //   discountedPrice: null,
-  //   maxAttendeesValidate: "",
-  //   priceValidate: "",
-  //   registTimeValidate: "",
-  //   durationValidate: "",
-  //   startDate: null,
-  //   endDate: null,
-  //   registStartDate: null,
-  //   registEndDate: null,
-  // });
   const [formValues, setFormValues] = useState({
     price: "",
     discountedPrice: "",
@@ -52,6 +43,8 @@ const AddNewCourse = () => {
   const [tagOptions, setTagOptions] = useState([]);
   const [searchTagQuery, setSearchTagQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
   useEffect(() => {
     const fetchTags = async () => {
       try {
@@ -61,34 +54,54 @@ const AddNewCourse = () => {
         console.error("Error fetching tags:", error);
       }
     };
-
     fetchTags();
   }, []);
+
   const capitalizeWords = (str) =>
     str
-      // .toLowerCase()
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   const addNewTag = (newTag) => {
     if (!newTag) return;
-    const existingTag = tagOptions.find(
-      (tag) => tag.tagName.toLowerCase() === newTag.toLowerCase()
-    );
-    const tagToAdd = existingTag
-      ? existingTag.tagName
-      : capitalizeWords(newTag);
 
-    if (!selectedTags.includes(tagToAdd)) {
+    const tagToAdd = capitalizeWords(newTag);
+
+    if (!selectedTags.includes(tagToAdd) && selectedTags.length < 20) {
       setSelectedTags((prevTags) => [...prevTags, tagToAdd]);
     }
-    setSearchTagQuery("");
   };
-  const handleInputSubmit = (event) => {
-    if (event.key === "Enter") {
-      addNewTag(searchTagQuery.trim());
+
+  const handleInputTagChange = (e) => {
+    const value = e.target.value;
+    setSearchTagQuery(value);
+    setShowDropdown(value.trim().length > 0);
+  };
+
+  const handleOptionSelect = (tagName) => {
+    if (selectedTags.length >= 20) return;
+    if (!selectedTags.includes(tagName)) {
+      setSelectedTags((prevTags) => [...prevTags, tagName]);
+    }
+    setSearchTagQuery("");
+    setShowDropdown(false);
+  };
+
+  const handleInputSubmit = (e) => {
+    if (selectedTags.length >= 20) return;
+    if (e.key === "Enter") {
+      const trimmedQuery = searchTagQuery.trim();
+
+      if (trimmedQuery && !selectedTags.includes(trimmedQuery)) {
+        addNewTag(trimmedQuery);
+      }
+
+      setSearchTagQuery("");
+      setShowDropdown(false);
+      e.preventDefault();
     }
   };
+
   const removeTag = (tagToRemove) => {
     setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
   };
@@ -128,19 +141,49 @@ const AddNewCourse = () => {
           blobFile = file;
         }
 
+        // Hủy URL cũ trước khi tạo URL mới
+        if (coverImage.coverImgUrl) {
+          URL.revokeObjectURL(coverImage.coverImgUrl);
+        }
         const fileUrl = URL.createObjectURL(blobFile);
         setCoverImage((prev) => ({
           ...prev,
           coverImgFile: blobFile,
           coverImgUrl: fileUrl,
         }));
-        // setQualiWarning("");
       } catch (error) {
         throw error;
       }
     }
   };
+  const handleDeleteFile = () => {
+    if (coverImage.coverImgUrl) {
+      URL.revokeObjectURL(coverImage.coverImgUrl);
+    }
+    setCoverImage({
+      coverImgFile: null,
+      coverImgUrl: "",
+    });
 
+    // Reset input file để cho phép chọn cùng một file lại
+    if (inputFileRef.current) {
+      inputFileRef.current.value = "";
+    }
+  };
+
+  //FEE
+  const formatNumber = (num) => {
+    return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+  const handleInputChangeNumberOnly = (field) => (e) => {
+    const value = e.target.value.replace(/[^0-9]/g, "");
+    const formattedValue = formatNumber(value);
+    setFormValues((prev) => ({
+      ...prev,
+      [field]: value,
+      [`${field}Display`]: formattedValue,
+    }));
+  };
   // VALIDATE
   const validateNumberInput = (field, value) => {
     if (!isNaN(value) || value === "") {
@@ -211,10 +254,6 @@ const AddNewCourse = () => {
     }
     validateDates(updatedFormValues);
   };
-  // const handleCheckboxChange = (e) => {
-  //   const { name, checked } = e.target;
-  //   setFormValues((prev) => ({ ...prev, [name]: checked }));
-  // };
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setFormValues((prev) => ({
@@ -327,6 +366,7 @@ const AddNewCourse = () => {
       tags: selectedTags,
       idTeacher: selectedTeacher.idUser,
     };
+    setLoadingAct(true);
     try {
       const response = await postAddCourse(dataToSubmit);
       if (response.status === APIStatus.success) {
@@ -341,6 +381,8 @@ const AddNewCourse = () => {
     } catch (error) {
       // setUpdateStr("There was an error updating center information.");
       throw error;
+    } finally {
+      setLoadingAct(false);
     }
   };
   return (
@@ -379,24 +421,50 @@ const AddNewCourse = () => {
                       You can add a new tag if you can't find the tag you need
                       by typing it in and pressing enter.
                     </span>
+                    {selectedTags.length >= 20 && (
+                      <span className="note-span">
+                        <br />
+                        <strong className="required">Note:</strong> You can only
+                        add up to 20 tags for a course.
+                      </span>
+                    )}
                   </span>
+
+                  {/* Select Container */}
                   <div className="select-container">
                     <input
                       className="input-form-pi"
                       type="text"
-                      list="tagOptions"
                       value={searchTagQuery}
-                      onChange={(e) => setSearchTagQuery(e.target.value)}
-                      onKeyDown={handleInputSubmit} // Thêm tag khi nhấn Enter
-                      placeholder="Search or create a new tag" // Placeholder sẽ hiển thị khi input trống
+                      onChange={handleInputTagChange}
+                      onKeyDown={handleInputSubmit}
+                      onClick={() => setShowDropdown(!showDropdown)}
+                      placeholder="Search or create a new tag"
                     />
-                    <datalist id="tagOptions">
-                      {tagOptions.map((tag, index) => (
-                        <option key={index} value={tag.tagName} />
-                      ))}
-                    </datalist>
                     <FaChevronDown className="arrow-icon" />
+                    {showDropdown && (
+                      <div className="dropdown-menu-tag">
+                        {tagOptions
+                          .filter((tag) =>
+                            tag.tagName
+                              .toLowerCase()
+                              .includes(searchTagQuery.toLowerCase())
+                          )
+                          .sort((a, b) => a.tagName.localeCompare(b.tagName))
+                          .map((tag, index) => (
+                            <div
+                              key={index}
+                              className="dropdown-item-tag"
+                              onClick={() => handleOptionSelect(tag.tagName)}
+                            >
+                              {tag.tagName}
+                            </div>
+                          ))}
+                      </div>
+                    )}
                   </div>
+
+                  {/* Tags Container */}
                   <div className="tags-container">
                     {selectedTags.map((tag, index) => (
                       <span key={index} className="tags">
@@ -431,7 +499,7 @@ const AddNewCourse = () => {
                       )}
                     </div>
                     <input
-                      type="text"
+                      type="number"
                       className="input-form-pi"
                       value={formValues.maxAttendees}
                       onChange={handleInputChange("maxAttendees")}
@@ -465,22 +533,37 @@ const AddNewCourse = () => {
                         </span>
                       )}
                     </div>
-
                     <div className="left-to-right">
-                      <input
-                        type="text"
-                        className="input-form-pi"
-                        value={formValues.price}
-                        onChange={handleInputChange("price")}
-                      />
+                      <div
+                        className="select-container"
+                        style={{ width: "100%" }}
+                      >
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          value={formValues.priceDisplay || ""}
+                          onChange={handleInputChangeNumberOnly("price")}
+                        />
+                        <TbCurrencyDong className="arrow-icon" />
+                      </div>
+
                       <LuMoveRight className="icon" />
-                      <input
-                        type="text"
-                        className="input-form-pi"
-                        placeholder="Discounted"
-                        value={formValues.discountedPrice}
-                        onChange={handleInputChange("discountedPrice")}
-                      />
+
+                      <div
+                        className="select-container"
+                        style={{ width: "100%" }}
+                      >
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          placeholder="Discounted"
+                          value={formValues.discountedPriceDisplay || ""}
+                          onChange={handleInputChangeNumberOnly(
+                            "discountedPrice"
+                          )}
+                        />
+                        <TbCurrencyDong className="arrow-icon" />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -561,12 +644,38 @@ const AddNewCourse = () => {
               </div>
               <div className="container-gap"></div>
               <div className="container-right">
-                <img
-                  src={coverImage.coverImgUrl || default_image}
-                  alt="Course cover"
-                  className="cover-course-img"
-                  onClick={handleOpenImgInput}
-                />
+                <div className="cover-course-img-container">
+                  <img
+                    src={coverImage.coverImgUrl || default_image}
+                    alt="Course cover"
+                    className="cover-course-img"
+                  />
+                  <button
+                    className="btn quiz-img-btn attach"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenImgInput();
+                    }}
+                  >
+                    <RiAttachment2
+                      className="file-icon"
+                      style={{ cursor: "pointer", pointerEvents: "all" }}
+                    />
+                  </button>
+                  <button
+                    className="btn quiz-img-btn delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteFile();
+                    }}
+                  >
+                    <FaTrashAlt
+                      className="del-question"
+                      style={{ cursor: "pointer", pointerEvents: "all" }}
+                    />
+                  </button>
+                </div>
+
                 <input
                   type="file"
                   ref={inputFileRef}
@@ -594,6 +703,9 @@ const AddNewCourse = () => {
                   disabled={!isFormValid()}
                   onClick={handleAddCourse}
                 >
+                  {loadingAct && (
+                    <ImSpinner2 className="icon-spin" color="#397979" />
+                  )}
                   Create Course
                 </button>
               </div>

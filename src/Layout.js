@@ -37,12 +37,15 @@ import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
 
+import StartAssign from "./pages/assignmentMgmt/StartAssign";
+
 import AllNotifications from "./pages/AllNotifications";
 import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
+import UpdateCourse from "./pages/courseMgmt/UpdateCourse";
 import AdminCenterDetail from "./pages/detail/AdminCenterDetail";
 
 const Layout = (props) => {
@@ -209,6 +212,15 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/updateCourse"
+            element={
+              <PrivateRoute>
+                <UpdateCourse />
+              </PrivateRoute>
+            }
+          />
+
           {/* Teacher */}
           <Route
             path="/teacherHome"
@@ -319,7 +331,14 @@ const Layout = (props) => {
             }
           />
         </Route>
-
+        <Route
+          path="/startAssignment"
+          element={
+            <PrivateRoute>
+              <StartAssign />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login-response" element={<LoginResponse />} />
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />

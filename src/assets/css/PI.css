@@ -30,6 +30,9 @@
   color: var(--red-color);
   font-size: 14px;
 }
+.title-info > .btn:hover {
+  background-color: rgba(217, 217, 217, 0.3);
+}
 .title-info > .btn:active {
   border: 1px solid var(--red-color);
   color: var(--red-color);
@@ -46,6 +49,9 @@
   align-items: flex-start;
   grid-area: 20px;
   grid-gap: 20px;
+}
+.container-pi.user-pi {
+  align-items: stretch;
 }
 
 .container-ava {
@@ -188,7 +194,7 @@
   cursor: pointer;
 }
 .container-icon:hover {
-  background-color: rgb(117, 117, 117);
+  background-color: #cfcfcf;
 }
 
 .icon {
@@ -246,6 +252,33 @@
 .info .select-container {
   position: relative;
   display: inline-block;
+}
+.add-course-container .dropdown-menu-tag {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  /* border: 1px solid #ccc; */
+  z-index: 1000;
+  padding: 8px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+  gap: 2px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  font-size: 14px;
+}
+.add-course-container .dropdown-item-tag {
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-course-container .dropdown-item-tag:hover {
+  cursor: pointer;
+  background-color: var(--border-gray);
 }
 
 .info .container-link {
@@ -402,13 +435,49 @@
   height: auto;
   color: var(--black-color);
 }
+.container-info .cover-course-img-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
 .container-info .cover-course-img {
   width: 600px;
   height: 440px;
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 4px;
+  border: 1px solid var(--border-gray);
   margin-left: auto;
+}
+.container-info .cover-course-img-container > button {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  padding: 6px 8px;
+  background-color: var(--white-color);
+  border-radius: 4px;
+  border: 1px solid var(--border-gray);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  right: 0;
+  bottom: 0;
+  margin: 6px;
+}
+.container-info .cover-course-img-container .quiz-img-btn.attach {
+  right: 36px;
+}
+.container-info .cover-course-img-container .quiz-img-btn .file-icon,
+.container-info .cover-course-img-container .quiz-img-btn .del-question {
+  width: 28px;
+  height: 28px;
+  color: var(--text-gray);
+}
+.container-info .cover-course-img-container .quiz-img-btn:hover {
+  background-color: rgba(217, 217, 217);
+  border: 1px solid var(--border-gray);
 }
 .alert-option {
   display: flex;
@@ -427,6 +496,9 @@
   border: 1px solid var(--main-color);
   background-color: #ffffff;
 }
+.alert-option .circle-btn:hover {
+  background-color: rgba(217, 217, 217, 0.3);
+}
 .alert-option .circle-btn .icon {
   color: var(--main-color);
   width: 24px;
@@ -440,9 +512,11 @@
   background-color: var(--main-color);
   border: none;
   font-size: 14px;
-  border: 2px solid var(--main-color);
   color: var(--white-color);
   width: 12rem;
+}
+.alert-option .main-action:hover {
+  background-color: rgba(57, 121, 121, 0.8);
 }
 .alert-option .container-button {
   margin-left: auto;
@@ -462,6 +536,11 @@
   background-color: var(--white-color);
   border: none;
   font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
 }
 
 .alert-option .container-button .discard-changes {

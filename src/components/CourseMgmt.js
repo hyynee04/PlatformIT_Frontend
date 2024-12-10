@@ -551,6 +551,19 @@ const CourseMgmt = (props) => {
             currentItemsPage.map((course, index) => (
               <div key={index} className="one-card-container">
                 <CourseCard key={"course" + course.idCourse} course={course} />
+                {role === Role.centerAdmin && (
+                  <div className="edit-course-btn">
+                    <button
+                      onClick={() =>
+                        navigate("/updateCourse", {
+                          state: { idCourse: course.idCourse },
+                        })
+                      }
+                    >
+                      <FiEdit /> Edit
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
         </div>

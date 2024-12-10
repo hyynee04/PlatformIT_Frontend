@@ -15,6 +15,16 @@ export const fetchTaskOfCenterAd = createAsyncThunk(
     return response.data || [];
   }
 );
+export const countTaskOfCenterAd = createAsyncThunk(
+  "taskOfCenterAd/countTaskOfCenterAd",
+  async (typeTask, thunkAPI) => {
+    let response;
+    if (typeTask === "qualifications") {
+      response = await getPendingQualifications();
+    }
+    return response.data.length || [];
+  }
+);
 export const approveQualification = createAsyncThunk(
   "taskOfCenterAd/approveQualification",
   async ({ idUser, idQualification }) => {
@@ -25,7 +35,11 @@ export const approveQualification = createAsyncThunk(
 export const rejectQualification = createAsyncThunk(
   "taskOfCenterAd/rejectQualification",
   async ({ idUser, idQualification, reason }) => {
-    const response = await postRejectQualification(idUser, idQualification, reason);
+    const response = await postRejectQualification(
+      idUser,
+      idQualification,
+      reason
+    );
     return response.data;
   }
 );

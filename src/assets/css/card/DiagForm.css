@@ -154,6 +154,7 @@
   min-width: fit-content;
   font-size: 14px;
   outline: none;
+  border: none;
 }
 .modal-container .diag-body .str-btns .act-btns .diag-btn > svg {
   height: 0.85rem;
@@ -214,6 +215,24 @@
   display: flex;
   flex-direction: column;
   color: var(--text-gray);
+}
+.modal-container
+  .diag-body
+  .container-diag-field
+  .left-diag-container
+  .info
+  > .setting-course,
+.modal-container
+  .diag-body
+  .container-diag-field
+  .right-diag-container
+  .info
+  > .setting-course {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
 }
 
 .modal-container .diag-body .container-diag-field .info > span {

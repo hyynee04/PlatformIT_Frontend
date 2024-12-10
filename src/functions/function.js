@@ -71,6 +71,16 @@ export const isPastDateTime = (dateTimeString) => {
   // Compare the dates
   return inputDateTime < now;
 };
+export const formatDuration = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  // Đảm bảo định dạng luôn 2 chữ số với padding
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+  const formattedSeconds = remainingSeconds.toString().padStart(2, "0");
+
+  return `${formattedMinutes}:${formattedSeconds}`;
+};
 export const handleNotificationNavigate = (notification, navigate) => {
   if (notification.notificationType === NotificationType.qualification) {
     navigate("/pi", {

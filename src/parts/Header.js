@@ -25,6 +25,7 @@ import {
 import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
+import { countTaskOfCenterAd } from "../store/listTaskOfCenterAd";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -123,6 +124,15 @@ const Header = () => {
       );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+  useEffect(() => {
+    dispatch(countTaskOfCenterAd("qualification"));
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (taskOfCenterAd) {
+  //     setListTask(taskOfCenterAd);
+  //   }
+  // }, [taskOfCenterAd]);
 
   const navLinks = {
     [Role.platformAdmin]: [
@@ -230,29 +240,37 @@ const Header = () => {
               <div className="auth-buttons">
                 {(idRole === Role.student || idRole === Role.teacher) && (
                   <button
-                    className={`circle-buts ${activeButton === "message" ? "clicked" : ""
-                      }`}
+                    className={`circle-buts ${
+                      activeButton === "message" ? "clicked" : ""
+                    }`}
                     onClick={() => handleButtonClick("message")}
                   >
                     <LuMessageCircle className="header-icon" />
                   </button>
                 )}
                 {idRole === Role.centerAdmin && (
-                  <button
-                    className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
-                        ? "clicked"
-                        : ""
+                  <>
+                    <button
+                      className={`circle-buts ${
+                        location.pathname === buttonPaths["clipboard"]
+                          ? "clicked"
+                          : ""
                       }`}
-                    onClick={() => handleButtonClick("clipboard")}
-                  >
-                    <LuClipboardCheck className="header-icon" />
-                  </button>
+                      onClick={() => handleButtonClick("clipboard")}
+                    >
+                      <LuClipboardCheck className="header-icon" />
+                    </button>
+                    {unreadCount ? (
+                      <div className="number-unseen">{unreadCount}</div>
+                    ) : null}
+                  </>
                 )}
                 <button
                   ref={notiButtonRef}
                   disabled={location.pathname === buttonPaths["bell"]}
-                  className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                    }`}
+                  className={`circle-buts ${
+                    location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                  }`}
                   onClick={() => {
                     setIsNotificationOpen(!isNotificationOpen);
                   }}
@@ -273,8 +291,9 @@ const Header = () => {
                 />
                 <button
                   ref={optionButtonRef}
-                  className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
-                    }`}
+                  className={`circle-buts ${
+                    isAvatarPage || showOptionAva ? "clicked" : ""
+                  }`}
                   onClick={() => handleButtonClick("avatar")}
                 >
                   <img

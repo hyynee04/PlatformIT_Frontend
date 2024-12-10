@@ -34,11 +34,15 @@ import {
 } from "../../functions/function";
 import {
   getCourseDetail,
+  getCourseProgressByIdStudent,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
+  getTestOfCourseStudent,
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
+import { IoReloadOutline } from "react-icons/io5";
+import { ConsoleLogger } from "@microsoft/signalr/dist/esm/Utils";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -46,12 +50,12 @@ const CourseDetail = (props) => {
 
   const [loading, setLoading] = useState(false);
 
-  // console.log(">> Course Detail:", addSection);
-
-  const [idRole, setIDRole] = useState(0);
-  const [idUser, setIDUser] = useState("");
+  const idRole = +localStorage.getItem("idRole");
+  const idUser = +localStorage.getItem("idUser");
   const [courseInfo, setCourseInfo] = useState({});
   const [notificationBoard, setNotificationBoard] = useState([]);
+  const [studentProgress, setStudentProgress] = useState({});
+  const [testList, setTestList] = useState([]);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [showedSections, setShowedSections] = useState({});
@@ -61,24 +65,32 @@ const CourseDetail = (props) => {
       [index]: !prev[index], // Toggle the current section's visibility
     }));
   };
-  const fetchCourseDetail = async (idCourse) => {
+  const fetchCourseDetail = async (idCourse, idRole, idUser) => {
     setLoading(true);
     try {
       let response = await getCourseDetail(idCourse);
       setCourseInfo(response.data);
 
-      // Get Notification Board
-      let notifications = await getNotificationBoardOfCourse(idCourse);
-      const processedData = notifications.data.map((notification) => ({
-        ...notification,
-        timestamp: parseRelativeTime(notification.relativeTime),
-      }));
-      setNotificationBoard(processedData);
+      if (idRole === Role.student || idRole === Role.teacher) {
+        // Get Notification Board
+        let notifications = await getNotificationBoardOfCourse(idCourse);
+        if (notifications.status === APIStatus) {
+          const processedData = notifications.data.map((notification) => ({
+            ...notification,
+            timestamp: parseRelativeTime(notification.relativeTime),
+          }));
+          setNotificationBoard(processedData);
+        } else {
+          console.warn("Error fetching data: ", notifications.data);
+        }
+      }
+
+      if (idRole === Role.student) {
+        let progress = await getCourseProgressByIdStudent(idCourse, idUser);
+        setStudentProgress(progress.data);
+      }
 
       const responseIsEnroll = await getIsEnRolledCourse(idCourse);
-      // if (idRole === Role.teacher) {
-
-      // }
       if (responseIsEnroll.data === true) {
         setIsEnrolledCourse(true);
       } else {
@@ -90,6 +102,21 @@ const CourseDetail = (props) => {
       setLoading(false); // Set loading to false after request completes
     }
   };
+
+  const fetchTestOfCourseStudent = async (idCourse, idUser) => {
+    let response = await getTestOfCourseStudent(idCourse, idUser);
+    if (response.status === APIStatus.success) {
+      setCourseInfo((prev) => ({ ...prev, tests: response.data }));
+    } else console.warn(response.data);
+  };
+
+  useEffect(() => {
+    console.log("Check is EnrolledCourse: ", isEnrolledCourse);
+
+    if (isEnrolledCourse) {
+      fetchTestOfCourseStudent(courseInfo.idCourse, idUser);
+    }
+  }, [isEnrolledCourse]);
 
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
@@ -124,9 +151,13 @@ const CourseDetail = (props) => {
     window.scrollTo(0, 0);
     const state = location.state;
     if (state) {
-      setIDUser(parseInt(state.idUser));
-      setIDRole(parseInt(state.idRole));
-      fetchCourseDetail(state.idCourse);
+      // setIDUser(parseInt(state.idUser));
+      // setIDRole(parseInt(state.idRole));
+      fetchCourseDetail(
+        state.idCourse,
+        parseInt(state.idRole),
+        parseInt(state.idUser)
+      );
     }
     const interval = setInterval(() => {
       setNotificationBoard((prevNotifications) =>
@@ -192,6 +223,8 @@ const CourseDetail = (props) => {
     }
   };
 
+  console.log(courseInfo);
+
   if (loading) {
     return (
       <div className="loading-page">
@@ -235,7 +268,6 @@ const CourseDetail = (props) => {
                   {courseInfo.price && <TbCurrencyDong />}
                 </span>
               )}
-              {/* <span className='initial-price'>300</span> */}
             </div>
             {courseInfo.tags && courseInfo.tags.length > 0 && (
               <div className="tag-container">
@@ -359,13 +391,13 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-          {idUser && idRole === Role.student && isEnrolledCourse && (
+          {idUser && idRole === Role.student && isEnrolledCourse ? (
             <>
               <button className="chat-button">
                 Chat <RiChat3Line />
               </button>
             </>
-          )}
+          ) : null}
         </div>
 
         <div className="block-container">
@@ -454,8 +486,15 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
-                      value={53}
-                      text="8/15"
+                      value={`${
+                        studentProgress.lectureCount > 0
+                          ? (studentProgress.courseStudentProgress[0]
+                              .finishedLectureCount /
+                              studentProgress.LectureCount) *
+                            100
+                          : 0
+                      }`}
+                      text={`${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`}
                     />
                   </div>
                 </div>
@@ -465,8 +504,15 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
-                      value={57}
-                      text="4/7"
+                      value={`${
+                        studentProgress.assignmentCount > 0
+                          ? (studentProgress.courseStudentProgress[0]
+                              .finishedAssignmentCount /
+                              studentProgress.assignmentCount) *
+                            100
+                          : 0
+                      }`}
+                      text={`${studentProgress.courseStudentProgress[0].finishedAssignmentCount}/${studentProgress.assignmentCount}`}
                     />
                   </div>
                 </div>
@@ -476,18 +522,20 @@ const CourseDetail = (props) => {
             <div className="block-container student">
               <span className="block-container-title">Notification Board</span>
               <div className="block-container-col noti-size">
-                <div className="notification">
-                  <div className="notification-body">
-                    <span className="notification-title">Title</span>
-                    <span className="notification-content">
-                      Body text for whatever you’d like to say. Add main
-                      takeaway points, quotes, anecdotes, or even a very very
-                      short story.
-                    </span>
+                {notificationBoard.length > 0 &&
+                  notificationBoard.map((notification, index) => (
+                    <div key={index} className="notification">
+                      <div className="notification-body">
+                        <span className="notification-content">
+                          {notification.content}
+                        </span>
 
-                    <span className="noti-time">13.hr</span>
-                  </div>
-                </div>
+                        <span className="noti-time">
+                          {notification.relativeTime}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </>
@@ -615,73 +663,76 @@ const CourseDetail = (props) => {
                       ? `${courseInfo.tests.length} ${
                           courseInfo.tests.length > 1 ? "tests" : "test"
                         }`
-                      : "0 section"}{" "}
+                      : "0 test"}{" "}
                   </span>
                 </div>
-                {courseInfo.tests && courseInfo.tests.length !== 0 && (
+                {courseInfo.tests && courseInfo.tests.length > 0 && (
                   <div className="block-container-col">
                     {courseInfo.tests.map((test, index) => (
-                      <div key={index} className="qualification test">
-                        <div className="qualification-body">
-                          <div className="test-header">
-                            <span className="test-name">
-                              {test.assignmentTitle}
-                            </span>
-                            {idUser &&
-                            isEnrolledCourse &&
-                            idRole === Role.student ? (
-                              <>
-                                {test.isSubmitted ? (
-                                  <div className="test-info submitted">
-                                    Submitted <FiCheckSquare />
-                                  </div>
-                                ) : isPastDateTime(
-                                    test.dueDate,
-                                    courseInfo.courseEndDate
-                                  ) ? (
-                                  <div className="test-info past-due">
-                                    Past Due
-                                  </div>
-                                ) : (
-                                  <div className="test-info">
-                                    {test.dueDate
-                                      ? formatDateTime(test.dueDate)
-                                      : formatDateTime(
-                                          courseInfo.courseEndDate
-                                        )}
-                                  </div>
+                      <>
+                        {test.isPublish ? (
+                          <div key={index} className="qualification test">
+                            <div className="qualification-body">
+                              <div className="test-header">
+                                <span className="test-name">
+                                  {test.assignmentTitle}
+                                </span>
+                                {idUser &&
+                                isEnrolledCourse &&
+                                idRole === Role.student ? (
+                                  <>
+                                    {test.isSubmitted ? (
+                                      <div className="test-info submitted">
+                                        Submitted <FiCheckSquare />
+                                      </div>
+                                    ) : test.dueDate &&
+                                      isPastDateTime(test.dueDate) ? (
+                                      <div className="test-info past-due">
+                                        Past Due
+                                      </div>
+                                    ) : (
+                                      test.dueDate && (
+                                        <div className="test-info">
+                                          {test.dueDate
+                                            ? formatDateTime(test.dueDate)
+                                            : formatDateTime(
+                                                courseInfo.courseEndDate
+                                              )}
+                                        </div>
+                                      )
+                                    )}
+                                  </>
+                                ) : null}
+                              </div>
+
+                              <div className="test-description">
+                                {test.assignmentType && (
+                                  <span>
+                                    <LuFileEdit /> {test.assignmentTypeDesc}
+                                  </span>
                                 )}
-                              </>
-                            ) : null}
+                                {test.duration > 0 && (
+                                  <span>
+                                    <LuClock /> {test.duration} mins
+                                  </span>
+                                )}
+                                {test.questionQuantity > 0 && (
+                                  <span>
+                                    <LuFileQuestion /> {test.questionQuantity}{" "}
+                                    questions
+                                  </span>
+                                )}
+                                {test.dueDate && (
+                                  <span>
+                                    <LuCalendar />
+                                    {formatDate(test.dueDate)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
-
-                          <div className="test-description">
-                            {test.assignmentType && (
-                              <span>
-                                <LuFileEdit /> {test.assignmentTypeDesc}
-                              </span>
-                            )}
-
-                            {test.duration > 0 && (
-                              <span>
-                                <LuClock /> {test.duration} mins
-                              </span>
-                            )}
-                            {test.questionQuantity > 0 && (
-                              <span>
-                                <LuFileQuestion /> {test.questionQuantity}{" "}
-                                questions
-                              </span>
-                            )}
-                            {test.dueDate && (
-                              <span>
-                                <LuCalendar />
-                                {formatDate(test.dueDate)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                        ) : null}
+                      </>
                     ))}
                   </div>
                 )}

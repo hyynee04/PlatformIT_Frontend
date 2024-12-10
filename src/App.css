@@ -17,6 +17,18 @@
   outline: none;
 }
 
+@keyframes fadeInOut {
+  0% {
+    opacity: 1; /* Fully visible */
+  }
+  50% {
+    opacity: 0; /* Fully transparent */
+  }
+  100% {
+    opacity: 1; /* Back to fully visible */
+  }
+}
+
 @keyframes slideToLeft {
   from {
     transform: translateX(25%);
@@ -75,8 +87,6 @@
   animation: slideToTop 0.75s ease-in-out forwards;
 }
 
-
-
 .app-container {
   overflow: scroll; /* or auto */
   overflow-x: hidden; /* or auto */
@@ -99,8 +109,8 @@ button {
 .app-container::-webkit-scrollbar {
   display: none;
 }
-.header-container >  .bg-body-tertiary {
-    background-color: var(--main-color) !important;
+.header-container > .bg-body-tertiary {
+  background-color: var(--main-color) !important;
 }
 .main-container {
   flex: 1;
@@ -134,10 +144,10 @@ button {
 }
 @keyframes spin {
   from {
-      transform: scale(1) rotate(0deg);
+    transform: scale(1) rotate(0deg);
   }
   to {
-      transform: scale(1) rotate(360deg);
+    transform: scale(1) rotate(360deg);
   }
 }
 
@@ -151,7 +161,7 @@ button {
 .pagination > button {
   margin: 0 3px;
   padding: 3px 10px;
-  font-size: .9rem;
+  font-size: 0.9rem;
 
   border: none;
   background-color: transparent;
@@ -160,14 +170,14 @@ button {
 
 .pagination > button:hover {
   background-color: rgba(217, 217, 217, 0.2);
-  border-radius: .3rem;
+  border-radius: 0.3rem;
 }
 
 .pagination > .active,
 .pagination > .active:hover {
   background-color: var(--main-color);
   color: white;
-  border-radius: .3rem;
+  border-radius: 0.3rem;
 }
 
 .viewall-container .viewall-main-section .pagination > button[disabled] {

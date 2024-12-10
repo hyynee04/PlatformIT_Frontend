@@ -43,6 +43,7 @@ import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
+import AdminCenterDetail from "./pages/detail/AdminCenterDetail";
 
 const Layout = (props) => {
   return (
@@ -92,7 +93,17 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <StudentDetail />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/adminCenterDetail"
+            element={
+              <PrivateRoute>
+                <AdminCenterDetail />
+              </PrivateRoute>
+            }
           />
 
           <Route
@@ -100,7 +111,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <Lecture />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           <Route path="/viewAll" element={<ViewAll />} />
@@ -110,7 +122,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <AllNotifications />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           {/* Platform Admin */}
@@ -258,7 +271,8 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <AddNewLecture />
-              </PrivateRoute>}
+              </PrivateRoute>
+            }
           />
 
           {/* Student */}

@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { BsPinAngleFill } from "react-icons/bs";
-import { LuBuilding2, LuClock, LuStar } from "react-icons/lu";
+import { LuBuilding2, LuClock, LuPenLine, LuStar } from "react-icons/lu";
 import { RiGroupLine } from "react-icons/ri";
 import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/Card.css";
 import default_image from "../../assets/img/default_image.png";
 import { formatDate } from "../../functions/function";
+import { Role } from "../../constants/constants";
 
 const CourseCard = (props) => {
   const navigate = useNavigate();
   const { course } = props;
   const [isHover, setIsHover] = useState(false);
+  const idRole = +localStorage.getItem("idRole");
 
   const longest_tag =
     course.tags && course.tags.length > 0
@@ -139,6 +141,15 @@ const CourseCard = (props) => {
       {isHover && (
         <div
           className="card-container card-container-hover"
+          onClick={() => {
+            navigate("/courseDetail", {
+              state: {
+                idCourse: course.idCourse,
+                idUser: localStorage.getItem("idUser"),
+                idRole: localStorage.getItem("idRole"),
+              },
+            });
+          }}
           onMouseLeave={() => setIsHover(false)}
         >
           {(course.isEnrolled ||
@@ -212,28 +223,33 @@ const CourseCard = (props) => {
             <div className="course-card-footer">
               <div className="course-card-price">
                 <span className="discount-price">
-                  {course.price
-                    ? `${course.price
+                  {course.discountedPrice
+                    ? `${course.discountedPrice
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
                     : "Free"}
-                  {course.price && <TbCurrencyDong />}
+                  {course.discountedPrice && <TbCurrencyDong />}
                 </span>
+                {course.discountedPrice && idRole !== Role.centerAdmin && (
+                  <span className="initial-price">
+                    {course.price
+                      ? `${course.price
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                      : "Free"}
+                    {course.price && <TbCurrencyDong />}
+                  </span>
+                )}
               </div>
-              <button
-                className="view-detail-btn"
-                onClick={() => {
-                  navigate("/courseDetail", {
-                    state: {
-                      idCourse: course.idCourse,
-                      idUser: localStorage.getItem("idUser"),
-                      idRole: localStorage.getItem("idRole"),
-                    },
-                  });
-                }}
-              >
-                View Detail
-              </button>
+              {idRole === Role.centerAdmin && (
+                <button
+                  className="view-detail-btn"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <LuPenLine />
+                  Edit
+                </button>
+              )}
             </div>
           </div>
         </div>

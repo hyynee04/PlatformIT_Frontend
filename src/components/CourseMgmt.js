@@ -7,7 +7,7 @@ import {
   LuFilter,
   LuPlus,
   LuSearch,
-  LuX
+  LuX,
 } from "react-icons/lu";
 import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
@@ -143,7 +143,7 @@ const CourseMgmt = (props) => {
                 new Date(course.courseEndDate) <= new Date(endDate)) &&
               (!startRegistration ||
                 new Date(course.registStartDate) >=
-                new Date(startRegistration)) &&
+                  new Date(startRegistration)) &&
               (!endRegistration ||
                 new Date(course.registEndDate) <= new Date(endRegistration))))
       )
@@ -187,7 +187,10 @@ const CourseMgmt = (props) => {
     currentPage * itemsPerPage
   );
 
-  const paginationNumbers = getPagination(currentPage.coursePage, Math.ceil(currentCourses.length / itemsPerPage))
+  const paginationNumbers = getPagination(
+    currentPage.coursePage,
+    Math.ceil(currentCourses.length / itemsPerPage)
+  );
 
   useEffect(() => {
     fetchAllTagModels();
@@ -548,13 +551,6 @@ const CourseMgmt = (props) => {
             currentItemsPage.map((course, index) => (
               <div key={index} className="one-card-container">
                 <CourseCard key={"course" + course.idCourse} course={course} />
-                {role === Role.centerAdmin && (
-                  <div className="edit-course-btn">
-                    <button>
-                      <FiEdit /> Edit
-                    </button>
-                  </div>
-                )}
               </div>
             ))}
         </div>

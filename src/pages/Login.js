@@ -310,10 +310,6 @@ const Login = () => {
             </div>
             <div className="mainpart-content">
               <div className="sep">
-                {/* <RiFacebookFill
-                  color="#1E1E1E"
-                  onClick={() => handleLoginThirdParty("Facebook")}
-                /> */}
                 <FaGooglePlusG
                   color="#1E1E1E"
                   onClick={() => handleLoginThirdParty("Google")}

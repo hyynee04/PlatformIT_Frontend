@@ -4,8 +4,8 @@ import axios from "../utils/axiosCustomize";
 const getAllCourseCards = (idStudent) => {
   return axios.get("api/Course/GetAllCourseCards", {
     params: {
-      idStudent: idStudent
-    }
+      idStudent: idStudent,
+    },
   });
 };
 const getAllCourseCardsByIdCenter = (idCenter) => {
@@ -478,9 +478,9 @@ const getLectureDetail = (idLecture) => {
   return axios.get("api/Lecture/GetLectureDetail", {
     params: {
       idLecture: idLecture,
-    }
-  })
-}
+    },
+  });
+};
 
 const getNotificationBoardOfCourse = (idCourse) => {
   return axios.get("api/Notification/GetNotificationBoardOfCourse", {
@@ -513,36 +513,66 @@ const getCourseContentStructure = (idCourse, idStudent) => {
     params: {
       idCourse: idCourse,
       ...(idStudent && { idStudent: idStudent }),
-    }
-  })
-}
+    },
+  });
+};
 
-const getExerciseOfLectureViaStudent = (idLecture, idStudent) => {
-  return axios.get("api/Assignment/GetExerciseOfLectureViaStudent", {
+const getExerciseOfLecture = (idLecture, idStudent) => {
+  return axios.get("api/Assignment/GetExerciseOfLecture", {
     params: {
       idLecture: idLecture,
       idStudent: idStudent,
-    }
-  })
-}
+    },
+  });
+};
+
+const getCourseProgressByIdStudent = (idCourse, idStudent) => {
+  return axios.get("api/Course/GetCourseProgressByIdStudent", {
+    params: {
+      idCourse: idCourse,
+      idStudent: idStudent,
+    },
+  });
+};
+
+const getTestOfCourseStudent = (idCourse, idStudent) => {
+  return axios.get("api/Course/GetTestOfCourseStudent", {
+    params: {
+      idCourse: idCourse,
+      idStudent: idStudent,
+    },
+  });
+};
 
 export {
   deleteAssignment,
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
-  getAllAssignmentCardOfTeacher, getAllCourseCards,
+  getAllAssignmentCardOfTeacher,
+  getAllCourseCards,
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
-  getAllTagModel, getAllTestCardOfStudent, getAssignmentInfo, getCourseContentStructure, getCourseDetail,
-  getCourseProgress, getExerciseOfLectureViaStudent, getIsEnRolledCourse, getLectureDetail, getNotificationBoardOfCourse,
+  getAllTagModel,
+  getAllTestCardOfStudent,
+  getAssignmentInfo,
+  getCourseContentStructure,
+  getCourseDetail,
+  getCourseProgress,
+  getExerciseOfLecture,
+  getIsEnRolledCourse,
+  getLectureDetail,
+  getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
   postAddCourse,
   postAddLecture,
   postAddManualAssignment,
-  postAddQuizAssignment, postAddSection,
+  postAddQuizAssignment,
+  postAddSection,
   postEnrollCourse,
-  postPublishAssignment, postUpdateAssignment
+  postPublishAssignment,
+  postUpdateAssignment,
+  getCourseProgressByIdStudent,
+  getTestOfCourseStudent,
 };
-

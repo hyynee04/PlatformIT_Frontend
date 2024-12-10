@@ -40,6 +40,7 @@ const CourseDetailTeacher = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const idRole = +localStorage.getItem("idUser");
   const [loading, setLoading] = useState();
 
   const [notificationContent, setNotificationContent] = useState("");
@@ -274,7 +275,22 @@ const CourseDetailTeacher = (props) => {
                           }`}
                         >
                           {section.lectures.map((lecture, index) => (
-                            <div key={index} className="lecture-content">
+                            <div
+                              key={index}
+                              className={`lecture-content ${
+                                courseInfo.idTeacher === idRole ? "" : "nohover"
+                              }`}
+                              onClick={() => {
+                                if (courseInfo.idTeacher === idRole)
+                                  navigate("/viewLecture", {
+                                    state: {
+                                      idCourse: courseInfo.idCourse,
+                                      idSection: section.idSection,
+                                      idLecture: lecture.idLecture,
+                                    },
+                                  });
+                              }}
+                            >
                               <div className="lecture-name">
                                 <span className="lecture-title">
                                   {lecture.lectureTitle}
@@ -534,7 +550,19 @@ const CourseDetailTeacher = (props) => {
           {attendanceList.courseStudentProgress &&
             attendanceList.courseStudentProgress.length > 0 &&
             attendanceList.courseStudentProgress.map((attendance, index) => (
-              <div key={index} className="attendance-progress-container">
+              <div
+                key={index}
+                className="attendance-progress-container"
+                onClick={() =>
+                  navigate("/studentdetail", {
+                    state: {
+                      idStudent: attendance.idStudent,
+                      idCourse: courseInfo.idCourse,
+                      courseTitle: courseInfo.courseTitle,
+                    },
+                  })
+                }
+              >
                 <div className="attendance-progress-content">
                   <div className="attendance-ava">
                     <img src={attendance.avatarPath || default_ava} />

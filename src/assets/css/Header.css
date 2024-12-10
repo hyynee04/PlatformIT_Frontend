@@ -37,7 +37,7 @@
 }
 .navbar > .container .me-auto .nav-link:hover {
   transition: transform 0.2s ease;
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
 .navbar > .container .me-auto .active,
 .navbar > .container .me-auto .active:hover {
@@ -96,19 +96,22 @@
 .navbar > .container .auth-buttons .register {
   background-color: var(--second-main-color);
   color: var(--white-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .register:hover {
   background-color: rgba(0, 59, 87, 0.7);
-  transition: background-color 0.3s ease;
+  transform: scale(1.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .sign-in {
   background-color: var(--white-color);
   color: var(--second-main-color);
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .sign-in:hover {
   background-color: var(--border-gray);
+  transform: scale(1.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .header-icon {
   width: 24px;

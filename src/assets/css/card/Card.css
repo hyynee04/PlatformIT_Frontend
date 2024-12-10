@@ -22,7 +22,8 @@
 /* .outside-card .card-container .course-card-container svg > path {
     box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 2px 0px;
 } */
-.card-container {
+.card-container,
+.card-container-hover {
   border: 1px solid var(--border-gray);
   border-radius: 0.5rem;
 
@@ -32,11 +33,13 @@
 
   background-color: var(--white-color);
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-  transition: width 0.3s ease, height 0.3s ease;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
 }
 
 .card-container.hover:hover {
   background-color: rgba(217, 217, 217, 0.2);
+  transition: background-color 0.3s ease;
 }
 
 /* Course Card */
@@ -309,7 +312,6 @@
   padding: 1rem 1.5rem;
   z-index: 2;
   width: 275px;
-  transition: width 0.3s ease, height 0.3s ease;
 }
 
 .card-container > .course-card-container.course-card-hover {
@@ -344,6 +346,20 @@
   border-radius: 0.3rem;
 
   padding: 4px 6px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.card-container
+  .course-card-container
+  .course-card-footer
+  .view-detail-btn
+  > svg {
+  font-size: 1.1rem;
 }
 
 .card-container

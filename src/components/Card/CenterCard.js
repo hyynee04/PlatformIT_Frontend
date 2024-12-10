@@ -8,14 +8,15 @@ const CenterCard = (props) => {
   const navigate = useNavigate();
 
   const { center } = props;
-  const longest_tag =
-    center.listTagCourses && center.listTagCourses.length > 0
-      ? center.listTagCourses.reduce((longest, current) =>
-          current.tagName.length > longest.tagName.length ? current : longest
-        ).tagName
-      : "";
+  const shortest_tags =
+    center.listTagCourses && center.listTagCourses.length > 1
+      ? center.listTagCourses
+          .sort((a, b) => a.tagName.length - b.tagName.length)
+          .slice(0, 3)
+          .map((tag) => tag.tagName) // Extract only the tag names
+      : [];
   const remain_tag_number = center.listTagCourses
-    ? center.listTagCourses.length - 1
+    ? center.listTagCourses.length - 3
     : 0;
 
   return (
@@ -42,7 +43,12 @@ const CenterCard = (props) => {
             {center.description !== null ? center.description : ""}
           </span>
           <div className="center-card-tag-container">
-            {longest_tag && <div className="tag-content">{longest_tag}</div>}
+            {shortest_tags.length > 0 &&
+              shortest_tags.map((tag, index) => (
+                <div key={index} className="tag-content">
+                  {tag}
+                </div>
+              ))}
             {remain_tag_number > 0 && (
               <div className="tag-content-more">+{remain_tag_number}</div>
             )}

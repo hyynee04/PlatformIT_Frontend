@@ -37,12 +37,12 @@ import {
   getCourseProgressByIdStudent,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
-  getTestOfCourseStudent,
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
 import { IoReloadOutline } from "react-icons/io5";
 import { ConsoleLogger } from "@microsoft/signalr/dist/esm/Utils";
+import { getTestOfCourseStudent } from "../../services/assignmentService";
 
 const CourseDetail = (props) => {
   const location = useLocation();

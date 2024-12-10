@@ -244,7 +244,12 @@ const CourseCard = (props) => {
               {idRole === Role.centerAdmin && (
                 <button
                   className="view-detail-btn"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate("/updateCourse", {
+                      state: { idCourse: course.idCourse },
+                    });
+                  }}
                 >
                   <LuPenLine />
                   Edit

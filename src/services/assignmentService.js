@@ -390,6 +390,14 @@ const deleteAssignment = async (idAssignment) => {
     throw error;
   }
 };
+const getTestOfCourseStudent = (idCourse, idStudent) => {
+  return axios.get("api/Course/GetTestOfCourseStudent", {
+    params: {
+      idCourse: idCourse,
+      idStudent: idStudent,
+    },
+  });
+};
 
 export {
   getAllAssignmentCardOfTeacher,
@@ -407,4 +415,5 @@ export {
   postSubmitManualQuestion,
   postGradingManualAssignment,
   deleteAssignment,
+  getTestOfCourseStudent,
 };

@@ -269,26 +269,15 @@ const getCourseProgressByIdStudent = (idCourse, idStudent) => {
   });
 };
 
-const getTestOfCourseStudent = (idCourse, idStudent) => {
-  return axios.get("api/Course/GetTestOfCourseStudent", {
-    params: {
-      idCourse: idCourse,
-      idStudent: idStudent,
-    },
-  });
-};
-
 export {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
-  getAllAssignmentCardOfTeacher,
   getAllCourseCards,
   getAllCourseCardsByIdCenter,
   getAllCourseCardsByIdStudent,
   getAllCourseCardsByIdTeacher,
   getAllTagModel,
-  getAllTestCardOfStudent,
   getCourseContentStructure,
   getCourseDetail,
   getCourseProgress,
@@ -300,12 +289,7 @@ export {
   postAddCourse,
   postUpdateCourse,
   postAddLecture,
-  postAddManualAssignment,
-  postAddQuizAssignment,
   postAddSection,
   postEnrollCourse,
-  postPublishAssignment,
-  postUpdateAssignment,
   getCourseProgressByIdStudent,
-  getTestOfCourseStudent,
 };

@@ -23,8 +23,6 @@ const getAssignmentInfo = async (idAssignment) => {
   });
 };
 const getOverviewAssignment = async (idAssignment, idCourse) => {
-  console.log("idCourse", idCourse);
-
   return await axios.get("api/Assignment/GetOverviewAssignment", {
     params: {
       idAssignment: idAssignment,
@@ -32,11 +30,11 @@ const getOverviewAssignment = async (idAssignment, idCourse) => {
     },
   });
 };
-const getDetailAssignmentForStudent = async (idAssignment) => {
+const getDetailAssignmentForStudent = async (idAssignment, idStudent) => {
   return await axios.get("api/Assignment/GetDetailAssignmentForStudent", {
     params: {
       idAssignment: idAssignment,
-      idStudent: Number(localStorage.getItem("idUser")),
+      idStudent: idStudent,
     },
   });
 };
@@ -47,11 +45,11 @@ const getDetailAssignmentItemForStudent = async (idAssignment) => {
     },
   });
 };
-const getAssignmentAnswer = async (idAssignment) => {
+const getAssignmentAnswer = async (idAssignment, idStudent) => {
   return await axios.get("api/Assignment/GetAssignmentAnswer", {
     params: {
       idAssignment: idAssignment,
-      idStudent: Number(localStorage.getItem("idUser")),
+      idStudent: idStudent,
     },
   });
 };
@@ -328,9 +326,53 @@ const postSubmitQuizAssignment = async (requestData) => {
     throw error;
   }
 };
-const postSubmitManualQuestion = async () => {
+const postSubmitManualQuestion = async (dataToSubmit) => {
+  dataToSubmit.submittedDate = dataToSubmit.submittedDate.split("+")[0];
+  console.log(dataToSubmit);
   try {
-    return await axios.post("api/Assignment/SubmitManualAssignment", {});
+    const formData = new FormData();
+    formData.append("IdAssignment", dataToSubmit.idAssignment);
+    formData.append("IdStudent", Number(localStorage.getItem("idUser")));
+    formData.append("Duration", dataToSubmit.duration);
+    formData.append(
+      "AssignmentResultStatus",
+      dataToSubmit.assignmentResultStatus
+    );
+    formData.append("SubmittedDate", dataToSubmit.submittedDate);
+    dataToSubmit.answers.forEach((answers, index) => {
+      formData.append(
+        `Answers[${index}].idAssignmentItem`,
+        answers.idAssignmentItem
+      );
+      if (typeof answers.answer === "string") {
+        formData.append(`Answers[${index}].answer`, answers.answer);
+      } else {
+        formData.append(`Answers[${index}].attachedFile`, answers.answer.file);
+      }
+    });
+    return await axios.post("api/Assignment/SubmitManualAssignment", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    console.error("Error add course:", error.response?.data || error.message);
+  }
+};
+const postGradingManualAssignment = async (requestData) => {
+  try {
+    return await axios.post(
+      "api/Assignment/GradingManualAssignment",
+      requestData,
+      {
+        params: {
+          idUpdatedBy: Number(localStorage.getItem("idUser")),
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } catch (error) {
     throw error;
   }
@@ -361,7 +403,8 @@ export {
   postAddQuizAssignment,
   postPublishAssignment,
   postUpdateAssignment,
-  deleteAssignment,
   postSubmitQuizAssignment,
   postSubmitManualQuestion,
+  postGradingManualAssignment,
+  deleteAssignment,
 };

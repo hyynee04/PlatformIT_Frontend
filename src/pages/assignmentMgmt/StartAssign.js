@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { format, fromZonedTime } from "date-fns-tz";
 import {
@@ -15,6 +15,8 @@ import {
 } from "../../constants/constants";
 import { getPagination } from "../../functions/function";
 import { LuCheckCircle, LuX } from "react-icons/lu";
+import { FaTrashAlt } from "react-icons/fa";
+import { RiAttachment2 } from "react-icons/ri";
 import { ImSpinner2 } from "react-icons/im";
 import Form from "react-bootstrap/Form";
 import default_image from "../../assets/img/default_image.png";
@@ -53,6 +55,12 @@ const StartAssign = () => {
               };
             });
           }
+          if (assignmentRes.data.assignmentType === AssignmentType.manual) {
+            updatedQuestions = updatedQuestions.map((question) => ({
+              ...question,
+              answer: "",
+            }));
+          }
           setQuestions(updatedQuestions);
         }
       } catch (error) {
@@ -66,94 +74,111 @@ const StartAssign = () => {
     if (state?.idAssignment) {
       fetchData(state.idAssignment);
     }
+    const queryParams = new URLSearchParams(window.location.search);
+    const idAssignment = queryParams.get("idAssignment");
+    if (idAssignment) {
+      fetchData(idAssignment);
+    }
   }, [location]);
 
-  //COUNTDOWN
-  const [timeLeft, setTimeLeft] = useState(assignmentInfo?.duration * 60);
+  // COUNTDOWN
+  const [timeLeft, setTimeLeft] = useState(
+    assignmentInfo?.duration ? assignmentInfo.duration * 60 : null
+  );
   const [totalDuration, setTotalDuration] = useState(0);
 
   useEffect(() => {
-    const durationInSeconds = assignmentInfo?.duration * 60;
+    const durationInSeconds = assignmentInfo?.duration
+      ? assignmentInfo.duration * 60
+      : null;
+
     setTimeLeft(durationInSeconds);
-    setTotalDuration(durationInSeconds); // Gán tổng thời gian ban đầu
+    setTotalDuration(0);
   }, [assignmentInfo?.duration]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
+        if (prevTime !== null && prevTime > 0) {
+          return prevTime - 1;
+        } else if (prevTime === 0) {
           clearInterval(interval);
           handleSubmitAssignment();
           return 0;
         }
-        return prevTime - 1;
+        return prevTime;
       });
+      if (timeLeft === null) {
+        setTotalDuration((prevTotal) => prevTotal + 1);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [timeLeft]);
+  const minutes = Math.floor((timeLeft ?? totalDuration) / 60);
+  const seconds = (timeLeft ?? totalDuration) % 60;
 
   const [diagSubmitVisible, setDiagSubmitVisible] = useState(false);
-  const [isQuestionsValid, setIsQuestionsValid] = useState(false); // Kiểm tra câu hỏi hợp lệ
+  const [isQuestionsValid, setIsQuestionsValid] = useState(false);
   const [diagMessage, setDiagMessage] = useState(
     "Are you sure you want to submit?"
-  ); // Thông báo
-
+  );
   const handleOpenDiag = () => {
     const hasInvalidQuestions = questions.some((question) => {
-      return !question.items.some((item) => item.isSelected === true); // Không có đáp án nào được chọn
+      if (assignmentInfo.assignmentType === AssignmentType.manual) {
+        return (
+          !question.answer ||
+          (question.assignmentItemAnswerType ===
+            AssignmentItemAnswerType.text &&
+            question.answer.trim() === "")
+        );
+      } else if (assignmentInfo.assignmentType === AssignmentType.code) {
+        return !question.items.some((item) => item.isSelected === true);
+      }
+      return false;
     });
 
     if (hasInvalidQuestions) {
       setIsQuestionsValid(false);
-      setDiagMessage(
-        "Please ensure all questions have at least one answer selected."
-      );
+      if (assignmentInfo.assignmentType === AssignmentType.quiz) {
+        setDiagMessage(
+          "Please ensure all questions have at least one answer selected."
+        );
+      }
+      if (assignmentInfo.assignmentType === AssignmentType.manual) {
+        setDiagMessage("Please ensure all questions have an answer.");
+      }
     } else {
       setIsQuestionsValid(true);
       setDiagMessage("Are you sure you want to submit?");
     }
-    setDiagSubmitVisible(true); // Hiển thị modal
+    setDiagSubmitVisible(true);
   };
   //HANDLE OUT OF PAGE
   const navigate = useNavigate();
 
   // useEffect(() => {
   //   const handleBeforeUnload = (event) => {
+  //     // Ngăn việc reload/trang bị rời bỏ
   //     event.preventDefault();
   //     event.returnValue =
-  //       "Are you sure you want to leave? Your progress may not be saved!";
-
-  //     // Nộp bài khi tắt trình duyệt hoặc reload
+  //       "Your assignment will automatically be submitted if you leave.";
   //     handleSubmitAssignment();
   //   };
-
-  //   const handlePopState = () => {
-  //     // Kiểm tra hành động Back/Forward
-  //     if (
-  //       window.confirm("Are you sure you want to leave without submitting?")
-  //     ) {
-  //       handleSubmitAssignment(); // Nộp bài trước khi rời trang
-  //       navigate(-1); // Quay lại trang trước
-  //     } else {
-  //       // Giữ nguyên trạng thái hiện tại
-  //       window.history.pushState(null, null, window.location.href);
+  //   const handleVisibilityChange = () => {
+  //     if (document.visibilityState === "hidden") {
+  //       handleOpenDiag();
   //     }
   //   };
 
-  //   // Đẩy trạng thái vào lịch sử để phát hiện sự kiện popstate
-  //   window.history.pushState(null, null, window.location.href);
-
-  //   // Thêm sự kiện xử lý
   //   window.addEventListener("beforeunload", handleBeforeUnload);
-  //   window.addEventListener("popstate", handlePopState);
+  //   document.addEventListener("visibilitychange", handleVisibilityChange);
 
-  //   // Cleanup
   //   return () => {
   //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //     window.removeEventListener("popstate", handlePopState);
+  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
   //   };
-  // }, [navigate]);
+  // }, []);
 
   // SUBMIT ASSIGNMENT
   const handleAssignmentResultStatus = (
@@ -171,7 +196,10 @@ const StartAssign = () => {
     }
 
     if (!assignmentInfo.duration) {
-      if (submittedDateObj > dueDate || submittedDateObj > courseEndDate) {
+      if (
+        (dueDate && submittedDateObj > dueDate) ||
+        (courseEndDate && submittedDateObj > courseEndDate)
+      ) {
         return AssignmentResultStatus.late;
       }
       return AssignmentResultStatus.onTime;
@@ -179,10 +207,6 @@ const StartAssign = () => {
 
     return AssignmentResultStatus.onTime;
   };
-
-  //COUNTDOWN
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
 
   //PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
@@ -225,7 +249,36 @@ const StartAssign = () => {
     }
     setQuestions(updatedQuestions);
   };
+  //MANUAL
+  const handleManualAnswerChange = (idx, field, value) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[idx][field] = value;
+    setQuestions(updatedQuestions);
+  };
+  const inputFileRef = useRef([]);
+  const handleOpenReferenceAnswerFile = (idx) => {
+    inputFileRef.current[idx]?.click();
+  };
 
+  const handleReferenceFileChange = (e, idx) => {
+    const file = e.target.files[0];
+    if (file) {
+      const updatedQuestions = [...questions];
+      updatedQuestions[idx].answer = {
+        name: file.name,
+        url: URL.createObjectURL(file),
+        file: file,
+      };
+      setQuestions(updatedQuestions);
+    }
+  };
+  const handleDeleteFile = (idx) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[idx].answer = null; // Xoá file
+    setQuestions(updatedQuestions);
+  };
+
+  //SUBMIT
   const handleSubmitAssignment = async () => {
     //duration
     const timeSpent = totalDuration - timeLeft;
@@ -238,22 +291,13 @@ const StartAssign = () => {
 
     const submittedDate = format(utcDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
 
-    const dueDate = new Date(assignmentInfo.dueDate); // Ngày hết hạn bài tập
+    const dueDate = assignmentInfo.dueDate
+      ? new Date(assignmentInfo.dueDate)
+      : null;
     const courseEndDate = assignmentInfo.courseEndDate
       ? new Date(assignmentInfo.courseEndDate)
-      : null; // Ngày kết thúc khóa học (nếu có)
+      : null;
     const submittedDateObj = new Date(submittedDate);
-
-    const answers = questions.map((question) => {
-      const selectedOptions = question.items
-        .filter((item) => item.isSelected === true)
-        .map((item) => item.idMultipleAssignmentItem);
-
-      return {
-        idAssignmentItem: question.idAssignmentItem,
-        selectedOptions,
-      };
-    });
 
     const assignmentResultStatus = handleAssignmentResultStatus(
       dueDate,
@@ -261,6 +305,19 @@ const StartAssign = () => {
       submittedDateObj
     );
 
+    const answers =
+      assignmentInfo.assignmentType === AssignmentType.quiz
+        ? questions.map((question) => {
+            const selectedOptions = question.items
+              .filter((item) => item.isSelected === true)
+              .map((item) => item.idMultipleAssignmentItem);
+
+            return {
+              idAssignmentItem: question.idAssignmentItem,
+              selectedOptions,
+            };
+          })
+        : questions;
     const requestData = {
       idAssignment: assignmentInfo.idAssignment,
       idStudent: Number(localStorage.getItem("idUser")),
@@ -276,11 +333,10 @@ const StartAssign = () => {
       if (assignmentInfo.assignmentType === AssignmentType.quiz) {
         response = await postSubmitQuizAssignment(requestData);
       } else if (assignmentInfo.assignmentType === AssignmentType.manual) {
-        response = await postSubmitManualQuestion();
+        response = await postSubmitManualQuestion(requestData);
       }
 
       if (response.status === APIStatus.success) {
-        console.log("Assignment submitted successfully.");
         navigate("/studentTest");
       } else {
         console.error("Failed to submit assignment:", response);
@@ -309,6 +365,7 @@ const StartAssign = () => {
               {minutes < 10 ? `0${minutes}` : minutes}:
               {seconds < 10 ? `0${seconds}` : seconds}
             </label>
+
             <button className="btn submit" onClick={() => handleOpenDiag()}>
               Submit
             </button>
@@ -379,10 +436,14 @@ const StartAssign = () => {
                           <Form.Control
                             as="textarea"
                             className="input-area-form-pi"
-                            //   value={tempUserPI.description || ""}
-                            //   onChange={(e) =>
-                            //     handleInputChange("description", e.target.value)
-                            //   }
+                            value={question.answer || ""}
+                            onChange={(e) =>
+                              handleManualAnswerChange(
+                                index,
+                                "answer",
+                                e.target.value
+                              )
+                            }
                           />
                         </div>
                       )}
@@ -390,16 +451,61 @@ const StartAssign = () => {
                         AssignmentItemAnswerType.attached_file && (
                         <div className="info">
                           <span>Your answer: </span>
-                          <Form.Control
-                            as="textarea"
-                            className="input-area-form-pi"
-                            //   value={tempUserPI.description || ""}
-                            //   onChange={(e) =>
-                            //     handleInputChange("description", e.target.value)
-                            //   }
-                          />
+                          {question.answer ? (
+                            <div className="select-container">
+                              <input
+                                type="text"
+                                style={{ cursor: "pointer" }}
+                                className="input-form-pi"
+                                title={
+                                  question.attachedFile?.name ||
+                                  question.nameFile
+                                }
+                                value={
+                                  question.answer.name.length > 54
+                                    ? question.answer.name.slice(0, 54) + "..."
+                                    : question.answer.name
+                                }
+                                onClick={() => {
+                                  if (question.answer.url) {
+                                    // Kiểm tra nếu answer chứa URL
+                                    window.open(question.answer.url, "_blank");
+                                  }
+                                }}
+                                readOnly
+                              />
+                              <FaTrashAlt
+                                className="arrow-icon del-question"
+                                style={{
+                                  cursor: "pointer",
+                                  pointerEvents: "all",
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteFile(index);
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <button
+                              className="file-btn"
+                              onClick={() =>
+                                handleOpenReferenceAnswerFile(index)
+                              }
+                            >
+                              <RiAttachment2 className="icon" />
+                              Attach file
+                            </button>
+                          )}
                         </div>
                       )}
+                      <input
+                        type="file"
+                        ref={(el) => (inputFileRef.current[index] = el)}
+                        style={{ display: "none" }}
+                        accept="*"
+                        onChange={(e) => handleReferenceFileChange(e, index)}
+                      />
                     </div>
                   </>
                 )}

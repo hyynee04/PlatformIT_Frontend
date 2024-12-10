@@ -35,6 +35,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import default_image from "../../assets/img/default_image.png";
 import default_ava from "../../assets/img/default_ava.png";
 import "../../assets/css/AssignmentDetail.css";
+import AnswerSheet from "../../components/assigment/AnswerSheet";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -47,6 +48,11 @@ const AssignDetail = () => {
   const [overviewAssignment, setOverviewAssignment] = useState({});
   const [questions, setQuestions] = useState([]);
   const [activeChoice, setActiveChoice] = useState("question");
+  //SHOW ANSWER FOR STUDENT
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [showAnswerSheet, setShowAnswerSheet] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState({});
+
   useEffect(() => {
     const fetchAssignmentData = async (idAssignment) => {
       setLoading(true);
@@ -56,7 +62,10 @@ const AssignDetail = () => {
         if (idRole === Role.teacher) {
           response = await getAssignmentInfo(idAssignment);
         } else if (idRole === Role.student) {
-          response = await getDetailAssignmentForStudent(idAssignment);
+          response = await getDetailAssignmentForStudent(
+            idAssignment,
+            Number(localStorage.getItem("idUser"))
+          );
         }
 
         if (response?.status === APIStatus.success) {
@@ -79,37 +88,39 @@ const AssignDetail = () => {
     }
   }, [location]);
 
-  useEffect(() => {
-    const fetchOverviewData = async () => {
-      if (idRole === Role.teacher && assignmentInfo?.idCourse) {
-        setLoading(true);
-        try {
-          const responseOverview = await getOverviewAssignment(
-            assignmentInfo.idAssignment,
-            assignmentInfo.idCourse
-          );
-          if (responseOverview.status === APIStatus.success) {
-            setOverviewAssignment(responseOverview.data);
-          }
-        } catch (error) {
-          console.error("Error fetching overview assignment data", error);
-        } finally {
-          setLoading(false);
+  const fetchOverviewData = async () => {
+    if (idRole === Role.teacher && assignmentInfo?.idCourse) {
+      setLoading(true);
+      try {
+        const responseOverview = await getOverviewAssignment(
+          assignmentInfo.idAssignment,
+          assignmentInfo.idCourse
+        );
+        if (responseOverview.status === APIStatus.success) {
+          setOverviewAssignment(responseOverview.data);
         }
+      } catch (error) {
+        console.error("Error fetching overview assignment data", error);
+      } finally {
+        setLoading(false);
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchOverviewData();
   }, [assignmentInfo?.idCourse, idRole]);
-  //SHOW ANSWER FOR STUDENT
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [answerSheet, setAnswerSheet] = useState({});
   useEffect(() => {
     const handleShowAnswer = async () => {
       try {
-        const response = await getAssignmentAnswer(assignmentInfo.idAssignment);
-        if (response.status === APIStatus.success) {
-          setQuestions(response.data.detailQuestionResponses);
+        let response;
+        if (idRole === Role.student) {
+          response = await getAssignmentAnswer(
+            assignmentInfo.idAssignment,
+            Number(localStorage.getItem("idUser"))
+          );
+          if (response.status === APIStatus.success) {
+            setQuestions(response.data.detailQuestionResponses);
+          }
         }
       } catch (error) {
         throw error;
@@ -272,6 +283,7 @@ const AssignDetail = () => {
   };
 
   //DO ASSIGNMENT
+  const [startAssignmentWindow, setStartAssignmentWindow] = useState(null);
   const [diagStartAssign, setDiagStartAssign] = useState(false);
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
@@ -348,39 +360,41 @@ const AssignDetail = () => {
                     </label>
                   </div>
                   {assignmentInfo.assignmentType === AssignmentType.quiz && (
-                    <div className="item">
-                      <span>Answer shuffling</span>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={assignmentInfo.isShufflingAnswer === 1}
-                          onChange={(e) =>
-                            handleUpdateAssignment(
-                              "isShufflingAnswer",
-                              e.target.checked ? 1 : 0
-                            )
-                          }
-                        />
-                        <span className="slider"></span>
-                      </label>
-                    </div>
+                    <>
+                      <div className="item">
+                        <span>Answer shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.isShufflingAnswer === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "isShufflingAnswer",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Show answer on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.showAnswer === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "showAnswer",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
                   )}
-                  <div className="item">
-                    <span>Show answer on submission</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.showAnswer === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "showAnswer",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
                 </div>
               )}
             </div>
@@ -501,18 +515,22 @@ const AssignDetail = () => {
                         : "Submitted"}
                     </label>
                   </div>
-
-                  <div className="field-value">
-                    <label className="field">Marks</label>
-                    <label className="value">{assignmentInfo.totalMark}</label>
-                  </div>
-                  <div className="field-value">
-                    <label className="field">Duration</label>
-                    <label className="value">
-                      {assignmentInfo.resultDuration &&
-                        formatDuration(assignmentInfo.resultDuration)}
-                    </label>
-                  </div>
+                  {assignmentInfo.totalMark && (
+                    <div className="field-value">
+                      <label className="field">Marks</label>
+                      <label className="value">
+                        {assignmentInfo.totalMark}
+                      </label>
+                    </div>
+                  )}
+                  {assignmentInfo.resultDuration && (
+                    <div className="field-value">
+                      <label className="field">Duration</label>
+                      <label className="value">
+                        {formatDuration(assignmentInfo.resultDuration)}
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
               {assignmentInfo?.showAnswer === 1 && (
@@ -667,7 +685,7 @@ const AssignDetail = () => {
                   ))}
                 </div>
               )}
-              {activeChoice === "overview" && (
+              {!showAnswerSheet && activeChoice === "overview" && (
                 <div className="overview-container">
                   <div className="chart-detail-container">
                     <div>
@@ -961,7 +979,14 @@ const AssignDetail = () => {
                         <tbody>
                           {sortedSubmissions.length > 0 ? (
                             sortedSubmissions.map((submission, index) => (
-                              <tr key={index}>
+                              <tr
+                                key={index}
+                                style={{ cursor: "pointer" }}
+                                onClick={() => {
+                                  setSelectedStudent(submission);
+                                  setShowAnswerSheet(true);
+                                }}
+                              >
                                 <td></td>
                                 <td>
                                   {" "}
@@ -1028,6 +1053,14 @@ const AssignDetail = () => {
                     </div>
                   </div>
                 </div>
+              )}
+              {showAnswerSheet && selectedStudent && (
+                <AnswerSheet
+                  idAssignment={assignmentInfo.idAssignment}
+                  selectedStudent={selectedStudent}
+                  onClose={() => setShowAnswerSheet(false)}
+                  fetchOverview={() => fetchOverviewData()}
+                />
               )}
             </>
           )}
@@ -1171,17 +1204,19 @@ const AssignDetail = () => {
             </div>
           )}
         </div>
-        <div className="pagination">
-          {getPagination(currentPage, npage).map((n, i) => (
-            <button
-              key={i}
-              className={`page-item ${currentPage === n ? "active" : ""}`}
-              onClick={() => changeCPage(n)}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+        {!showAnswerSheet && (
+          <div className="pagination">
+            {getPagination(currentPage, npage).map((n, i) => (
+              <button
+                key={i}
+                className={`page-item ${currentPage === n ? "active" : ""}`}
+                onClick={() => changeCPage(n)}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       {diagStartAssign && (
         <div
@@ -1203,12 +1238,16 @@ const AssignDetail = () => {
               />
             </div>
             <div className="diag-body">
-              <span>
-                You have only <b style={{ color: "var(--red-color)" }}>1</b>{" "}
-                attempt to complete this assignment.
-                <br />
-                Are you sure you want to start?
-              </span>
+              {startAssignmentWindow && !startAssignmentWindow.closed ? (
+                <span>You have already done this assignment.</span>
+              ) : (
+                <span>
+                  You have only <b style={{ color: "var(--red-color)" }}>1</b>{" "}
+                  attempt to complete this assignment.
+                  <br />
+                  Are you sure you want to start?
+                </span>
+              )}
 
               <div className="str-btns">
                 <div className="act-btns">
@@ -1218,18 +1257,43 @@ const AssignDetail = () => {
                   >
                     Cancel
                   </button>
-                  <button
-                    className="btn diag-btn signout"
-                    onClick={() =>
-                      navigate("/startAssignment", {
-                        state: {
-                          idAssignment: assignmentInfo.idAssignment,
-                        },
-                      })
-                    }
-                  >
-                    Start
-                  </button>
+                  {!(
+                    startAssignmentWindow && !startAssignmentWindow.closed
+                  ) && (
+                    <button
+                      className="btn diag-btn signout"
+                      onClick={() =>
+                        navigate("/startAssignment", {
+                          state: {
+                            idAssignment: assignmentInfo.idAssignment,
+                          },
+                        })
+                      }
+                      // onClick={() => {
+                      //   if (assignmentInfo?.isTest === 0) {
+                      //     navigate("/startAssignment", {
+                      //       state: {
+                      //         idAssignment: assignmentInfo.idAssignment,
+                      //       },
+                      //     });
+                      //   } else if (
+                      //     startAssignmentWindow &&
+                      //     !startAssignmentWindow.closed
+                      //   ) {
+                      //     return;
+                      //   }
+                      //   const newWindow = window.open(
+                      //     `/startAssignment?idAssignment=${assignmentInfo.idAssignment}`,
+                      //     "_blank",
+                      //     "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600"
+                      //   );
+
+                      //   setStartAssignmentWindow(newWindow);
+                      // }}
+                    >
+                      Start
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

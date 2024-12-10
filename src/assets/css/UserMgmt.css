@@ -174,11 +174,10 @@
 td {
   padding: 12px 8px;
   text-align: left;
-  font-weight: 500px;
+  font-weight: 500;
   color: var(--second-main-color);
   max-width: 300px;
   word-wrap: break-word; /* Ngắt dòng nếu nội dung quá dài */
-  overflow: hidden; /* Ẩn nội dung vượt quá */
   white-space: nowrap; /* Không ngắt dòng trong ô */
 }
 .list-container > table > tbody > tr > td > span {

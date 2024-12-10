@@ -99,7 +99,10 @@ const AdminCenterDetail = (props) => {
           <div className="center-of-admincenter-container">
             <div className="center-of-admincenter">
               <div className="center-ava-container">
-                <img src={default_image} alt="center" />
+                <img
+                  src={adminInfo.avatarCenter || default_image}
+                  alt="center"
+                />
               </div>
               <div className="center-infomation">
                 <span className="center-name">{adminInfo.centerName}</span>

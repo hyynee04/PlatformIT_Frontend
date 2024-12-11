@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
+  LuAirplay,
   LuCheckSquare,
   LuClock,
   LuFileEdit,
   LuFileQuestion,
+  LuPenLine,
   LuPlus,
+  LuTrash2,
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
@@ -15,9 +18,15 @@ import {
   getVideoType,
   isPastDateTime,
 } from "../../functions/function";
+import { IoEllipsisHorizontal } from "react-icons/io5";
 
 const LectureView = ({ lectureDetail }) => {
   const [index, setIndex] = useState(1);
+  const [isEdit, setIsEdit] = useState(false);
+
+  const [isOpenOption, setIsOpenOption] = useState(false);
+  const optionBoxRef = useRef(null);
+  const optionButtonRef = useRef(null);
 
   const idRole = +localStorage.getItem("idRole");
   console.log(lectureDetail);
@@ -77,11 +86,86 @@ const LectureView = ({ lectureDetail }) => {
     }
   }, [isExpanded]);
 
+  useEffect(() => {
+    const handleClickOutsideOptionBox = (event) => {
+      if (
+        optionBoxRef.current &&
+        !optionBoxRef.current.contains(event.target) &&
+        !optionButtonRef.current.contains(event.target)
+      )
+        setIsOpenOption(false);
+    };
+    // Attach both event listeners
+    document.addEventListener("mousedown", handleClickOutsideOptionBox);
+    // Cleanup both event listeners on component unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideOptionBox);
+    };
+  }, []);
+
   return (
     <>
+      <div
+        ref={optionBoxRef}
+        className={`option-box ${isOpenOption ? "active" : ""}`}
+      >
+        <button
+          onClick={() => {
+            setIsEdit(!isEdit);
+            setIsOpenOption(!isOpenOption);
+          }}
+        >
+          {isEdit ? (
+            <>
+              <LuAirplay /> Lecture View
+            </>
+          ) : (
+            <>
+              <LuPenLine /> Edit Lecture
+            </>
+          )}
+        </button>
+        <button>
+          <LuTrash2 />
+          Remove Lecture
+        </button>
+      </div>
+      {isEdit && (
+        <div className="lecture-header">
+          <div className="lecture-head-info teacher-view">
+            <span className="lecture-title">Edit Lecture</span>
+          </div>
+          <div className="option-container">
+            <button
+              ref={optionButtonRef}
+              onClick={() => {
+                setIsOpenOption(!isOpenOption);
+              }}
+            >
+              <IoEllipsisHorizontal />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="lecture-header slide-to-bottom">
-        <span className="lecture-title">{lectureDetail.lectureTitle}</span>
-        <span className="time-created">{lectureDetail.relativeTime}</span>
+        <div className={`lecture-head-info ${isEdit ? "" : "teacher-view"}`}>
+          <span className="lecture-title">{lectureDetail.lectureTitle}</span>
+          {!isEdit && (
+            <span className="time-created">{lectureDetail.relativeTime}</span>
+          )}
+        </div>
+        {!isEdit && (
+          <div className="option-container">
+            <button
+              ref={optionButtonRef}
+              onClick={() => {
+                setIsOpenOption(!isOpenOption);
+              }}
+            >
+              <IoEllipsisHorizontal />
+            </button>
+          </div>
+        )}
       </div>
       {lectureDetail.videoMaterial ? (
         <div
@@ -249,8 +333,8 @@ const LectureView = ({ lectureDetail }) => {
                                 >
                                   {`${
                                     exercise.isPublish
-                                      ? "published"
-                                      : "unpublished"
+                                      ? "Published"
+                                      : "Unpublished"
                                   }`}
                                 </span>
                               </div>

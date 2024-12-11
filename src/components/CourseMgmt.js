@@ -550,7 +550,11 @@ const CourseMgmt = (props) => {
           {currentCourses.length !== 0 &&
             currentItemsPage.map((course, index) => (
               <div key={index} className="one-card-container">
-                <CourseCard key={"course" + course.idCourse} course={course} />
+                <CourseCard
+                  key={"course" + course.idCourse}
+                  course={course}
+                  unpinned={true}
+                />
               </div>
             ))}
         </div>

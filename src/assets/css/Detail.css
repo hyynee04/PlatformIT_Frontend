@@ -70,9 +70,9 @@
 
 .detail-container .left-container .block-container > .biography-ava.center {
   width: 100%;
-  max-height: 13rem;
-
+  height: 13rem;
   border-radius: 0.5rem;
+  object-fit: contain;
 }
 
 .detail-container .left-container .block-container > .biography-block {

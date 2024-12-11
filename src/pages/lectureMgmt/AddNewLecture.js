@@ -96,6 +96,8 @@ const AddNewLecture = () => {
     }
   }, [location.state]);
 
+  console.log(">>> Lectue Data: ", lectureData);
+
   return (
     <div className="add-lecture-container">
       <div className="page-header">
@@ -154,7 +156,16 @@ const AddNewLecture = () => {
               <label className="sub-title">
                 Introduction &#40;Optional&#41;
               </label>
-              <textarea placeholder="Tell a little thing about this lecture..."></textarea>
+              <textarea
+                onChange={(e) => {
+                  setLectureData({
+                    ...lectureData,
+                    Introduction: e.target.value,
+                  });
+                  setIsMissing(0);
+                }}
+                placeholder="Tell a little thing about this lecture..."
+              ></textarea>
             </div>
           </div>
         </div>

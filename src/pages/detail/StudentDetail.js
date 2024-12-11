@@ -84,7 +84,7 @@ const StudentDetail = (props) => {
   }
   return (
     <div className="detail-container">
-      <div className="left-container">
+      <div className="left-container slide-to-right">
         <div className="block-container">
           <img
             className="biography-ava teacher"
@@ -138,7 +138,7 @@ const StudentDetail = (props) => {
         ) : null}
       </div>
 
-      <div className="right-container">
+      <div className="right-container slide-to-left">
         {idRole === Role.teacher ? (
           <div className="block-container">
             <span className="block-container-title">{courseTitle}</span>

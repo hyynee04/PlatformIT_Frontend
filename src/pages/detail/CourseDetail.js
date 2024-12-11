@@ -55,7 +55,7 @@ const CourseDetail = (props) => {
   const [courseInfo, setCourseInfo] = useState({});
   const [notificationBoard, setNotificationBoard] = useState([]);
   const [studentProgress, setStudentProgress] = useState({});
-  const [testList, setTestList] = useState([]);
+  const [index, setIndex] = useState(null);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [showedSections, setShowedSections] = useState({});
@@ -85,11 +85,6 @@ const CourseDetail = (props) => {
         }
       }
 
-      if (idRole === Role.student) {
-        let progress = await getCourseProgressByIdStudent(idCourse, idUser);
-        setStudentProgress(progress.data);
-      }
-
       const responseIsEnroll = await getIsEnRolledCourse(idCourse);
       if (responseIsEnroll.data === true) {
         setIsEnrolledCourse(true);
@@ -103,17 +98,37 @@ const CourseDetail = (props) => {
     }
   };
 
+  const fetchCourseProgress = async (idCourse, idStudent) => {
+    let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
+    if (progress.status === APIStatus.success) {
+      console.log("Response data: ", progress.data);
+
+      setStudentProgress(progress.data);
+    } else {
+      console.warn(progress.data);
+    }
+  };
+
   const fetchTestOfCourseStudent = async (idCourse, idUser) => {
     let response = await getTestOfCourseStudent(idCourse, idUser);
     if (response.status === APIStatus.success) {
-      setCourseInfo((prev) => ({ ...prev, tests: response.data }));
+      setCourseInfo((prev) => ({
+        ...prev,
+        tests: [
+          ...response.data.map((test) => {
+            return {
+              ...test,
+              isPublish: true,
+            };
+          }),
+        ],
+      }));
     } else console.warn(response.data);
   };
 
   useEffect(() => {
-    console.log("Check is EnrolledCourse: ", isEnrolledCourse);
-
     if (isEnrolledCourse) {
+      fetchCourseProgress(courseInfo.idCourse, idUser);
       fetchTestOfCourseStudent(courseInfo.idCourse, idUser);
     }
   }, [isEnrolledCourse]);
@@ -171,24 +186,6 @@ const CourseDetail = (props) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Remove the item if the user refreshes or leaves the page
-      if (location.pathname === "/courseDetail") {
-        localStorage.removeItem("menuIndex");
-      }
-    };
-    // Handle refresh scenarios
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      // Handle navigation away from the page
-      if (location.pathname !== "/courseDetail") {
-        localStorage.removeItem("menuIndex");
-      }
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [location.pathname]); // Re-run when the path changes
-
   const reviews = courseInfo?.rateModels || [];
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -215,6 +212,7 @@ const CourseDetail = (props) => {
       const response = await postEnrollCourse(courseInfo.idCourse);
       if (response.status === APIStatus.success) {
         openSuccessModal();
+        // fetchCourseDetail(courseInfo.idCourse, idRole);
         setIsEnrolledCourse(true);
       }
       //   openSuccessModal();
@@ -223,7 +221,7 @@ const CourseDetail = (props) => {
     }
   };
 
-  console.log(courseInfo);
+  console.log(studentProgress);
 
   if (loading) {
     return (
@@ -494,7 +492,10 @@ const CourseDetail = (props) => {
                             100
                           : 0
                       }`}
-                      text={`${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`}
+                      text={`${
+                        studentProgress.courseStudentProgress?.length > 0 &&
+                        `${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`
+                      }`}
                     />
                   </div>
                 </div>
@@ -512,7 +513,10 @@ const CourseDetail = (props) => {
                             100
                           : 0
                       }`}
-                      text={`${studentProgress.courseStudentProgress[0].finishedAssignmentCount}/${studentProgress.assignmentCount}`}
+                      text={`${
+                        studentProgress.courseStudentProgress?.length > 0 &&
+                        `${studentProgress.courseStudentProgress[0]?.finishedAssignmentCount}/${studentProgress.assignmentCount}`
+                      }`}
                     />
                   </div>
                 </div>
@@ -573,6 +577,7 @@ const CourseDetail = (props) => {
                           className={`lecture-header ${
                             showedSections[index] ? "" : "change-header"
                           } `}
+                          onClick={() => handleIsShowed(index)}
                         >
                           <span className="section-name">
                             {section.sectionName}

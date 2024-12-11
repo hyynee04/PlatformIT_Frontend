@@ -408,7 +408,7 @@ const AssignDetail = () => {
                 <label className="name-course">
                   {assignmentInfo.courseTitle}
                 </label>
-                {assignmentInfo.idSection && (
+                {assignmentInfo.nameSection && (
                   <>
                     <LuChevronRight className="icon" />
                     <label className="name-course">
@@ -416,7 +416,7 @@ const AssignDetail = () => {
                     </label>
                   </>
                 )}
-                {assignmentInfo.idLecture && (
+                {assignmentInfo.nameLecture && (
                   <>
                     <LuChevronRight className="icon" />
                     <label className="name-course">
@@ -558,7 +558,15 @@ const AssignDetail = () => {
                 className="btn"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleOpenStartAssign();
+                  if (assignmentInfo.isTest === 1) {
+                    handleOpenStartAssign();
+                  } else {
+                    navigate("/startAssignment", {
+                      state: {
+                        idAssignment: assignmentInfo.idAssignment,
+                      },
+                    });
+                  }
                 }}
               >
                 Start
@@ -669,7 +677,7 @@ const AssignDetail = () => {
                                           : "radio"
                                       }
                                       name={`question_${index}`}
-                                      defaultChecked={choice.isCorrect}
+                                      checked={!!choice.isCorrect}
                                       disabled
                                     />
                                   </label>
@@ -1210,7 +1218,7 @@ const AssignDetail = () => {
             </div>
           )}
         </div>
-        {!showAnswerSheet && (
+        {!showAnswerSheet && records.length > 0 && (
           <div className="pagination">
             {getPagination(currentPage, npage).map((n, i) => (
               <button

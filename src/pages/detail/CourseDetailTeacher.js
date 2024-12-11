@@ -65,6 +65,13 @@ const CourseDetailTeacher = (props) => {
     localStorage.setItem("menuIndex", menuIndex);
   }, [menuIndex]);
 
+  // Effect to clean up localStorage when the component is unmounted
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("menuIndex");
+    };
+  }, []);
+
   const menuItems = [
     { label: "Main content", index: 1 },
     { label: "Notification", index: 2 },
@@ -138,6 +145,28 @@ const CourseDetailTeacher = (props) => {
   useEffect(() => {
     fetchCourseProgress(courseInfo.idCourse);
   }, []);
+
+  // useEffect(() => {
+  //   const handleBeforeUnload = () => {
+  //     console.log("runhere");
+  //     // Remove the item if the user refreshes or leaves the page
+  //     if (location.pathname === "/courseDetail") {
+  //       console.log("inside");
+  //       localStorage.removeItem("menuIndex");
+  //     }
+  //   };
+
+  //   // Handle refresh scenarios
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+
+  //   return () => {
+  //     // Handle navigation away from the page
+  //     if (location.pathname !== "/courseDetail") {
+  //       localStorage.removeItem("menuIndex");
+  //     }
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //   };
+  // }, [location.pathname]);
 
   return (
     <>
@@ -466,19 +495,20 @@ const CourseDetailTeacher = (props) => {
                   ))}
                 </div>
               )}
-
-              <button
-                className="add-section-btn"
-                onClick={() => {
-                  navigate("/addAssignment", {
-                    state: {
-                      selectedCourse: courseInfo,
-                    },
-                  });
-                }}
-              >
-                <LuPlus /> Add new test
-              </button>
+              <div className="add-section-btn-container">
+                <button
+                  className="add-section-btn"
+                  onClick={() => {
+                    navigate("/addAssignment", {
+                      state: {
+                        selectedCourse: courseInfo,
+                      },
+                    });
+                  }}
+                >
+                  <LuPlus /> Add new test
+                </button>
+              </div>
             </div>
           ) : null}
         </>

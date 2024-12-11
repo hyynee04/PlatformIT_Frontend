@@ -13,7 +13,7 @@ import {
   AssignmentResultStatus,
   AssignmentType,
 } from "../../constants/constants";
-import { getPagination } from "../../functions/function";
+import { getPagination, shuffleArray } from "../../functions/function";
 import { LuCheckCircle, LuX } from "react-icons/lu";
 import { FaTrashAlt } from "react-icons/fa";
 import { RiAttachment2 } from "react-icons/ri";
@@ -27,6 +27,7 @@ const StartAssign = () => {
   const location = useLocation();
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [questions, setQuestions] = useState([]);
+
   useEffect(() => {
     const fetchData = async (idAssignment) => {
       setLoading(true);
@@ -41,13 +42,19 @@ const StartAssign = () => {
         }
         if (questionsRes.status === APIStatus.success) {
           let updatedQuestions = questionsRes.data;
+          if (assignmentRes.data.isShufflingQuestion === 1) {
+            updatedQuestions = shuffleArray(updatedQuestions);
+          }
 
           if (assignmentRes.data.assignmentType === AssignmentType.quiz) {
             updatedQuestions = updatedQuestions.map((question) => {
-              const updatedItems = question.items.map((item) => ({
+              let updatedItems = question.items.map((item) => ({
                 ...item,
                 isSelected: false,
               }));
+              if (assignmentRes.data.isShufflingAnswer === 1) {
+                updatedItems = shuffleArray(updatedItems);
+              }
 
               return {
                 ...question,
@@ -132,7 +139,7 @@ const StartAssign = () => {
             AssignmentItemAnswerType.text &&
             question.answer.trim() === "")
         );
-      } else if (assignmentInfo.assignmentType === AssignmentType.code) {
+      } else if (assignmentInfo.assignmentType === AssignmentType.quiz) {
         return !question.items.some((item) => item.isSelected === true);
       }
       return false;
@@ -217,38 +224,83 @@ const StartAssign = () => {
   const npage = Math.ceil(questions.length / recordsPerPage);
 
   //QUIZ
-  const handleChoiceChange = (e, choiceIdx, questionIndex) => {
-    const updatedQuestions = [...questions];
-    const currentQuestion = updatedQuestions[questionIndex];
-    const currentChoices = currentQuestion.items;
+  // const handleChoiceChange = (e, choiceIdx, questionIndex) => {
+  //   const updatedQuestions = [...questions];
+  //   const currentQuestion = updatedQuestions[questionIndex];
+  //   const currentChoices = currentQuestion.items;
 
+  //   const selectedChoices = currentChoices.filter(
+  //     (choice) => choice.isSelected === true
+  //   );
+
+  //   if (currentQuestion.totalCorrect === 1) {
+  //     currentChoices.forEach((choice, idx) => {
+  //       choice.isSelected = idx === choiceIdx;
+  //     });
+  //   } else {
+  //     if (e.target.checked) {
+  //       if (selectedChoices.length < currentQuestion.totalCorrect) {
+  //         currentChoices[choiceIdx].isSelected = true;
+  //       } else {
+  //         const firstSelectedChoiceIndex = currentChoices.findIndex(
+  //           (choice) => choice.isSelected
+  //         );
+  //         if (firstSelectedChoiceIndex !== -1) {
+  //           currentChoices[firstSelectedChoiceIndex].isSelected = false;
+  //         }
+  //         currentChoices[choiceIdx].isSelected = true;
+  //       }
+  //     } else {
+  //       currentChoices[choiceIdx].isSelected = false;
+  //     }
+  //   }
+  //   setQuestions(updatedQuestions);
+  // };
+  const handleChoiceChange = (e, choiceId, questionId) => {
+    const updatedQuestions = [...questions];
+    const currentQuestion = updatedQuestions.find(
+      (question) => question.idAssignmentItem === questionId
+    );
+
+    const currentChoices = currentQuestion.items;
     const selectedChoices = currentChoices.filter(
       (choice) => choice.isSelected === true
     );
 
     if (currentQuestion.totalCorrect === 1) {
-      currentChoices.forEach((choice, idx) => {
-        choice.isSelected = idx === choiceIdx;
+      currentChoices.forEach((choice) => {
+        choice.isSelected = choice.idMultipleAssignmentItem === choiceId;
       });
     } else {
       if (e.target.checked) {
         if (selectedChoices.length < currentQuestion.totalCorrect) {
-          currentChoices[choiceIdx].isSelected = true;
+          const choiceToSelect = currentChoices.find(
+            (choice) => choice.idMultipleAssignmentItem === choiceId
+          );
+          choiceToSelect.isSelected = true;
         } else {
-          const firstSelectedChoiceIndex = currentChoices.findIndex(
+          const firstSelectedChoice = currentChoices.find(
             (choice) => choice.isSelected
           );
-          if (firstSelectedChoiceIndex !== -1) {
-            currentChoices[firstSelectedChoiceIndex].isSelected = false;
+          if (firstSelectedChoice) {
+            firstSelectedChoice.isSelected = false;
           }
-          currentChoices[choiceIdx].isSelected = true;
+          const choiceToSelect = currentChoices.find(
+            (choice) => choice.idMultipleAssignmentItem === choiceId
+          );
+          choiceToSelect.isSelected = true;
         }
       } else {
-        currentChoices[choiceIdx].isSelected = false;
+        const choiceToDeselect = currentChoices.find(
+          (choice) => choice.idMultipleAssignmentItem === choiceId
+        );
+        choiceToDeselect.isSelected = false;
       }
     }
+
     setQuestions(updatedQuestions);
   };
+
   //MANUAL
   const handleManualAnswerChange = (idx, field, value) => {
     const updatedQuestions = [...questions];
@@ -377,7 +429,7 @@ const StartAssign = () => {
               <div className="question-item" key={index}>
                 <div className="info-row">
                   <label className="question-idx">{`Question ${
-                    index + 1
+                    firstIndex + index + 1
                   }`}</label>
                 </div>
                 <div className="info-row">
@@ -533,8 +585,15 @@ const StartAssign = () => {
                                 }
                                 name={`question_${index}`}
                                 checked={choice.isSelected}
+                                // onChange={(e) =>
+                                //   handleChoiceChange(e, choiceIdx, index)
+                                // }
                                 onChange={(e) =>
-                                  handleChoiceChange(e, choiceIdx, index)
+                                  handleChoiceChange(
+                                    e,
+                                    choice.idMultipleAssignmentItem, // Truyền idMultipleAssignmentItem thay vì index
+                                    question.idAssignmentItem // Truyền idAssignmentItem thay vì index
+                                  )
                                 }
                               />
                             </label>

@@ -18,7 +18,10 @@ const DiagSuccessfully = ({ isOpen, onClose, notification }) => {
 
   return (
     <div className={`modal-overlay ${show ? "show" : ""}`} onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container slide-to-bottom"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="diag-header">
           <div className="container-title">
             <LuCheckCheck className="diag-icon" />

@@ -681,7 +681,7 @@ const ListAssignMgmt = () => {
                             });
                           }
                         } else if (idRole === Role.student) {
-                          navigate("/teacherAssignDetail", {
+                          navigate("/studentAssignDetail", {
                             state: { idAssignment: assignment.idAssignment },
                           });
                         }

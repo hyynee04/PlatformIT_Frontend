@@ -49,7 +49,7 @@ const AdminCenterDetail = (props) => {
   }
   return (
     <div className="detail-container">
-      <div className="left-container" style={{ width: "40%" }}>
+      <div className="left-container slide-to-right" style={{ width: "40%" }}>
         <div className="block-container">
           <img
             className="biography-ava teacher"
@@ -61,7 +61,7 @@ const AdminCenterDetail = (props) => {
           </div>
         </div>
       </div>
-      <div className="right-container" style={{ width: "60%" }}>
+      <div className="right-container slide-to-left" style={{ width: "60%" }}>
         <div className="block-container-admincenter">
           {/* <span className="block-container-title">Information</span> */}
           <div
@@ -97,7 +97,18 @@ const AdminCenterDetail = (props) => {
             </div>
           </div>
           <div className="center-of-admincenter-container">
-            <div className="center-of-admincenter">
+            <div
+              className="center-of-admincenter"
+              onClick={() => {
+                navigate("/centerDetail", {
+                  state: {
+                    idCenter: adminInfo.idCenter,
+                    idUser: localStorage.getItem("idUser"),
+                    idRole: localStorage.getItem("idRole"),
+                  },
+                });
+              }}
+            >
               <div className="center-ava-container">
                 <img
                   src={adminInfo.avatarCenter || default_image}

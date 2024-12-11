@@ -185,12 +185,15 @@ const AnswerSheet = ({
           </label>
         </div>
         <div className="detail-info field-value-container">
-          <div className="field-value">
-            <label className="field">Submitted Date</label>
-            <label className="value">
-              {formatDateTime(answerInfo.submittedDate)}
-            </label>
-          </div>
+          {answerInfo.submittedDate && (
+            <div className="field-value">
+              <label className="field">Submitted Date</label>
+              <label className="value">
+                {formatDateTime(answerInfo.submittedDate)}
+              </label>
+            </div>
+          )}
+
           <div className="field-value">
             <label className="field">Status</label>
             <label
@@ -207,7 +210,9 @@ const AnswerSheet = ({
                 ? "On time"
                 : answerInfo.resultStatus === AssignmentResultStatus.late
                 ? "Late"
-                : "Submitted"}
+                : answerInfo.resultStatus === AssignmentResultStatus.submitted
+                ? "Submitted"
+                : "Not submitted"}
             </label>
           </div>
           {answerInfo.totalMark && (

@@ -11,7 +11,7 @@ import { Role } from "../../constants/constants";
 
 const CourseCard = (props) => {
   const navigate = useNavigate();
-  const { course } = props;
+  const { course, unpinned } = props;
   const [isHover, setIsHover] = useState(false);
   const idRole = +localStorage.getItem("idRole");
 
@@ -56,9 +56,8 @@ const CourseCard = (props) => {
   return (
     <div className="outside-card">
       {(course.isEnrolled ||
-        course.idTeacher === +localStorage.getItem("idUser")) && (
-        <BsPinAngleFill />
-      )}
+        course.idTeacher === +localStorage.getItem("idUser")) &&
+        !unpinned && <BsPinAngleFill />}
 
       <div className="card-container">
         <div
@@ -153,9 +152,8 @@ const CourseCard = (props) => {
           onMouseLeave={() => setIsHover(false)}
         >
           {(course.isEnrolled ||
-            course.idTeacher === +localStorage.getItem("idUser")) && (
-            <BsPinAngleFill className="pin-hover" />
-          )}
+            course.idTeacher === +localStorage.getItem("idUser")) &&
+            !unpinned && <BsPinAngleFill className="pin-hover" />}
           <div className="course-card-container course-card-hover">
             {course.isLimitedTime === 1 && (
               <div

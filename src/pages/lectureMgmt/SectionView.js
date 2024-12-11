@@ -67,6 +67,7 @@ const SectionView = (props) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          setEditSectionName(section.sectionName);
                           setIsEdit({
                             ...Object.keys(isEdit).reduce(
                               (acc, key) => ({ ...acc, [key]: false }),

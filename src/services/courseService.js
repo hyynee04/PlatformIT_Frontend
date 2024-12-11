@@ -300,6 +300,14 @@ const getCourseProgressByIdStudent = (idCourse, idStudent) => {
   });
 };
 
+const getSectionDetail = (idCourse) => {
+  return axios.get("api/Course/GetSectionDetail", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
+
 export {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
@@ -324,4 +332,5 @@ export {
   postAddSection,
   postEnrollCourse,
   getCourseProgressByIdStudent,
+  getSectionDetail,
 };

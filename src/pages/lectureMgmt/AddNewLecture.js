@@ -96,8 +96,13 @@ const AddNewLecture = () => {
     }
   }, [location.state]);
 
-  console.log(">>> Lectue Data: ", lectureData);
+  useEffect(() => {
+    document.querySelectorAll("button").forEach((button) => {
+      button.disabled = loading;
+    });
+  }, [loading]);
 
+  console.log(idList);
   return (
     <div className="add-lecture-container">
       <div className="page-header">
@@ -193,6 +198,7 @@ const AddNewLecture = () => {
                   type="file"
                   ref={videoInputRef}
                   style={{ display: "none" }}
+                  accept="video/mp4, video/webm, video/ogg"
                   onChange={(event) => {
                     setIsMissing(0);
                     const file = event.target.files[0]; // Get the selected file
@@ -201,8 +207,17 @@ const AddNewLecture = () => {
                     }
                   }}
                 />
+                {console.log(lectureData.LectureVideo)}
                 {lectureData.LectureVideo ? (
-                  <video className="video-player" controls>
+                  <video
+                    className="video-player"
+                    controls
+                    key={
+                      lectureData.LectureVideo instanceof File
+                        ? lectureData.LectureVideo.name
+                        : "invalid-video"
+                    }
+                  >
                     {lectureData.LectureVideo instanceof File ? (
                       <source
                         src={URL.createObjectURL(lectureData.LectureVideo)}
@@ -234,7 +249,7 @@ const AddNewLecture = () => {
                   className="upload-btn"
                   onClick={() => videoInputRef.current.click()}
                 >
-                  <LuUpload /> Upload video
+                  <LuUpload /> Upload Video
                 </button>
               </div>
             </div>
@@ -278,10 +293,7 @@ const AddNewLecture = () => {
                   <div className="file-buttons">
                     <button
                       onClick={() => {
-                        setLectureData({ ...lectureData, LectureVideo: "" });
-                        if (videoInputRef.current) {
-                          videoInputRef.current.value = ""; // Reset the file input value
-                        }
+                        setLectureData({ ...lectureData, MainMaterials: "" });
                       }}
                     >
                       <LuTrash2 />
@@ -328,7 +340,12 @@ const AddNewLecture = () => {
                       <span>{file.name}</span>
                     </div>
                     <div className="file-buttons">
-                      <button onClick={() => handleDelete(index)}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(index);
+                        }}
+                      >
                         <LuTrash2 />
                       </button>
                     </div>

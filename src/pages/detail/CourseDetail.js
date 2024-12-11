@@ -467,6 +467,7 @@ const CourseDetail = (props) => {
         courseInfo.idTeacher === idUser ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
+            setCourseInfo={setCourseInfo}
             idUser={idUser}
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
@@ -564,7 +565,7 @@ const CourseDetail = (props) => {
                     : "0 section"}{" "}
                   -{" "}
                   {`${numberOfLectures} ${
-                    numberOfLectures >= 1 ? "lecture" : "lectures"
+                    numberOfLectures >= 1 ? "lectures" : "lecture"
                   }`}
                 </span>
               </div>

@@ -24,6 +24,7 @@ import { APIStatus, Role } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
   getCourseProgress,
+  getSectionDetail,
   postAddBoardNotificationForCourse,
   postAddSection,
 } from "../../services/courseService";
@@ -31,6 +32,7 @@ import {
 const CourseDetailTeacher = (props) => {
   const {
     courseInfo,
+    setCourseInfo,
     idUser,
     fetchCourseDetail,
     notificationBoard,
@@ -83,7 +85,7 @@ const CourseDetailTeacher = (props) => {
 
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
-    ? courseInfo.sectionsWithCourses.reduce((total, section) => {
+    ? courseInfo.sectionsWithCourses?.reduce((total, section) => {
         return total + (section.lectures ? section.lectures.length : 0);
       }, 0)
     : 0;
@@ -121,7 +123,17 @@ const CourseDetailTeacher = (props) => {
         idUser
       );
       if (response.status === APIStatus.success) {
-        fetchCourseDetail(courseInfo.idCourse);
+        let newSections = await getSectionDetail(courseInfo.idCourse);
+        if (newSections.status === APIStatus.success) {
+          setCourseInfo({
+            ...courseInfo,
+            sectionsWithCourses: newSections.data,
+          });
+          setNewSection("");
+          setAddSection(false);
+        } else {
+          console.log(newSections.data);
+        }
       } else console.log(response.data);
     } catch (error) {
       console.error("Error posting data:", error);
@@ -207,7 +219,7 @@ const CourseDetailTeacher = (props) => {
                   : "0 section"}{" "}
                 -{" "}
                 {`${numberOfLectures} ${
-                  numberOfLectures >= 1 ? "lecture" : "lectures"
+                  numberOfLectures >= 1 ? "lectures" : "lecture"
                 }`}
               </span>
             </div>
@@ -240,6 +252,7 @@ const CourseDetailTeacher = (props) => {
                                     ),
                                     [index]: true,
                                   });
+                                  setNewSectionTitle(section.sectionName);
                                 }}
                               >
                                 <LuPenLine />
@@ -406,7 +419,7 @@ const CourseDetailTeacher = (props) => {
                       </button>
                       <button
                         onClick={() => {
-                          setNewSectionTitle("");
+                          setNewSection("");
                           setAddSection(!addSection);
                         }}
                       >

@@ -270,7 +270,15 @@ const PlatformAdCenterMgmt = () => {
                       <td>{center.centerAdminName}</td>
                       <td>{center.centerAdminEmail}</td>
                       <td>{center.tin}</td>
-                      <td>{center.description}</td>
+                      <td
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {center.description}
+                      </td>
                       <td>
                         {center.submissionDate &&
                           (() => {

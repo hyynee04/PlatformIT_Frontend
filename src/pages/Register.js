@@ -9,7 +9,7 @@ import {
   LuMail,
   LuPenLine,
   LuPenTool,
-  LuUser
+  LuUser,
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/Register.css";
@@ -19,13 +19,13 @@ import { APIStatus } from "../constants/constants";
 import {
   postCheckEmail,
   postRegister,
-  postSendOTP
+  postSendOTP,
 } from "../services/authService";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -36,7 +36,9 @@ const Register = () => {
     TIN: "",
     centerName: "",
     centerDescription: "",
-  })
+    isChecked: false,
+    isCheckedPolicy: false,
+  });
   const formDataRef = useRef(formData);
 
   useEffect(() => {
@@ -45,31 +47,30 @@ const Register = () => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      console.log(formDataRef.current)
-      if (event.key === 'Enter') {
-        if (localStorage.getItem('verifiedEmail') === formDataRef.current.email) {
+      console.log(formDataRef.current);
+      if (event.key === "Enter") {
+        if (
+          localStorage.getItem("verifiedEmail") === formDataRef.current.email
+        ) {
           handleRegister(formDataRef.current);
-          return
+          return;
         }
-        handleSendOTP(formDataRef.current.email);
+        handleSendOTP(formDataRef.current);
       }
     };
 
     // Add the event listener for keydown
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     // Cleanup the event listener on component unmount
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const [isCheckedPolicy, setIsCheckedPolicy] = useState(false);
   const [showVerifyEmail, setShowVerifyEmail] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
 
@@ -90,7 +91,6 @@ const Register = () => {
   };
 
   const checkInput = (formData) => {
-    console.log(">>> Form Data: ", formDataRef)
     const isValidEmail = validateEmail(formData.email);
     // Check all inputs are filled
     if (
@@ -99,9 +99,9 @@ const Register = () => {
       !formData.username ||
       !formData.password ||
       !formData.confirmPassword ||
-      (isChecked && !formData.TIN) ||
-      (isChecked && !formData.centerName) ||
-      (isChecked && !formData.centerDescription)
+      (formData.isChecked && !formData.TIN) ||
+      (formData.isChecked && !formData.centerName) ||
+      (formData.isChecked && !formData.centerDescription)
     ) {
       setError(1);
       return;
@@ -119,88 +119,102 @@ const Register = () => {
     }
 
     // Check confirm password
-    if (formData.confirmPassword && formData.confirmPassword !== formData.password) {
+    if (
+      formData.confirmPassword &&
+      formData.confirmPassword !== formData.password
+    ) {
       setError(4);
       return;
     }
 
     // Check TIN length
-    if (formData.TIN && (formData.TIN.length !== 10 && formData.TIN.length !== 13)) {
+    if (
+      formData.TIN &&
+      formData.TIN.length !== 10 &&
+      formData.TIN.length !== 13
+    ) {
       setError(5);
       return;
     }
 
     //Agree with policy
-    if (isChecked && !isCheckedPolicy) {
+    if (formData.isChecked && !formData.isCheckedPolicy) {
       setError(6);
       return;
     }
 
     setError(0);
     return true;
-  }
+  };
 
-  const handleSendOTP = async (email) => {
-    const isValid = checkInput(formDataRef.current)
+  const handleSendOTP = async (formData) => {
+    const isValid = checkInput(formData);
     if (!isValid) return;
     setLoading(true);
     try {
-      let response = await postCheckEmail(email);
+      let response = await postCheckEmail(formData.email);
       let checkEmail = response.data;
       if (response.status === APIStatus.success) {
-        await postSendOTP(email);
+        await postSendOTP(formData.email);
         setShowVerifyEmail(true);
-      }
-      else {
+      } else {
         setCoincidedInform(checkEmail);
         setLoading(false);
-        return
+        return;
       }
     } catch (error) {
       console.error("Error posting data: ", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   const handleRegister = async (formData) => {
     setLoading(true);
     try {
-      let response = await postRegister(formData.fullName, formData.email, formData.username, formData.password, formData.centerName, formData.centerDescription, formData.TIN);
+      let response = await postRegister(
+        formData.fullName,
+        formData.email,
+        formData.username,
+        formData.password,
+        formData.centerName,
+        formData.centerDescription,
+        formData.TIN
+      );
       let data = response.data;
       if (response.status === APIStatus.success) {
-        localStorage.removeItem('verifiedEmail');
+        localStorage.removeItem("verifiedEmail");
         navigate("/login");
       } else {
         setCoincidedInform(data);
         setLoading(false);
-        return
+        return;
       }
     } catch (error) {
-      console.error("Error posting data: ", error)
+      console.error("Error posting data: ", error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const getErrorMessage = (error) => {
     switch (error) {
       case 1:
-        return 'Fill all information!';
+        return "Fill all information!";
       case 2:
-        return 'Invalid email address!';
+        return "Invalid email address!";
       case 3:
-        return 'Password must be at least 5 characters!';
+        return "Password must be at least 5 characters!";
       case 4:
-        return 'Confirm password is not right!';
+        return "Confirm password is not right!";
       case 5:
-        return 'TIN must be 10 or 13 characters!';
+        return "TIN must be 10 or 13 characters!";
       case 6:
-        return 'Agree with our policy to register!';
+        return "Agree with our policy to register!";
       default:
-        return '';
+        return "";
     }
-  }
+  };
 
   return (
     <>
@@ -211,7 +225,6 @@ const Register = () => {
               <sp className="header-text">Register</sp>
             </div>
             <div className="mainpart-content">
-
               <div className="mb-3 ">
                 <LuPenTool color="#757575" className="icon-head rotate-icon" />
                 <input
@@ -264,7 +277,10 @@ const Register = () => {
                     className="form-control"
                     value={formData.password}
                     onChange={(event) => {
-                      setFormData({ ...formData, password: event.target.value });
+                      setFormData({
+                        ...formData,
+                        password: event.target.value,
+                      });
                       setError(0);
                     }}
                   />
@@ -291,7 +307,10 @@ const Register = () => {
                     className="form-control"
                     value={formData.confirmPassword}
                     onChange={(event) => {
-                      setFormData({ ...formData, confirmPassword: event.target.value });
+                      setFormData({
+                        ...formData,
+                        confirmPassword: event.target.value,
+                      });
                       setError(0);
                     }}
                   />
@@ -315,16 +334,19 @@ const Register = () => {
                 <input
                   type="checkbox"
                   className="AC-check"
-                  checked={isChecked}
+                  checked={formData.isChecked}
                   onChange={(event) => {
-                    setIsChecked(event.target.checked)
+                    setFormData({
+                      ...formData,
+                      isChecked: event.target.checked,
+                    });
                     setCoincidedInform("");
                     setError(0);
                   }}
                 />
                 Register as Admin Center
               </div>
-              {isChecked && (
+              {formData.isChecked && (
                 <>
                   <div className="mb-3">
                     <LuBuilding2 color="#757575" className="icon-head" />
@@ -334,7 +356,10 @@ const Register = () => {
                       className="form-control"
                       value={formData.centerName}
                       onChange={(event) => {
-                        setFormData({ ...formData, centerName: event.target.value });
+                        setFormData({
+                          ...formData,
+                          centerName: event.target.value,
+                        });
                         setError(0);
                       }}
                     />
@@ -361,7 +386,10 @@ const Register = () => {
                       className="introduce-center form-control"
                       value={formData.centerDescription}
                       onChange={(event) => {
-                        setFormData({ ...formData, centerDescription: event.target.value });
+                        setFormData({
+                          ...formData,
+                          centerDescription: event.target.value,
+                        });
                         setError(0);
                         setCoincidedInform("");
                       }}
@@ -371,9 +399,12 @@ const Register = () => {
                     <input
                       type="checkbox"
                       className="AC-check"
-                      checked={isCheckedPolicy}
+                      checked={formData.isCheckedPolicy}
                       onChange={(event) => {
-                        setIsCheckedPolicy(event.target.checked)
+                        setFormData({
+                          ...formData,
+                          isCheckedPolicy: event.target.checked,
+                        });
                         setCoincidedInform("");
                         setError(0);
                       }}
@@ -382,7 +413,9 @@ const Register = () => {
                     <b
                       className="style-text"
                       onClick={() => setShowPolicy(true)}
-                    >Plait Policy</b>
+                    >
+                      Plait Policy
+                    </b>
                   </div>
                 </>
               )}
@@ -403,17 +436,17 @@ const Register = () => {
               <button
                 className="register-button"
                 onClick={() => {
-                  if (localStorage.getItem('verifiedEmail') === formData.email) {
+                  if (
+                    localStorage.getItem("verifiedEmail") === formData.email
+                  ) {
                     handleRegister(formData);
-                    return
+                    return;
                   }
-                  handleSendOTP(formData.email);
+                  handleSendOTP(formData);
                 }}
                 disabled={!(error === 0 && coincidedInform === "")}
               >
-                {loading && (
-                  <ImSpinner2 className="icon-spin" />
-                )}
+                {loading && <ImSpinner2 className="icon-spin" />}
                 Register
               </button>
             </div>
@@ -444,13 +477,14 @@ const Register = () => {
       <DiagPolicy
         isOpen={showPolicy}
         onClose={() => setShowPolicy(false)}
-        setIsCheckedPolicy={setIsCheckedPolicy}
+        formData={formData}
+        setFormData={setFormData}
       />
 
       <DiagVerifyOtpForm
         isOpen={showVerifyEmail}
         onClose={() => setShowVerifyEmail(false)}
-        handleRegister={(handleRegister)}
+        handleRegister={handleRegister}
         formData={formData}
       />
 

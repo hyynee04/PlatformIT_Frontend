@@ -6,12 +6,16 @@ import {
   LuClock,
   LuFileEdit,
   LuFileQuestion,
+  LuPaperclip,
   LuPenLine,
   LuPlus,
+  LuSettings,
   LuTrash2,
+  LuUpload,
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
+import default_image from "../../assets/img/default_image.png";
 import { AssignmentType, Role } from "../../constants/constants";
 import {
   formatDateTime,
@@ -22,14 +26,18 @@ import { IoEllipsisHorizontal } from "react-icons/io5";
 
 const LectureView = ({ lectureDetail }) => {
   const [index, setIndex] = useState(1);
+
   const [isEdit, setIsEdit] = useState(false);
+  const [editLecture, setEditLecture] = useState({ ...lectureDetail });
+
+  const [loading, setLoaidng] = useState(false);
 
   const [isOpenOption, setIsOpenOption] = useState(false);
   const optionBoxRef = useRef(null);
   const optionButtonRef = useRef(null);
 
   const idRole = +localStorage.getItem("idRole");
-  console.log(lectureDetail);
+
   const menuItems = [
     { label: "Introduction", index: 1 },
     { label: "Support Materials", index: 2 },
@@ -113,6 +121,7 @@ const LectureView = ({ lectureDetail }) => {
           onClick={() => {
             setIsEdit(!isEdit);
             setIsOpenOption(!isOpenOption);
+            setIndex(1);
           }}
         >
           {isEdit ? (
@@ -132,122 +141,218 @@ const LectureView = ({ lectureDetail }) => {
       </div>
       {isEdit && (
         <div className="lecture-header">
-          <div className="lecture-head-info teacher-view">
+          <div className="lecture-head-info edit-view slide-to-bottom">
             <span className="lecture-title">Edit Lecture</span>
           </div>
           <div className="option-container">
+            <button className="changes-button discard slide-to-bottom">
+              Discard changes
+            </button>
+            <button className="changes-button save slide-to-bottom">
+              Save changes
+            </button>
             <button
+              className="setting-button"
               ref={optionButtonRef}
               onClick={() => {
                 setIsOpenOption(!isOpenOption);
               }}
             >
-              <IoEllipsisHorizontal />
+              <LuSettings />
             </button>
           </div>
         </div>
       )}
       <div className="lecture-header slide-to-bottom">
         <div className={`lecture-head-info ${isEdit ? "" : "teacher-view"}`}>
-          <span className="lecture-title">{lectureDetail.lectureTitle}</span>
-          {!isEdit && (
-            <span className="time-created">{lectureDetail.relativeTime}</span>
+          {isEdit ? (
+            <>
+              <label
+                className="field-label slide-to-bottom"
+                style={{ marginBottom: "10px" }}
+              >
+                Lecture Title
+              </label>
+              <input
+                className="edit-title slide-to-bottom"
+                type="text"
+                value={editLecture.lectureTitle}
+                placeholder={editLecture.lectureTitle}
+              />
+            </>
+          ) : (
+            <>
+              <span className="lecture-title">
+                {lectureDetail.lectureTitle}
+              </span>
+              <span className="time-created">{lectureDetail.relativeTime}</span>
+            </>
           )}
         </div>
         {!isEdit && (
           <div className="option-container">
             <button
+              className="setting-button"
               ref={optionButtonRef}
               onClick={() => {
                 setIsOpenOption(!isOpenOption);
               }}
             >
-              <IoEllipsisHorizontal />
+              <LuSettings />
             </button>
           </div>
         )}
       </div>
-      {lectureDetail.videoMaterial ? (
+
+      {lectureDetail.videoMaterial || isEdit ? (
         <div
-          className={`video-container slide-to-bottom ${
-            lectureDetail.videoMaterial ? "" : "no-video"
+          className={`video-container  ${
+            lectureDetail.videoMaterial ? "" : "slide-to-bottom no-video"
           }`}
         >
-          <video className="video-player" controls>
-            {lectureDetail?.videoMaterial?.path ? (
-              <source
-                src={lectureDetail.videoMaterial.path}
-                type={getVideoType(lectureDetail.videoMaterial.path)}
-              />
-            ) : (
-              <p>Error: Invalid file</p>
-            )}
-            Your browser does not support the video tag.
-          </video>
+          {isEdit && (
+            <>
+              <div className="edit-video-header">
+                <label className="field-label">Lecture video</label>
+                <div className="video-button-container">
+                  <button className="remove-btn">
+                    <LuTrash2 /> Remove
+                  </button>
+                  <button className="upload-btn">
+                    <LuUpload /> Upload video
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+          {lectureDetail.videoMaterial ? (
+            <video className="video-player" controls>
+              {lectureDetail?.videoMaterial?.path ? (
+                <source
+                  src={lectureDetail.videoMaterial.path}
+                  type={getVideoType(lectureDetail.videoMaterial.path)}
+                />
+              ) : (
+                <p>Error: Invalid file</p>
+              )}
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <div className="image-container">
+              <img src={default_image} />
+            </div>
+          )}
         </div>
       ) : null}
-      {lectureDetail.mainMaterials &&
-        lectureDetail.mainMaterials.length > 0 && (
-          <div className="main-material slide-to-right slide-to-bottom">
-            <span className="title">Main Material</span>
-            <span className="material-content">
-              <div
-                onClick={() => window.open(lectureDetail.mainMaterials[0].path)}
-                className="content-file"
-              >
-                <span>{lectureDetail.mainMaterials[0].fileName}</span>
-              </div>
-            </span>
+
+      {((lectureDetail.mainMaterials &&
+        lectureDetail.mainMaterials.length > 0) ||
+        isEdit) && (
+        <div className="main-material slide-to-right slide-to-bottom">
+          <span className="title">Main Material</span>
+          <button
+            className="attach-file-button"
+            // onClick={() => fileInputRef.current.click()}
+          >
+            <LuPaperclip /> Attach file
+          </button>
+          <input
+            className="file-container"
+            type="file"
+            style={{ display: "none" }}
+          />
+          <div className="material-content">
+            <div
+              onClick={() => window.open(lectureDetail.mainMaterials[0].path)}
+              className="content-file"
+            >
+              <span>{lectureDetail.mainMaterials[0].fileName}</span>
+            </div>
+            {isEdit && (
+              <button className="file-buttons">
+                <LuTrash2 />
+              </button>
+            )}
           </div>
-        )}
+        </div>
+      )}
 
       <div className="lecture-main slide-to-bottom">
         <div className="lecture-main-menu">
-          {menuItems.map((item) => (
-            <button
-              key={item.index}
-              className={`${index === item.index ? "active" : ""}`}
-              onClick={() => {
-                setIndex(item.index);
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
+          {menuItems
+            .filter((item) => !isEdit || item.index === 1 || item.index === 2)
+            .map((item) => (
+              <button
+                key={item.index}
+                className={`${index === item.index ? "active" : ""}`}
+                onClick={() => {
+                  setIndex(item.index);
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
         </div>
         <div className="menu-part">
           {index === 1 && (
-            <div className="part-item">
-              {lectureDetail.lectureIntroduction && (
-                <span className="intro-content">
-                  {lectureDetail.lectureIntroduction}
-                </span>
+            <>
+              {isEdit ? (
+                <>
+                  <textarea placeholder="Tell a little thing about this lecture..."></textarea>
+                </>
+              ) : (
+                <div className="part-item">
+                  {lectureDetail.lectureIntroduction && (
+                    <span className="intro-content">
+                      {lectureDetail.lectureIntroduction}
+                    </span>
+                  )}
+                </div>
               )}
-            </div>
+            </>
           )}
           {index === 2 && (
-            <div className="part-item">
-              {lectureDetail.supportMaterials &&
-                lectureDetail.supportMaterials.length > 0 && (
-                  <span className="intro-content">
-                    {lectureDetail.supportMaterials.map((material, index) => (
-                      <div
-                        key={index}
-                        className="content-file"
-                        onClick={() => window.open(material.path)}
-                      >
-                        <span>{material.fileName}</span>
-                      </div>
-                    ))}
-                  </span>
-                )}
-            </div>
+            <>
+              {isEdit ? (
+                <div className="add-exercise-container">
+                  <button
+                    className="attach-file-button"
+                    // onClick={() => fileInputRef.current.click()}
+                  >
+                    <LuPaperclip /> Attach file
+                  </button>
+                </div>
+              ) : null}
+              <div className="part-item">
+                {lectureDetail.supportMaterials &&
+                  lectureDetail.supportMaterials.length > 0 && (
+                    <span className="intro-content">
+                      {lectureDetail.supportMaterials.map((material, index) => (
+                        <>
+                          <div
+                            key={index}
+                            className="content-file"
+                            onClick={() => window.open(material.path)}
+                          >
+                            <span>{material.fileName}</span>
+                          </div>
+                          {isEdit && (
+                            <button className="file-buttons">
+                              <LuTrash2 />
+                            </button>
+                          )}
+                        </>
+                      ))}
+                    </span>
+                  )}
+              </div>
+            </>
           )}
           {index === 3 && (
             <>
               {idRole === Role.teacher ? (
                 <div className="add-exercise-container">
-                  <button>
+                  <button className="add-ex-but">
                     <LuPlus /> Add new exercise
                   </button>
                 </div>
@@ -257,7 +362,7 @@ const LectureView = ({ lectureDetail }) => {
                 lectureDetail.exercises.length > 0 &&
                 lectureDetail.exercises.map((exercise, index) => (
                   <>
-                    {exercise.isPublish ? (
+                    {exercise.isPublish && idRole === Role.student ? (
                       <div key={index} className="part-item exercise">
                         <div className="exercise-display">
                           <div className="exercise-body">

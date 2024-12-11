@@ -58,7 +58,7 @@ input[type="number"]::-webkit-outer-spin-button {
   align-items: center;
 
   margin: auto;
-  margin-bottom: .8rem !important;
+  margin-bottom: 0.8rem !important;
 }
 
 .mb-3.change-mb3 {
@@ -105,7 +105,7 @@ input[type="number"]::-webkit-outer-spin-button {
 .form-control {
   height: 43px;
   padding: 4px 40px;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   border-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
   background-color: rgba(217, 217, 217, 0.3);
@@ -120,10 +120,10 @@ input[type="number"]::-webkit-outer-spin-button {
 .form-control.introduce-center {
   padding: 8px 40px;
 
-  height: 70px;      
-  width: 100%;       
-  resize: none;       
-  overflow-y: auto;  
+  height: 70px;
+  width: 100%;
+  resize: none;
+  overflow-y: auto;
 }
 
 .icon-head.penline {
@@ -159,22 +159,21 @@ input[type="number"]::-webkit-outer-spin-button {
   color: var(--red-color);
   font-weight: 500;
 }
-
 .AC-check {
   cursor: pointer;
   margin-right: 10px;
   width: 16px;
   height: 16px;
   border: none;
+  accent-color: var(--main-color);
 }
-
 .register-button {
   /* width: 100px; */
   height: 40px;
-  padding: .25rem 1rem;
+  padding: 0.25rem 1rem;
   font-size: 20px;
   font-weight: 400;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   border: none;
   cursor: pointer;
   background-color: var(--second-main-color);
@@ -286,10 +285,10 @@ input[type="number"]::-webkit-outer-spin-button {
 
 @media (min-width: 576px) {
   .modal-dialog {
-      max-width: var(--bs-modal-width);
-      margin-right: auto;
-      margin-left: auto;
-      margin-top: 5%;
+    max-width: var(--bs-modal-width);
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 5%;
   }
 }
 .modal-dialog > .modal-content {
@@ -320,17 +319,16 @@ input[type="number"]::-webkit-outer-spin-button {
   word-wrap: break-word;
 }
 
-
 .policy-btn {
-  border-radius: .25rem;
+  border-radius: 0.25rem;
   padding: 4px 8px;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .policy-btn.agree {
   color: var(--white-color);
   background-color: var(--main-color);
-  border: 1px solid var(--main-color)
+  border: 1px solid var(--main-color);
 }
 
 .policy-btn.agree:hover {
@@ -340,29 +338,28 @@ input[type="number"]::-webkit-outer-spin-button {
 .policy-btn.not-agree {
   color: var(--main-color);
   background-color: var(--white-color);
-  border: 1px solid var(--main-color)
+  border: 1px solid var(--main-color);
 }
 
 .policy-btn.not-agree:hover {
   background-color: rgba(217, 217, 217, 0.3);
 }
 
-
 /* Custom scrollbar styling */
 .policy-content::-webkit-scrollbar,
 textarea::-webkit-scrollbar {
-  width: 6px;           /* Set the scrollbar width */
+  width: 6px; /* Set the scrollbar width */
 }
 
 .policy-content::-webkit-scrollbar-track,
 textarea::-webkit-scrollbar-track {
-  background: var(--border-gray);  /* Background color of the scrollbar track */
+  background: var(--border-gray); /* Background color of the scrollbar track */
 }
 
 .policy-content::-webkit-scrollbar-thumb,
 textarea::-webkit-scrollbar-thumb {
   background-color: var(--text-gray); /* Scrollbar thumb color */
-  border-radius: 4px;     /* Rounded corners for a flatter look */
+  border-radius: 4px; /* Rounded corners for a flatter look */
   cursor: grab;
 }
 

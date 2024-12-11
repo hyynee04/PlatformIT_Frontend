@@ -82,7 +82,7 @@
   padding: 4px 12px;
   border-radius: 0.25rem;
   border: 1px solid var(--border-gray);
-  width: 140px;
+  min-width: 140px;
 }
 .date-picker:focus,
 .input-sortby:focus {

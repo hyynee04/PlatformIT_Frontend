@@ -21,6 +21,7 @@ import {
   LuMoreHorizontal,
   LuCheckCircle,
   LuX,
+  LuBell,
 } from "react-icons/lu";
 import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
@@ -164,7 +165,6 @@ const AssignDetail = () => {
     },
     maintainAspectRatio: false,
   };
-  const [searchTerm, setSearchTerm] = useState("");
 
   //LIST SUBMISSIONS
   const sortedSubmissions = overviewAssignment?.submissions
@@ -174,12 +174,20 @@ const AssignDetail = () => {
       const dateB = new Date(b.submittedDate).getTime();
       return dateB - dateA;
     });
+
+  const [searchTerm, setSearchTerm] = useState("");
   //FILTER
   const [filterVisble, setFilterVisble] = useState(false);
   const filterRef = useRef(null);
+  const filterBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterBtnRef.current &&
+        !filterBtnRef.current.contains(event.target)
+      ) {
         setFilterVisble(false);
       }
     };
@@ -189,18 +197,20 @@ const AssignDetail = () => {
     };
   }, [filterRef]);
 
-  const [isTest, setIsTest] = useState("all");
-  const [assignmentType, setAssignmentType] = useState("all");
-
-  const [tempIsTest, setTempIsTest] = useState("all");
-  const [tempAssignmentType, setTempAssignmentType] = useState("all");
+  const [statusSubmission, setStatusSubmission] = useState("all");
 
   //SORT BY
   const [sortByVisible, setSortByVisible] = useState(false);
   const sortByRef = useRef(null);
+  const sortByBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sortByRef.current && !sortByRef.current.contains(event.target)) {
+      if (
+        sortByRef.current &&
+        !sortByRef.current.contains(event.target) &&
+        sortByBtnRef.current &&
+        !sortByBtnRef.current.contains(event.target)
+      ) {
         setSortByVisible(false);
       }
     };
@@ -215,6 +225,83 @@ const AssignDetail = () => {
   const [tempSortField, setTempSortField] = useState("createdDate");
   const [tempSortOrder, setTempSortOrder] = useState("desc");
 
+  const filteredSubmission = sortedSubmissions
+    ?.filter((submission) => {
+      // Tìm kiếm theo searchTerm (theo tiêu đề)
+      const searchLower = searchTerm.toLowerCase().trim();
+      if (
+        searchTerm &&
+        !(
+          (submission.nameStudent &&
+            submission.nameStudent.toLowerCase().includes(searchLower)) ||
+          (submission.status &&
+            (submission.status === AssignmentResultStatus.submitted
+              ? "Submitted"
+              : submission.status === AssignmentResultStatus.onTime
+              ? overviewAssignment.isPastDue === 1
+                ? "On time"
+                : "Submitted"
+              : submission.status === AssignmentResultStatus.late
+              ? "Late"
+              : submission.status === AssignmentResultStatus.locked
+              ? "Locked"
+              : ""
+            )
+              .toLowerCase()
+              .includes(searchTerm)) ||
+          (submission.studentDuration &&
+            String(submission.studentDuration).includes(searchLower)) ||
+          (submission.studentTotalMark &&
+            String(submission.studentTotalMark).includes(searchLower)) ||
+          (submission.submittedDate &&
+            formatDateTime(submission.submittedDate)
+              .toLowerCase()
+              .includes(searchLower))
+        )
+      ) {
+        return false;
+      }
+      return true;
+    })
+    .filter((submission) => {
+      if (statusSubmission === "notSubmitted" && submission.status === null) {
+        return true;
+      }
+      if (
+        statusSubmission !== "all" &&
+        submission.status !== Number(statusSubmission)
+      ) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      let aValue, bValue;
+
+      if (sortField === "marks") {
+        aValue = a.studentTotalMark || 0;
+        bValue = b.studentTotalMark || 0;
+      } else if (sortField === "duration") {
+        aValue = a.studentDuration || 0;
+        bValue = b.studentDuration || 0;
+      } else if (sortField === "submittedDate") {
+        aValue = new Date(a.submittedDate) || new Date(0);
+        bValue = new Date(b.submittedDate) || new Date(0);
+      } else if (sortField === "student") {
+        aValue = a.nameStudent.toLowerCase() || "";
+        bValue = b.nameStudent.toLowerCase() || "";
+      }
+
+      return sortOrder === "asc"
+        ? aValue > bValue
+          ? 1
+          : -1
+        : aValue < bValue
+        ? 1
+        : -1;
+    });
+
   //PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
@@ -224,7 +311,7 @@ const AssignDetail = () => {
     idRole === Role.student ||
     (idRole === Role.teacher && activeChoice === "question")
       ? questions
-      : sortedSubmissions;
+      : filteredSubmission;
   const records = activeList.slice(firstIndex, lastIndex);
   const npage = Math.ceil(activeList.length / recordsPerPage);
 
@@ -235,7 +322,6 @@ const AssignDetail = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      // Kiểm tra nếu nhấp bên ngoài cả optionRef và buttonRef
       if (
         optionRef.current &&
         !optionRef.current.contains(e.target) &&
@@ -258,7 +344,7 @@ const AssignDetail = () => {
     const dataToSubmit = {
       idAssignment: updatedAssignmentInfo.idAssignment,
       title: updatedAssignmentInfo.title,
-      isTest: isTest,
+      isTest: updatedAssignmentInfo.isTest,
       startDate: updatedAssignmentInfo.startDate || "",
       endDate: updatedAssignmentInfo.dueDate || "",
       duration: updatedAssignmentInfo.duration || "",
@@ -292,6 +378,12 @@ const AssignDetail = () => {
   const [diagStartAssign, setDiagStartAssign] = useState(false);
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
+  };
+
+  //NOTICE NOT SUBMITTED
+  const [diagNotSubmitted, setDiagNotSubmitted] = useState(false);
+  const handleOpenNotSubmitted = () => {
+    setDiagNotSubmitted(true);
   };
 
   if (loading) {
@@ -473,13 +565,19 @@ const AssignDetail = () => {
           <div className="handle-button">
             <button
               className={`btn ${activeChoice === "question" ? "active" : ""}`}
-              onClick={() => handleChoiceClick("question")}
+              onClick={() => {
+                handleChoiceClick("question");
+                setCurrentPage(1);
+              }}
             >
               Questions
             </button>
             <button
               className={`btn ${activeChoice === "overview" ? "active" : ""}`}
-              onClick={() => handleChoiceClick("overview")}
+              onClick={() => {
+                handleChoiceClick("overview");
+                setCurrentPage(1);
+              }}
             >
               Overview
             </button>
@@ -678,7 +776,7 @@ const AssignDetail = () => {
                                       }
                                       name={`question_${index}`}
                                       checked={!!choice.isCorrect}
-                                      disabled
+                                      readOnly
                                     />
                                   </label>
                                   <div className="info" style={{ flex: "1" }}>
@@ -792,6 +890,7 @@ const AssignDetail = () => {
                       <div className="filter-search-assign">
                         <div className="filter-sort-btns">
                           <button
+                            ref={filterBtnRef}
                             className="btn"
                             onClick={() => {
                               setFilterVisble(!filterVisble);
@@ -816,28 +915,34 @@ const AssignDetail = () => {
                                       type="radio"
                                       value="manual"
                                       checked={
-                                        tempAssignmentType ===
-                                        AssignmentType.manual
+                                        statusSubmission ===
+                                        (overviewAssignment.isPastDue === 1
+                                          ? AssignmentResultStatus.onTime
+                                          : AssignmentResultStatus.submitted)
                                       }
                                       onChange={() =>
-                                        setTempAssignmentType(
-                                          AssignmentType.manual
+                                        setStatusSubmission(
+                                          overviewAssignment.isPastDue === 1
+                                            ? AssignmentResultStatus.onTime
+                                            : AssignmentResultStatus.submitted
                                         )
                                       }
                                     />
-                                    On time
+                                    {overviewAssignment.isPastDue === 1
+                                      ? "On time"
+                                      : "Submitted"}
                                   </label>
                                   <label className="radio-container status">
                                     <input
                                       type="radio"
                                       value="quiz"
                                       checked={
-                                        tempAssignmentType ===
-                                        AssignmentType.quiz
+                                        statusSubmission ===
+                                        AssignmentResultStatus.late
                                       }
                                       onChange={() =>
-                                        setTempAssignmentType(
-                                          AssignmentType.quiz
+                                        setStatusSubmission(
+                                          AssignmentResultStatus.late
                                         )
                                       }
                                     />
@@ -848,13 +953,10 @@ const AssignDetail = () => {
                                       type="radio"
                                       value="code"
                                       checked={
-                                        tempAssignmentType ===
-                                        AssignmentType.code
+                                        statusSubmission === "notSubmitted"
                                       }
                                       onChange={() =>
-                                        setTempAssignmentType(
-                                          AssignmentType.code
-                                        )
+                                        setStatusSubmission("notSubmitted")
                                       }
                                     />
                                     Not submitted
@@ -863,9 +965,9 @@ const AssignDetail = () => {
                                     <input
                                       type="radio"
                                       value="all"
-                                      checked={tempAssignmentType === "all"}
+                                      checked={statusSubmission === "all"}
                                       onChange={() =>
-                                        setTempAssignmentType("all")
+                                        setStatusSubmission("all")
                                       }
                                     />
                                     All
@@ -882,8 +984,7 @@ const AssignDetail = () => {
                                 <button
                                   className="btn save-filter"
                                   onClick={() => {
-                                    setIsTest(tempIsTest);
-                                    setAssignmentType(tempAssignmentType);
+                                    setStatusSubmission(statusSubmission);
                                     setFilterVisble(false);
                                   }}
                                 >
@@ -893,6 +994,7 @@ const AssignDetail = () => {
                             </div>
                           )}
                           <button
+                            ref={sortByBtnRef}
                             className="btn"
                             onClick={() => {
                               setSortByVisible(!sortByVisible);
@@ -997,8 +1099,12 @@ const AssignDetail = () => {
                                 key={index}
                                 style={{ cursor: "pointer" }}
                                 onClick={() => {
-                                  setSelectedStudent(submission);
-                                  setShowAnswerSheet(true);
+                                  if (submission.submittedDate) {
+                                    setSelectedStudent(submission);
+                                    setShowAnswerSheet(true);
+                                  } else {
+                                    handleOpenNotSubmitted();
+                                  }
                                 }}
                               >
                                 <td></td>
@@ -1068,14 +1174,16 @@ const AssignDetail = () => {
                   </div>
                 </div>
               )}
-              {showAnswerSheet && selectedStudent && (
-                <AnswerSheet
-                  idAssignment={assignmentInfo.idAssignment}
-                  selectedStudent={selectedStudent}
-                  onClose={() => setShowAnswerSheet(false)}
-                  fetchOverview={() => fetchOverviewData()}
-                />
-              )}
+              {showAnswerSheet &&
+                selectedStudent &&
+                activeChoice === "overview" && (
+                  <AnswerSheet
+                    idAssignment={assignmentInfo.idAssignment}
+                    selectedStudent={selectedStudent}
+                    onClose={() => setShowAnswerSheet(false)}
+                    fetchOverview={() => fetchOverviewData()}
+                  />
+                )}
             </>
           )}
           {idRole === Role.student && (
@@ -1189,21 +1297,19 @@ const AssignDetail = () => {
                                   defaultValue={choice.content}
                                   style={{
                                     backgroundColor:
-                                      question.selectedOptions.includes(
+                                      question.correctOptions.includes(
                                         choice.idMultipleAssignmentItem
                                       )
-                                        ? question.selectedOptions.includes(
+                                        ? "#B2E0C8" // Luôn hiển thị đáp án đúng màu xanh
+                                        : question.selectedOptions.includes(
                                             choice.idMultipleAssignmentItem
-                                          ) &&
-                                          question.selectedOptions.includes(
+                                          )
+                                        ? question.correctOptions.includes(
                                             choice.idMultipleAssignmentItem
-                                          ) ===
-                                            question.correctOptions.includes(
-                                              choice.idMultipleAssignmentItem
-                                            )
-                                          ? "#B2E0C8" // Nếu đúng
-                                          : "#E6B1B0"
-                                        : "rgba(217, 217, 217, 0.3)",
+                                          )
+                                          ? "#B2E0C8" // Người dùng chọn đúng
+                                          : "#E6B1B0" // Người dùng chọn sai
+                                        : "rgba(217, 217, 217, 0.3)", // Các lựa chọn khác
                                   }}
                                   readOnly
                                 />
@@ -1218,7 +1324,7 @@ const AssignDetail = () => {
             </div>
           )}
         </div>
-        {!showAnswerSheet && records.length > 0 && (
+        {(!showAnswerSheet || activeChoice === "question") && (
           <div className="pagination">
             {getPagination(currentPage, npage).map((n, i) => (
               <button
@@ -1308,6 +1414,42 @@ const AssignDetail = () => {
                       Start
                     </button>
                   )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {diagNotSubmitted && (
+        <div
+          className="modal-overlay"
+          onClick={() => setDiagNotSubmitted(false)}
+        >
+          <div
+            className="modal-container slide-to-bottom"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="diag-header">
+              <div className="container-title">
+                <LuBell className="diag-icon" />
+                <span className="diag-title">Notification</span>
+              </div>
+              <LuX
+                className="diag-icon"
+                onClick={() => setDiagNotSubmitted(false)}
+              />
+            </div>
+            <div className="diag-body">
+              <span>This student has not submitted the assignment yet.</span>
+
+              <div className="str-btns">
+                <div className="act-btns">
+                  <button
+                    className="btn diag-btn signout"
+                    onClick={() => setDiagNotSubmitted(false)}
+                  >
+                    OK
+                  </button>
                 </div>
               </div>
             </div>

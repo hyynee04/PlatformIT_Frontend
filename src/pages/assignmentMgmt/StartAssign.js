@@ -389,7 +389,7 @@ const StartAssign = () => {
       }
 
       if (response.status === APIStatus.success) {
-        navigate("/studentTest");
+        navigate(-1);
       } else {
         console.error("Failed to submit assignment:", response);
       }

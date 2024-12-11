@@ -301,33 +301,32 @@ const AnswerSheet = ({
                   <div className="info-row manual-answer-marked">
                     <div className="info" style={{ flex: "0.92 1" }}>
                       <span>Answer: </span>
-                      {question.assignmentItemAnswerType ===
-                        AssignmentItemAnswerType.text && (
+                      {question.answerText && (
                         <Form.Control
                           as="textarea"
                           className="input-area-form-pi"
-                          value={question.answer || ""}
+                          value={question.answerText || ""}
                         />
                       )}
-                      {question.assignmentItemAnswerType ===
-                        AssignmentItemAnswerType.attached_file && (
+                      {question.answerAttachedFile && (
                         <div className="select-container">
                           <input
                             type="text"
                             style={{ cursor: "pointer" }}
                             className="input-form-pi"
-                            title={
-                              question.attachedFile?.name || question.nameFile
-                            }
+                            title={question.answerNameFile}
                             value={
-                              question.answer.name.length > 54
-                                ? question.answer.name.slice(0, 54) + "..."
-                                : question.answer.name
+                              question.answerNameFile.length > 54
+                                ? question.answerNameFile.slice(0, 54) + "..."
+                                : question.answerNameFile
                             }
                             onClick={() => {
-                              if (question.answer.url) {
+                              if (question.answerAttachedFile) {
                                 // Kiểm tra nếu answer chứa URL
-                                window.open(question.answer.url, "_blank");
+                                window.open(
+                                  question.answerAttachedFile,
+                                  "_blank"
+                                );
                               }
                             }}
                             readOnly
@@ -390,9 +389,10 @@ const AnswerSheet = ({
                                 question.isMultipleAnswer ? "checkbox" : "radio"
                               }
                               name={`question_${index}`}
-                              defaultChecked={question.selectedOptions.includes(
+                              checked={question.selectedOptions.includes(
                                 choice.idMultipleAssignmentItem
                               )}
+                              readOnly
                             />
                           </label>
                           <div className="info" style={{ flex: "1" }}>
@@ -401,23 +401,39 @@ const AnswerSheet = ({
                               className="input-form-pi"
                               placeholder="Type a choice"
                               defaultValue={choice.content}
+                              // style={{
+                              //   backgroundColor:
+                              //     question.selectedOptions.includes(
+                              //       choice.idMultipleAssignmentItem
+                              //     )
+                              //       ? question.selectedOptions.includes(
+                              //           choice.idMultipleAssignmentItem
+                              //         ) &&
+                              //         question.selectedOptions.includes(
+                              //           choice.idMultipleAssignmentItem
+                              //         ) ===
+                              //           question.correctOptions.includes(
+                              //             choice.idMultipleAssignmentItem
+                              //           )
+                              //         ? "#B2E0C8"
+                              //         : "#E6B1B0"
+                              //       : "rgba(217, 217, 217, 0.3)",
+                              // }}
                               style={{
                                 backgroundColor:
-                                  question.selectedOptions.includes(
+                                  question.correctOptions.includes(
                                     choice.idMultipleAssignmentItem
                                   )
-                                    ? question.selectedOptions.includes(
+                                    ? "#B2E0C8" // Luôn hiển thị đáp án đúng màu xanh
+                                    : question.selectedOptions.includes(
                                         choice.idMultipleAssignmentItem
-                                      ) &&
-                                      question.selectedOptions.includes(
+                                      )
+                                    ? question.correctOptions.includes(
                                         choice.idMultipleAssignmentItem
-                                      ) ===
-                                        question.correctOptions.includes(
-                                          choice.idMultipleAssignmentItem
-                                        )
-                                      ? "#B2E0C8"
-                                      : "#E6B1B0"
-                                    : "rgba(217, 217, 217, 0.3)",
+                                      )
+                                      ? "#B2E0C8" // Người dùng chọn đúng
+                                      : "#E6B1B0" // Người dùng chọn sai
+                                    : "rgba(217, 217, 217, 0.3)", // Các lựa chọn khác
                               }}
                               readOnly
                             />

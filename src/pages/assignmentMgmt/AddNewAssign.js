@@ -30,6 +30,7 @@ const AddNewAssign = () => {
     save: false,
     publish: false,
   });
+  const [loading, setLoading] = useState(false);
   const [isAddByCourse, setIsAddByCourse] = useState(false);
   const [isAddByLecture, setIsAddByLecture] = useState(false);
 
@@ -397,15 +398,16 @@ const AddNewAssign = () => {
       isShowAnswer: isShowAnswer,
       questions: questions,
     };
-    isPublish
-      ? setLoadingBtn((prevState) => ({
-          ...prevState,
-          publish: true,
-        }))
-      : setLoadingBtn((prevState) => ({
-          ...prevState,
-          save: true,
-        }));
+    // isPublish
+    //   ? setLoadingBtn((prevState) => ({
+    //       ...prevState,
+    //       publish: true,
+    //     }))
+    //   : setLoadingBtn((prevState) => ({
+    //       ...prevState,
+    //       save: true,
+    //     }));
+    setLoading(true);
     try {
       let response;
 
@@ -425,7 +427,7 @@ const AddNewAssign = () => {
             },
           });
         } else {
-          navigate("/teacherAssignment");
+          navigate(-1);
         }
       } else {
         console.error("Error adding assignment:", response?.message);
@@ -433,18 +435,25 @@ const AddNewAssign = () => {
     } catch (error) {
       console.error("Failed to add assignment:", error);
     } finally {
-      isPublish
-        ? setLoadingBtn((prevState) => ({
-            ...prevState,
-            publish: false,
-          }))
-        : setLoadingBtn((prevState) => ({
-            ...prevState,
-            save: false,
-          }));
+      setLoading(false);
+      // isPublish
+      //   ? setLoadingBtn((prevState) => ({
+      //       ...prevState,
+      //       publish: false,
+      //     }))
+      //   : setLoadingBtn((prevState) => ({
+      //       ...prevState,
+      //       save: false,
+      //     }));
     }
   };
-
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="assign-span">
@@ -477,7 +486,7 @@ const AddNewAssign = () => {
         </div>
 
         <div className="action-btns-form">
-          <div className="container-button sticky">
+          <div className="container-button">
             <button
               className="btn save"
               disabled={!isFormValid()}

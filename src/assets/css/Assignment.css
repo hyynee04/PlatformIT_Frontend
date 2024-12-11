@@ -213,24 +213,28 @@
   flex-direction: row;
   align-items: stretch;
   grid-gap: 20px;
+
+  .container-left-assign,
+  .container-right-assign {
+    padding: 24px 0;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-shrink: 0;
+    gap: 24px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    border-radius: 8px;
+  }
+  .container-left-assign {
+    flex: 0.3;
+    min-width: 534px;
+    position: -webkit-sticky;
+    top: 0;
+  }
 }
-.container-left-assign,
-.container-right-assign {
-  padding: 24px 0;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-shrink: 0;
-  gap: 24px;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-  border-radius: 8px;
-}
-.container-left-assign {
-  flex: 0.4;
-  min-width: 534px;
-}
+
 .container-right-assign {
   flex: 1;
 }
@@ -370,14 +374,7 @@
   align-items: flex-start;
   background-color: var(--white-color);
 }
-/* .container-button.sticky {
-  position: fixed;
-  top: 116px;
-  right: 64px;
-  width: 100%;
-  z-index: 9999;
-  background-color: var(--white-color);
-} */
+
 .action-btns-form .container-button {
   display: flex;
   flex-direction: row;

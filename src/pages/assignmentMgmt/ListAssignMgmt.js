@@ -53,9 +53,15 @@ const ListAssignMgmt = () => {
   //FILTER
   const [filterVisble, setFilterVisble] = useState(false);
   const filterRef = useRef(null);
+  const filterBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterBtnRef.current &&
+        !filterBtnRef.current.contains(event.target)
+      ) {
         setFilterVisble(false);
       }
     };
@@ -74,9 +80,15 @@ const ListAssignMgmt = () => {
   //SORT BY
   const [sortByVisible, setSortByVisible] = useState(false);
   const sortByRef = useRef(null);
+  const sortByBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sortByRef.current && !sortByRef.current.contains(event.target)) {
+      if (
+        sortByRef.current &&
+        !sortByRef.current.contains(event.target) &&
+        sortByBtnRef.current &&
+        !sortByBtnRef.current.contains(event.target)
+      ) {
         setSortByVisible(false);
       }
     };
@@ -457,6 +469,7 @@ const ListAssignMgmt = () => {
           <div className="filter-search-assign">
             <div className="filter-sort-btns">
               <div
+                ref={filterBtnRef}
                 className="btn"
                 onClick={() => {
                   setFilterVisble(!filterVisble);
@@ -572,6 +585,7 @@ const ListAssignMgmt = () => {
                 </div>
               )}
               <div
+                ref={sortByBtnRef}
                 className="btn"
                 onClick={() => {
                   setSortByVisible(!sortByVisible);

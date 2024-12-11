@@ -313,7 +313,7 @@
   .chart {
   width: 100px;
   height: auto;
-  z-index: 9999;
+  /* z-index: 9999; */
 }
 .questions-overview-container .overview-container .chart-detail-container > div,
 .questions-overview-container

@@ -114,224 +114,235 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
   };
   return (
     <div className="new-quiz-questions" style={{ width: "100%" }}>
-      {questions
-        .filter((question) => question.assignmentItemStatus === 1)
-        .map((question, idx) => (
-          <div className="row-item" key={idx}>
-            <div className="num-del">
-              <span className="num-question">{idx + 1}</span>
-              <button
-                className="del-question"
-                onClick={() => handleDeleteQuestion(idx)}
-              >
-                <FaTrashAlt />
-              </button>
-            </div>
-            <div className="question-info">
-              <div className="row-info">
-                <div className="left-question-info">
-                  <div className="info">
-                    <span>
-                      <span style={{ fontWeight: "bold", color: "#1e1e1e" }}>
-                        Question {idx + 1}
-                      </span>
-                      <span className="required">*</span>
-                    </span>
-
-                    <Form.Control
-                      as="textarea"
-                      className="input-area-form-pi"
-                      placeholder="Question text"
-                      value={question.question}
-                      onChange={(e) =>
-                        handleQuestionChange(idx, "question", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="right-question-info">
-                  <div className="img-container">
-                    <img
-                      className="question-img"
-                      alt=""
-                      src={
-                        question.attachedFilePreview ||
-                        question.attachedFile ||
-                        default_image
-                      }
-                      style={{
-                        cursor: question.attachedFile ? "pointer" : "default",
-                      }}
-                      onClick={() => window.open(question.attachedFile)}
-                    />
-                    <button
-                      className="btn quiz-img-btn attach"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenReferenceQuestion(idx);
-                      }}
-                    >
-                      <RiAttachment2
-                        className="file-icon"
-                        style={{ cursor: "pointer", pointerEvents: "all" }}
-                      />
-                    </button>
-                    <button
-                      className="btn quiz-img-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteFile(idx);
-                      }}
-                    >
-                      <FaTrashAlt
-                        className="del-question"
-                        style={{ cursor: "pointer", pointerEvents: "all" }}
-                      />
-                    </button>
-                  </div>
-                  <input
-                    type="file"
-                    ref={(el) => (inputFileRef.current[idx] = el)}
-                    style={{ display: "none" }}
-                    accept="image/*"
-                    onChange={(e) => handleReferenceFileChange(e, idx)}
-                  />
-                </div>
+      {questions.map((question, idx) => {
+        let displayIndex = 0;
+        if (question.assignmentItemStatus === 1) {
+          displayIndex += 1;
+          return (
+            <div className="row-item" key={idx}>
+              <div className="num-del">
+                <span className="num-question">{displayIndex}</span>
+                <button
+                  className="del-question"
+                  onClick={() => handleDeleteQuestion(idx)}
+                >
+                  <FaTrashAlt />
+                </button>
               </div>
-              <div className="row-info">
-                <div className="left-question-info">
-                  <span className="choices-setting">
-                    <span>Choices</span>
-                    <span>|</span>
-                    <span>Multiple answers</span>
-                    <label className="switch-mul-anw">
-                      <input
-                        type="checkbox"
-                        checked={question.isMultipleAnswer}
-                        onChange={(e) => {
+              <div className="question-info">
+                <div className="row-info">
+                  <div className="left-question-info">
+                    <div className="info">
+                      <span>
+                        <span style={{ fontWeight: "bold", color: "#1e1e1e" }}>
+                          Question {idx + 1}
+                        </span>
+                        <span className="required">*</span>
+                      </span>
+
+                      <Form.Control
+                        as="textarea"
+                        className="input-area-form-pi"
+                        placeholder="Question text"
+                        value={question.question}
+                        onChange={(e) =>
+                          handleQuestionChange(idx, "question", e.target.value)
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="right-question-info">
+                    <div className="img-container">
+                      <img
+                        className="question-img"
+                        alt=""
+                        src={
+                          question.attachedFilePreview ||
+                          question.attachedFile ||
+                          default_image
+                        }
+                        style={{
+                          cursor: question.attachedFile ? "pointer" : "default",
+                        }}
+                        onClick={() => window.open(question.attachedFile)}
+                      />
+                      <button
+                        className="btn quiz-img-btn attach"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenReferenceQuestion(idx);
+                        }}
+                      >
+                        <RiAttachment2
+                          className="file-icon"
+                          style={{ cursor: "pointer", pointerEvents: "all" }}
+                        />
+                      </button>
+                      <button
+                        className="btn quiz-img-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteFile(idx);
+                        }}
+                      >
+                        <FaTrashAlt
+                          className="del-question"
+                          style={{ cursor: "pointer", pointerEvents: "all" }}
+                        />
+                      </button>
+                    </div>
+                    <input
+                      type="file"
+                      ref={(el) => (inputFileRef.current[idx] = el)}
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      onChange={(e) => handleReferenceFileChange(e, idx)}
+                    />
+                  </div>
+                </div>
+                <div className="row-info">
+                  <div className="left-question-info">
+                    <span className="choices-setting">
+                      <span>Choices</span>
+                      <span>|</span>
+                      <span>Multiple answers</span>
+                      <label className="switch-mul-anw">
+                        <input
+                          type="checkbox"
+                          checked={question.isMultipleAnswer}
+                          onChange={(e) => {
+                            handleQuestionChange(
+                              idx,
+                              "isMultipleAnswer",
+                              e.target.checked
+                            );
+                            if (!question.isMultipleAnswer) {
+                              // Nếu chuyển sang chế độ "Single Answer", đảm bảo chỉ có 1 đáp án đúng
+                              const updatedItems = question.items.map(
+                                (choice, choiceIdx) => ({
+                                  ...choice,
+                                  isCorrect: choiceIdx === 0, // Đặt đáp án đầu tiên là đúng
+                                })
+                              );
+                              handleQuestionChange(idx, "items", updatedItems);
+                            }
+                          }}
+                        />
+                        <span className="slider-mul-anw"></span>
+                      </label>
+                    </span>
+                    {question.items.map(
+                      (choice, choiceIdx) =>
+                        choice.multipleAssignmentItemStatus === 1 && (
+                          <div className="info-in-row" key={choiceIdx}>
+                            <label className="radio-choice">
+                              <input
+                                type={
+                                  question.isMultipleAnswer
+                                    ? "checkbox"
+                                    : "radio"
+                                }
+                                name={`question_${idx}`}
+                                checked={choice.isCorrect}
+                                onChange={(e) =>
+                                  handleChoiceChange(
+                                    idx,
+                                    choiceIdx,
+                                    "isCorrect",
+                                    e.target.checked
+                                  )
+                                }
+                              />
+                            </label>
+                            <div className="info" style={{ flex: "1" }}>
+                              <input
+                                type="text"
+                                className="input-form-pi"
+                                placeholder="Type a choice"
+                                value={choice.content}
+                                onChange={(e) =>
+                                  handleChoiceChange(
+                                    idx,
+                                    choiceIdx,
+                                    "content",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                            <button
+                              className="btn del-question"
+                              onClick={() => handleDeleteChoice(idx, choiceIdx)}
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
+                        )
+                    )}
+
+                    <div>
+                      <button
+                        className="btn add-new-choice"
+                        onClick={() => handleAddChoice(idx)}
+                      >
+                        <BiPlus />
+                        Add new choice
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  className="row-info"
+                  style={{ borderTop: "1px solid var(--border-gray)" }}
+                >
+                  <div className="left-question-info">
+                    <div className="info">
+                      <span
+                        style={{
+                          color: "var(--black-color)",
+                          fontSize: "14px",
+                        }}
+                      >
+                        Answer explanation
+                      </span>
+
+                      <Form.Control
+                        as="textarea"
+                        className="input-area-form-pi"
+                        placeholder="Explanation"
+                        value={question.explanation}
+                        onChange={(e) =>
                           handleQuestionChange(
                             idx,
-                            "isMultipleAnswer",
-                            e.target.checked
-                          );
-                          if (!question.isMultipleAnswer) {
-                            // Nếu chuyển sang chế độ "Single Answer", đảm bảo chỉ có 1 đáp án đúng
-                            const updatedItems = question.items.map(
-                              (choice, choiceIdx) => ({
-                                ...choice,
-                                isCorrect: choiceIdx === 0, // Đặt đáp án đầu tiên là đúng
-                              })
-                            );
-                            handleQuestionChange(idx, "items", updatedItems);
-                          }
-                        }}
+                            "explanation",
+                            e.target.value
+                          )
+                        }
                       />
-                      <span className="slider-mul-anw"></span>
-                    </label>
-                  </span>
-                  {question.items.map(
-                    (choice, choiceIdx) =>
-                      choice.multipleAssignmentItemStatus === 1 && (
-                        <div className="info-in-row" key={choiceIdx}>
-                          <label className="radio-choice">
-                            <input
-                              type={
-                                question.isMultipleAnswer ? "checkbox" : "radio"
-                              }
-                              name={`question_${idx}`}
-                              checked={choice.isCorrect}
-                              onChange={(e) =>
-                                handleChoiceChange(
-                                  idx,
-                                  choiceIdx,
-                                  "isCorrect",
-                                  e.target.checked
-                                )
-                              }
-                            />
-                          </label>
-                          <div className="info" style={{ flex: "1" }}>
-                            <input
-                              type="text"
-                              className="input-form-pi"
-                              placeholder="Type a choice"
-                              value={choice.content}
-                              onChange={(e) =>
-                                handleChoiceChange(
-                                  idx,
-                                  choiceIdx,
-                                  "content",
-                                  e.target.value
-                                )
-                              }
-                            />
-                          </div>
-                          <button
-                            className="btn del-question"
-                            onClick={() => handleDeleteChoice(idx, choiceIdx)}
-                          >
-                            <FaTrashAlt />
-                          </button>
-                        </div>
-                      )
-                  )}
-
-                  <div>
-                    <button
-                      className="btn add-new-choice"
-                      onClick={() => handleAddChoice(idx)}
-                    >
-                      <BiPlus />
-                      Add new choice
-                    </button>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div
-                className="row-info"
-                style={{ borderTop: "1px solid var(--border-gray)" }}
-              >
-                <div className="left-question-info">
-                  <div className="info">
-                    <span
-                      style={{
-                        color: "var(--black-color)",
-                        fontSize: "14px",
-                      }}
-                    >
-                      Answer explanation
-                    </span>
-
-                    <Form.Control
-                      as="textarea"
-                      className="input-area-form-pi"
-                      placeholder="Explanation"
-                      value={question.explanation}
-                      onChange={(e) =>
-                        handleQuestionChange(idx, "explanation", e.target.value)
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="right-question-info">
-                  <div className="info">
-                    <span>
-                      Mark<span className="required">*</span>
-                    </span>
-                    <input
-                      type="number"
-                      className="input-form-pi"
-                      value={question.mark}
-                      onChange={(e) =>
-                        handleQuestionChange(idx, "mark", e.target.value)
-                      }
-                    />
+                  <div className="right-question-info">
+                    <div className="info">
+                      <span>
+                        Mark<span className="required">*</span>
+                      </span>
+                      <input
+                        type="number"
+                        className="input-form-pi"
+                        value={question.mark}
+                        onChange={(e) =>
+                          handleQuestionChange(idx, "mark", e.target.value)
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        }
+        return null;
+      })}
     </div>
   );
 };

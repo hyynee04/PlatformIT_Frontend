@@ -20,7 +20,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { RiGroupLine } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
-import { APIStatus } from "../../constants/constants";
+import { APIStatus, Role } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
   getCourseProgress,
@@ -456,7 +456,32 @@ const CourseDetailTeacher = (props) => {
               {courseInfo.tests && courseInfo.tests.length !== 0 && (
                 <div className="block-container-col">
                   {courseInfo.tests.map((test, index) => (
-                    <div key={index} className="qualification test">
+                    <div
+                      key={index}
+                      className="qualification test"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (idRole === Role.teacher) {
+                          if (test.isPublish === 1) {
+                            navigate("/teacherAssignDetail", {
+                              state: {
+                                idAssignment: test.idAssignment,
+                              },
+                            });
+                          } else {
+                            navigate("/updateAssignment", {
+                              state: {
+                                idAssignment: test.idAssignment,
+                              },
+                            });
+                          }
+                        } else if (idRole === Role.student) {
+                          navigate("/studentAssignDetail", {
+                            state: { idAssignment: test.idAssignment },
+                          });
+                        }
+                      }}
+                    >
                       <div className="qualification-body">
                         <div className="test-header">
                           <span className="test-name teacher-view">

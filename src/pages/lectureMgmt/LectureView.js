@@ -22,6 +22,7 @@ import {
   getVideoType,
   isPastDateTime,
 } from "../../functions/function";
+import { useNavigate } from "react-router-dom";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 
 const LectureView = ({ lectureDetail }) => {
@@ -35,7 +36,7 @@ const LectureView = ({ lectureDetail }) => {
   const [isOpenOption, setIsOpenOption] = useState(false);
   const optionBoxRef = useRef(null);
   const optionButtonRef = useRef(null);
-
+  const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
 
   const menuItems = [
@@ -352,7 +353,16 @@ const LectureView = ({ lectureDetail }) => {
             <>
               {idRole === Role.teacher ? (
                 <div className="add-exercise-container">
-                  <button className="add-ex-but">
+                  <button
+                    className="add-ex-but"
+                    onClick={() => {
+                      navigate("/addAssignment", {
+                        state: {
+                          selectedLecture: lectureDetail,
+                        },
+                      });
+                    }}
+                  >
                     <LuPlus /> Add new exercise
                   </button>
                 </div>
@@ -364,7 +374,31 @@ const LectureView = ({ lectureDetail }) => {
                   <>
                     {exercise.isPublish && idRole === Role.student ? (
                       <div key={index} className="part-item exercise">
-                        <div className="exercise-display">
+                        <div
+                          className="exercise-display"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (idRole === Role.teacher) {
+                              if (exercise.isPublish === 1) {
+                                navigate("/teacherAssignDetail", {
+                                  state: {
+                                    idAssignment: exercise.idAssignment,
+                                  },
+                                });
+                              } else {
+                                navigate("/updateAssignment", {
+                                  state: {
+                                    idAssignment: exercise.idAssignment,
+                                  },
+                                });
+                              }
+                            } else if (idRole === Role.student) {
+                              navigate("/studentAssignDetail", {
+                                state: { idAssignment: exercise.idAssignment },
+                              });
+                            }
+                          }}
+                        >
                           <div className="exercise-body">
                             <span className="item-title">{exercise.title}</span>
                             <div className="exercise-description">

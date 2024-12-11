@@ -249,7 +249,10 @@ const CourseCard = (props) => {
                   onClick={(e) => {
                     e.stopPropagation();
                     navigate("/updateCourse", {
-                      state: { idCourse: course.idCourse },
+                      state: {
+                        idCourse: course.idCourse,
+                        hasStudent: course.studentCount > 0 ? true : false,
+                      },
                     });
                   }}
                 >

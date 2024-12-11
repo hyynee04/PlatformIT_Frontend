@@ -1,23 +1,42 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { postChangeAvatar } from "../services/userService";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../store/profileUserSlice";
 import { fetchCenterProfile } from "../store/profileCenterSlice";
 import DiagRemoveImgForm from "./diag/DiagRemoveImgForm";
 
-const AvatarImageOption = ({ isAvatar }) => {
+const AvatarImageOption = ({
+  isAvatar,
+  openRemoveAvaModal,
+  isOpen,
+  onClose,
+  optionButtonRef,
+}) => {
   const dispatch = useDispatch();
   // const userPI = useSelector((state) => state.profileUser);
   const userId = +localStorage.getItem("idUser");
   const [isOptionVisible, setIsOptionVisible] = useState(true);
-  const [isModalRemoveAvaOpen, setIsModalRemoveAvaOpen] = useState(false);
 
-  const openRemoveAvaModal = () => {
-    setIsModalRemoveAvaOpen(true);
-    setIsOptionVisible(false);
-  };
-  const closeRemoveAvaModal = () => setIsModalRemoveAvaOpen(false);
+  const optionBoxRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutsideOptionBox = (event) => {
+      if (
+        optionBoxRef.current &&
+        !optionBoxRef.current.contains(event.target) &&
+        (!optionButtonRef.current ||
+          !optionButtonRef.current.contains(event.target))
+      ) {
+        onClose();
+      }
+    };
 
+    // Attach the event listener if the options are visible
+    document.addEventListener("mousedown", handleClickOutsideOptionBox);
+    // Cleanup the event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideOptionBox);
+    };
+  }, []);
   const inputFileRef = useRef(null);
   const handleChangeImg = () => {
     inputFileRef.current.click();
@@ -60,22 +79,10 @@ const AvatarImageOption = ({ isAvatar }) => {
       }
     }
   };
-  if (!isOptionVisible) {
-    <>
-      {isModalRemoveAvaOpen && (
-        <div>
-          <DiagRemoveImgForm
-            isOpen={isModalRemoveAvaOpen}
-            onClose={closeRemoveAvaModal}
-            isAvatar={isAvatar}
-          />
-        </div>
-      )}
-    </>;
-  }
+
   return (
     <div>
-      <div className="container-options avatarOption">
+      <div ref={optionBoxRef} className="container-options avatarOption">
         <button className="op-buts" onClick={handleChangeImg}>
           {isAvatar ? (
             <span>Change avatar</span>
@@ -83,12 +90,7 @@ const AvatarImageOption = ({ isAvatar }) => {
             <span>Change cover image</span>
           )}
         </button>
-        <button
-          className="op-buts"
-          onClick={() => {
-            openRemoveAvaModal();
-          }}
-        >
+        <button className="op-buts" onClick={() => openRemoveAvaModal()}>
           {isAvatar ? (
             <span>Remove avatar</span>
           ) : (
@@ -102,11 +104,6 @@ const AvatarImageOption = ({ isAvatar }) => {
         style={{ display: "none" }} // Ẩn input file
         accept=".png, .jpg, .jpeg" // Chỉ cho phép chọn file ảnh
         onChange={handleFileChange}
-      />
-      <DiagRemoveImgForm
-        isOpen={isModalRemoveAvaOpen}
-        onClose={closeRemoveAvaModal}
-        isAvatar={isAvatar}
       />
     </div>
   );

@@ -312,6 +312,14 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/studentAssignDetail"
+            element={
+              <PrivateRoute>
+                <AssignDetail />
+              </PrivateRoute>
+            }
+          />
 
           {/* General */}
           <Route

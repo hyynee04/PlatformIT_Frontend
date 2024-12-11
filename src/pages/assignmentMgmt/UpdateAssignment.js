@@ -518,7 +518,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       const response = await postUpdateAssignment(dataToSubmit);
 
       if (response.status === APIStatus.success) {
-        navigate("/teacherAssignment");
+        navigate(-1);
       } else {
         console.error("Error updating assignment:", response?.message);
       }
@@ -716,7 +716,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       </div>
 
       <div className="container-assign">
-        <div className="container-left-assign">
+        <div className="container-left-assign sticky">
           <span className="title-span">
             {assignmentInfo.isTest === 1 ? "Detail test" : "Detail exercise"}
           </span>

@@ -276,6 +276,7 @@ const PlatformAdCenterMgmt = () => {
                           overflow: "hidden",
                           textOverflow: "ellipsis",
                         }}
+                        title={center.description}
                       >
                         {center.description}
                       </td>

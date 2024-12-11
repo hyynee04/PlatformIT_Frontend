@@ -40,7 +40,7 @@ const CourseDetailTeacher = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const idRole = +localStorage.getItem("idUser");
+  const idRole = +localStorage.getItem("idRole");
   const [loading, setLoading] = useState();
 
   const [notificationContent, setNotificationContent] = useState("");
@@ -321,7 +321,7 @@ const CourseDetailTeacher = (props) => {
                                 courseInfo.idTeacher === idRole ? "" : "nohover"
                               }`}
                               onClick={() => {
-                                if (courseInfo.idTeacher === idRole)
+                                if (courseInfo.idTeacher === idUser)
                                   navigate("/viewLecture", {
                                     state: {
                                       idCourse: courseInfo.idCourse,
@@ -447,8 +447,10 @@ const CourseDetailTeacher = (props) => {
                       key={index}
                       className="qualification test"
                       onClick={(e) => {
+                        console.log(idRole);
                         e.stopPropagation();
                         if (idRole === Role.teacher) {
+                          console.log("onClick1");
                           if (test.isPublish === 1) {
                             navigate("/teacherAssignDetail", {
                               state: {
@@ -463,6 +465,7 @@ const CourseDetailTeacher = (props) => {
                             });
                           }
                         } else if (idRole === Role.student) {
+                          console.log("onClick2");
                           navigate("/studentAssignDetail", {
                             state: { idAssignment: test.idAssignment },
                           });

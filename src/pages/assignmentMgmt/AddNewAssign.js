@@ -485,7 +485,10 @@ const AddNewAssign = () => {
           </div>
         </div>
 
-        <div className="action-btns-form">
+        <div
+          className="action-btns-form"
+          style={{ backgroundColor: "transparent" }}
+        >
           <div className="container-button">
             <button
               className="btn save"

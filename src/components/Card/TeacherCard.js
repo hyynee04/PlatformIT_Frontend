@@ -18,6 +18,7 @@ const TeacherCard = (props) => {
           },
         });
       }}
+      style={{ cursor: "pointer" }}
     >
       <div className="teacher-card-container">
         <img

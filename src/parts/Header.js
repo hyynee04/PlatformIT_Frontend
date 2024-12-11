@@ -18,10 +18,14 @@ import "../assets/css/Header.css";
 import DiagSignOutForm from "../components/diag/DiagSignOutForm";
 import Notification from "../components/Notification";
 import FetchDataUpdated from "../functions/FetchDataUpdated";
-import { calculateRelativeTime, parseRelativeTime } from "../functions/function";
+import {
+  calculateRelativeTime,
+  parseRelativeTime,
+} from "../functions/function";
 import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
+import { countTaskOfCenterAd } from "../store/listTaskOfCenterAd";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -63,19 +67,21 @@ const Header = () => {
   }, [idRole, currentPath, navigate]);
 
   const fetchUserNotification = async (idUser) => {
-    let response = await getAllNotificationOfUser(idUser)
+    let response = await getAllNotificationOfUser(idUser);
     if (response.status === APIStatus.success) {
       const processedData = response.data.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
       }));
-      let unread = processedData.filter((notification) => notification.isRead === 0).length;
-      setUnreadCount(unread > 99 ? "99+" : unread)
+      let unread = processedData.filter(
+        (notification) => notification.isRead === 0
+      ).length;
+      setUnreadCount(unread > 99 ? "99+" : unread);
       setNotifications(processedData);
     } else {
-      console.log(response.data)
+      console.log(response.data);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchAvatar = async () => {
@@ -103,7 +109,8 @@ const Header = () => {
   }, [dispatch, idUser]);
 
   useEffect(() => {
-    if (Array.isArray(updatedNotifications)) { // Ensure it's a valid array
+    if (Array.isArray(updatedNotifications)) {
+      // Ensure it's a valid array
       const processedData = updatedNotifications.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
@@ -111,9 +118,21 @@ const Header = () => {
       setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
       setNotifications(processedData);
     } else {
-      console.warn('updatedNotifications is not an array or is undefined:', updatedNotifications);
+      console.warn(
+        "updatedNotifications is not an array or is undefined:",
+        updatedNotifications
+      );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+  useEffect(() => {
+    dispatch(countTaskOfCenterAd("qualification"));
+  }, [dispatch]);
+
+  // useEffect(() => {
+  //   if (taskOfCenterAd) {
+  //     setListTask(taskOfCenterAd);
+  //   }
+  // }, [taskOfCenterAd]);
 
   const navLinks = {
     [Role.platformAdmin]: [
@@ -136,7 +155,7 @@ const Header = () => {
     [Role.student]: [
       { title: "Home", path: "/studentHome" },
       { title: "My Course", path: "/studentCourse" },
-      { title: "Assignment", path: "/studentAssignment" },
+      { title: "My Test", path: "/studentTest" },
     ],
     default: [
       { title: "Home", path: "/" },
@@ -192,89 +211,99 @@ const Header = () => {
           </NavLink>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">{renderNavLinksByRole()}</Nav>
-            <div className="auth-buttons">
-              {!idRole ? (
-                <>
+
+            {!idRole ? (
+              <div className="auth-buttons">
+                <button
+                  className="buts sign-in"
+                  onClick={() => navigate("/login")}
+                >
+                  Sign in
+                </button>
+                <button
+                  className="buts register"
+                  onClick={() => navigate("/register")}
+                >
+                  Register
+                </button>
+              </div>
+            ) : isPendingCenter ? (
+              <div className="auth-buttons">
+                <button
+                  className="circle-buts"
+                  onClick={() => openSignoutModal()}
+                >
+                  <LuLogOut className="header-icon" />
+                </button>
+              </div>
+            ) : (
+              <div className="auth-buttons">
+                {(idRole === Role.student || idRole === Role.teacher) && (
                   <button
-                    className="buts sign-in"
-                    onClick={() => navigate("/login")}
+                    className={`circle-buts ${
+                      activeButton === "message" ? "clicked" : ""
+                    }`}
+                    onClick={() => handleButtonClick("message")}
                   >
-                    Sign in
+                    <LuMessageCircle className="header-icon" />
                   </button>
-                  <button
-                    className="buts register"
-                    onClick={() => navigate("/register")}
-                  >
-                    Register
-                  </button>
-                </>
-              ) : isPendingCenter ? (
-                <>
-                  <button
-                    className="circle-buts"
-                    onClick={() => openSignoutModal()}
-                  >
-                    <LuLogOut className="header-icon" />
-                  </button>
-                </>
-              ) : (
-                <>
-                  {(idRole === Role.student || idRole === Role.teacher) && (
+                )}
+                {idRole === Role.centerAdmin && (
+                  <>
                     <button
-                      className={`circle-buts ${activeButton === "message" ? "clicked" : ""
-                        }`}
-                      onClick={() => handleButtonClick("message")}
-                    >
-                      <LuMessageCircle className="header-icon" />
-                    </button>
-                  )}
-                  {idRole === Role.centerAdmin && (
-                    <button
-                      className={`circle-buts ${location.pathname === buttonPaths["clipboard"]
-                        ? "clicked"
-                        : ""
-                        }`}
+                      className={`circle-buts ${
+                        location.pathname === buttonPaths["clipboard"]
+                          ? "clicked"
+                          : ""
+                      }`}
                       onClick={() => handleButtonClick("clipboard")}
                     >
                       <LuClipboardCheck className="header-icon" />
                     </button>
-                  )}
-                  <button
-                    ref={notiButtonRef}
-                    disabled={location.pathname === buttonPaths["bell"]}
-                    className={`circle-buts ${location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                      }`}
-                    onClick={() => {
-                      setIsNotificationOpen(!isNotificationOpen);
-                    }}
-                  >
-                    <LuBell className="header-icon" />
-                  </button>
-                  {unreadCount ? (<div className='number-unseen'>{unreadCount}</div>) : null}
-                  <Notification
-                    idUser={idUser}
-                    isOpen={isNotificationOpen}
-                    onClose={() => setIsNotificationOpen(false)}
-                    notiButtonRef={notiButtonRef}
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    fetchUserNotification={() => fetchUserNotification(idUser)}
+                    {unreadCount ? (
+                      <div className="number-unseen">{unreadCount}</div>
+                    ) : null}
+                  </>
+                )}
+                <button
+                  ref={notiButtonRef}
+                  disabled={location.pathname === buttonPaths["bell"]}
+                  className={`circle-buts ${
+                    location.pathname === buttonPaths["bell"] ? "clicked" : ""
+                  }`}
+                  onClick={() => {
+                    setIsNotificationOpen(!isNotificationOpen);
+                  }}
+                >
+                  <LuBell className="header-icon" />
+                </button>
+                {unreadCount ? (
+                  <div className="number-unseen">{unreadCount}</div>
+                ) : null}
+                <Notification
+                  idUser={idUser}
+                  isOpen={isNotificationOpen}
+                  onClose={() => setIsNotificationOpen(false)}
+                  notiButtonRef={notiButtonRef}
+                  notifications={notifications}
+                  unreadCount={unreadCount}
+                  fetchUserNotification={() => fetchUserNotification(idUser)}
+                />
+                <button
+                  ref={optionButtonRef}
+                  className={`circle-buts ${
+                    isAvatarPage || showOptionAva ? "clicked" : ""
+                  }`}
+                  onClick={() => handleButtonClick("avatar")}
+                >
+                  <img
+                    src={avaImg || default_ava}
+                    alt=""
+                    className="header-avatar"
                   />
-                  <button
-                    ref={optionButtonRef}
-                    className={`circle-buts ${isAvatarPage || showOptionAva ? "clicked" : ""
-                      }`}
-                    onClick={() => handleButtonClick("avatar")}
-                  >
-                    <img
-                      src={avaImg || default_ava}
-                      alt=""
-                      className="header-avatar"
-                    />
-                  </button>
-                </>
-              )}
-            </div>
+                </button>
+              </div>
+            )}
             <HeaderAvatarOption
               optionButtonRef={optionButtonRef}
               isOpen={showOptionAva}

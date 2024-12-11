@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "react-bootstrap/Modal";
 
 import { FaGooglePlusG } from "react-icons/fa";
-import {
-  LuEye,
-  LuEyeOff,
-  LuLock,
-  LuMail,
-  LuUser
-} from "react-icons/lu";
+import { LuEye, LuEyeOff, LuLock, LuMail, LuUser } from "react-icons/lu";
 import { TbBrandGithubFilled } from "react-icons/tb";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../assets/css/Login.css";
@@ -16,10 +10,13 @@ import DiagLoginMessageForm from "../components/diag/DiagLoginMessageForm";
 import { APIStatus, Role, UserStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
+import { ImSpinner2 } from "react-icons/im";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -33,8 +30,8 @@ const Login = () => {
   const [showAlert, setShowAlert] = useState(false);
   const closeLoginNotification = () => {
     setShowAlert(false);
-    navigate('/login');
-  }
+    navigate("/login");
+  };
 
   const [message, setMessage] = useState("");
 
@@ -72,74 +69,88 @@ const Login = () => {
   };
 
   const handleAutoLogin = async (idUser, idRole) => {
-    // Step 2: Simulate a login action based on the received idUser and idRole
-    localStorage.setItem("idRole", idRole);
-    localStorage.setItem("idUser", idUser);
-    //console.log(localStorage.getItem("idRole"))
-    // Navigate to the appropriate page based on role
-    let roleBasesPath = "/";
-    switch (parseInt(idRole)) {
-      case Role.platformAdmin:
-        roleBasesPath = "/platformAdDashboard";
-        break;
-      case Role.centerAdmin:
-        roleBasesPath = "/centerAdDashboard";
-        break;
-      case Role.teacher:
-        roleBasesPath = "/teacherHome";
-        break;
-      case Role.student:
-        roleBasesPath = "/studentHome";
-        break;
-      default:
-        break;
+    setLoading(true);
+    try {
+      // Step 2: Simulate a login action based on the received idUser and idRole
+      localStorage.setItem("idRole", idRole);
+      localStorage.setItem("idUser", idUser);
+      //console.log(localStorage.getItem("idRole"))
+      // Navigate to the appropriate page based on role
+      let roleBasesPath = "/";
+      switch (parseInt(idRole)) {
+        case Role.platformAdmin:
+          roleBasesPath = "/platformAdDashboard";
+          break;
+        case Role.centerAdmin:
+          roleBasesPath = "/centerAdDashboard";
+          break;
+        case Role.teacher:
+          roleBasesPath = "/teacherHome";
+          break;
+        case Role.student:
+          roleBasesPath = "/studentHome";
+          break;
+        default:
+          break;
+      }
+      navigate(roleBasesPath, {
+        state: { idUser: idUser, idRole: idRole },
+      });
+    } catch (error) {
+      console.error("Login failed: ", error);
+    } finally {
+      setLoading(false);
     }
-    navigate(roleBasesPath, {
-      state: { idUser: idUser, idRole: idRole },
-    });
   };
 
-  const handleLogin = async () => {
-    let response = await postLogin(username, password);
-    let data = response.data;
-    if (data && data.idUser) {
-      if (data.status === UserStatus.active) {
-        localStorage.setItem("idRole", data.idRole);
-        localStorage.setItem("idUser", data.idUser);
-        localStorage.setItem("idAccount", data.idAccount);
-        let roleBasesPath = "/";
-        switch (data.idRole) {
-          case Role.platformAdmin:
-            roleBasesPath = "/platformAdDashboard";
-            break;
-          case Role.centerAdmin:
-            localStorage.setItem("idCenter", data.idCenter);
-            roleBasesPath = "/centerAdDashboard";
-            break;
-          case Role.teacher:
-            localStorage.setItem("idCenter", data.idCenter);
-            roleBasesPath = "/teacherHome";
-            break;
-          case Role.student:
-            roleBasesPath = "/studentHome";
-            break;
-          default:
-            break;
+  const handleLogin = async (username, password) => {
+    setLoading(true);
+    try {
+      let response = await postLogin(username, password);
+      let data = response.data;
+      if (data && data.idUser) {
+        if (data.status === UserStatus.active) {
+          localStorage.setItem("idRole", data.idRole);
+          localStorage.setItem("idUser", data.idUser);
+          localStorage.setItem("idAccount", data.idAccount);
+          let roleBasesPath = "/";
+          switch (data.idRole) {
+            case Role.platformAdmin:
+              roleBasesPath = "/platformAdDashboard";
+              break;
+            case Role.centerAdmin:
+              localStorage.setItem("idCenter", data.idCenter);
+              roleBasesPath = "/centerAdDashboard";
+              break;
+            case Role.teacher:
+              localStorage.setItem("idCenter", data.idCenter);
+              roleBasesPath = "/teacherHome";
+              break;
+            case Role.student:
+              roleBasesPath = "/studentHome";
+              break;
+            default:
+              break;
+          }
+          navigate(roleBasesPath, {
+            state: { idUser: data.idUser, idRole: data.idRole },
+          });
+        } else if (
+          data.status === UserStatus.pending &&
+          data.idRole === Role.centerAdmin
+        ) {
+          localStorage.setItem("idUser", data.idUser);
+          localStorage.setItem("idRole", data.idRole);
+          localStorage.setItem("isPendingCenter", data.status);
+          navigate("/pendingCenter");
         }
-        navigate(roleBasesPath, {
-          state: { idUser: data.idUser, idRole: data.idRole },
-        });
-      } else if (
-        data.status === UserStatus.pending &&
-        data.idRole === Role.centerAdmin
-      ) {
-        localStorage.setItem("idUser", data.idUser);
-        localStorage.setItem("idRole", data.idRole);
-        localStorage.setItem("isPendingCenter", data.status);
-        navigate("/pendingCenter");
+      } else {
+        setIsFailed(true);
       }
-    } else {
-      setIsFailed(true);
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -166,16 +177,36 @@ const Login = () => {
   const handleLoginThirdParty = async (base) => {
     if (base === "Google")
       window.location.href = "http://localhost:5000/api/Authen/login-google";
-    // else if (base === "Facebook")
-    //   window.location.href = "http://localhost:5000/api/Authen/login-facebook";
     else window.location.href = "http://localhost:5000/api/Authen/login-github";
-
-    // window.open("http://localhost:5000/api/Authen/login-google")
   };
+
+  const usernameRef = useRef(username);
+  const passwordRef = useRef(password);
+
+  useEffect(() => {
+    usernameRef.current = username;
+    passwordRef.current = password;
+  }, [username, password]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter") {
+        handleLogin(usernameRef.current, passwordRef.current); // Access refs instead of state
+      }
+    };
+
+    // Add the event listener for keydown
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <>
-      <div className={`login-container ${isVisible ? "slide-in" : ""}`}>
+      <div className={`login-container ${isVisible ? "slide-to-left" : ""}`}>
         <div className="sidepart-container">
           <div className="sidepart-header">
             <div className="header">
@@ -264,10 +295,10 @@ const Login = () => {
             <div className="mainpart-content">
               <button
                 className="signin-button"
-                onClick={() => handleLogin()}
+                onClick={() => handleLogin(username, password)}
                 disabled={isFailed}
               >
-                Sign in
+                {loading && <ImSpinner2 className="icon-spin" />} Sign in
               </button>
             </div>
             <div className="mainpart-content">
@@ -279,10 +310,6 @@ const Login = () => {
             </div>
             <div className="mainpart-content">
               <div className="sep">
-                {/* <RiFacebookFill
-                  color="#1E1E1E"
-                  onClick={() => handleLoginThirdParty("Facebook")}
-                /> */}
                 <FaGooglePlusG
                   color="#1E1E1E"
                   onClick={() => handleLoginThirdParty("Google")}

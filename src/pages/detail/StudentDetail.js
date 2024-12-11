@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import { BsGenderTrans } from "react-icons/bs";
 import { IoMdOpen } from "react-icons/io";
 import { LiaBirthdayCakeSolid } from "react-icons/lia";
@@ -9,114 +9,217 @@ import { RiChat3Line } from "react-icons/ri";
 import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
 import Carousel from "../../components/Carousel";
-import { getAllCourseCards } from "../../services/courseService";
+import { getAllCourseCardsByIdStudent } from "../../services/courseService";
+import { APIStatus, Object, Role } from "../../constants/constants";
+import { getPI, getStudentDetail } from "../../services/userService";
+import { ImSpinner2 } from "react-icons/im";
+import { useLocation, useNavigate } from "react-router-dom";
+import { formatDate } from "../../functions/function";
 
 const StudentDetail = (props) => {
-    const [listCourse, setListCourse] = useState([])
-    const [totalCourseTracks, setTotalCourseTracks] = useState(0)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [studentInfo, setStudentInfo] = useState({});
 
-    const getCourseCards = async () => {
-        let courses = await getAllCourseCards();
-        //courses.sort((a, b) => new Date(b.courseStartDate) - new Date(a.courseStartDate));
-        if (courses.length > 12) {
-            setTotalCourseTracks(3);
+  const idRole = +localStorage.getItem("idRole");
+  const [courseTitle, setCourseTitle] = useState("");
+
+  const fetchStudentDetail = async (idStudent, idCourse) => {
+    setLoading(true);
+    try {
+      let response = await getStudentDetail(idStudent, idCourse);
+      if (response.status === APIStatus.success) {
+        setStudentInfo(response.data);
+      } else {
+        console.warn("Error fetching data: ", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStudentPI = async (idStudent) => {
+    setLoading(true);
+    try {
+      let response = await getPI(idStudent);
+      if (response.status === APIStatus.success) {
+        let courselist = await getAllCourseCardsByIdStudent(idStudent);
+        if (courselist.status === APIStatus.success) {
+          setStudentInfo({ ...response.data, courses: courselist.data });
+        } else {
+          console.warn("Error fetching data: ", courselist.data);
         }
-        else
-            setTotalCourseTracks(Math.ceil(courses.length / 4))
-        setListCourse(courses)
-    };
+      } else {
+        console.warn("Error fetching data: ", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-        getCourseCards();
-    }, []);
+  useEffect(() => {
+    const state = location.state;
+
+    if (state && state.idCourse && state.idStudent && state.courseTitle) {
+      setCourseTitle(state.courseTitle);
+      fetchStudentDetail(state.idStudent, state.idCourse);
+    } else if (state && state.idStudent) {
+      fetchStudentPI(state.idStudent);
+    }
+  }, [location.state]);
+
+  console.log("Data: ", studentInfo);
+
+  if (loading) {
     return (
-        <div className="detail-container">
-            <div className="left-container">
-                <div className="block-container">
-                    <img className="biography-ava teacher" src={default_ava} />
-                    <div className="biography-block">
-                        <span className="biography-name">Jang Jae Young</span>
-                    </div>
-                </div>
-
-                <div className="block-container">
-                    <span className="block-container-title">Information</span>
-                    <div className="block-container-col">
-                        <div className="info-line">
-                            <LuMail />
-                            <span>JJY_sematic_error@gmail.com</span>
-                        </div>
-                        <div className="info-line">
-                            <LuPhone />
-                            <span>0987 645 463</span>
-                        </div>
-                        <div className="info-line">
-                            <BsGenderTrans />
-                            <span>Other</span>
-                        </div>
-                        <div className="info-line">
-                            <LiaBirthdayCakeSolid />
-                            <span>10/04/1993</span>
-                        </div>
-                        <div className="info-line">
-                            <LuGlobe2 />
-                            <span>Korea</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button className="contact-block">
-                    Contact <RiChat3Line />
-                </button>
-            </div>
-
-            <div className="right-container">
-                <div className="block-container">
-                    <span className="block-container-title">Name Course</span>
-                    <div className="block-container-row">
-                        <div className='progress-section'>
-                            <div className='progress-container'>
-                                <CircularProgressbar
-                                    strokeWidth={12}
-                                    value={53}
-                                    text="8/15"
-                                />
-                            </div>
-
-                            <label>Lecture</label>
-                        </div>
-
-                        <div className='progress-section'>
-                            <div className='progress-container'>
-                                <CircularProgressbar
-                                    strokeWidth={12}
-                                    value={57}
-                                    text="4/7"
-                                />
-                            </div>
-                            <label>Assignment</label>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div className="block-container">
-                    <div className="carousel-block">
-                        <div className='carousel-header'>
-                            <span>Courses</span>
-                            <button>View more <IoMdOpen /></button>
-                        </div>
-                        <Carousel
-                            object={1} //course
-                            totalTracks={totalCourseTracks}
-                            itemsPerTrack={2}
-                            listInfo={listCourse}
-                        />
-                    </div>
-                </div>
-            </div>
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
+  return (
+    <div className="detail-container">
+      <div className="left-container slide-to-right">
+        <div className="block-container">
+          <img
+            className="biography-ava teacher"
+            src={studentInfo.avatarPath || studentInfo.avatar || default_ava}
+            alt="avatar"
+          />
+          <div className="biography-block">
+            <span className="biography-name">
+              {studentInfo.fullName || " "}
+            </span>
+          </div>
         </div>
-    )
-}
+
+        <div className="block-container">
+          {/* <span className="block-container-title">Information</span> */}
+          <div className="block-container-col">
+            <div className="info-line">
+              <LuMail />
+              <span>{studentInfo.email || "(Email)"}</span>
+            </div>
+            <div className="info-line">
+              <LuPhone />
+              <span>
+                {studentInfo.phoneNumber?.replace(
+                  /(\d{4})(\d{3})(\d{3})/,
+                  "$1 $2 $3"
+                ) || "(Phone number)"}
+              </span>
+            </div>
+            <div className="info-line">
+              <BsGenderTrans />
+              <span>{studentInfo.gender || "(Gender)"}</span>
+            </div>
+            <div className="info-line">
+              <LiaBirthdayCakeSolid />
+              <span>
+                {studentInfo.dob ? formatDate(studentInfo.dob) : "(Birthday)"}
+              </span>
+            </div>
+            <div className="info-line">
+              <LuGlobe2 />
+              <span>{studentInfo.nationality || "(Nationality)"}</span>
+            </div>
+          </div>
+        </div>
+
+        {idRole === Role.teacher ? (
+          <button className="contact-block">
+            Contact <RiChat3Line />
+          </button>
+        ) : null}
+      </div>
+
+      <div className="right-container slide-to-left">
+        {idRole === Role.teacher ? (
+          <div className="block-container">
+            <span className="block-container-title">{courseTitle}</span>
+            <div className="block-container-row">
+              <div className="progress-section">
+                <div className="progress-container">
+                  <CircularProgressbar
+                    strokeWidth={12}
+                    value={`${
+                      studentInfo.exerciseTotal + studentInfo.testTotal > 0
+                        ? ((studentInfo.exerciseProgress +
+                            studentInfo.testProgress) /
+                            (studentInfo.exerciseTotal +
+                              studentInfo.testTotal)) *
+                          100
+                        : 0
+                    }`}
+                    text={`${
+                      studentInfo.exerciseProgress + studentInfo.testProgress
+                    } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
+                  />
+                </div>
+
+                <label>Lecture</label>
+              </div>
+
+              <div className="progress-section">
+                <div className="progress-container">
+                  <CircularProgressbar
+                    strokeWidth={12}
+                    value={`${
+                      studentInfo.lectureTotal > 0
+                        ? (studentInfo.lectureProgress /
+                            studentInfo.lectureTotal) *
+                          100
+                        : 0
+                    }`}
+                    text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
+                  />
+                </div>
+                <label>Assignment</label>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="block-container" style={{ height: "29.2rem" }}>
+          <div className="carousel-block">
+            <div className="carousel-header">
+              <span>Courses</span>
+              <button
+                disabled={studentInfo.courses?.length < 1}
+                onClick={() =>
+                  navigate("/viewAll", {
+                    state: {
+                      object: Object.course,
+                      listContent: studentInfo.courses,
+                    },
+                  })
+                }
+              >
+                View more <IoMdOpen />
+              </button>
+            </div>
+            {studentInfo.courses?.length > 0 && (
+              <Carousel
+                object={1} //course
+                totalTracks={
+                  studentInfo.courses.length > 6
+                    ? 6
+                    : Math.floor(studentInfo.courses?.length / 2)
+                }
+                itemsPerTrack={2}
+                listInfo={studentInfo.courses}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default StudentDetail;

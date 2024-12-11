@@ -22,7 +22,7 @@ const DiagCreateSuccessfully = ({ isOpen, onClose, notification, clearData }) =>
                     <span>{notification}</span>
                     <div className="str-btns">
                         <div className="act-btns">
-                            <button className="btn diag-btn cancle"
+                            <button className="btn diag-btn cancel"
                                 onClick={() => {
                                     onClose();
                                     navigate(-1);

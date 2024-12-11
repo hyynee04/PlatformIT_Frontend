@@ -4,7 +4,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/Detail.css";
 
-import { FaDollarSign, FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
@@ -15,21 +15,34 @@ import {
   LuPlus,
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
+import { TbCurrencyDong } from "react-icons/tb";
 
 import StarRatings from "react-star-ratings";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 
+import { FiCheckSquare } from "react-icons/fi";
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, Role } from "../../constants/constants";
-import { formatDate } from "../../functions/function";
+import {
+  calculateRelativeTime,
+  formatDate,
+  formatDateTime,
+  getPagination,
+  isPastDateTime,
+  parseRelativeTime,
+} from "../../functions/function";
 import {
   getCourseDetail,
+  getCourseProgressByIdStudent,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
+import { IoReloadOutline } from "react-icons/io5";
+import { ConsoleLogger } from "@microsoft/signalr/dist/esm/Utils";
+import { getTestOfCourseStudent } from "../../services/assignmentService";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -37,13 +50,12 @@ const CourseDetail = (props) => {
 
   const [loading, setLoading] = useState(false);
 
-  // console.log(">> Course Detail:", addSection);
-
-  const [idRole, setIDRole] = useState(0);
-  const [idUser, setIDUser] = useState("");
+  const idRole = +localStorage.getItem("idRole");
+  const idUser = +localStorage.getItem("idUser");
   const [courseInfo, setCourseInfo] = useState({});
-  const [listTestCards, setListTestCards] = useState([]);
   const [notificationBoard, setNotificationBoard] = useState([]);
+  const [studentProgress, setStudentProgress] = useState({});
+  const [index, setIndex] = useState(null);
 
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [showedSections, setShowedSections] = useState({});
@@ -53,24 +65,27 @@ const CourseDetail = (props) => {
       [index]: !prev[index], // Toggle the current section's visibility
     }));
   };
-  const fetchCourseDetail = async (idCourse) => {
+  const fetchCourseDetail = async (idCourse, idRole, idUser) => {
     setLoading(true);
     try {
       let response = await getCourseDetail(idCourse);
       setCourseInfo(response.data);
 
-      // Get Notification Board
-      let notifications = await getNotificationBoardOfCourse(idCourse);
-      const processedData = notifications.data.map((notification) => ({
-        ...notification,
-        timestamp: parseRelativeTime(notification.relativeTime),
-      }));
-      setNotificationBoard(processedData);
+      if (idRole === Role.student || idRole === Role.teacher) {
+        // Get Notification Board
+        let notifications = await getNotificationBoardOfCourse(idCourse);
+        if (notifications.status === APIStatus) {
+          const processedData = notifications.data.map((notification) => ({
+            ...notification,
+            timestamp: parseRelativeTime(notification.relativeTime),
+          }));
+          setNotificationBoard(processedData);
+        } else {
+          console.warn("Error fetching data: ", notifications.data);
+        }
+      }
 
       const responseIsEnroll = await getIsEnRolledCourse(idCourse);
-      // if (idRole === Role.teacher) {
-
-      // }
       if (responseIsEnroll.data === true) {
         setIsEnrolledCourse(true);
       } else {
@@ -83,39 +98,46 @@ const CourseDetail = (props) => {
     }
   };
 
-  // Helper to calculate relative time
-  const calculateRelativeTime = (timestamp) => {
-    const now = new Date();
-    const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
+  const fetchCourseProgress = async (idCourse, idStudent) => {
+    let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
+    if (progress.status === APIStatus.success) {
+      console.log("Response data: ", progress.data);
 
-    if (difference < 60) return `${difference} seconds ago`;
-    if (difference < 3600) return `${Math.floor(difference / 60)} minutes ago`;
-    if (difference < 86400) return `${Math.floor(difference / 3600)} hours ago`;
-    return `${Math.floor(difference / 86400)} days ago`;
-  };
-
-  // Helper to parse "relativeTime" into a timestamp
-  const parseRelativeTime = (relativeTime) => {
-    const now = new Date();
-    const parts = relativeTime.split(" ");
-
-    if (parts.includes("seconds")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 1000);
-    } else if (parts.includes("minutes")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 60 * 1000);
-    } else if (parts.includes("hours")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 3600 * 1000);
-    } else if (parts.includes("days")) {
-      return new Date(now.getTime() - parseInt(parts[0], 10) * 86400 * 1000);
+      setStudentProgress(progress.data);
+    } else {
+      console.warn(progress.data);
     }
-    return now; // Default to current time if unrecognized format
   };
+
+  const fetchTestOfCourseStudent = async (idCourse, idUser) => {
+    let response = await getTestOfCourseStudent(idCourse, idUser);
+    if (response.status === APIStatus.success) {
+      setCourseInfo((prev) => ({
+        ...prev,
+        tests: [
+          ...response.data.map((test) => {
+            return {
+              ...test,
+              isPublish: true,
+            };
+          }),
+        ],
+      }));
+    } else console.warn(response.data);
+  };
+
+  useEffect(() => {
+    if (isEnrolledCourse) {
+      fetchCourseProgress(courseInfo.idCourse, idUser);
+      fetchTestOfCourseStudent(courseInfo.idCourse, idUser);
+    }
+  }, [isEnrolledCourse]);
 
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
     ? courseInfo.sectionsWithCourses.reduce((total, section) => {
-      return total + (section.lectures ? section.lectures.length : 0);
-    }, 0)
+        return total + (section.lectures ? section.lectures.length : 0);
+      }, 0)
     : 0;
 
   const getCourseStatus = (course) => {
@@ -144,9 +166,13 @@ const CourseDetail = (props) => {
     window.scrollTo(0, 0);
     const state = location.state;
     if (state) {
-      setIDUser(parseInt(state.idUser));
-      setIDRole(parseInt(state.idRole));
-      fetchCourseDetail(state.idCourse);
+      // setIDUser(parseInt(state.idUser));
+      // setIDRole(parseInt(state.idRole));
+      fetchCourseDetail(
+        state.idCourse,
+        parseInt(state.idRole),
+        parseInt(state.idUser)
+      );
     }
     const interval = setInterval(() => {
       setNotificationBoard((prevNotifications) =>
@@ -160,69 +186,18 @@ const CourseDetail = (props) => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      // Remove the item if the user refreshes or leaves the page
-      if (location.pathname === "/courseDetail") {
-        localStorage.removeItem("menuIndex");
-      }
-    };
-    // Handle refresh scenarios
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => {
-      // Handle navigation away from the page
-      if (location.pathname !== "/courseDetail") {
-        localStorage.removeItem("menuIndex");
-      }
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [location.pathname]); // Re-run when the path changes
-
   const reviews = courseInfo?.rateModels || [];
 
   const [currentPage, setCurrentPage] = useState(1);
-  const reviewsPerPage = 5;
+  const reviewsPerPage = 3;
   // Calculate total pages
   const totalPages = Math.ceil(reviews.length / reviewsPerPage);
   // Get reviews for the current page
   const startIndex = (currentPage - 1) * reviewsPerPage;
   const currentReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
   // Generate pagination display numbers
-  const getPagination = () => {
-    if (totalPages <= 5) {
-      // Show all pages if there are 5 or fewer
-      return Array.from({ length: totalPages }, (_, index) => index + 1);
-    } else {
-      // Logic for more than 5 pages
-      if (currentPage <= 3) {
-        // Show first few pages if current page is near the start
-        return [1, 2, 3, 4, "...", totalPages];
-      } else if (currentPage >= totalPages - 2) {
-        // Show last few pages if current page is near the end
-        return [
-          1,
-          "...",
-          totalPages - 3,
-          totalPages - 2,
-          totalPages - 1,
-          totalPages,
-        ];
-      } else {
-        // Show current page in the middle with surrounding pages
-        return [
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages,
-        ];
-      }
-    }
-  };
 
-  const paginationNumbers = getPagination();
+  const paginationNumbers = getPagination(currentPage, totalPages);
 
   //REGIST COURSE
   const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
@@ -237,6 +212,7 @@ const CourseDetail = (props) => {
       const response = await postEnrollCourse(courseInfo.idCourse);
       if (response.status === APIStatus.success) {
         openSuccessModal();
+        // fetchCourseDetail(courseInfo.idCourse, idRole);
         setIsEnrolledCourse(true);
       }
       //   openSuccessModal();
@@ -245,7 +221,8 @@ const CourseDetail = (props) => {
     }
   };
 
-  console.log(idRole);
+  console.log(studentProgress);
+
   if (loading) {
     return (
       <div className="loading-page">
@@ -255,7 +232,7 @@ const CourseDetail = (props) => {
   }
   return (
     <div className="detail-container">
-      <div className="left-container">
+      <div className="left-container slide-to-right">
         <div className="block-container">
           <img
             className="biography-ava center"
@@ -267,11 +244,28 @@ const CourseDetail = (props) => {
               {courseInfo.courseTitle}
             </span>
             <div className="course-card-price">
-              <FaDollarSign color="#003B57" />
               <span className="discount-price">
-                {courseInfo.price || "Free"}
+                {courseInfo.discountedPrice
+                  ? `${courseInfo.discountedPrice
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : courseInfo.price
+                  ? `${courseInfo.price
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                  : "Free"}
+                {courseInfo.price && <TbCurrencyDong />}
               </span>
-              {/* <span className='initial-price'>300</span> */}
+              {courseInfo.discountedPrice && (
+                <span className="initial-price">
+                  {courseInfo.price
+                    ? `${courseInfo.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                    : "Free"}
+                  {courseInfo.price && <TbCurrencyDong />}
+                </span>
+              )}
             </div>
             {courseInfo.tags && courseInfo.tags.length > 0 && (
               <div className="tag-container">
@@ -304,8 +298,9 @@ const CourseDetail = (props) => {
 
               <span className="">
                 <RiGroupLine color="#757575" />
-                {`${courseInfo.studentCount} ${courseInfo.studentCount > 1 ? "students" : "student"
-                  }`}
+                {`${courseInfo.studentCount} ${
+                  courseInfo.studentCount > 1 ? "students" : "student"
+                }`}
               </span>
               <span>{courseInfo.introduction}</span>
             </div>
@@ -387,31 +382,32 @@ const CourseDetail = (props) => {
                 </span>
                 <span className="number-course">
                   <FaRegFile color="#757575" />
-                  {`${courseInfo.teacherCourseCount} ${courseInfo.teacherCourseCount > 1 ? "courses" : "course"
-                    }`}
+                  {`${courseInfo.teacherCourseCount} ${
+                    courseInfo.teacherCourseCount > 1 ? "courses" : "course"
+                  }`}
                 </span>
               </div>
             </div>
           </div>
-          {idUser && idRole === Role.student && isEnrolledCourse && (
+          {idUser && idRole === Role.student && isEnrolledCourse ? (
             <>
               <button className="chat-button">
                 Chat <RiChat3Line />
               </button>
             </>
-          )}
+          ) : null}
         </div>
 
-        {reviews && reviews.length !== 0 && (
-          <div className="block-container">
-            <div className="block-container-header">
-              <span className="block-container-title">Review</span>
-              {idUser && idRole === Role.student && isEnrolledCourse && (
-                <button className="add-review-button">
-                  <LuPlus /> Add review
-                </button>
-              )}
-            </div>
+        <div className="block-container">
+          <div className="block-container-header">
+            <span className="block-container-title">Review</span>
+            {idUser && idRole === Role.student && isEnrolledCourse && (
+              <button className="add-review-button">
+                <LuPlus /> Add review
+              </button>
+            )}
+          </div>
+          {reviews && reviews.length !== 0 && (
             <div className="block-container-col">
               {currentReviews.map((review, index) => (
                 <div key={index} className="review-content">
@@ -450,30 +446,33 @@ const CourseDetail = (props) => {
                 ))}
               </div>
             </div>
-            <div className="total-rating">
-              {courseInfo.totalRatePoint}/5
-              <StarRatings
-                rating={1}
-                starRatedColor="rgb(255, 204, 0)"
-                // changeRating={this.changeRating}
-                starDimension="1.5rem"
-                numberOfStars={1}
-                name="rating"
-              />
-            </div>
+          )}
+          <div className="total-rating">
+            {courseInfo.totalRatePoint}/5
+            <StarRatings
+              rating={1}
+              starRatedColor="rgb(255, 204, 0)"
+              // changeRating={this.changeRating}
+              starDimension="1.5rem"
+              numberOfStars={1}
+              name="rating"
+            />
           </div>
-        )}
+        </div>
       </div>
 
-      <div className="right-container">
-        {idUser && idRole === Role.teacher && courseInfo.idTeacher === idUser ? (
+      <div className="right-container slide-to-left">
+        {idUser &&
+        idRole === Role.teacher &&
+        courseInfo.idTeacher === idUser ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
             idUser={idUser}
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
             fetchCourseDetail={fetchCourseDetail}
-          />) : null}
+          />
+        ) : null}
 
         {/* Student View */}
         {idUser && idRole === Role.student && isEnrolledCourse ? (
@@ -485,8 +484,18 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
-                      value={53}
-                      text="8/15"
+                      value={`${
+                        studentProgress.lectureCount > 0
+                          ? (studentProgress.courseStudentProgress[0]
+                              .finishedLectureCount /
+                              studentProgress.LectureCount) *
+                            100
+                          : 0
+                      }`}
+                      text={`${
+                        studentProgress.courseStudentProgress?.length > 0 &&
+                        `${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`
+                      }`}
                     />
                   </div>
                 </div>
@@ -496,29 +505,41 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
-                      value={57}
-                      text="4/7"
+                      value={`${
+                        studentProgress.assignmentCount > 0
+                          ? (studentProgress.courseStudentProgress[0]
+                              .finishedAssignmentCount /
+                              studentProgress.assignmentCount) *
+                            100
+                          : 0
+                      }`}
+                      text={`${
+                        studentProgress.courseStudentProgress?.length > 0 &&
+                        `${studentProgress.courseStudentProgress[0]?.finishedAssignmentCount}/${studentProgress.assignmentCount}`
+                      }`}
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="block-container">
+            <div className="block-container student">
               <span className="block-container-title">Notification Board</span>
               <div className="block-container-col noti-size">
-                <div className="notification">
-                  <div className="notification-body">
-                    <span className="notification-title">Title</span>
-                    <span className="notification-content">
-                      Body text for whatever you’d like to say. Add main
-                      takeaway points, quotes, anecdotes, or even a very very
-                      short story.
-                    </span>
+                {notificationBoard.length > 0 &&
+                  notificationBoard.map((notification, index) => (
+                    <div key={index} className="notification">
+                      <div className="notification-body">
+                        <span className="notification-content">
+                          {notification.content}
+                        </span>
 
-                    <span className="noti-time">13.hr</span>
-                  </div>
-                </div>
+                        <span className="noti-time">
+                          {notification.relativeTime}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </>
@@ -526,32 +547,37 @@ const CourseDetail = (props) => {
 
         {idRole !== Role.teacher || idUser !== courseInfo.idTeacher ? (
           <>
-            {courseInfo.sectionsWithCourses &&
-              courseInfo.sectionsWithCourses.length > 0 && (
-                <div className="block-container">
-                  <div className="block-container-header">
-                    <span className="block-container-title">
-                      Course Content
-                    </span>
-                    <span className="block-container-sub-title">
-                      {courseInfo.sectionsWithCourses
-                        ? `${courseInfo.sectionsWithCourses.length} ${courseInfo.sectionsWithCourses.length === 1
-                          ? "section"
-                          : "sections"
-                        }`
-                        : "0 section"}{" "}
-                      -{" "}
-                      {`${numberOfLectures} ${numberOfLectures >= 1 ? "lecture" : "lectures"
-                        }`}
-                    </span>
-                  </div>
-
+            <div
+              className={`block-container ${
+                isEnrolledCourse ? "student" : "content-test"
+              }`}
+            >
+              <div className="block-container-header">
+                <span className="block-container-title">Course Content</span>
+                <span className="block-container-sub-title">
+                  {courseInfo.sectionsWithCourses
+                    ? `${courseInfo.sectionsWithCourses.length} ${
+                        courseInfo.sectionsWithCourses.length > 1
+                          ? "sections"
+                          : "section"
+                      }`
+                    : "0 section"}{" "}
+                  -{" "}
+                  {`${numberOfLectures} ${
+                    numberOfLectures >= 1 ? "lecture" : "lectures"
+                  }`}
+                </span>
+              </div>
+              {courseInfo.sectionsWithCourses &&
+                courseInfo.sectionsWithCourses.length > 0 && (
                   <div className="block-container-col">
                     {courseInfo.sectionsWithCourses.map((section, index) => (
                       <div key={index} className="lecture">
                         <div
-                          className={`lecture-header ${showedSections[index] ? "" : "change-border-radius"
-                            } `}
+                          className={`lecture-header ${
+                            showedSections[index] ? "" : "change-header"
+                          } `}
+                          onClick={() => handleIsShowed(index)}
                         >
                           <span className="section-name">
                             {section.sectionName}
@@ -559,10 +585,11 @@ const CourseDetail = (props) => {
                           <div className="section-info">
                             <span className="section-name">
                               {section.lectures
-                                ? `${section.lectures.length} ${section.lectures.length > 1
-                                  ? "lectures"
-                                  : "lecture"
-                                }`
+                                ? `${section.lectures.length} ${
+                                    section.lectures.length > 1
+                                      ? "lectures"
+                                      : "lecture"
+                                  }`
                                 : "0 lecture"}
                             </span>
                             <button
@@ -580,22 +607,39 @@ const CourseDetail = (props) => {
                         </div>
                         {section.lectures && (
                           <div
-                            className={`lecture-block ${showedSections[index]
-                              ? ""
-                              : "adjust-lecture-block"
-                              }`}
+                            className={`lecture-block ${
+                              showedSections[index]
+                                ? ""
+                                : "adjust-lecture-block"
+                            }`}
                           >
                             {section.lectures.map((lecture, index) => (
-                              <div key={index} className="lecture-content">
+                              <div
+                                key={index}
+                                className={`lecture-content ${
+                                  isEnrolledCourse ? "" : "nohover"
+                                } `}
+                                onClick={() => {
+                                  if (isEnrolledCourse)
+                                    navigate("/viewLecture", {
+                                      state: {
+                                        idCourse: courseInfo.idCourse,
+                                        idSection: section.idSection,
+                                        idLecture: lecture.idLecture,
+                                      },
+                                    });
+                                }}
+                              >
                                 <div className="lecture-name">
                                   <span className="lecture-title">
                                     {lecture.lectureTitle}
                                   </span>
                                   <span className="lecture-exercise-num">
-                                    {`${lecture.exerciseCount} ${lecture.exerciseCount > 1
-                                      ? "exercises"
-                                      : "exercise"
-                                      }`}
+                                    {`${lecture.exerciseCount} ${
+                                      lecture.exerciseCount > 1
+                                        ? "exercises"
+                                        : "exercise"
+                                    }`}
                                   </span>
                                 </div>
                                 <span className="lecture-description">
@@ -608,52 +652,97 @@ const CourseDetail = (props) => {
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+            </div>
 
-            {courseInfo.tests && courseInfo.tests.length !== 0 && (
-              <div className="block-container">
-                <span className="block-container-title">Test</span>
-                <div className="block-container-col">
-                  {courseInfo.tests.map((test, index) => (
-                    <div key={index} className="qualification test">
-                      <div className="qualification-body">
-                        <div className="test-header">
-                          <span className="test-name">
-                            {test.assignmentTitle}
-                          </span>
-                          {idUser && idRole === Role.student ? (
-                            <div className="test-info">
-                              Due: 09/15/2024, 23:59
+            {courseInfo.isLimitedTime ? (
+              <div
+                className={`block-container ${
+                  isEnrolledCourse ? "student" : "content-test"
+                }`}
+              >
+                <div className="block-container-header">
+                  <span className="block-container-title">Tests</span>
+                  <span className="block-container-sub-title">
+                    {courseInfo.tests
+                      ? `${courseInfo.tests.length} ${
+                          courseInfo.tests.length > 1 ? "tests" : "test"
+                        }`
+                      : "0 test"}{" "}
+                  </span>
+                </div>
+                {courseInfo.tests && courseInfo.tests.length > 0 && (
+                  <div className="block-container-col">
+                    {courseInfo.tests.map((test, index) => (
+                      <>
+                        {test.isPublish ? (
+                          <div key={index} className="qualification test">
+                            <div className="qualification-body">
+                              <div className="test-header">
+                                <span className="test-name">
+                                  {test.assignmentTitle}
+                                </span>
+                                {idUser &&
+                                isEnrolledCourse &&
+                                idRole === Role.student ? (
+                                  <>
+                                    {test.isSubmitted ? (
+                                      <div className="test-info submitted">
+                                        Submitted <FiCheckSquare />
+                                      </div>
+                                    ) : test.dueDate &&
+                                      isPastDateTime(test.dueDate) ? (
+                                      <div className="test-info past-due">
+                                        Past Due
+                                      </div>
+                                    ) : (
+                                      test.dueDate && (
+                                        <div className="test-info">
+                                          {test.dueDate
+                                            ? formatDateTime(test.dueDate)
+                                            : formatDateTime(
+                                                courseInfo.courseEndDate
+                                              )}
+                                        </div>
+                                      )
+                                    )}
+                                  </>
+                                ) : null}
+                              </div>
+
+                              <div className="test-description">
+                                {test.assignmentType && (
+                                  <span>
+                                    <LuFileEdit /> {test.assignmentTypeDesc}
+                                  </span>
+                                )}
+                                {test.duration > 0 && (
+                                  <span>
+                                    <LuClock /> {test.duration} mins
+                                  </span>
+                                )}
+                                {test.questionQuantity > 0 && (
+                                  <span>
+                                    <LuFileQuestion /> {test.questionQuantity}{" "}
+                                    questions
+                                  </span>
+                                )}
+                                {test.dueDate && (
+                                  <span>
+                                    <LuCalendar />
+                                    {formatDate(test.dueDate)}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          ) : // <div className="test-info">Submitted <FiCheckSquare /></div>
-                            // <div className="test-info past-due">Past Due</div>
-                            null}
-                        </div>
-
-                        <div className="test-description">
-                          <span>
-                            <LuFileEdit /> Manual
-                          </span>
-                          {test.duration && (
-                            <span>
-                              <LuClock /> {test.duration} mins
-                            </span>
-                          )}
-                          <span>
-                            <LuFileQuestion /> {test.maxScore} questions
-                          </span>
-                          <span>
-                            <LuCalendar />
-                            Due date: 11/20/2024
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                          </div>
+                        ) : null}
+                      </>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ) : null}
           </>
         ) : null}
       </div>
@@ -662,7 +751,9 @@ const CourseDetail = (props) => {
         <DiagSuccessfully
           isOpen={isModalSuccessOpen}
           onClose={closeSuccessModal}
-          notification={"Congratulations! You have successfully enrolled in the course."}
+          notification={
+            "Congratulations! You have successfully enrolled in the course."
+          }
         />
         <DiagSuccessfully
           isOpen={addedNotification}

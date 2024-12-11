@@ -240,14 +240,38 @@ const QuizQuestion = ({ questions, setQuestions, inputFileRef, isUpdate }) => {
                               }
                               name={`question_${idx}`}
                               checked={choice.isCorrect}
-                              onChange={(e) =>
-                                handleChoiceChange(
-                                  idx,
-                                  choiceIdx,
-                                  "isCorrect",
-                                  e.target.checked
-                                )
-                              }
+                              // onChange={(e) =>
+                              //   handleChoiceChange(
+                              //     idx,
+                              //     choiceIdx,
+                              //     "isCorrect",
+                              //     e.target.checked
+                              //   )
+                              // }
+                              onChange={(e) => {
+                                if (question.isMultipleAnswer) {
+                                  // Multiple Answer Mode
+                                  handleChoiceChange(
+                                    idx,
+                                    choiceIdx,
+                                    "isCorrect",
+                                    e.target.checked
+                                  );
+                                } else {
+                                  // Single Answer Mode (Radio)
+                                  const updatedItems = question.items.map(
+                                    (item, index) => ({
+                                      ...item,
+                                      isCorrect: index === choiceIdx, // Đặt lựa chọn được chọn là true, các lựa chọn khác là false
+                                    })
+                                  );
+                                  handleQuestionChange(
+                                    idx,
+                                    "items",
+                                    updatedItems
+                                  );
+                                }
+                              }}
                             />
                           </label>
                           <div className="info" style={{ flex: "1" }}>

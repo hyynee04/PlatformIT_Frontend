@@ -90,7 +90,10 @@ const DiagWorkingHourForm = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container slide-to-bottom"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="diag-header">
           <div className="container-title">
             <LuClock7 className="diag-icon" />

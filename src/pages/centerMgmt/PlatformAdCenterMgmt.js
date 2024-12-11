@@ -20,6 +20,7 @@ import {
   fetchCenters,
   setActiveStatusCenter,
 } from "../../store/listCenterSlice";
+import { getPagination } from "../../functions/function";
 
 const PlatformAdCenterMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -126,8 +127,8 @@ const PlatformAdCenterMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
 
   //pagination
@@ -182,22 +183,25 @@ const PlatformAdCenterMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.active ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.active ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.active)}
           >
             Approval
           </button>
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.pending ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.pending ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.pending)}
           >
             Pending Approval
           </button>
           <button
-            className={`role-btn ${activeStatusCenter === CenterStatus.inactive ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeStatusCenter === CenterStatus.inactive ? "active" : ""
+            }`}
             onClick={() => handleStatusCenterClick(CenterStatus.inactive)}
           >
             Inactive
@@ -259,72 +263,81 @@ const PlatformAdCenterMgmt = () => {
                 </tr>
               </thead>
               <tbody>
-                {records.map((center, index) => (
-                  <tr key={index}>
-                    <td style={{ textAlign: "center" }}>{index + 1}</td>
-                    <td>{center.centerAdminName}</td>
-                    <td>{center.centerAdminEmail}</td>
-                    <td>{center.tin}</td>
-                    <td>{center.description}</td>
-                    <td>
-                      {center.submissionDate &&
-                        (() => {
-                          const date = new Date(center.submissionDate);
-                          const day = String(date.getDate()).padStart(2, "0");
-                          const month = String(date.getMonth() + 1).padStart(
-                            2,
-                            "0"
-                          );
-                          const year = date.getFullYear();
-                          return `${month}/${day}/${year}`;
-                        })()}
-                    </td>
-                    <td
-                      className={`table-cell ${activeStatusCenter === CenterStatus.pending
-                          ? "pending"
-                          : ""
+                {records.length > 0 ? (
+                  records.map((center, index) => (
+                    <tr key={index}>
+                      <td style={{ textAlign: "center" }}>{index + 1}</td>
+                      <td>{center.centerAdminName}</td>
+                      <td>{center.centerAdminEmail}</td>
+                      <td>{center.tin}</td>
+                      <td>{center.description}</td>
+                      <td>
+                        {center.submissionDate &&
+                          (() => {
+                            const date = new Date(center.submissionDate);
+                            const day = String(date.getDate()).padStart(2, "0");
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            );
+                            const year = date.getFullYear();
+                            return `${month}/${day}/${year}`;
+                          })()}
+                      </td>
+                      <td
+                        className={`table-cell ${
+                          activeStatusCenter === CenterStatus.pending
+                            ? "pending"
+                            : ""
                         }`}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <button
-                        className="btn approve"
-                        onClick={() => {
-                          handleApproveCenter(center.idCenter);
-                          openActionModal();
-                        }}
+                        style={{ cursor: "pointer" }}
                       >
-                        Approve
-                      </button>
-                      {approvedCenterId === center.idCenter && (
-                        <DiagActionCenterForm
-                          isOpen={isModalActionOpen}
-                          onClose={closeActionModal}
-                          idCenterSelected={center.idCenter}
-                          activeStatus={activeStatusCenter}
-                          isApproveAction={true}
-                        />
-                      )}
-                      <button
-                        className="btn reject"
-                        onClick={() => {
-                          handleRejectCenter(center.idCenter);
-                          openActionModal();
-                        }}
-                      >
-                        Reject
-                      </button>
-                      {rejectedCenterId === center.idCenter && (
-                        <DiagActionCenterForm
-                          isOpen={isModalActionOpen}
-                          onClose={closeActionModal}
-                          idCenterSelected={center.idCenter}
-                          activeStatus={activeStatusCenter}
-                          isApproveAction={false}
-                        />
-                      )}
+                        <button
+                          className="btn approve"
+                          onClick={() => {
+                            handleApproveCenter(center.idCenter);
+                            openActionModal();
+                          }}
+                        >
+                          Approve
+                        </button>
+                        {approvedCenterId === center.idCenter && (
+                          <DiagActionCenterForm
+                            isOpen={isModalActionOpen}
+                            onClose={closeActionModal}
+                            idCenterSelected={center.idCenter}
+                            activeStatus={activeStatusCenter}
+                            isApproveAction={true}
+                          />
+                        )}
+                        <button
+                          className="btn reject"
+                          onClick={() => {
+                            handleRejectCenter(center.idCenter);
+                            openActionModal();
+                          }}
+                        >
+                          Reject
+                        </button>
+                        {rejectedCenterId === center.idCenter && (
+                          <DiagActionCenterForm
+                            isOpen={isModalActionOpen}
+                            onClose={closeActionModal}
+                            idCenterSelected={center.idCenter}
+                            activeStatus={activeStatusCenter}
+                            isApproveAction={false}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center" }}>
+                      "No centers are pending approval at the moment."
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           ) : (
@@ -347,8 +360,8 @@ const PlatformAdCenterMgmt = () => {
               </thead>
               <tbody>
                 {(() => {
-                  let count = 0; // Khởi tạo biến đếm bên ngoài map
-                  return records.map((center, index) => {
+                  let count = 0;
+                  const rows = records.map((center, index) => {
                     const shouldDisplay =
                       (activeStatusCenter === CenterStatus.active &&
                         center.centerStatus === CenterStatus.active) ||
@@ -356,14 +369,13 @@ const PlatformAdCenterMgmt = () => {
                         (center.centerStatus === CenterStatus.inactive ||
                           center.centerStatus === CenterStatus.locked));
                     if (shouldDisplay) {
-                      count++; // Tăng biến đếm khi hiển thị dòng
+                      count++;
                       return (
                         <React.Fragment key={index}>
                           <tr>
                             <td style={{ textAlign: "center" }}>{count}</td>
                             <td>{center.centerName}</td>
                             <td>{center.centerEmail}</td>
-                            {/* <td>{center.centerAdminName}</td> */}
                             <td>{center.centerAdminEmail}</td>
                             <td>{center.tin}</td>
                             <td>
@@ -393,15 +405,16 @@ const PlatformAdCenterMgmt = () => {
                                 {center.reason
                                   ? center.reason
                                   : center.centerStatus === CenterStatus.locked
-                                    ? "Locked"
-                                    : ""}
+                                  ? "Locked"
+                                  : ""}
                               </td>
                             )}
                             <td
-                              className={`table-cell ${center.centerStatus === CenterStatus.pending
+                              className={`table-cell ${
+                                center.centerStatus === CenterStatus.pending
                                   ? "pending"
                                   : ""
-                                }`}
+                              }`}
                               style={{ cursor: "pointer" }}
                             >
                               <LuMoreHorizontal
@@ -430,55 +443,38 @@ const PlatformAdCenterMgmt = () => {
                     }
                     return null;
                   });
+                  if (count === 0) {
+                    rows.push(
+                      <tr key="no-records">
+                        <td colSpan="7" style={{ textAlign: "center" }}>
+                          "No centers available in this status."
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return rows;
                 })()}
               </tbody>
             </table>
           )}
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

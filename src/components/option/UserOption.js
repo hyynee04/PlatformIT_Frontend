@@ -118,6 +118,18 @@ const UserOption = ({
                       idUser: localStorage.getItem("idUser"),
                     },
                   });
+                else if (roleUserSelected === Role.student)
+                  navigate("/studentDetail", {
+                    state: {
+                      idStudent: idUserSelected,
+                    },
+                  });
+                else if (roleUserSelected === Role.centerAdmin)
+                  navigate("/adminCenterDetail", {
+                    state: {
+                      idUser: idUserSelected,
+                    },
+                  });
                 setIsOptionVisible(false);
               }}
             >

@@ -47,10 +47,18 @@ export const AssignmentStatus = {
   publish: 1,
   unpublish: 0,
   pastDue: 2,
+  upComing: 3,
+  completed: 4,
 };
 export const AssignmentItemStatus = {
   active: 1,
   inactive: 0,
+};
+export const AssignmentResultStatus = {
+  inactive: 0,
+  onTime: 1,
+  late: 2,
+  submitted: 3,
 };
 export const NotificationType = {
   qualification: 1,

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
   LuChevronDown,
-  LuChevronLeft,
-  LuChevronRight,
   LuFilter,
   LuMoreHorizontal,
   LuSearch,
   LuUserPlus,
 } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch, useSelector } from "react-redux";
 import FilterUserOfCenter from "../../components/FilterUserOfCenter";
 import SortByUserOfCenter from "../../components/SortByUserOfCenter";
@@ -20,16 +19,16 @@ import {
 } from "../../store/listUserOfCenter";
 
 import "../../assets/css/UserMgmt.css";
+import { getPagination } from "../../functions/function";
 
 const CenterAdUserMgmt = () => {
   const dispatch = useDispatch();
-  const {
-    listUserOfCenter = [],
-    loading,
-    error,
-  } = useSelector((state) => state.listUserOfCenter || {});
+  const { listUserOfCenter = [] } = useSelector(
+    (state) => state.listUserOfCenter || {}
+  );
 
   const activeRole = useSelector((state) => state.listUserOfCenter.activeRole);
+  const [loading, setLoading] = useState(false);
   const [listUser, setListUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
@@ -45,7 +44,17 @@ const CenterAdUserMgmt = () => {
   const closeAddTeacherModal = () => setIsModalAddTeacherOpen(false);
 
   useEffect(() => {
-    dispatch(fetchListUserOfCenter(activeRole));
+    const fectchData = async () => {
+      setLoading(true);
+      try {
+        await dispatch(fetchListUserOfCenter(activeRole));
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    };
+    fectchData();
   }, [dispatch, activeRole]);
 
   useEffect(() => {
@@ -128,8 +137,8 @@ const CenterAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
 
   //pagination
@@ -146,27 +155,30 @@ const CenterAdUserMgmt = () => {
       prevSelectedId === idUser ? null : idUser
     );
   };
+  const totalColumns = 6 + (activeRole === Role.teacher ? 2 : 0);
   if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
   }
   return (
     <>
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.teacher ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${activeRole === Role.student ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.student ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -215,10 +227,10 @@ const CenterAdUserMgmt = () => {
         </div>
         {activeRole === Role.teacher && (
           <div className="add-btn">
-            <div className="btn" onClick={() => openAddTeacherModal()}>
+            <button className="btn" onClick={() => openAddTeacherModal()}>
               <LuUserPlus className="icon" />
               <span>Add teacher</span>
-            </div>
+            </button>
             <DiagAddUserForm
               isOpen={isModalAddTeacherOpen}
               onClose={closeAddTeacherModal}
@@ -241,119 +253,102 @@ const CenterAdUserMgmt = () => {
               </tr>
             </thead>
             <tbody>
-              {records.map((user, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{user.fullName}</td>
-                  <td>{user.phoneNumber}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    {user.joinedDate &&
-                      (() => {
-                        const date = new Date(user.joinedDate);
-                        const day = String(date.getDate()).padStart(2, "0");
-                        const month = String(date.getMonth() + 1).padStart(
-                          2,
-                          "0"
-                        );
-                        const year = date.getFullYear();
-
-                        return `${month}/${day}/${year}`;
-                      })()}
-                  </td>
-                  {activeRole === Role.teacher && <td>{user.teachingMajor}</td>}
-                  {activeRole === Role.teacher && (
+              {records.length > 0 ? (
+                records.map((user, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{user.fullName}</td>
+                    <td>{user.phoneNumber}</td>
+                    <td>{user.email}</td>
                     <td>
-                      <span
-                        className={`status ${user.status === UserStatus.active
-                            ? "active"
-                            : user.status === UserStatus.pending
+                      {user.joinedDate &&
+                        (() => {
+                          const date = new Date(user.joinedDate);
+                          const day = String(date.getDate()).padStart(2, "0");
+                          const month = String(date.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          );
+                          const year = date.getFullYear();
+
+                          return `${month}/${day}/${year}`;
+                        })()}
+                    </td>
+                    {activeRole === Role.teacher && (
+                      <td>{user.teachingMajor}</td>
+                    )}
+                    {activeRole === Role.teacher && (
+                      <td>
+                        <span
+                          className={`status ${
+                            user.status === UserStatus.active
+                              ? "active"
+                              : user.status === UserStatus.pending
                               ? "pending"
                               : user.status === UserStatus.inactive
-                                ? "inactive"
-                                : ""
+                              ? "inactive"
+                              : ""
                           }`}
-                      >
-                        {user.status === UserStatus.active
-                          ? "Active"
-                          : user.status === UserStatus.pending
+                        >
+                          {user.status === UserStatus.active
+                            ? "Active"
+                            : user.status === UserStatus.pending
                             ? "Pending"
                             : user.status === UserStatus.inactive
-                              ? "Inactive"
-                              : ""}
-                      </span>
-                    </td>
-                  )}
-                  <td className="table-cell" style={{ cursor: "pointer" }}>
-                    <LuMoreHorizontal
-                      onClick={() => handleMoreIconClick(user.idUser)}
-                    />
-                    {selectedUserId === user.idUser && (
-                      <UserOption
-                        className="user-option"
-                        idUserSelected={user.idUser}
-                        {...(activeRole === Role.teacher && {
-                          statusUserSelected: user.status,
-                        })}
-                        onUserInactivated={() => setSelectedUserId(null)}
-                        roleUserSelected={Role.teacher}
-                        {...(user.idRole === Role.teacher
-                          ? {
-                            isReactivatable: true,
-                          }
-                          : {})}
-                      />
+                            ? "Inactive"
+                            : ""}
+                        </span>
+                      </td>
                     )}
+                    <td className="table-cell" style={{ cursor: "pointer" }}>
+                      <LuMoreHorizontal
+                        onClick={() => handleMoreIconClick(user.idUser)}
+                      />
+                      {selectedUserId === user.idUser && (
+                        <UserOption
+                          className="user-option"
+                          idUserSelected={user.idUser}
+                          {...(activeRole === Role.teacher && {
+                            statusUserSelected: user.status,
+                          })}
+                          onUserInactivated={() => setSelectedUserId(null)}
+                          roleUserSelected={Role.teacher}
+                          {...(user.idRole === Role.teacher
+                            ? {
+                                isReactivatable: true,
+                              }
+                            : {})}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={totalColumns} style={{ textAlign: "center" }}>
+                    "Currently, there are no items in this list."
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

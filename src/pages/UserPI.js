@@ -40,11 +40,21 @@ import {
   postUpdateUserBasicPI,
 } from "../services/userService";
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
+import DiagRemoveImgForm from "../components/diag/DiagRemoveImgForm";
 
 const TeacherPI = () => {
   const location = useLocation();
   const targetDivRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [loadingBtn, setLoadingBtn] = useState({
+    basicPI: false,
+    specializedPI: false,
+    changePW: false,
+    link: false,
+    qualification: false,
+  });
+  const [loadingLink, setLoadingLink] = useState(null);
+  const [loadingQualification, setLoadingQualification] = useState(null);
   const idUser = +localStorage.getItem("idUser");
   const idRole = +localStorage.getItem("idRole");
 
@@ -102,7 +112,12 @@ const TeacherPI = () => {
   const toggleVisibility = () => {
     setShowAvatarImageOption(!showAvatarImageOption);
   };
+  const [isModalRemoveAvaOpen, setIsModalRemoveAvaOpen] = useState(false);
+
+  const openRemoveAvaModal = () => setIsModalRemoveAvaOpen(true);
+  const closeRemoveAvaModal = () => setIsModalRemoveAvaOpen(false);
   const inputFileRef = useRef(null);
+  const optionButtonRef = useRef(null);
 
   const fetchContries = async () => {
     try {
@@ -190,6 +205,10 @@ const TeacherPI = () => {
       setPhoneNumWarning("Phone number must be exactly 10 digits.");
     } else {
       setPhoneNumWarning("");
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        basicPI: true,
+      }));
       try {
         const response = await postUpdateUserBasicPI(
           idUser,
@@ -210,6 +229,11 @@ const TeacherPI = () => {
       } catch (error) {
         console.error("Error updating profile:", error);
         setUpdateSuccess("There was an error updating your profile.");
+      } finally {
+        setLoadingBtn((prevState) => ({
+          ...prevState,
+          basicPI: false,
+        }));
       }
     }
   };
@@ -234,20 +258,33 @@ const TeacherPI = () => {
     updateBasicInfo();
   };
   const updateTeacherSpecializedPI = async () => {
-    const response = await postUpdateTeacherSpecializedPI(
-      idUser,
-      tempUserPI.teachingMajor,
-      tempUserPI.description
-    );
-    if (response.status === APIStatus.success) {
-      dispatch(updateUserPI({ teachingMajor, description }));
-      await dispatch(fetchUserProfile(idUser));
-      setUpdatePITeacherSuccess(
-        "Your specialized infomation has been updated successfully!"
+    setLoadingBtn((prevState) => ({
+      ...prevState,
+      specializedPI: true,
+    }));
+    try {
+      const response = await postUpdateTeacherSpecializedPI(
+        idUser,
+        tempUserPI.teachingMajor,
+        tempUserPI.description
       );
-      setTimeout(() => {
-        setUpdatePITeacherSuccess("");
-      }, 3000);
+      if (response.status === APIStatus.success) {
+        dispatch(updateUserPI({ teachingMajor, description }));
+        await dispatch(fetchUserProfile(idUser));
+        setUpdatePITeacherSuccess(
+          "Your specialized infomation has been updated successfully!"
+        );
+        setTimeout(() => {
+          setUpdatePITeacherSuccess("");
+        }, 3000);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        specializedPI: false,
+      }));
     }
   };
 
@@ -256,20 +293,40 @@ const TeacherPI = () => {
   };
   const addProfileLink = async () => {
     if (newProfileLink.name && newProfileLink.url) {
-      const response = await postAddProfileLink(
-        newProfileLink.name,
-        newProfileLink.url
-      );
-      if (response.status === APIStatus.success) {
-        await dispatch(fetchUserProfile(idUser));
-        setNewProfileLink({ name: "", url: "" });
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        link: true,
+      }));
+      try {
+        const response = await postAddProfileLink(
+          newProfileLink.name,
+          newProfileLink.url
+        );
+        if (response.status === APIStatus.success) {
+          await dispatch(fetchUserProfile(idUser));
+          setNewProfileLink({ name: "", url: "" });
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoadingBtn((prevState) => ({
+          ...prevState,
+          link: false,
+        }));
       }
     }
   };
   const removeProfileLink = async (idProfileLink) => {
-    const response = await deleteProfileLink(idProfileLink);
-    if (response.status === APIStatus.success) {
-      await dispatch(fetchUserProfile(idUser));
+    setLoadingLink(idProfileLink);
+    try {
+      const response = await deleteProfileLink(idProfileLink);
+      if (response.status === APIStatus.success) {
+        await dispatch(fetchUserProfile(idUser));
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoadingLink(null); // Tắt loading sau khi hoàn tất
     }
   };
   const handleURLProfileLinkChange = (e) => {
@@ -344,21 +401,34 @@ const TeacherPI = () => {
       newQualification.qualificationDescr &&
       newQualification.qualificationFile
     ) {
-      const response = await postAddQualification(
-        idUser,
-        newQualification.qualificationName,
-        newQualification.qualificationDescr,
-        newQualification.qualificationFile
-      );
-      if (response.status === APIStatus.success) {
-        await setNewQualification((prev) => ({
-          ...prev,
-          qualificationName: "",
-          qualificationDescr: "",
-          qualificationFile: null,
-          qualificationUrl: "",
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        qualification: true,
+      }));
+      try {
+        const response = await postAddQualification(
+          idUser,
+          newQualification.qualificationName,
+          newQualification.qualificationDescr,
+          newQualification.qualificationFile
+        );
+        if (response.status === APIStatus.success) {
+          await setNewQualification((prev) => ({
+            ...prev,
+            qualificationName: "",
+            qualificationDescr: "",
+            qualificationFile: null,
+            qualificationUrl: "",
+          }));
+          await setQualiPDFCheck(false);
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoadingBtn((prevState) => ({
+          ...prevState,
+          qualification: false,
         }));
-        await setQualiPDFCheck(false);
       }
     } else {
       setQualiWarning(
@@ -369,7 +439,7 @@ const TeacherPI = () => {
     await dispatch(fetchUserProfile(idUser));
   };
   const removeQualification = async (idQualification) => {
-    // setLoading(true);
+    setLoadingQualification(idQualification);
     try {
       const response = await deleteQualification(idQualification);
       if (response.status === APIStatus.success) {
@@ -377,17 +447,20 @@ const TeacherPI = () => {
       }
     } catch (error) {
       throw error;
+    } finally {
+      setLoadingQualification(null);
     }
-    // finally {
-    //   setLoading(false);
-    // }
   };
 
   const handleChangePassword = async () => {
     if (oldPassword && newPassword && confirmPassword) {
       if (newPassword === confirmPassword) {
         const idAccount = +localStorage.getItem("idAccount");
-        // setLoading(true);
+        setLoadingBtn((prevState) => ({
+          ...prevState,
+          changePW: true,
+        }));
+        console.log("LoadingBtn set to true:", loadingBtn);
         try {
           const response = await postChangePassword(
             oldPassword,
@@ -409,10 +482,13 @@ const TeacherPI = () => {
           }
         } catch (error) {
           setChangePWError(error.message);
+        } finally {
+          setLoadingBtn((prevState) => ({
+            ...prevState,
+            changePW: false,
+          }));
+          console.log("LoadingBtn set to false:", loadingBtn);
         }
-        // finally {
-        //   setLoading(false);
-        // }
       } else {
         setChangePWError("New password and confirmation do not match.");
       }
@@ -423,12 +499,12 @@ const TeacherPI = () => {
       <div className="loading-page">
         <ImSpinner2 color="#397979" />
       </div>
-    ); // Show loading while waiting for API response
+    );
   }
   return (
     <div>
-      <div className="container-pi">
-        <div className="container-ava">
+      <div className="container-pi user-pi">
+        <div className="container-ava slide-to-right">
           <div className="sub-container-ava">
             <img
               src={avaImg ? avaImg : default_ava}
@@ -438,7 +514,15 @@ const TeacherPI = () => {
             <div className="container-icon" onClick={toggleVisibility}>
               <LuCamera className="icon" />
             </div>
-            {showAvatarImageOption && <AvatarImageOption isAvatar={true} />}
+            {showAvatarImageOption && (
+              <AvatarImageOption
+                isAvatar={true}
+                openRemoveAvaModal={openRemoveAvaModal}
+                isOpen={showAvatarImageOption}
+                onClose={() => setShowAvatarImageOption(false)}
+                optionButtonRef={optionButtonRef}
+              />
+            )}
           </div>
           <div className="sub-container-action">
             <span className="name-info">{name}</span>
@@ -474,7 +558,7 @@ const TeacherPI = () => {
           </div>
         </div>
         {activeAction === "basicPI" ? (
-          <div className="container-specialized">
+          <div className="container-specialized slide-to-left">
             <div className="container-info">
               <span className="title-span">Personal Infomation</span>
               <div className="info">
@@ -582,6 +666,9 @@ const TeacherPI = () => {
                     Discard changes
                   </button>
                   <button className="save-change" onClick={handleSaveChanges}>
+                    {loadingBtn.basicPI && (
+                      <ImSpinner2 className="icon-spin" color="#397979" />
+                    )}
                     Save changes
                   </button>
                 </div>
@@ -589,8 +676,8 @@ const TeacherPI = () => {
             </div>
           </div>
         ) : activeAction === "specializedPI" ? (
-          <div className="container-specialized">
-            <div className="container-info">
+          <div className="container-specialized slide-to-left">
+            <div className="container-info auto">
               <span className="title-span">Specialized Infomation</span>
               <div className="info">
                 <span>Center</span>
@@ -643,6 +730,9 @@ const TeacherPI = () => {
                     className="save-change"
                     onClick={() => updateTeacherSpecializedPI()}
                   >
+                    {loadingBtn.specializedPI && (
+                      <ImSpinner2 className="icon-spin" color="#397979" />
+                    )}
                     Save changes
                   </button>
                 </div>
@@ -676,7 +766,11 @@ const TeacherPI = () => {
                         removeProfileLink(profile.idProfileLink);
                       }}
                     >
-                      <LuTrash2 className="icon" />
+                      {loadingLink === profile.idProfileLink ? (
+                        <ImSpinner2 className="icon-spin icon" />
+                      ) : (
+                        <LuTrash2 className="icon" />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -714,7 +808,11 @@ const TeacherPI = () => {
                     />
                   </InputGroup>
                   <div className="icon-button" onClick={addProfileLink}>
-                    <LuCheck className="icon" />
+                    {loadingBtn.link ? (
+                      <ImSpinner2 className="icon-spin icon" color="#D9D9D9" />
+                    ) : (
+                      <LuCheck className="icon" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -762,7 +860,12 @@ const TeacherPI = () => {
                               );
                             }}
                           >
-                            <LuTrash2 className="icon" />
+                            {loadingQualification ===
+                            qualification.idQualification ? (
+                              <ImSpinner2 className="icon-spin icon" />
+                            ) : (
+                              <LuTrash2 className="icon" />
+                            )}
                           </div>
                         </div>
                       </div>
@@ -824,7 +927,14 @@ const TeacherPI = () => {
                           <LuFile className="icon" />
                         </div>
                         <div className="icon-button" onClick={AddQualification}>
-                          <LuCheck className="icon" />
+                          {loadingBtn.qualification ? (
+                            <ImSpinner2
+                              className="icon-spin icon"
+                              color="#D9D9D9"
+                            />
+                          ) : (
+                            <LuCheck className="icon" />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -869,7 +979,7 @@ const TeacherPI = () => {
             </div>
           </div>
         ) : (
-          <div className="container-specialized">
+          <div className="container-specialized slide-to-left">
             <div className="container-info">
               <span className="title-span">Security</span>
               <div className="info">
@@ -878,7 +988,11 @@ const TeacherPI = () => {
                   type={showOldPassword ? "text" : "password"}
                   className="input-form-pi"
                   value={oldPassword || ""}
-                  onChange={(e) => setOldPassword(e.target.value)}
+                  onChange={(e) => {
+                    setOldPassword(e.target.value);
+                    setChangePWError("");
+                    setChangePWSuccess("");
+                  }}
                 />
                 <span onClick={() => setShowOldPassword(!showOldPassword)}>
                   {showOldPassword ? (
@@ -894,7 +1008,11 @@ const TeacherPI = () => {
                   type={showNewPassword ? "text" : "password"}
                   className="input-form-pi"
                   value={newPassword || ""}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    setChangePWError("");
+                    setChangePWSuccess("");
+                  }}
                 />
                 <span onClick={() => setShowNewPassword(!showNewPassword)}>
                   {showNewPassword ? (
@@ -910,7 +1028,11 @@ const TeacherPI = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   className="input-form-pi"
                   value={confirmPassword || ""}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setChangePWError("");
+                    setChangePWSuccess("");
+                  }}
                 />
                 <span
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -952,6 +1074,9 @@ const TeacherPI = () => {
                       handleChangePassword();
                     }}
                   >
+                    {loadingBtn.changePW && (
+                      <ImSpinner2 className="icon-spin" color="#397979" />
+                    )}
                     Change password
                   </button>
                 </div>
@@ -960,6 +1085,13 @@ const TeacherPI = () => {
           </div>
         )}
       </div>
+      {isModalRemoveAvaOpen && (
+        <DiagRemoveImgForm
+          isOpen={isModalRemoveAvaOpen}
+          onClose={closeRemoveAvaModal}
+          isAvatar={true}
+        />
+      )}
     </div>
   );
 };

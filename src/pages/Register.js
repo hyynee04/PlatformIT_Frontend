@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import Modal from "react-bootstrap/Modal";
+import { useEffect, useRef, useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
 import {
   LuBuilding2,
   LuCreditCard,
@@ -13,26 +13,57 @@ import {
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import "../assets/css/Register.css";
+import DiagPolicy from "../components/diag/DiagPolicy";
+import DiagVerifyOtpForm from "../components/diag/DiagVerifyOtpForm";
 import { APIStatus } from "../constants/constants";
 import {
   postCheckEmail,
   postRegister,
-  postSendOTP,
-  postVerifyOtp,
+  postSendOTP
 } from "../services/authService";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [TIN, setTIN] = useState("");
-  const [centerName, setCenterName] = useState("");
-  const [centerDescription, setCenterDescription] = useState("");
-  const [OTP, setOTP] = useState("");
+  const [loading, setLoading] = useState(false)
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    TIN: "",
+    centerName: "",
+    centerDescription: "",
+  })
+  const formDataRef = useRef(formData);
+
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      console.log(formDataRef.current)
+      if (event.key === 'Enter') {
+        if (localStorage.getItem('verifiedEmail') === formDataRef.current.email) {
+          handleRegister(formDataRef.current);
+          return
+        }
+        handleSendOTP(formDataRef.current.email);
+      }
+    };
+
+    // Add the event listener for keydown
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
 
   const [isShowedP, setIsShowedP] = useState(false);
   const [isShowedCP, setIsShowedCP] = useState(false);
@@ -45,17 +76,9 @@ const Register = () => {
   const [error, setError] = useState(0);
   const [coincidedInform, setCoincidedInform] = useState("");
 
-  const [errorVerify, setErrorVerify] = useState("")
-
-  const [fileContent, setFileContent] = useState('');
   useEffect(() => {
     setIsVisible(true);
     localStorage.setItem("verifiedEmail", "email");
-
-    fetch('\policy.txt')
-      .then((response) => response.text())
-      .then((text) => setFileContent(text))
-      .catch((error) => console.error('Error loading text file:', error));
   }, []);
 
   const validateEmail = (email) => {
@@ -66,18 +89,19 @@ const Register = () => {
       );
   };
 
-  const checkInput = () => {
-    const isValidEmail = validateEmail(email);
+  const checkInput = (formData) => {
+    console.log(">>> Form Data: ", formDataRef)
+    const isValidEmail = validateEmail(formData.email);
     // Check all inputs are filled
     if (
-      fullName === "" ||
-      email === "" ||
-      username === "" ||
-      password === "" ||
-      confirmPassword === "" ||
-      (isChecked && TIN === "") ||
-      (isChecked && centerName === "") ||
-      (isChecked && centerDescription === "")
+      !formData.fullName ||
+      !formData.email ||
+      !formData.username ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      (isChecked && !formData.TIN) ||
+      (isChecked && !formData.centerName) ||
+      (isChecked && !formData.centerDescription)
     ) {
       setError(1);
       return;
@@ -89,19 +113,19 @@ const Register = () => {
       return;
     }
 
-    if (password.length < 5) {
+    if (formData.password.length < 5) {
       setError(3);
       return;
     }
 
     // Check confirm password
-    if (confirmPassword && confirmPassword !== password) {
+    if (formData.confirmPassword && formData.confirmPassword !== formData.password) {
       setError(4);
       return;
     }
 
     // Check TIN length
-    if (TIN && (TIN.length !== 10 && TIN.length !== 13)) {
+    if (formData.TIN && (formData.TIN.length !== 10 && formData.TIN.length !== 13)) {
       setError(5);
       return;
     }
@@ -116,48 +140,46 @@ const Register = () => {
     return true;
   }
 
-  const handleSendOTP = async () => {
-    const isValid = checkInput()
+  const handleSendOTP = async (email) => {
+    const isValid = checkInput(formDataRef.current)
     if (!isValid) return;
-
-    let response = await postCheckEmail(email);
-    let checkEmail = response.data;
-    if (response.status === APIStatus.success) {
-      await postSendOTP(email);
-      setShowVerifyEmail(true);
-      setErrorVerify("OTP has been sent to your email. It will expire in 2 minutes!");
+    setLoading(true);
+    try {
+      let response = await postCheckEmail(email);
+      let checkEmail = response.data;
+      if (response.status === APIStatus.success) {
+        await postSendOTP(email);
+        setShowVerifyEmail(true);
+      }
+      else {
+        setCoincidedInform(checkEmail);
+        setLoading(false);
+        return
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    } finally {
+      setLoading(false)
     }
-    else {
-      setCoincidedInform(checkEmail)
-      return
-    }
-
   };
 
-  const handleVerify = async () => {
-    let response = await postVerifyOtp(email, OTP);
-    let verifyOTP = response.data;
-    if (response.status === APIStatus.success) {
-      localStorage.setItem('verifiedEmail', email);
-      setShowVerifyEmail(false);
-      handleRegister();
-    }
-    else {
-      setErrorVerify(verifyOTP)
-    }
-
-  }
-
-  const handleRegister = async () => {
-    //submit api
-    let response = await postRegister(fullName, email, username, password, centerName, centerDescription, TIN);
-    let data = response.data;
-    if (response.status === APIStatus.success) {
-      localStorage.removeItem('verifiedEmail');
-      navigate("/login");
-    } else {
-      setCoincidedInform(data)
-      return
+  const handleRegister = async (formData) => {
+    setLoading(true);
+    try {
+      let response = await postRegister(formData.fullName, formData.email, formData.username, formData.password, formData.centerName, formData.centerDescription, formData.TIN);
+      let data = response.data;
+      if (response.status === APIStatus.success) {
+        localStorage.removeItem('verifiedEmail');
+        navigate("/login");
+      } else {
+        setCoincidedInform(data);
+        setLoading(false);
+        return
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error)
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -182,7 +204,7 @@ const Register = () => {
 
   return (
     <>
-      <div className={`register-container ${isVisible ? "slide-in" : ""}`}>
+      <div className={`register-container ${isVisible ? "slide-to-left" : ""}`}>
         <div className="mainpart-container">
           <div className="holder">
             <div className="mainpart-content">
@@ -196,9 +218,10 @@ const Register = () => {
                   type="text"
                   placeholder="Name (*)"
                   className="form-control"
-                  value={fullName}
+                  value={formData.fullName}
                   onChange={(event) => {
-                    setFullName(event.target.value);
+                    setError(0);
+                    setFormData({ ...formData, fullName: event.target.value });
                   }}
                 />
               </div>
@@ -209,9 +232,9 @@ const Register = () => {
                   type="text"
                   placeholder="Email (*)"
                   className="form-control"
-                  value={email}
+                  value={formData.email}
                   onChange={(event) => {
-                    setEmail(event.target.value);
+                    setFormData({ ...formData, email: event.target.value });
                     setError(0);
                     setCoincidedInform("");
                   }}
@@ -224,9 +247,9 @@ const Register = () => {
                   type="text"
                   placeholder="Username (*)"
                   className="form-control"
-                  value={username}
+                  value={formData.username}
                   onChange={(event) => {
-                    setUsername(event.target.value);
+                    setFormData({ ...formData, username: event.target.value });
                     setError(0);
                     setCoincidedInform("");
                   }}
@@ -239,9 +262,9 @@ const Register = () => {
                     type={isShowedP ? "text" : "password"}
                     placeholder="Password (*)"
                     className="form-control"
-                    value={password}
+                    value={formData.password}
                     onChange={(event) => {
-                      setPassword(event.target.value);
+                      setFormData({ ...formData, password: event.target.value });
                       setError(0);
                     }}
                   />
@@ -266,9 +289,9 @@ const Register = () => {
                     type={isShowedCP ? "text" : "password"}
                     placeholder="Confirm password (*)"
                     className="form-control"
-                    value={confirmPassword}
+                    value={formData.confirmPassword}
                     onChange={(event) => {
-                      setConfirmPassword(event.target.value);
+                      setFormData({ ...formData, confirmPassword: event.target.value });
                       setError(0);
                     }}
                   />
@@ -309,9 +332,9 @@ const Register = () => {
                       type="text"
                       placeholder="Center Name (*)"
                       className="form-control"
-                      value={centerName}
+                      value={formData.centerName}
                       onChange={(event) => {
-                        setCenterName(event.target.value);
+                        setFormData({ ...formData, centerName: event.target.value });
                         setError(0);
                       }}
                     />
@@ -322,9 +345,9 @@ const Register = () => {
                       type="number"
                       placeholder="TIN (*)"
                       className="form-control"
-                      value={TIN}
+                      value={formData.TIN}
                       onChange={(event) => {
-                        setTIN(event.target.value);
+                        setFormData({ ...formData, TIN: event.target.value });
                         setError(0);
                         setCoincidedInform("");
                       }}
@@ -336,9 +359,9 @@ const Register = () => {
                       type="number"
                       placeholder="Introduce your center (*)"
                       className="introduce-center form-control"
-                      value={centerDescription}
+                      value={formData.centerDescription}
                       onChange={(event) => {
-                        setCenterDescription(event.target.value);
+                        setFormData({ ...formData, centerDescription: event.target.value });
                         setError(0);
                         setCoincidedInform("");
                       }}
@@ -380,14 +403,17 @@ const Register = () => {
               <button
                 className="register-button"
                 onClick={() => {
-                  if (localStorage.getItem('verifiedEmail') === email) {
-                    handleRegister();
+                  if (localStorage.getItem('verifiedEmail') === formData.email) {
+                    handleRegister(formData);
                     return
                   }
-                  handleSendOTP();
+                  handleSendOTP(formData.email);
                 }}
                 disabled={!(error === 0 && coincidedInform === "")}
               >
+                {loading && (
+                  <ImSpinner2 className="icon-spin" />
+                )}
                 Register
               </button>
             </div>
@@ -415,34 +441,20 @@ const Register = () => {
       </div>
 
       {/* Policy Popup */}
-      <Modal show={showPolicy} onHide={() => setShowPolicy(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Plait Policy</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="adjus-modal-body">
-          <div className="policy-content">
-            <pre>{fileContent}</pre>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="policy-btn not-agree"
-            onClick={() => {
-              setShowPolicy(false);
-              setIsCheckedPolicy(false);
-            }}
-          >Don't agree</button>
-          <button
-            className="policy-btn agree"
-            onClick={() => {
-              setShowPolicy(false);
-              setIsCheckedPolicy(true);
-            }}
-          >I agree</button>
-        </Modal.Footer>
-      </Modal>
+      <DiagPolicy
+        isOpen={showPolicy}
+        onClose={() => setShowPolicy(false)}
+        setIsCheckedPolicy={setIsCheckedPolicy}
+      />
 
-      <Modal show={showVerifyEmail} onHide={() => setShowVerifyEmail(false)}>
+      <DiagVerifyOtpForm
+        isOpen={showVerifyEmail}
+        onClose={() => setShowVerifyEmail(false)}
+        handleRegister={(handleRegister)}
+        formData={formData}
+      />
+
+      {/* <Modal show={showVerifyEmail} onHide={() => setShowVerifyEmail(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Verify Email</Modal.Title>
         </Modal.Header>
@@ -482,7 +494,7 @@ const Register = () => {
             disabled={!(OTP.length === 6 && errorVerify === "")}
           >Verify</button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

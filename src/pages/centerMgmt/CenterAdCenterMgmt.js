@@ -318,7 +318,7 @@ const CenterAdCenterMgmt = () => {
             />
           </div>
         )}
-        <div className="container-pi">
+        <div className="container-pi user-pi">
           <div className="container-ava">
             <div className="sub-container-ava">
               <img
@@ -332,16 +332,18 @@ const CenterAdCenterMgmt = () => {
             <div className="sub-container-action">
               <div className="action-btn">
                 <div
-                  className={`btn ${activeAction === "basicInfo" ? "active" : ""
-                    }`}
+                  className={`btn ${
+                    activeAction === "basicInfo" ? "active" : ""
+                  }`}
                   onClick={() => handleActionClick("basicInfo")}
                 >
                   <FaInfoCircle className="icon" />
                   Basic Infomation
                 </div>
                 <div
-                  className={`btn ${activeAction === "link_quali" ? "active" : ""
-                    }`}
+                  className={`btn ${
+                    activeAction === "link_quali" ? "active" : ""
+                  }`}
                   onClick={() => handleActionClick("link_quali")}
                 >
                   <FaGlobe className="icon" />
@@ -605,7 +607,7 @@ const CenterAdCenterMgmt = () => {
                       </div>
                       <div className="quali-image">
                         {qualification.path &&
-                          qualification.path.endsWith(".pdf") ? (
+                        qualification.path.endsWith(".pdf") ? (
                           <div
                             onClick={() =>
                               window.open(qualification.path, "_blank")

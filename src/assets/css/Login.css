@@ -130,7 +130,7 @@
   .form-control {
   height: 43px;
   padding: 4px 40px;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   border: none;
   background-color: rgba(217, 217, 217, 0.3);
   color: var(--text-gray);
@@ -199,6 +199,19 @@
   cursor: pointer;
   background-color: var(--second-main-color);
   color: var(--white-color);
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+.login-container
+  .mainpart-container
+  .holder
+  .mainpart-content
+  .signin-button
+  > svg {
+  font-size: 1rem;
 }
 .login-container
   .mainpart-container
@@ -256,15 +269,15 @@
 .cancel-btn {
   color: var(--second-main-color);
 }
-.cancel-btn:hover{
+.cancel-btn:hover {
   background-color: var(--border-gray);
 }
 @media (min-width: 576px) {
   .modal-dialog {
-      max-width: var(--bs-modal-width);
-      margin-right: auto;
-      margin-left: auto;
-      margin-top: 5%;
+    max-width: var(--bs-modal-width);
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 5%;
   }
 }
 .modal-dialog > .modal-content {
@@ -286,4 +299,3 @@
 .red-color {
   color: var(--red-color);
 }
-

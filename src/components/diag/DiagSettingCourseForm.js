@@ -1,5 +1,4 @@
 import React from "react";
-import Form from "react-bootstrap/Form";
 import { FiSettings } from "react-icons/fi";
 import { LuX } from "react-icons/lu";
 import "../../assets/css/card/DiagForm.css";
@@ -20,7 +19,10 @@ const DiagSettingCourseForm = ({
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container slide-to-bottom"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="diag-header">
           <div className="container-title">
             <FiSettings className="diag-icon" />
@@ -32,26 +34,35 @@ const DiagSettingCourseForm = ({
           <div className="container-diag-field">
             <div className="left-diag-container">
               <div className="info">
-                <Form>
-                  <Form.Check
-                    type="switch"
-                    className="custom-switch"
-                    label="Require lecture approval before publishing"
-                    checked={isApprovedLecture}
-                    onChange={handleApprovedLectureChange}
-                  />
-                </Form>
+                <div className="item setting-course">
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={isApprovedLecture}
+                      onChange={handleApprovedLectureChange}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                  <label style={{ color: "var(--black-color)" }}>
+                    Require lecture approval before publishing
+                  </label>
+                </div>
               </div>
+
               <div className="info">
-                <Form>
-                  <Form.Check
-                    type="switch"
-                    className="custom-switch"
-                    label="Enforce lecture sequence completion"
-                    checked={isSequenced}
-                    onChange={handleSequencedChange}
-                  />
-                </Form>
+                <div className="item setting-course">
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={isSequenced}
+                      onChange={handleSequencedChange}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                  <label style={{ color: "var(--black-color)" }}>
+                    Enforce lecture sequence completion
+                  </label>
+                </div>
               </div>
             </div>
             <div className="right-diag-container"></div>

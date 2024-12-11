@@ -23,18 +23,24 @@ import {
 import { formatDate } from "../../functions/function";
 import {
   deleteAssignment,
-  getAllActiveCourseOfTeacher,
-  getAllActiveLecturesOfCoure,
-  getAllActiveSectionOfCourse,
   getAssignmentInfo,
   postAddManualAssignment,
   postAddQuizAssignment,
   postUpdateAssignment,
+} from "../../services/assignmentService";
+import {
+  getAllActiveCourseOfTeacher,
+  getAllActiveLecturesOfCoure,
+  getAllActiveSectionOfCourse,
 } from "../../services/courseService";
 const UpdateAssignment = ({ isDuplicate }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [loadingBtn, setLoadingBtn] = useState({
+    save: false,
+    publish: false,
+  });
   const [listCourse, setListCourse] = useState([]);
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [originAssignInfo, setOriginAssignInfo] = useState({});
@@ -446,6 +452,15 @@ const UpdateAssignment = ({ isDuplicate }) => {
       isShowAnswer: assignmentInfo.isShowAnswer,
       questions: questions,
     };
+    isPublish
+      ? setLoadingBtn((prevState) => ({
+          ...prevState,
+          publish: true,
+        }))
+      : setLoadingBtn((prevState) => ({
+          ...prevState,
+          save: true,
+        }));
     try {
       let response;
 
@@ -462,6 +477,16 @@ const UpdateAssignment = ({ isDuplicate }) => {
       }
     } catch (error) {
       console.error("Failed to add assignment:", error);
+    } finally {
+      isPublish
+        ? setLoadingBtn((prevState) => ({
+            ...prevState,
+            publish: false,
+          }))
+        : setLoadingBtn((prevState) => ({
+            ...prevState,
+            save: false,
+          }));
     }
   };
   const handleEditAssignment = async (isPublish) => {
@@ -480,7 +505,15 @@ const UpdateAssignment = ({ isDuplicate }) => {
       assignmentStatus: assignmentInfo.assignmentStatus,
       questions: questions,
     };
-    setLoading(true);
+    isPublish
+      ? setLoadingBtn((prevState) => ({
+          ...prevState,
+          publish: true,
+        }))
+      : setLoadingBtn((prevState) => ({
+          ...prevState,
+          save: true,
+        }));
     try {
       const response = await postUpdateAssignment(dataToSubmit);
 
@@ -491,6 +524,16 @@ const UpdateAssignment = ({ isDuplicate }) => {
       }
     } catch (error) {
       console.error("Failed to updating assignment:", error);
+    } finally {
+      isPublish
+        ? setLoadingBtn((prevState) => ({
+            ...prevState,
+            publish: false,
+          }))
+        : setLoadingBtn((prevState) => ({
+            ...prevState,
+            save: false,
+          }));
     }
   };
   const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
@@ -645,7 +688,11 @@ const UpdateAssignment = ({ isDuplicate }) => {
                   : handleEditAssignment(false);
               }}
             >
-              <FaSave />
+              {loadingBtn.save ? (
+                <ImSpinner2 className="icon-spin" color="#397979" />
+              ) : (
+                <FaSave />
+              )}
               Save
             </button>
             <button
@@ -657,7 +704,11 @@ const UpdateAssignment = ({ isDuplicate }) => {
                   : handleEditAssignment(true);
               }}
             >
-              <MdPublish />
+              {loadingBtn.publish ? (
+                <ImSpinner2 className="icon-spin" color="#f5f5f5" />
+              ) : (
+                <MdPublish />
+              )}
               Publish
             </button>
           </div>

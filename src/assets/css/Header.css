@@ -33,14 +33,21 @@
   padding: 0px;
   font-weight: 400;
   color: var(--border-gray);
+  transition: transform 0.2s ease;
 }
-.navbar > .container .me-auto .active {
+.navbar > .container .me-auto .nav-link:hover {
+  transition: transform 0.2s ease;
+  transform: scale(1.1);
+}
+.navbar > .container .me-auto .active,
+.navbar > .container .me-auto .active:hover {
   padding: 0px;
   font-size: 18px;
   font-weight: 500;
   /* border-bottom: 3px solid var(--white-color); */
   color: var(--white-color) !important;
   height: fit-content;
+  transform: scale(1);
 }
 .navbar > .container .auth-buttons {
   display: flex;
@@ -66,9 +73,11 @@
   justify-content: center;
   align-items: center;
   background-color: var(--main-color);
+  transition: background-color 0.2s ease;
 }
 .navbar > .container .auth-buttons .circle-buts:hover {
   background-color: rgba(217, 217, 217, 0.3);
+  transition: background-color 0.2s ease;
 }
 /* .navbar > .container .auth-buttons .pi {
   background-color: var(--border-gray);
@@ -82,20 +91,27 @@
   width: 24px;
   height: 24px;
   color: var(--main-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 .navbar > .container .auth-buttons .register {
   background-color: var(--second-main-color);
   color: var(--white-color);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .register:hover {
   background-color: rgba(0, 59, 87, 0.7);
+  transform: scale(1.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .sign-in {
   background-color: var(--white-color);
   color: var(--second-main-color);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .sign-in:hover {
   background-color: var(--border-gray);
+  transform: scale(1.1);
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 .navbar > .container .auth-buttons .header-icon {
   width: 24px;
@@ -120,12 +136,12 @@
   border-radius: 50%;
   width: 1.8rem;
   height: 1.8rem;
-  background-color: #E6B1B0;
-  color: var(--black-color);
+  background-color: #cc3f3d;
+  color: var(--white-color);
 
-  font-size: .8rem;
+  font-size: 0.8rem;
   font-weight: 600;
   position: absolute;
-  top: -.5rem;
+  top: -0.5rem;
   right: 2.8rem;
 }

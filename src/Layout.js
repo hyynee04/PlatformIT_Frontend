@@ -31,11 +31,13 @@ import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
 
 import AddNewAssign from "./pages/assignmentMgmt/AddNewAssign";
 import DuplicateAssign from "./pages/assignmentMgmt/DuplicateAssign";
-import TeacherAssignDetail from "./pages/assignmentMgmt/TeacherAssignDetail";
-import TeacherAssignMgmt from "./pages/assignmentMgmt/TeacherAssignMgmt";
+import AssignDetail from "./pages/assignmentMgmt/AssignDetail";
+import ListAssignMgmt from "./pages/assignmentMgmt/ListAssignMgmt";
 import UpdateAssignment from "./pages/assignmentMgmt/UpdateAssignment";
 import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
+
+import StartAssign from "./pages/assignmentMgmt/StartAssign";
 
 import AllNotifications from "./pages/AllNotifications";
 import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
@@ -43,7 +45,8 @@ import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 
 import { Role } from "./constants/constants";
-
+import UpdateCourse from "./pages/courseMgmt/UpdateCourse";
+import AdminCenterDetail from "./pages/detail/AdminCenterDetail";
 
 const Layout = (props) => {
   return (
@@ -87,13 +90,44 @@ const Layout = (props) => {
           <Route path="/teacherDetail" element={<TeacherDetail />} />
           <Route path="/centerDetail" element={<CenterDetail />} />
           <Route path="/courseDetail" element={<CourseDetail />} />
-          <Route path="/studentDetail" element={<StudentDetail />} />
 
-          <Route path="/addNewLecture" element={<AddNewLecture />} />
-          <Route path="/viewLecture" element={<Lecture />} />
+          <Route
+            path="/studentDetail"
+            element={
+              <PrivateRoute>
+                <StudentDetail />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/adminCenterDetail"
+            element={
+              <PrivateRoute>
+                <AdminCenterDetail />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/viewLecture"
+            element={
+              <PrivateRoute>
+                <Lecture />
+              </PrivateRoute>
+            }
+          />
 
           <Route path="/viewAll" element={<ViewAll />} />
-          <Route path="/allNotifications" element={<AllNotifications />} />
+
+          <Route
+            path="/allNotifications"
+            element={
+              <PrivateRoute>
+                <AllNotifications />
+              </PrivateRoute>
+            }
+          />
 
           {/* Platform Admin */}
           <Route
@@ -178,6 +212,15 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/updateCourse"
+            element={
+              <PrivateRoute>
+                <UpdateCourse />
+              </PrivateRoute>
+            }
+          />
+
           {/* Teacher */}
           <Route
             path="/teacherHome"
@@ -191,7 +234,7 @@ const Layout = (props) => {
             path="/teacherAssignment"
             element={
               <PrivateRoute>
-                <TeacherAssignMgmt />
+                <ListAssignMgmt />
               </PrivateRoute>
             }
           />
@@ -223,7 +266,7 @@ const Layout = (props) => {
             path="/teacherAssignDetail"
             element={
               <PrivateRoute>
-                <TeacherAssignDetail />
+                <AssignDetail />
               </PrivateRoute>
             }
           />
@@ -232,6 +275,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <TeacherCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/addNewLecture"
+            element={
+              <PrivateRoute>
+                <AddNewLecture />
               </PrivateRoute>
             }
           />
@@ -250,6 +301,22 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <StudentCourseMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/studentTest"
+            element={
+              <PrivateRoute>
+                <ListAssignMgmt />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/studentAssignDetail"
+            element={
+              <PrivateRoute>
+                <AssignDetail />
               </PrivateRoute>
             }
           />
@@ -272,7 +339,14 @@ const Layout = (props) => {
             }
           />
         </Route>
-
+        <Route
+          path="/startAssignment"
+          element={
+            <PrivateRoute>
+              <StartAssign />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login-response" element={<LoginResponse />} />
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />

@@ -22,6 +22,7 @@ import {
 import { fetchAllUsers } from "../../store/userSlice";
 
 import "../../assets/css/UserMgmt.css";
+import { getPagination } from "../../functions/function";
 
 const PlatformAdUserMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -107,8 +108,8 @@ const PlatformAdUserMgmt = () => {
         ? "Main"
         : "Sub"
       : user.status === UserStatus.inactive
-        ? "Rejected"
-        : "Pending";
+      ? "Rejected"
+      : "Pending";
   };
 
   const filteredUser = listUser
@@ -122,8 +123,8 @@ const PlatformAdUserMgmt = () => {
           (user.gender === UserGender.female
             ? "Female"
             : user.gender === UserGender.male
-              ? "Male"
-              : "Other"
+            ? "Male"
+            : "Other"
           )
             .toLowerCase()
             .includes(searchTermLower)) ||
@@ -182,8 +183,8 @@ const PlatformAdUserMgmt = () => {
           ? 1
           : -1
         : aValue < bValue
-          ? 1
-          : -1;
+        ? 1
+        : -1;
     });
 
   //pagination
@@ -210,7 +211,10 @@ const PlatformAdUserMgmt = () => {
   //     </div>
   //   );
   // }
-
+  const totalColumns =
+    7 +
+    (activeRole !== Role.student ? 1 : 0) +
+    (activeRole === Role.centerAdmin ? 1 : 0);
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -226,22 +230,25 @@ const PlatformAdUserMgmt = () => {
       <div className="page-list-container">
         <div className="role-users-group">
           <button
-            className={`role-btn ${activeRole === Role.centerAdmin ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.centerAdmin ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.centerAdmin)}
           >
             Center Administrator
           </button>
           <button
-            className={`role-btn ${activeRole === Role.teacher ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.teacher ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.teacher)}
           >
             Teacher
           </button>
           <button
-            className={`role-btn ${activeRole === Role.student ? "active" : ""
-              }`}
+            className={`role-btn ${
+              activeRole === Role.student ? "active" : ""
+            }`}
             onClick={() => handleRoleClick(Role.student)}
           >
             Student
@@ -307,132 +314,113 @@ const PlatformAdUserMgmt = () => {
               </tr>
             </thead>
             <tbody>
-              {records.map((user, index) => (
-                <tr key={index}>
-                  <td style={{ textAlign: "center" }}>{index + 1}</td>
-                  <td>{user.fullName}</td>
-                  <td>{renderGender(user.gender)}</td>
-                  <td>{user.email}</td>
-                  {activeRole !== Role.student && <td>{user.centerName}</td>}
-                  {activeRole === Role.centerAdmin && (
-                    <td>
-                      {user.isMainCenterAdmin !== null
-                        ? user.isMainCenterAdmin === 1
-                          ? "Main"
-                          : "Sub"
-                        : user.status === UserStatus.inactive
+              {records.length > 0 ? (
+                records.map((user, index) => (
+                  <tr key={index}>
+                    <td style={{ textAlign: "center" }}>{index + 1}</td>
+                    <td>{user.fullName}</td>
+                    <td>{renderGender(user.gender)}</td>
+                    <td>{user.email}</td>
+                    {activeRole !== Role.student && <td>{user.centerName}</td>}
+                    {activeRole === Role.centerAdmin && (
+                      <td>
+                        {user.isMainCenterAdmin !== null
+                          ? user.isMainCenterAdmin === 1
+                            ? "Main"
+                            : "Sub"
+                          : user.status === UserStatus.inactive
                           ? "Rejected"
                           : "Pending"}
-                    </td>
-                  )}
-                  <td>
-                    {user.joinedDate &&
-                      (() => {
-                        const date = new Date(user.joinedDate);
-                        const day = String(date.getDate()).padStart(2, "0");
-                        const month = String(date.getMonth() + 1).padStart(
-                          2,
-                          "0"
-                        ); // Tháng trong JavaScript bắt đầu từ 0
-                        const year = date.getFullYear();
+                      </td>
+                    )}
+                    <td>
+                      {user.joinedDate &&
+                        (() => {
+                          const date = new Date(user.joinedDate);
+                          const day = String(date.getDate()).padStart(2, "0");
+                          const month = String(date.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          ); // Tháng trong JavaScript bắt đầu từ 0
+                          const year = date.getFullYear();
 
-                        return `${month}/${day}/${year}`;
-                      })()}
-                  </td>
-                  <td>
-                    <span
-                      className={`status ${user.status === UserStatus.active
-                          ? "active"
-                          : user.status === UserStatus.pending
+                          return `${month}/${day}/${year}`;
+                        })()}
+                    </td>
+                    <td>
+                      <span
+                        className={`status ${
+                          user.status === UserStatus.active
+                            ? "active"
+                            : user.status === UserStatus.pending
                             ? "pending"
                             : user.status === UserStatus.inactive ||
                               user.status === UserStatus.locked
-                              ? "inactive"
-                              : ""
+                            ? "inactive"
+                            : ""
                         }`}
-                    >
-                      {user.status === UserStatus.active
-                        ? "Active"
-                        : user.status === UserStatus.pending
+                      >
+                        {user.status === UserStatus.active
+                          ? "Active"
+                          : user.status === UserStatus.pending
                           ? "Pending"
                           : user.status === UserStatus.inactive
-                            ? "Inactive"
-                            : user.status === UserStatus.locked
-                              ? "Locked"
-                              : ""}
-                    </span>
-                  </td>
-                  <td className="table-cell" style={{ cursor: "pointer" }}>
-                    <LuMoreHorizontal
-                      onClick={() => handleMoreIconClick(user.idUser)}
-                    />
-                    {selectedUserId === user.idUser && (
-                      <UserOption
-                        className="user-option"
-                        idUserSelected={user.idUser}
-                        {...(!user.isMainCenterAdmin
-                          ? { statusUserSelected: user.status }
-                          : {})}
-                        onUserInactivated={() => setSelectedUserId(null)}
-                        {...(user.centerStatus === CenterStatus.active ||
-                          user.idRole === Role.student
-                          ? {
-                            isReactivatable: true,
-                          }
-                          : {})}
-                        roleUserSelected={user.idRole}
+                          ? "Inactive"
+                          : user.status === UserStatus.locked
+                          ? "Locked"
+                          : ""}
+                      </span>
+                    </td>
+                    <td className="table-cell" style={{ cursor: "pointer" }}>
+                      <LuMoreHorizontal
+                        onClick={() => handleMoreIconClick(user.idUser)}
                       />
-                    )}
+                      {selectedUserId === user.idUser && (
+                        <UserOption
+                          className="user-option"
+                          idUserSelected={user.idUser}
+                          {...(!user.isMainCenterAdmin
+                            ? { statusUserSelected: user.status }
+                            : {})}
+                          onUserInactivated={() => setSelectedUserId(null)}
+                          {...(user.centerStatus === CenterStatus.active ||
+                          user.idRole === Role.student
+                            ? {
+                                isReactivatable: true,
+                              }
+                            : {})}
+                          roleUserSelected={user.idRole}
+                        />
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={totalColumns} style={{ textAlign: "center" }}>
+                    "Currently, there are no items in this list."
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
-        <div className="pagination-container">
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link" onClick={prePage}>
-                  <LuChevronLeft />
-                </button>
-              </li>
-              {numbers.map((n, i) => (
-                <li
-                  className={`page-item ${currentPage === n ? "active" : ""}`}
-                  key={i}
-                >
-                  <button
-                    className="page-link btn"
-                    onClick={() => changeCPage(n)}
-                  >
-                    {n}
-                  </button>
-                </li>
-              ))}
-              <li className="page-item">
-                <button className="page-link" onClick={nextPage}>
-                  <LuChevronRight />
-                </button>
-              </li>
-            </ul>
-          </nav>
+        <div className="pagination">
+          {getPagination(currentPage, npage).map((n, i) => (
+            <button
+              key={i}
+              className={`page-item ${currentPage === n ? "active" : ""}`}
+              onClick={() => changeCPage(n)}
+            >
+              {n}
+            </button>
+          ))}
         </div>
       </div>
     </>
   );
-  function prePage() {
-    if (currentPage !== 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  }
   function changeCPage(id) {
     setCurrentPage(id);
-  }
-  function nextPage() {
-    if (currentPage !== npage) {
-      setCurrentPage(currentPage + 1);
-    }
   }
 };
 

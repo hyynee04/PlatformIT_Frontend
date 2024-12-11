@@ -17,6 +17,18 @@
   outline: none;
 }
 
+@keyframes fadeInOut {
+  0% {
+    opacity: 1; /* Fully visible */
+  }
+  50% {
+    opacity: 0; /* Fully transparent */
+  }
+  100% {
+    opacity: 1; /* Back to fully visible */
+  }
+}
+
 @keyframes slideToLeft {
   from {
     transform: translateX(25%);
@@ -28,9 +40,51 @@
   }
 }
 
-/* Slide-in CSS class */
-.slide-in {
+@keyframes slideToRight {
+  from {
+    transform: translateX(-25%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideToBottom {
+  from {
+    transform: translateY(-25%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideToTop {
+  from {
+    transform: translateY(25%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* slide-to-left CSS class */
+.slide-to-left {
   animation: slideToLeft 0.75s ease-in-out forwards;
+}
+.slide-to-right {
+  animation: slideToRight 0.75s ease-in-out forwards;
+}
+.slide-to-bottom {
+  animation: slideToBottom 0.85s ease-in-out forwards;
+}
+.slide-to-top {
+  animation: slideToTop 0.75s ease-in-out forwards;
 }
 
 .app-container {
@@ -40,6 +94,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+div {
+  transition: all 0.3s ease;
 }
 input {
   outline: none;
@@ -52,8 +109,8 @@ button {
 .app-container::-webkit-scrollbar {
   display: none;
 }
-.header-container >  .bg-body-tertiary {
-    background-color: var(--main-color) !important;
+.header-container > .bg-body-tertiary {
+  background-color: var(--main-color) !important;
 }
 .main-container {
   flex: 1;
@@ -73,6 +130,10 @@ button {
   align-items: center;
   height: 100vh;
 }
+.loading-page.component {
+  height: 100%;
+  margin: 10rem;
+}
 .loading-page > svg,
 .icon-spin {
   animation: spin 1s infinite linear;
@@ -83,11 +144,45 @@ button {
 }
 @keyframes spin {
   from {
-      transform: scale(1) rotate(0deg);
+    transform: scale(1) rotate(0deg);
   }
   to {
-      transform: scale(1) rotate(360deg);
+    transform: scale(1) rotate(360deg);
   }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+
+  padding: 2.5rem 4.5rem 1rem;
+}
+
+.pagination > button {
+  margin: 0 3px;
+  padding: 3px 10px;
+  font-size: 0.9rem;
+
+  border: none;
+  background-color: transparent;
+  color: var(--black-color);
+}
+
+.pagination > button:hover {
+  background-color: rgba(217, 217, 217, 0.2);
+  border-radius: 0.3rem;
+}
+
+.pagination > .active,
+.pagination > .active:hover {
+  background-color: var(--main-color);
+  color: white;
+  border-radius: 0.3rem;
+}
+
+.viewall-container .viewall-main-section .pagination > button[disabled] {
+  cursor: default;
+  color: gray;
 }
 
 /* // .App-logo {

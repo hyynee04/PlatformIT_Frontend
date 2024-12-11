@@ -7,13 +7,14 @@ import {
   LuFilter,
   LuPlus,
   LuSearch,
-  LuX
+  LuX,
 } from "react-icons/lu";
 import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
 import "../assets/css/ViewAll.css";
 import { Role } from "../constants/constants";
+import { getPagination } from "../functions/function";
 import {
   getAllCourseCards,
   getAllCourseCardsByIdCenter,
@@ -142,7 +143,7 @@ const CourseMgmt = (props) => {
                 new Date(course.courseEndDate) <= new Date(endDate)) &&
               (!startRegistration ||
                 new Date(course.registStartDate) >=
-                new Date(startRegistration)) &&
+                  new Date(startRegistration)) &&
               (!endRegistration ||
                 new Date(course.registEndDate) <= new Date(endRegistration))))
       )
@@ -184,6 +185,11 @@ const CourseMgmt = (props) => {
   currentItemsPage = currentCourses.slice(
     currentPage * itemsPerPage - itemsPerPage,
     currentPage * itemsPerPage
+  );
+
+  const paginationNumbers = getPagination(
+    currentPage.coursePage,
+    Math.ceil(currentCourses.length / itemsPerPage)
   );
 
   useEffect(() => {
@@ -539,35 +545,32 @@ const CourseMgmt = (props) => {
           </div>
         </div>
       </div>
-      <div className="viewall-main-section">
+      <div className="viewall-main-section slide-to-right">
         <div className="all-cards-container course">
           {currentCourses.length !== 0 &&
             currentItemsPage.map((course, index) => (
               <div key={index} className="one-card-container">
-                <CourseCard key={"course" + course.idCourse} course={course} />
-                {role === Role.centerAdmin && (
-                  <div className="edit-course-btn">
-                    <button>
-                      <FiEdit /> Edit
-                    </button>
-                  </div>
-                )}
+                <CourseCard
+                  key={"course" + course.idCourse}
+                  course={course}
+                  unpinned={true}
+                />
               </div>
             ))}
         </div>
         <div className="pagination">
-          {Array.from(
-            { length: Math.ceil(currentCourses.length / itemsPerPage) },
-            (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => setCurrentPage(index + 1)}
-                className={currentPage === index + 1 ? "active" : ""}
-              >
-                {index + 1}
-              </button>
-            )
-          )}
+          {paginationNumbers.map((number, index) => (
+            <button
+              key={index}
+              onClick={() =>
+                typeof number === "number" && setCurrentPage(number)
+              }
+              className={number === currentPage ? "active" : ""}
+              disabled={number === "..."}
+            >
+              {number}
+            </button>
+          ))}
         </div>
       </div>
     </div>

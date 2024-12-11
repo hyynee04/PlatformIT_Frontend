@@ -13,7 +13,6 @@ import {
   AssignmentItemAnswerType,
   AssignmentType,
 } from "../../constants/constants";
-import { formatDate } from "../../functions/function";
 import {
   postAddManualAssignment,
   postAddQuizAssignment,
@@ -31,22 +30,48 @@ const AddNewAssign = () => {
     save: false,
     publish: false,
   });
-
-  const [title, setTitle] = useState("");
-  //IS TEST
-  const [isTest, setIsTest] = useState(false);
-  //COURSE
   const [isAddByCourse, setIsAddByCourse] = useState(false);
   const [isAddByLecture, setIsAddByLecture] = useState(false);
+
   const [listCourse, setListCourse] = useState([]);
+  const [listSection, setListSection] = useState([]);
+  const [listLecture, setListLecture] = useState([]);
+
+  const [isDropdownCourseVisible, setDropdownCourseVisible] = useState(false);
+  const [isDropdownSectionVisible, setDropdownSectionVisible] = useState(false);
+  const [isDropdownLectureVisible, setDropdownLectureVisible] = useState(false);
+
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedLecture, setSelectedLecture] = useState(null);
+  const [selectedSection, setSelectedSection] = useState(null);
+
+  const [title, setTitle] = useState("");
+  const [isTest, setIsTest] = useState(false);
   const [isLimitedTimeCourse, setIsLimitedTimeCourse] = useState(false);
+  const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
+  const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
+  const [isShowAnswer, setIsShowAnswer] = useState(false);
+  const [typeAssignment, setTypeAssignment] = useState(null);
+  const [duration, setDuration] = useState(0);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [questions, setQuestions] = useState([]);
+  const inputFileRef = useRef([]);
+
+  const [showOptionQuiz, setShowOptionQuiz] = useState(false);
+  const optionQuizRef = useRef(null);
+
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errorAddQuestionMessage, setErrorAddQuestionMessage] = useState("");
+
   useEffect(() => {
     const state = location.state;
     if (state) {
-      if (state.idLecture) {
+      if (state.selectedLecture) {
         setIsAddByLecture(true);
-        setSelectedLecture(state.idLecture);
+        setSelectedLecture(state.selectedLecture);
         setIsTest(false);
       } else if (state.selectedCourse) {
         setIsAddByCourse(true);
@@ -68,24 +93,21 @@ const AddNewAssign = () => {
     };
     fetchCourses();
   }, []);
-  // const handleCourseChange = (event) => {
-  //   const selectedCourseTitle = event.target.value;
-  //   const course = listCourse.find(
-  //     (c) => c.courseTitle === selectedCourseTitle
-  //   );
-  //   setSelectedCourse(course);
-  // };
-  const [isDropdownCourseVisible, setDropdownCourseVisible] = useState(false);
-
-  // const handleInputCourseClick = () => {
-  //   setDropdownCourseVisible(!isDropdownCourseVisible);
-  // };
 
   const handleCourseSelect = (course) => {
     setSelectedCourse(course);
     setSelectedSection(null);
     setSelectedLecture(null);
     setDropdownCourseVisible(false);
+    if (
+      course.isLimitedTime === 0 &&
+      +typeAssignment === AssignmentType.manual
+    ) {
+      setTypeAssignment(AssignmentType.quiz);
+      setQuestions([]);
+    }
+
+    setErrorAddQuestionMessage("");
   };
   const formatTimeCourse = (courseStartDate, courseEndDate) => {
     const now = new Date();
@@ -106,9 +128,6 @@ const AddNewAssign = () => {
   };
 
   //SECTION
-  const [listSection, setListSection] = useState([]);
-  const [selectedSection, setSelectedSection] = useState(null);
-  const [isDropdownSectionVisible, setDropdownSectionVisible] = useState(false);
 
   useEffect(() => {
     const fectchSection = async () => {
@@ -140,9 +159,7 @@ const AddNewAssign = () => {
   };
 
   //LECTURE
-  const [listLecture, setListLecture] = useState([]);
-  const [selectedLecture, setSelectedLecture] = useState(null);
-  const [isDropdownLectureVisible, setDropdownLectureVisible] = useState(false);
+
   useEffect(() => {
     const fetchLectures = async () => {
       if (selectedCourse && selectedCourse.idCourse) {
@@ -182,15 +199,22 @@ const AddNewAssign = () => {
     setDropdownSectionVisible((prev) => (type === "section" ? !prev : false));
     setDropdownLectureVisible((prev) => (type === "lecture" ? !prev : false));
   };
-  //TYPE ASSIGNMENT
-  const [typeAssignment, setTypeAssignment] = useState(null);
-
-  //TIME
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [duration, setDuration] = useState(0);
-  const [isValid, setIsValid] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    if (isAddByLecture) {
+      const matchedCourse = listCourse.find(
+        (course) => course.idCourse === selectedLecture.idCourse
+      );
+      if (matchedCourse) {
+        setSelectedCourse(matchedCourse);
+      }
+      const matchedSection = listSection.find(
+        (section) => section.idSection === selectedLecture.idSection
+      );
+      if (matchedSection) {
+        setSelectedSection(matchedSection);
+      }
+    }
+  }, [listCourse, listSection, selectedLecture, isAddByLecture]);
 
   const isStartDateAfterNow = (startDate) => {
     const currentDate = new Date();
@@ -278,11 +302,6 @@ const AddNewAssign = () => {
   };
 
   //ISSHUFFLINGQUESTION
-  const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
-  const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
-  const [isShowAnswer, setIsShowAnswer] = useState(false);
-  const [showOptionQuiz, setShowOptionQuiz] = useState(false);
-  const optionQuizRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -296,10 +315,6 @@ const AddNewAssign = () => {
     };
   }, []);
   //QUESTION
-  const [questions, setQuestions] = useState([]);
-  const inputFileRef = useRef([]);
-  // const [selectedFile, setSelectedFile] = useState([]);
-  const [errorAddQuestionMessage, setErrorAddQuestionMessage] = useState("");
   const handleAddQuestion = () => {
     if (+typeAssignment === AssignmentType.manual) {
       setQuestions([
@@ -447,18 +462,22 @@ const AddNewAssign = () => {
             )}
             {isAddByLecture && (
               <div className="name-sub-container">
-                <span className="name-course">Name Course</span>
+                <span className="name-course">
+                  {selectedCourse?.courseTitle}
+                </span>
                 <LuChevronRight className="icon" />
-                <span className="name-course">Name Section</span>
+                <span className="name-course">{selectedSection?.title}</span>
                 <LuChevronRight className="icon" />
-                <span className="name-course">Name Lecture</span>
+                <span className="name-course">
+                  {selectedLecture.lectureTitle}
+                </span>
               </div>
             )}
           </div>
         </div>
 
         <div className="action-btns-form">
-          <div className="container-button">
+          <div className="container-button sticky">
             <button
               className="btn save"
               disabled={!isFormValid()}
@@ -508,7 +527,7 @@ const AddNewAssign = () => {
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            {!isAddByCourse && (
+            {!isAddByCourse && !isAddByLecture && (
               <div className="info">
                 <span>
                   Add to course<span className="required">*</span>
@@ -581,7 +600,7 @@ const AddNewAssign = () => {
                   gap: "24px",
                 }}
               >
-                {!isAddByCourse && (
+                {!isAddByCourse && !isAddByLecture && (
                   <div className="info">
                     <div className="check-container">
                       <input

@@ -79,7 +79,10 @@ const postAddManualAssignment = async (dataToSubmit) => {
     );
     // Duyệt qua từng câu hỏi trong mảng questions
     dataToSubmit.questions.forEach((question, index) => {
-      formData.append(`AssignmentItems[${index}].Question`, question.question);
+      formData.append(
+        `AssignmentItems[${index}].Question`,
+        question.question.trim()
+      );
       formData.append(`AssignmentItems[${index}].Mark`, question.mark);
       formData.append(
         `AssignmentItems[${index}].AssignmentItemAnswerType`,

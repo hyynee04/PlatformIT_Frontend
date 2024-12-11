@@ -220,8 +220,13 @@ const AssignDetail = () => {
   const recordsPerPage = 10;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
-  const records = questions.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(questions.length / recordsPerPage);
+  const activeList =
+    idRole === Role.student ||
+    (idRole === Role.teacher && activeChoice === "question")
+      ? questions
+      : sortedSubmissions;
+  const records = activeList.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(activeList.length / recordsPerPage);
 
   //OPTION QUIZ
   const [showOption, setShowOption] = useState(false);
@@ -665,6 +670,7 @@ const AssignDetail = () => {
                                       }
                                       name={`question_${index}`}
                                       defaultChecked={choice.isCorrect}
+                                      disabled
                                     />
                                   </label>
                                   <div className="info" style={{ flex: "1" }}>
@@ -977,8 +983,8 @@ const AssignDetail = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {sortedSubmissions.length > 0 ? (
-                            sortedSubmissions.map((submission, index) => (
+                          {records.length > 0 ? (
+                            records.map((submission, index) => (
                               <tr
                                 key={index}
                                 style={{ cursor: "pointer" }}

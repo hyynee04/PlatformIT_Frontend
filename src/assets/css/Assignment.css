@@ -211,8 +211,7 @@
   padding: 0px 64px 48px;
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  grid-area: 20px;
+  align-items: stretch;
   grid-gap: 20px;
 }
 .container-left-assign,
@@ -371,12 +370,13 @@
   align-items: flex-start;
   background-color: var(--white-color);
 }
-/* .action-btns-form.sticky {
+/* .container-button.sticky {
   position: fixed;
-  top: 48px;
+  top: 116px;
   right: 64px;
   width: 100%;
   z-index: 9999;
+  background-color: var(--white-color);
 } */
 .action-btns-form .container-button {
   display: flex;

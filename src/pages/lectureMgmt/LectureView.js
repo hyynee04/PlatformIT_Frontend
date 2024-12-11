@@ -15,10 +15,11 @@ import {
   getVideoType,
   isPastDateTime,
 } from "../../functions/function";
+import { useNavigate } from "react-router-dom";
 
 const LectureView = ({ lectureDetail }) => {
   const [index, setIndex] = useState(1);
-
+  const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
   console.log(lectureDetail);
   const menuItems = [
@@ -163,7 +164,15 @@ const LectureView = ({ lectureDetail }) => {
             <>
               {idRole === Role.teacher ? (
                 <div className="add-exercise-container">
-                  <button>
+                  <button
+                    onClick={() => {
+                      navigate("/addAssignment", {
+                        state: {
+                          selectedLecture: lectureDetail,
+                        },
+                      });
+                    }}
+                  >
                     <LuPlus /> Add new exercise
                   </button>
                 </div>

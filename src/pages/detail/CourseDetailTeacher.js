@@ -191,20 +191,27 @@ const CourseDetailTeacher = (props) => {
                         className={`lecture-header ${
                           showedSections[index] ? "" : "change-header"
                         } `}
+                        onClick={() =>
+                          setShowedSections({
+                            ...showedSections,
+                            [index]: !showedSections[index],
+                          })
+                        }
                       >
                         {!isEdit[index] ? (
                           <>
                             <span className="section-name">
                               <button
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setIsEdit({
                                     ...Object.keys(isEdit).reduce(
                                       (acc, key) => ({ ...acc, [key]: false }),
                                       {}
                                     ),
                                     [index]: true,
-                                  })
-                                }
+                                  });
+                                }}
                               >
                                 <LuPenLine />
                               </button>
@@ -238,7 +245,10 @@ const CourseDetailTeacher = (props) => {
                             </div>
                           </>
                         ) : (
-                          <div className="edit-section-container">
+                          <div
+                            className="edit-section-container"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <input
                               className="edit-section"
                               value={newSectionTitle}
@@ -253,7 +263,8 @@ const CourseDetailTeacher = (props) => {
                                 <LuCheck />
                               </button>
                               <button
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setNewSectionTitle("");
                                   setIsEdit({
                                     ...isEdit,
@@ -377,12 +388,14 @@ const CourseDetailTeacher = (props) => {
                 </div>
               </div>
             ) : (
-              <button
-                className="add-section-btn"
-                onClick={() => setAddSection(!addSection)}
-              >
-                <LuPlus /> Add new section
-              </button>
+              <div className="add-section-btn-container">
+                <button
+                  className="add-section-btn"
+                  onClick={() => setAddSection(!addSection)}
+                >
+                  <LuPlus /> Add new section
+                </button>
+              </div>
             )}
           </div>
 

@@ -1276,8 +1276,20 @@
   > .lecture-content:hover {
   background-color: rgba(217, 217, 217, 0.2);
 }
+.detail-container
+  .right-container
+  .block-container
+  > .add-section-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
 
-.detail-container .right-container .block-container > .add-section-btn,
+.detail-container
+  .right-container
+  .block-container
+  .add-section-btn-container
+  > .add-section-btn,
 .detail-container
   .left-container
   .block-container
@@ -1302,7 +1314,12 @@
   cursor: pointer;
 }
 
-.detail-container .right-container .block-container .add-section-btn > svg,
+.detail-container
+  .right-container
+  .block-container
+  .add-section-btn-container
+  .add-section-btn
+  > svg,
 .detail-container
   .left-container
   .block-container
@@ -1313,7 +1330,11 @@
   height: 1.1rem;
 }
 
-.detail-container .right-container .block-container > .add-section-btn:hover,
+.detail-container
+  .right-container
+  .block-container
+  .add-section-btn-container
+  > .add-section-btn:hover,
 .detail-container
   .left-container
   .block-container
@@ -1557,7 +1578,7 @@
   .qualification
   .test-status
   > .test-status-text.is-published {
-  color: var(--green-color);
+  color: var(--main-color);
 }
 
 .block-container-col > .info-line {
@@ -2463,7 +2484,7 @@
   height: 100%;
   object-fit: contain;
   border-radius: 0.25rem;
-  filter: blur(5px);
+  /* filter: blur(5px); */
 }
 .center-of-admincenter-container .center-of-admincenter > .center-infomation {
   display: flex;

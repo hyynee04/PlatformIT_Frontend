@@ -1,767 +1,1248 @@
 .lecture-container {
-    width: 100%;
-    height: fit-content;
-    padding: 1.5rem 4.5rem;
-    background-color: #fafafa;
+  width: 100%;
+  height: fit-content;
+  padding: 1.5rem 4.5rem;
+  background-color: #fafafa;
 }
 .lecture-container .lecture-content {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 
-    width: 100%;
-    height: fit-content;
-    background-color: transparent;
+  width: 100%;
+  height: fit-content;
+  background-color: transparent;
 }
 .lecture-container .lecture-content > .course-name {
-    width: 100%;
-    text-align: left;
-    color: var(--black-color);
-    font-weight: 700;
-    font-size: 1.5rem;
+  width: 100%;
+  text-align: left;
+  color: var(--black-color);
+  font-weight: 700;
+  font-size: 1.5rem;
 }
 .lecture-container .lecture-content > .lecture-detail {
-    display: flex;
-    flex-direction: row;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
 
-    width: 100%;
-    height: fit-content;
+  width: 100%;
+  height: fit-content;
 }
 .lecture-container .lecture-content .lecture-detail > .lecture-content-section,
 .lecture-container .lecture-content .lecture-detail > .course-content-section {
-    height: fit-content;
+  height: fit-content;
 
-    padding: 1.5rem 0;
-    background-color: var(--white-color);
-    border: 1px solid var(--border-gray);
-    border-radius: .5rem;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 15px 5px, rgba(0, 0, 0, 0.2) 0px 0px 10px;
+  padding: 1.5rem 0;
+  background-color: var(--white-color);
+  border: 1px solid var(--border-gray);
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 15px 5px,
+    rgba(0, 0, 0, 0.2) 0px 0px 10px;
 }
 .lecture-container .lecture-content .lecture-detail > .lecture-content-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    width: 60%;
-    transition: height 0.5s;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 60%;
+  transition: height 0.5s;
 }
 
 .lecture-container .lecture-content .lecture-detail > .course-content-section {
-    width: 40%;
-    padding: 1.5rem;
+  width: 40%;
+  padding: 1.5rem;
 }
 .video-container {
-    width: 100%;
-    height: 350px;
-    border-radius: .5rem;
-    display: flex;
-    justify-content: center;
-    padding: 0 1.5rem;
+  width: 100%;
+  height: 350px;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  padding: 0 1.5rem;
 }
 .video-container > .video-player {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; 
-    display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 .video-container > .image-container {
-    width: 100%;
-    height: 100%;
-    border-radius: .5rem;
-    background-color: #f5f5f5;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: #f5f5f5;
+  object-fit: contain;
 }
 .video-container .image-container > img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section > .lecture-header {
-    display: flex;
-    flex-direction: column;
-    padding: 0 1.5rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  > .lecture-header {
+  display: flex;
+  flex-direction: column;
+  padding: 0 1.5rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-header > .lecture-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--black-color);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-header
+  > .lecture-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--black-color);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-header > .time-created {
-    font-size: .8rem;
-    color: var(--text-gray);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-header
+  > .time-created {
+  font-size: 0.8rem;
+  color: var(--text-gray);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section > .lecture-main {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main > .lecture-main-menu {
-    display: flex;
-    flex-direction: row;
-    gap: 1.5rem;
-    padding: 0 1.5rem;
-    border: none;
-    border-bottom: 1px solid var(--border-gray);
-}
-
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .lecture-main-menu > button {
-    border: none;
-    background-color: transparent;
-    padding: .25rem 0rem;
-
-    color: var(--text-gray);
-    font-size: .9rem;
-    cursor: pointer;
-}
-
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .lecture-main-menu > button:hover {
-    color: var(--main-color);
-    font-weight: bold;
-    scale: 1.1;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  > .lecture-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .lecture-main-menu > button.active,
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .lecture-main-menu > button.active:hover {
-    border-bottom: 3px solid var(--main-color);
-    color: var(--main-color);
-    font-weight: 700;
-    padding: 0;
-    background-color: transparent;
-    scale: 1;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  > .lecture-main-menu {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  border: none;
+  border-bottom: 1px solid var(--border-gray);
 }
 
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main > .menu-part {
-    padding: 0 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .lecture-main-menu
+  > button {
+  border: none;
+  background-color: transparent;
+  padding: 0.25rem 0rem;
+
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  cursor: pointer;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part > .part-item,
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display > .exercise-body,
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display > .exercise-sideinfo,
+
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .lecture-main-menu
+  > button:hover {
+  color: var(--main-color);
+  font-weight: bold;
+  scale: 1.1;
+}
+
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .lecture-main-menu
+  > button.active,
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .lecture-main-menu
+  > button.active:hover {
+  border-bottom: 3px solid var(--main-color);
+  color: var(--main-color);
+  font-weight: 700;
+  padding: 0;
+  background-color: transparent;
+  scale: 1;
+}
+
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  > .menu-part {
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  > .part-item,
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  > .exercise-body,
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  > .exercise-sideinfo,
 .main-material {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part > .part-item.exercise:hover {
-    cursor: pointer;
-    background-color: rgba(217 , 217, 217, 0.5);
-    transform: scale(1.01);
-    border-radius: .25rem;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  > .part-item.exercise:hover {
+  cursor: pointer;
+  background-color: rgba(217, 217, 217, 0.5);
+  transform: scale(1.01);
+  border-radius: 0.25rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .main-material {
-    padding: 0 1.5rem;
+  padding: 0 1.5rem;
 }
 
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .item-title,
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-body > .item-title,
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  > .item-title,
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-body
+  > .item-title,
 .main-material > .title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--black-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--black-color);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .intro-content {
-    font-size: .8rem;
-    color: var(--text-gray);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  > .intro-content {
+  font-size: 0.8rem;
+  color: var(--text-gray);
 
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display > .exercise-body {
-    max-width: 75%;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  > .exercise-body {
+  max-width: 75%;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .exercise-display {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  > .exercise-display {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
-    padding: .5rem;
+  padding: 0.5rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-body > .exercise-description {
-    width: 100%;
-    height: fit-content;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-body
+  > .exercise-description {
+  width: 100%;
+  height: fit-content;
 
-    display: flex;
-    flex-direction: row;
-    gap: 1.5rem;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  align-items: center;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-description > span {
-    width: fit-content;
-    height: fit-content;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-description
+  > span {
+  width: fit-content;
+  height: fit-content;
 
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: .3rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
 
-    color: var(--text-gray);
-    font-size: .8rem;
+  color: var(--text-gray);
+  font-size: 0.8rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display > .exercise-sideinfo {
-    justify-content: end;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  > .exercise-sideinfo {
+  justify-content: end;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-sideinfo > span {
-    font-size: .8rem;
-    padding: 2px 8px;
-    border-radius: .25rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 0.25rem;
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-sideinfo > span.inform {
-    color: var(--text-gray);
-    background-color: rgba(217 , 217, 217, 0.5);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span.inform {
+  color: var(--text-gray);
+  background-color: rgba(217, 217, 217, 0.5);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-sideinfo > span.complete {
-    color: var(--green-color);
-    background-color: rgba(20, 174, 92, 0.3);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span.complete {
+  color: var(--green-color);
+  background-color: rgba(20, 174, 92, 0.3);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.exercise-display .exercise-sideinfo > span.pastdue {
-    color: var(--red-color);
-    background-color: rgba(192, 15, 12, 0.3);
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span.pastdue {
+  color: var(--red-color);
+  background-color: rgba(192, 15, 12, 0.3);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .comment-display {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span.published {
+  background-color: var(--border-gray);
+  color: var(--main-color);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display > .ava-holder {
-    width: fit-content;
-    height: 100%;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .exercise-display
+  .exercise-sideinfo
+  > span.unpublish {
+  background-color: var(--border-gray);
+  color: var(--text-gray);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-display .ava-holder > img {
-    width: 2.5rem;
-    height: 2.5rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  > .comment-display {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-display
+  > .ava-holder {
+  width: fit-content;
+  height: 100%;
+}
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-display
+  .ava-holder
+  > img {
+  width: 2.5rem;
+  height: 2.5rem;
 
-    object-fit: cover;
-    border-radius: 50%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 .comment-content {
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
 }
 .comment-content > .comment-entering {
-    width: 100%;
-    font-size: 0.8rem;
-    margin-bottom: 5px;
-    border: none;
-    border-bottom: 1px solid var(--border-gray);
-    outline: none;
+  width: 100%;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+  border: none;
+  border-bottom: 1px solid var(--border-gray);
+  outline: none;
 
-    line-height: 25px;
-    max-height: 150px; 
-    overflow-y: auto; 
-    box-sizing: border-box;
-    resize: none; 
+  line-height: 25px;
+  max-height: 150px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  resize: none;
 }
 .comment-content > .button-container {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
-    gap: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  gap: 10px;
 }
 .comment-content .button-container > button {
-    font-size: .85rem;
-    padding: 2px 8px;
-    border: none;
-    border-radius: .25rem;
-    cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
 }
 .comment-content .button-container > button.comment {
-    background-color: var(--main-color);
-    color: var(--white-color);
+  background-color: var(--main-color);
+  color: var(--white-color);
 }
 .comment-content .button-container > button.comment:hover {
-    background-color: rgba(57, 121, 121, 0.8);
+  background-color: rgba(57, 121, 121, 0.8);
 }
 .comment-content .button-container > button.cancel {
-    background-color: transparent;
-    color: var(--text-gray);
+  background-color: transparent;
+  color: var(--text-gray);
 }
 .comment-content .button-container > button.cancel:hover {
-    background-color: rgba(217 , 217, 217, 0.5);
+  background-color: rgba(217, 217, 217, 0.5);
 }
 .comment-content > .comment-header {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: center;
-    justify-content: flex-start;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
 }
 .comment-content .comment-header > .commentator-name {
-    font-size: .9rem;
-    color: var(--second-main-color);
-    font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--second-main-color);
+  font-weight: 600;
 }
 .comment-content .comment-header > .comment-time {
-    font-size: .7rem;
-    color: var(--text-gray);
-    font-weight: 600;
+  font-size: 0.7rem;
+  color: var(--text-gray);
+  font-weight: 600;
 }
 .comment-content > .comment-body {
-    width: 100%;
-    font-size: .8rem;
-    color: var(--text-gray);
-    text-wrap: wrap;
-    overflow-y: hidden;
-    position: relative;
-    text-align: justify;
-    max-height: 50px;
-    transition: max-height 0.1s ease-in-out;
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--text-gray);
+  text-wrap: wrap;
+  overflow-y: hidden;
+  position: relative;
+  text-align: justify;
+  max-height: 50px;
+  transition: max-height 0.1s ease-in-out;
 }
 .comment-content > .comment-body.expanded {
-    overflow-y: visible;
-    max-height: 500px;
-    transition: max-height 0.3s ease;
+  overflow-y: visible;
+  max-height: 500px;
+  transition: max-height 0.3s ease;
 }
 .comment-content .comment-body > .blur-bottom {
-    width: 100%;
-    height: 20px;
-    position: absolute;
-    bottom: 0;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
-    opacity: 0;                
-    visibility: hidden;        
-    transition: opacity 0.1s ease-out, visibility 0s 0.1s; 
+  width: 100%;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 1)
+  );
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.1s ease-out, visibility 0s 0.1s;
 }
 .comment-content .comment-body > .blur-bottom.show {
-    opacity: 1;                /* Visible after transition */
-    visibility: visible;       /* Make it visible */
+  opacity: 1; /* Visible after transition */
+  visibility: visible; /* Make it visible */
 }
 .comment-content > .view-more-container {
-    width: 100%;
+  width: 100%;
 
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .comment-content .view-more-container > hr {
-    margin: 0;
-    background-color: rgba(217 , 217, 217, 0.5);
+  margin: 0;
+  background-color: rgba(217, 217, 217, 0.5);
 }
 .comment-content .view-more-container > .line-1 {
-    width: 10%;
+  width: 10%;
 }
 .comment-content .view-more-container > .line-2 {
-    width: 78%;
+  width: 78%;
 }
 .comment-content .view-more-container > button {
-    border: none;
-    border-radius: .25rem;
-    background-color: transparent;
-    color: var(--text-gray);
-    font-size: 0.7rem;
-    padding: 2px 4px;
-    outline: none;
-    cursor: pointer;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: var(--text-gray);
+  font-size: 0.7rem;
+  padding: 2px 4px;
+  outline: none;
+  cursor: pointer;
 }
 .comment-content .view-more-container > button:hover {
-    background-color: rgba(217 , 217, 217, 0.5);
+  background-color: rgba(217, 217, 217, 0.5);
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item > .comment-responses-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  > .comment-responses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 
-    padding-left: 50px;
+  padding-left: 50px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item .comment-responses-container > .comment-response {
-    display: flex;
-    flex-direction: row;
-    gap: .5rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  > .comment-response {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.comment-responses-container > .more-responses {
-    width: fit-content;
-    height: fit-content;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  > .more-responses {
+  width: fit-content;
+  height: fit-content;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.comment-responses-container .more-responses > button {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: center;
-    background-color: rgba(217 , 217, 217, 0.5);
-    color: var(--main-color);
-    border: none;
-    border-radius: .5rem;
-    font-size: .7rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    margin-top: .5rem;
-    cursor: pointer;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  .more-responses
+  > button {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 0.5);
+  color: var(--main-color);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  margin-top: 0.5rem;
+  cursor: pointer;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part .part-item 
-.comment-responses-container .more-responses button > svg {
-    width: .8rem;
-    height: .8rem;
-    margin-top: 1px;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  .more-responses
+  button
+  > svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: 1px;
 }
-.lecture-container .lecture-content .lecture-detail .lecture-content-section .lecture-main .menu-part 
-.part-item .comment-responses-container .comment-response .ava-holder > img {
-    width: 2rem;
-    height: 2rem;
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  .comment-response
+  .ava-holder
+  > img {
+  width: 2rem;
+  height: 2rem;
 
-    object-fit: cover;
-    border-radius: 50%;
+  object-fit: cover;
+  border-radius: 50%;
 }
-
-
-
-
 
 .section-view-container {
-    width: 100%;
-    height: fit-content;
+  width: 100%;
+  height: fit-content;
 
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 .section-view-container > .section-header {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 .section-view-container .section-header > .header-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--main-color);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--main-color);
 }
 .section-view-container .section-header > .header-info {
-    color: var(--text-gray);
+  color: var(--text-gray);
 }
 .section-view-container > .section-display {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 .section-view-container .section-display > .each-section {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: fit-content;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
 }
 .section-view-container .section-display .each-section > .each-section-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    height: fit-content;
-    padding: .5rem 1rem;
-    background-color: rgba(217 , 217, 217, 0.5);
-    border-radius: .25rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: fit-content;
+  padding: 0.5rem 1rem;
+  background-color: rgba(217, 217, 217, 0.5);
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
-.section-view-container .section-display .each-section > .each-section-header.active {
-    background-color: rgba(57, 121, 121, 0.3);
-    border-radius: .25rem .25rem 0 0;
-    transition: all 0.3s ease;
+.section-view-container
+  .section-display
+  .each-section
+  > .each-section-header.active {
+  background-color: rgba(57, 121, 121, 0.3);
+  border-radius: 0.25rem 0.25rem 0 0;
+  transition: all 0.3s ease;
 }
 
-.section-view-container .section-display .each-section .each-section-header > .each-section-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--black-color);
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  > .each-section-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--black-color);
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
-.section-view-container .section-display .each-section .each-section-header .each-section-name > button {
-    border: none;
-    background-color: transparent;
-    padding: 0 .25rem;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .each-section-name
+  > button {
+  border: none;
+  background-color: transparent;
+  padding: 0 0.25rem;
 }
-.section-view-container .section-display .each-section .each-section-header .each-section-name > button:hover {
-    transform: scale(1.1) translate(2px, -2px);
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .each-section-name
+  > button:hover {
+  transform: scale(1.1) translate(2px, -2px);
 }
-.section-view-container .section-display .each-section .each-section-header > .each-section-info {
-    width: 7.25rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: end;
-    gap: 1rem;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  > .each-section-info {
+  width: 7.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: end;
+  gap: 1rem;
 }
-.section-view-container .section-display .each-section .each-section-header .each-section-info > .lecture-number {
-    font-size: .8rem;
-    font-weight: 600;
-    color: var(--text-gray);
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .each-section-info
+  > .lecture-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-gray);
 }
-.section-view-container .section-display .each-section .each-section-header .each-section-info > .dropdown-button {
-    border: none;
-    outline: none;
-    background-color: transparent;
-    cursor: pointer;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .each-section-info
+  > .dropdown-button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  cursor: pointer;
 }
-.section-view-container .section-display .each-section .each-section-header .each-section-info > .dropdown-button:hover {
-    opacity: 0.5;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .each-section-info
+  > .dropdown-button:hover {
+  opacity: 0.5;
 }
-.section-view-container .section-display .each-section .each-section-header > .edit-section-container {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  > .edit-section-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
-.section-view-container .section-display .each-section .each-section-header .edit-section-container > input {
-    width: 80%;
-    border: none;
-    border-bottom: 1px solid var(--black-color);
-    background-color: transparent;
-    font-size: 1.06rem;
-    font-weight: 500;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  > input {
+  width: 80%;
+  border: none;
+  border-bottom: 1px solid var(--black-color);
+  background-color: transparent;
+  font-size: 1.06rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.section-view-container .section-display .each-section .each-section-header .edit-section-container > .edit-section-buttons {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    width: fit-content;
-    height: fit-content;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  > .edit-section-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  height: fit-content;
 }
-.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button {
-    border: none;
-    border-radius: .25rem;
-    width: 1.5rem;
-    aspect-ratio: 1;
-    background-color: transparent;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  .edit-section-buttons
+  > button {
+  border: none;
+  border-radius: 0.25rem;
+  width: 1.5rem;
+  aspect-ratio: 1;
+  background-color: transparent;
 }
-.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:disabled,
-.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:disabled:hover {
-    background-color: rgba(217, 217, 217, 0.5);
-    color: var(--text-gray);
-    cursor:not-allowed;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  .edit-section-buttons
+  > button:disabled,
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  .edit-section-buttons
+  > button:disabled:hover {
+  background-color: rgba(217, 217, 217, 0.5);
+  color: var(--text-gray);
+  cursor: not-allowed;
 }
-.section-view-container .section-display .each-section .each-section-header .edit-section-container .edit-section-buttons > button:hover {
-    background-color: rgba(57, 121, 121, 0.3);
-    scale: 1.2;
+.section-view-container
+  .section-display
+  .each-section
+  .each-section-header
+  .edit-section-container
+  .edit-section-buttons
+  > button:hover {
+  background-color: rgba(57, 121, 121, 0.3);
+  scale: 1.2;
 }
 
 .section-view-container .section-display .each-section > .section-lectures {
-    display: flex;
-    flex-direction: column;
-    border-radius: 0 0 .25rem .25rem;
-    border-left: 1px solid var(--border-gray);
-    border-right: 1px solid var(--border-gray);
-    max-height: 1000;
-    overflow: auto;
-    opacity: 1;
-    transition: opacity 0.2s ease-in, max-height 0.2s ease-in;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 0 0.25rem 0.25rem;
+  border-left: 1px solid var(--border-gray);
+  border-right: 1px solid var(--border-gray);
+  max-height: 1000;
+  overflow: auto;
+  opacity: 1;
+  transition: opacity 0.2s ease-in, max-height 0.2s ease-in;
 }
-.section-view-container .section-display .each-section > .section-lectures.deactive {
-    opacity: 0;
-    max-height: 0;
-    transition: opacity 0.2s ease-out, max-height 0.2s ease-out;
+.section-view-container
+  .section-display
+  .each-section
+  > .section-lectures.deactive {
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.2s ease-out, max-height 0.2s ease-out;
 }
-.section-view-container .section-display .each-section .section-lectures > .lecture-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    
-    width: 100%;
-    height: fit-content;
-    padding: .5rem 1rem;
-    border-bottom: 1px solid var(--border-gray);
-}
-.section-view-container .section-display .each-section .section-lectures > .lecture-item:hover {
-    background-color: rgba(217, 217, 217, 0.3);
-    cursor: pointer;
-}
-.section-view-container .section-display .each-section .section-lectures > .nohover,
-.section-view-container .section-display .each-section .section-lectures > .nohover:hover {
-    background-color: transparent;
-}
-.section-view-container .section-display .each-section .section-lectures > .lecture-item.contain-button {
-    padding: .25rem 1rem;
-    height: 2.25rem;
-}
-.section-view-container .section-display .each-section .section-lectures .lecture-item > .lecture-info {
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-}
-.section-view-container .section-display .each-section .section-lectures .lecture-item .lecture-info > .lecture-title {
-    font-size: 1rem;
-    color: var(--black-color);
-    font-weight: 600;
-    width: 100%;
-}
-.section-view-container .section-display .each-section .section-lectures .lecture-item .lecture-info > .lecture-title.active {
-    color: var(--main-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  > .lecture-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 
+  width: 100%;
+  height: fit-content;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border-gray);
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .lecture-info > .exercise-num {
-    font-size: .8rem;
-    color: var(--black-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  > .lecture-item:hover {
+  background-color: rgba(217, 217, 217, 0.3);
+  cursor: pointer;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item > svg {
-    width: 20px;
-    height: 20px;
-    color: var(--green-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  > .nohover,
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  > .nohover:hover {
+  background-color: transparent;
 }
-.section-view-container .section-display > .add-section {
-    width: 100%;
-    height: fit-content;
-    display: flex;
-    justify-content: flex-end;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  > .lecture-item.contain-button {
+  padding: 0.25rem 1rem;
+  height: 2.25rem;
 }
-.section-view-container .section-display .add-section > button {
-    background-color: rgba(217, 217, 217, 0.2);
-    color: var(--main-color);
-    font-size: .8rem;
-    font-weight: 500;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  > .lecture-info {
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .lecture-info
+  > .lecture-title {
+  font-size: 1rem;
+  color: var(--black-color);
+  font-weight: 600;
+  width: 100%;
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .lecture-info
+  > .lecture-title.active {
+  color: var(--main-color);
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .lecture-info
+  > .exercise-num {
+  font-size: 0.8rem;
+  color: var(--black-color);
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  > svg {
+  width: 20px;
+  height: 20px;
+  color: var(--green-color);
+}
+.section-view-container .section-display > .add-section,
+.add-exercise-container {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  justify-content: flex-end;
+}
+.add-exercise-container {
+  justify-content: flex-start;
+}
+.section-view-container .section-display .add-section > button,
+.add-exercise-container > button {
+  background-color: rgba(217, 217, 217, 0.2);
+  color: var(--main-color);
+  font-size: 0.8rem;
+  font-weight: 500;
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    
-    width: fit-content;
-    height: fit-content;
-    padding: .3rem .5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
 
-    border: none;
-    border-radius: .25rem;
-    cursor: pointer;
+  width: fit-content;
+  height: fit-content;
+  padding: 0.3rem 0.5rem;
+
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
 }
-.section-view-container .section-display .add-section > button:hover {
-    background-color: rgba(57, 121, 121, 0.3);
+.section-view-container .section-display .add-section > button:hover,
+.add-exercise-container > button:hover {
+  background-color: rgba(57, 121, 121, 0.3);
 }
-.section-view-container .section-display .add-section button > svg {
-    width: 1.1rem;
-    height: 1.1rem;
+.section-view-container .section-display .add-section button > svg,
+.add-exercise-container button > svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 .content-file {
-    width: 100%;
-    border: none;
-    border-radius: .25rem;
-    background-color: rgba(217, 217, 217, 0.3);
-    color: var(--black-color);
-    padding: .5rem 1rem;
+  width: 100%;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: rgba(217, 217, 217, 0.3);
+  color: var(--black-color);
+  padding: 0.5rem 1rem;
 
-    overflow-x: hidden;
-    display: flex; 
-    align-items: center;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
 
-    cursor: pointer;
+  cursor: pointer;
 }
-.content-file >  span {
-    -webkit-line-clamp: 1; /* Limit to 1 line */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: normal; /* Allow text wrapping for line clamping */
-    max-width: 80%; /* Limit the width to control the ellipsis */
-    line-height: 1.4rem;
-    font-size: .9rem;
+.content-file > span {
+  -webkit-line-clamp: 1; /* Limit to 1 line */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal; /* Allow text wrapping for line clamping */
+  max-width: 80%; /* Limit the width to control the ellipsis */
+  line-height: 1.4rem;
+  font-size: 0.9rem;
 }
 .content-file:hover {
-    background-color: rgba(217, 217, 217, 1);
+  background-color: rgba(217, 217, 217, 1);
 }
 
-.section-view-container .section-display .each-section .section-lectures .lecture-item > .option-container {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 10px;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  > .option-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 10px;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    position: relative;
-    border: none;
-    border-radius: .25rem;
-    font-size: .8rem;
-    padding: 3px;
-    cursor: pointer;
-    width: 1.5rem;
-    height: fit-content;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-    white-space: nowrap;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  padding: 3px;
+  cursor: pointer;
+  width: 1.5rem;
+  height: fit-content;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  white-space: nowrap;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button .icon > svg {
-    width: 1.1rem;
-    height: 1.1rem;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  button
+  .icon
+  > svg {
+  width: 1.1rem;
+  height: 1.1rem;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button > span {
-    display: flex;
-    align-items: center;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  button
+  > span {
+  display: flex;
+  align-items: center;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container button > .text {
-    font-weight: 600;
-    font-size: .8rem;
-    transform: translateX(10px);
-    opacity: 0;
-    transition: opacity 0.5s ease;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  button
+  > .text {
+  font-weight: 600;
+  font-size: 0.8rem;
+  transform: translateX(10px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button:hover {
-    width: fit-content;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button:hover {
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button:hover .text {
-    opacity: 1;
-    transition: opacity 0.5s ease;
-    transform: translateX(0px);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button:hover
+  .text {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  transform: translateX(0px);
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture {
-    color: var(--main-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.add-lecture {
+  color: var(--main-color);
 }
 
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section {
-    color: var(--red-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.remove-section {
+  color: var(--red-color);
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture:hover {
-    background-color: rgba(57, 121, 121, 0.3);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.add-lecture:hover {
+  background-color: rgba(57, 121, 121, 0.3);
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.add-lecture:hover .icon {
-    color: var(--main-color);
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.add-lecture:hover
+  .icon {
+  color: var(--main-color);
 }
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section:hover {
-    background-color: rgba(192, 15, 12, 0.3);
-} 
-.section-view-container .section-display .each-section .section-lectures .lecture-item .option-container > button.remove-section:hover .icon {
-    color: var(--red-color);
-} 
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.remove-section:hover {
+  background-color: rgba(192, 15, 12, 0.3);
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  .option-container
+  > button.remove-section:hover
+  .icon {
+  color: var(--red-color);
+}

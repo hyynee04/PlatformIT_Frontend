@@ -5,10 +5,11 @@ import {
   LuClock,
   LuFileEdit,
   LuFileQuestion,
+  LuPlus,
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
-import { AssignmentType } from "../../constants/constants";
+import { AssignmentType, Role } from "../../constants/constants";
 import {
   formatDateTime,
   getVideoType,
@@ -17,6 +18,8 @@ import {
 
 const LectureView = ({ lectureDetail }) => {
   const [index, setIndex] = useState(1);
+
+  const idRole = +localStorage.getItem("idRole");
   console.log(lectureDetail);
   const menuItems = [
     { label: "Introduction", index: 1 },
@@ -158,6 +161,14 @@ const LectureView = ({ lectureDetail }) => {
           )}
           {index === 3 && (
             <>
+              {idRole === Role.teacher ? (
+                <div className="add-exercise-container">
+                  <button>
+                    <LuPlus /> Add new exercise
+                  </button>
+                </div>
+              ) : null}
+
               {lectureDetail.exercises &&
                 lectureDetail.exercises.length > 0 &&
                 lectureDetail.exercises.map((exercise, index) => (
@@ -203,25 +214,47 @@ const LectureView = ({ lectureDetail }) => {
                               )}
                             </div>
                           </div>
-                          {exercise.isSubmitted ? (
-                            <div className="exercise-sideinfo">
-                              <span className="complete">
-                                Complete <LuCheckSquare />
-                              </span>
-                            </div>
-                          ) : exercise.dueDate &&
-                            isPastDateTime(exercise.dueDate) ? (
-                            <div className="exercise-sideinfo">
-                              <span className="pastdue">Past due</span>
-                            </div>
+                          {idRole === Role.student ? (
+                            <>
+                              {exercise.isSubmitted ? (
+                                <div className="exercise-sideinfo">
+                                  <span className="complete">
+                                    Complete <LuCheckSquare />
+                                  </span>
+                                </div>
+                              ) : exercise.dueDate &&
+                                isPastDateTime(exercise.dueDate) ? (
+                                <div className="exercise-sideinfo">
+                                  <span className="pastdue">Past due</span>
+                                </div>
+                              ) : (
+                                exercise.dueDate && (
+                                  <div className="exercise-sideinfo">
+                                    <span className="inform">
+                                      {formatDateTime(exercise.dueDate)}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                            </>
                           ) : (
-                            exercise.dueDate && (
+                            <>
                               <div className="exercise-sideinfo">
-                                <span className="inform">
-                                  {formatDateTime(exercise.dueDate)}
+                                <span
+                                  className={`${
+                                    exercise.isPublish
+                                      ? "published"
+                                      : "unpublished"
+                                  }`}
+                                >
+                                  {`${
+                                    exercise.isPublish
+                                      ? "published"
+                                      : "unpublished"
+                                  }`}
                                 </span>
                               </div>
-                            )
+                            </>
                           )}
                         </div>
                       </div>

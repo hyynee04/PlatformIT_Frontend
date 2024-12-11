@@ -227,8 +227,12 @@ const CourseCard = (props) => {
                     ? `${course.discountedPrice
                         .toString()
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
+                    : course.price
+                    ? `${course.price
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`
                     : "Free"}
-                  {course.discountedPrice && <TbCurrencyDong />}
+                  {course.price && <TbCurrencyDong />}
                 </span>
                 {course.discountedPrice && idRole !== Role.centerAdmin && (
                   <span className="initial-price">

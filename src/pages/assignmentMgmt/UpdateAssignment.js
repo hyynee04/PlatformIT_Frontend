@@ -348,18 +348,22 @@ const UpdateAssignment = ({ isDuplicate }) => {
     );
   };
   useEffect(() => {
-    if (assignmentInfo.startDate && assignmentInfo.dueDate) {
-      setIsValid(
-        validateForm(
-          assignmentInfo.startDate,
-          assignmentInfo.dueDate,
-          assignmentInfo.duration,
-          selectedCourse
-            ? selectedCourse.courseEndDate
-            : assignmentInfo.courseEndDate
-        )
-      );
-    }
+    if (
+      selectedCourse?.isLimitedTime === 1 &&
+      assignmentInfo.isLimitedTime === 1
+    )
+      if (assignmentInfo.startDate && assignmentInfo.dueDate) {
+        setIsValid(
+          validateForm(
+            assignmentInfo.startDate,
+            assignmentInfo.dueDate,
+            assignmentInfo.duration,
+            selectedCourse
+              ? selectedCourse.courseEndDate
+              : assignmentInfo.courseEndDate
+          )
+        );
+      }
   }, [assignmentInfo, selectedCourse]);
   //QUESTION
 
@@ -614,7 +618,10 @@ const UpdateAssignment = ({ isDuplicate }) => {
           </div>
         </div>
 
-        <div className={`action-btns-form ${isSticky ? "sticky" : ""}`}>
+        <div
+          className="action-btns-form"
+          style={{ backgroundColor: "transparent" }}
+        >
           <div className="container-button">
             {!isDuplicate && (
               <div
@@ -903,7 +910,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                       </div>
                     </div>
                     {(isDuplicate
-                      ? selectedCourse?.isLimitedTime
+                      ? selectedCourse?.isLimitedTime === 1
                       : assignmentInfo.isLimitedTime === 1) && (
                       <div className="info">
                         <div className="container-validate">
@@ -941,7 +948,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                       </div>
                     </div>
                     {(isDuplicate
-                      ? selectedCourse?.isLimitedTime
+                      ? selectedCourse?.isLimitedTime === 1
                       : assignmentInfo.isLimitedTime === 1) && (
                       <div className="info">
                         <div className="container-validate">

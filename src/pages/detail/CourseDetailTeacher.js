@@ -331,7 +331,7 @@ const CourseDetailTeacher = (props) => {
                             <div
                               key={index}
                               className={`lecture-content ${
-                                courseInfo.idTeacher === idRole ? "" : "nohover"
+                                courseInfo.idTeacher === idUser ? "" : "nohover"
                               }`}
                               onClick={() => {
                                 if (courseInfo.idTeacher === idUser)

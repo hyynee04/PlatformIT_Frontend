@@ -38,6 +38,13 @@ const getCourseDetail = (idCourse) => {
     },
   });
 };
+const getViewCourse = (idCourse) => {
+  return axios.get("api/Course/ViewCourse", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
 const postAddCourse = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   const idCenter = +localStorage.getItem("idCenter");
@@ -94,26 +101,50 @@ const postAddCourse = async (dataToSubmit) => {
 };
 const postUpdateCourse = async (courseInfo) => {
   try {
-    return await axios.post("api/Course/UpdateCourseInfo", null, {
-      params: {
-        IdCourse: courseInfo.idCourse,
-        Title: courseInfo.title,
-        Introduction: courseInfo.introduction,
-        StartDate: courseInfo.startDate,
-        EndDate: courseInfo.endDate,
-        MaxAttendees: courseInfo.maxAttendees,
-        Price: courseInfo.price,
-        DiscountedPrice: courseInfo.discountedPrice,
-        RegistStartDate: courseInfo.registStartDate,
-        RegistEndDate: courseInfo.registEndDate,
-        IsLimitAttendees: courseInfo.isLimitAttendees ? 1 : 0,
-        IsPremiumCourse: courseInfo.isPremiumCourse ? 1 : 0,
-        IsLimitedTime: courseInfo.isLimitedTime ? 1 : 0,
-        IsSequenced: courseInfo.isSequenced ? 1 : 0,
-        IsApprovedLecture: courseInfo.isApprovedLecture ? 1 : 0,
-        idUpdatedBy: Number(localStorage.getItem("idUser")),
-      },
+    const formData = new FormData();
+    formData.append("IdCourse", courseInfo.idCourse);
+    formData.append("Title", courseInfo.title);
+    formData.append("Introduction", courseInfo.introduction);
+    formData.append("CourseAvatar", courseInfo.coverImg);
+    formData.append("IsLimitedTime", courseInfo.isLimitedTime);
+    if (courseInfo.isLimitedTime === 1) {
+      formData.append("StartDate", courseInfo.startDate);
+      formData.append("EndDate", courseInfo.endDate);
+      formData.append("RegistStartDate", courseInfo.registStartDate);
+      formData.append("RegistEndDate", courseInfo.registEndDate);
+    }
+    formData.append("IsLimitAttendees", courseInfo.isLimitAttendees);
+    if (courseInfo.isLimitAttendees === 1) {
+      formData.append("MaxAttendees", courseInfo.maxAttendees);
+    }
+    formData.append("IsPremiumCourse", courseInfo.isPremiumCourse);
+    if (courseInfo.isPremiumCourse === 1) {
+      formData.append("Price", courseInfo.price);
+      formData.append("DiscountedPrice", courseInfo.discountedPrice);
+    }
+    formData.append(
+      "IsSequenced",
+      courseInfo.isSequenced === 1 || courseInfo.isSequenced ? 1 : 0
+    );
+    formData.append(
+      "IsApprovedLecture",
+      courseInfo.isApprovedLecture === 1 || courseInfo.isApprovedLecture ? 1 : 0
+    );
+    courseInfo.tags.forEach((tag) => {
+      formData.append("Tags", tag);
     });
+    formData.append("IdTeacher", courseInfo.idTeacher);
+    return await axios.post(
+      `api/Course/UpdateCourseInfo?idUpdatedBy=${Number(
+        localStorage.getItem("idUser")
+      )}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
   } catch (error) {
     throw error;
   }
@@ -280,6 +311,7 @@ export {
   getAllTagModel,
   getCourseContentStructure,
   getCourseDetail,
+  getViewCourse,
   getCourseProgress,
   getExerciseOfLecture,
   getIsEnRolledCourse,

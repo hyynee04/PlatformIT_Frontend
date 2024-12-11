@@ -40,6 +40,7 @@ import {
   postUpdateUserBasicPI,
 } from "../services/userService";
 import { fetchUserProfile, updateUserPI } from "../store/profileUserSlice";
+import DiagRemoveImgForm from "../components/diag/DiagRemoveImgForm";
 
 const TeacherPI = () => {
   const location = useLocation();
@@ -111,7 +112,12 @@ const TeacherPI = () => {
   const toggleVisibility = () => {
     setShowAvatarImageOption(!showAvatarImageOption);
   };
+  const [isModalRemoveAvaOpen, setIsModalRemoveAvaOpen] = useState(false);
+
+  const openRemoveAvaModal = () => setIsModalRemoveAvaOpen(true);
+  const closeRemoveAvaModal = () => setIsModalRemoveAvaOpen(false);
   const inputFileRef = useRef(null);
+  const optionButtonRef = useRef(null);
 
   const fetchContries = async () => {
     try {
@@ -508,7 +514,15 @@ const TeacherPI = () => {
             <div className="container-icon" onClick={toggleVisibility}>
               <LuCamera className="icon" />
             </div>
-            {showAvatarImageOption && <AvatarImageOption isAvatar={true} />}
+            {showAvatarImageOption && (
+              <AvatarImageOption
+                isAvatar={true}
+                openRemoveAvaModal={openRemoveAvaModal}
+                isOpen={showAvatarImageOption}
+                onClose={() => setShowAvatarImageOption(false)}
+                optionButtonRef={optionButtonRef}
+              />
+            )}
           </div>
           <div className="sub-container-action">
             <span className="name-info">{name}</span>
@@ -1071,6 +1085,13 @@ const TeacherPI = () => {
           </div>
         )}
       </div>
+      {isModalRemoveAvaOpen && (
+        <DiagRemoveImgForm
+          isOpen={isModalRemoveAvaOpen}
+          onClose={closeRemoveAvaModal}
+          isAvatar={true}
+        />
+      )}
     </div>
   );
 };

@@ -199,42 +199,30 @@ const AddNewCourse = () => {
     let registTimeValidate = "";
     let durationValidate = "";
     const today = new Date().setHours(0, 0, 0, 0);
-    // Kiểm tra không được trước ngày hôm nay
     if (new Date(values.registStartDate) < today) {
       registTimeValidate = "Registration start date cannot be before today";
-    }
-    if (new Date(values.registEndDate) < today) {
+    } else if (new Date(values.registEndDate) < today) {
       registTimeValidate = "Registration end date cannot be before today";
-    }
-    if (new Date(values.startDate) < today) {
-      durationValidate = "Course start date cannot be before today";
-    }
-    if (new Date(values.endDate) < today) {
-      durationValidate = "Course end date cannot be before today";
-    }
-
-    if (new Date(values.registEndDate) < new Date(values.registStartDate)) {
+    } else if (
+      new Date(values.registEndDate) < new Date(values.registStartDate)
+    ) {
       registTimeValidate =
         "Registration end date cannot be earlier than registration start date";
-    }
-    if (
+    } else if (
       new Date(values.registEndDate) >= new Date(values.startDate) ||
       new Date(values.registStartDate) >= new Date(values.startDate)
     ) {
       registTimeValidate =
         "Course start date must be after the registration period";
     }
-    if (new Date(values.endDate) < new Date(values.startDate)) {
+
+    if (new Date(values.startDate) < today) {
+      durationValidate = "Course start date cannot be before today";
+    } else if (new Date(values.endDate) < today) {
+      durationValidate = "Course end date cannot be before today";
+    } else if (new Date(values.endDate) < new Date(values.startDate)) {
       durationValidate = "End date cannot be earlier than start date";
     }
-
-    // if (values.startDate && !values.endDate) {
-    //   durationValidate = "Please enter an end date for the course";
-    // }
-    // if (values.endDate && !values.startDate) {
-    //   durationValidate = "Please enter a start date for the course";
-    // }
-
     setFormValues((prev) => ({
       ...prev,
       registTimeValidate,

@@ -99,13 +99,20 @@ const CourseDetail = (props) => {
   };
 
   const fetchCourseProgress = async (idCourse, idStudent) => {
-    let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
-    if (progress.status === APIStatus.success) {
-      console.log("Response data: ", progress.data);
+    setLoading(true);
+    try {
+      let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
+      if (progress.status === APIStatus.success) {
+        console.log("Response data: ", progress.data);
 
-      setStudentProgress(progress.data);
-    } else {
-      console.warn(progress.data);
+        setStudentProgress(progress.data);
+      } else {
+        console.warn(progress.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 

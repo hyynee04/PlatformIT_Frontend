@@ -251,12 +251,14 @@ const LectureView = ({ lectureDetail }) => {
         isEdit) && (
         <div className="main-material slide-to-right slide-to-bottom">
           <span className="title">Main Material</span>
-          <button
-            className="attach-file-button"
-            // onClick={() => fileInputRef.current.click()}
-          >
-            <LuPaperclip /> Attach file
-          </button>
+          {isEdit && (
+            <button
+              className="attach-file-button"
+              // onClick={() => fileInputRef.current.click()}
+            >
+              <LuPaperclip /> Attach file
+            </button>
+          )}
           <input
             className="file-container"
             type="file"

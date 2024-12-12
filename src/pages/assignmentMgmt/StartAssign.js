@@ -52,9 +52,9 @@ const StartAssign = () => {
                 ...item,
                 isSelected: false,
               }));
-              if (assignmentRes.data.isShufflingAnswer === 1) {
-                updatedItems = shuffleArray(updatedItems);
-              }
+              // if (assignmentRes.data.isShufflingAnswer === 1) {
+              //   updatedItems = shuffleArray(updatedItems);
+              // }
 
               return {
                 ...question,

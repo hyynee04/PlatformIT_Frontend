@@ -1284,9 +1284,10 @@ const AssignDetail = () => {
                                       : "radio"
                                   }
                                   name={`question_${index}`}
-                                  defaultChecked={question.selectedOptions.includes(
+                                  checked={question.selectedOptions.includes(
                                     choice.idMultipleAssignmentItem
                                   )}
+                                  readOnly
                                 />
                               </label>
                               <div className="info" style={{ flex: "1" }}>

@@ -464,7 +464,7 @@ const CourseDetailTeacher = (props) => {
                         e.stopPropagation();
                         if (idRole === Role.teacher) {
                           console.log("onClick1");
-                          if (test.isPublish === 1) {
+                          if (test.isPublish) {
                             navigate("/teacherAssignDetail", {
                               state: {
                                 idAssignment: test.idAssignment,

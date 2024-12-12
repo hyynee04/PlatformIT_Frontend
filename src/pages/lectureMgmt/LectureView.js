@@ -374,7 +374,8 @@ const LectureView = ({ lectureDetail }) => {
                 lectureDetail.exercises.length > 0 &&
                 lectureDetail.exercises.map((exercise, index) => (
                   <>
-                    {exercise.isPublish && idRole === Role.student ? (
+                    {(exercise.isPublish && idRole === Role.student) ||
+                    idRole === Role.teacher ? (
                       <div key={index} className="part-item exercise">
                         <div
                           className="exercise-display"

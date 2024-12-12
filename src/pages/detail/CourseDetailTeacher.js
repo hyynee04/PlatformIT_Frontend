@@ -526,10 +526,10 @@ const CourseDetailTeacher = (props) => {
                         </span>
                         <div
                           className={`test-status-text ${
-                            courseInfo.isPublish ? "is-published" : "unpublish"
+                            test.isPublish ? "is-published" : "unpublish"
                           }`}
                         >
-                          {courseInfo.isPublish ? "Published" : "Unpublish"}
+                          {test.isPublish ? "Published" : "Unpublish"}
                         </div>
                       </div>
                     </div>

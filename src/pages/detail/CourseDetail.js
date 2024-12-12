@@ -228,7 +228,28 @@ const CourseDetail = (props) => {
     }
   };
 
+  const progressValue = {
+    lecture:
+      studentProgress.assignmentCount > 0
+        ? `${
+            (studentProgress.courseStudentProgress[0].finishedAssignmentCount /
+              studentProgress.assignmentCount) *
+            100
+          }`
+        : 0,
+  };
+
   console.log(studentProgress);
+  console.log(
+    "Check: ",
+    studentProgress.assignmentCount > 0
+      ? `${
+          (studentProgress.courseStudentProgress[0].finishedAssignmentCount /
+            studentProgress.assignmentCount) *
+          100
+        }`
+      : 0
+  );
 
   if (loading) {
     return (
@@ -492,14 +513,23 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
+                      // value={`${
+                      //   studentProgress.lectureCount > 0
+                      //     ? (studentProgress.courseStudentProgress[0]
+                      //         .finishedLectureCount /
+                      //         studentProgress.LectureCount) *
+                      //       100
+                      //     : 0
+                      // }`}
                       value={`${
                         studentProgress.lectureCount > 0
                           ? (studentProgress.courseStudentProgress[0]
                               .finishedLectureCount /
-                              studentProgress.LectureCount) *
+                              studentProgress.lectureCount) *
                             100
                           : 0
                       }`}
+                      // value={0}
                       text={`${
                         studentProgress.courseStudentProgress?.length > 0 &&
                         `${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`
@@ -515,10 +545,11 @@ const CourseDetail = (props) => {
                       strokeWidth={12}
                       value={`${
                         studentProgress.assignmentCount > 0
-                          ? (studentProgress.courseStudentProgress[0]
-                              .finishedAssignmentCount /
-                              studentProgress.assignmentCount) *
-                            100
+                          ? (studentProgress.courseStudentProgress?.length >
+                              0 &&
+                              studentProgress.courseStudentProgress[0]
+                                .finishedAssignmentCount /
+                                studentProgress.assignmentCount) * 100
                           : 0
                       }`}
                       text={`${

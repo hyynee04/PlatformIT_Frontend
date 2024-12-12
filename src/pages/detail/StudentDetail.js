@@ -148,17 +148,13 @@ const StudentDetail = (props) => {
                   <CircularProgressbar
                     strokeWidth={12}
                     value={`${
-                      studentInfo.exerciseTotal + studentInfo.testTotal > 0
-                        ? ((studentInfo.exerciseProgress +
-                            studentInfo.testProgress) /
-                            (studentInfo.exerciseTotal +
-                              studentInfo.testTotal)) *
+                      studentInfo.lectureTotal > 0
+                        ? (studentInfo.lectureProgress /
+                            studentInfo.lectureTotal) *
                           100
                         : 0
                     }`}
-                    text={`${
-                      studentInfo.exerciseProgress + studentInfo.testProgress
-                    } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
+                    text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
                   />
                 </div>
 
@@ -170,13 +166,17 @@ const StudentDetail = (props) => {
                   <CircularProgressbar
                     strokeWidth={12}
                     value={`${
-                      studentInfo.lectureTotal > 0
-                        ? (studentInfo.lectureProgress /
-                            studentInfo.lectureTotal) *
+                      studentInfo.exerciseTotal + studentInfo.testTotal > 0
+                        ? ((studentInfo.exerciseProgress +
+                            studentInfo.testProgress) /
+                            (studentInfo.exerciseTotal +
+                              studentInfo.testTotal)) *
                           100
                         : 0
                     }`}
-                    text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
+                    text={`${
+                      studentInfo.exerciseProgress + studentInfo.testProgress
+                    } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
                   />
                 </div>
                 <label>Assignment</label>

@@ -50,6 +50,7 @@
 .lecture-container .lecture-content .lecture-detail > .course-content-section {
   width: 40%;
   padding: 1.5rem;
+  position: sticky;
 }
 .video-container {
   width: 100%;
@@ -370,7 +371,7 @@
   padding: 0 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 .lecture-container
   .lecture-content
@@ -416,6 +417,15 @@
   transform: scale(1.01);
   border-radius: 0.25rem;
   transition: transform 0.3s ease, background-color 0.3s ease;
+}
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  > .part-item.comment {
+  gap: 0;
 }
 
 .main-material {
@@ -632,29 +642,30 @@
   display: flex;
   flex-direction: row;
   gap: 1rem;
+
+  position: relative;
+  margin-bottom: 1rem;
 }
-.lecture-container
-  .lecture-content
-  .lecture-detail
-  .lecture-content-section
-  .lecture-main
-  .menu-part
-  .part-item
-  .comment-display
-  > .ava-holder {
+.action-button {
+  right: -1.5rem;
+  background-color: transparent;
+  border: none;
+  font-size: 1rem;
+  opacity: 0;
+}
+.action-button.active {
+  opacity: 1;
+}
+.action-button:hover {
+  scale: 1.2;
+  opacity: 1;
+}
+.ava-holder {
   width: fit-content;
   height: 100%;
 }
-.lecture-container
-  .lecture-content
-  .lecture-detail
-  .lecture-content-section
-  .lecture-main
-  .menu-part
-  .part-item
-  .comment-display
-  .ava-holder
-  > img {
+
+.ava-holder > img {
   width: 2.5rem;
   height: 2.5rem;
 
@@ -662,22 +673,25 @@
   border-radius: 50%;
 }
 .comment-content {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
   height: fit-content;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .comment-content > .comment-entering {
   width: 100%;
   font-size: 0.8rem;
+  padding-bottom: 5px;
   margin-bottom: 5px;
   border: none;
   border-bottom: 1px solid var(--border-gray);
   outline: none;
 
-  line-height: 25px;
+  line-height: 24px;
   max-height: 150px;
-  overflow-y: auto;
+  overflow: hidden;
   box-sizing: border-box;
   resize: none;
 }
@@ -701,6 +715,12 @@
 }
 .comment-content .button-container > button.comment:hover {
   background-color: rgba(57, 121, 121, 0.8);
+  scale: 1.05;
+}
+.comment-content .button-container > button.comment:disabled,
+.comment-content .button-container > button.comment:disabled:hover {
+  background-color: var(--main-color);
+  scale: 1;
 }
 .comment-content .button-container > button.cancel {
   background-color: transparent;
@@ -708,6 +728,12 @@
 }
 .comment-content .button-container > button.cancel:hover {
   background-color: rgba(217, 217, 217, 0.5);
+  scale: 1.05;
+}
+.comment-content .button-container > button.cancel:disabled,
+.comment-content .button-container > button.cancel:disabled:hover {
+  background-color: transparent;
+  scale: 1;
 }
 .comment-content > .comment-header {
   display: flex;
@@ -729,13 +755,22 @@
 .comment-content > .comment-body {
   width: 100%;
   font-size: 0.8rem;
-  color: var(--text-gray);
+  color: var(--black-color);
   text-wrap: wrap;
   overflow-y: hidden;
   position: relative;
   text-align: justify;
   max-height: 50px;
   transition: max-height 0.1s ease-in-out;
+}
+.comment-content .comment-body > span {
+  display: flex;
+  align-items: center;
+}
+.comment-content .comment-body span > b {
+  color: var(--main-color);
+  display: flex;
+  align-items: center;
 }
 .comment-content > .comment-body.expanded {
   overflow-y: visible;
@@ -784,7 +819,8 @@
   background-color: transparent;
   color: var(--text-gray);
   font-size: 0.7rem;
-  padding: 2px 4px;
+  padding: 1px 4px;
+  margin-top: 3px;
   outline: none;
   cursor: pointer;
 }
@@ -805,18 +841,23 @@
 
   padding-left: 50px;
 }
-.lecture-container
-  .lecture-content
-  .lecture-detail
-  .lecture-content-section
-  .lecture-main
-  .menu-part
-  .part-item
-  .comment-responses-container
-  > .comment-response {
-  display: flex;
+.comment-response {
+  /* display: flex; */
   flex-direction: row;
   gap: 0.5rem;
+  position: relative;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.comment-response.active {
+  display: flex;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.comment-response.reply {
+  margin-top: 16px;
+  /* padding-left: 50px; */
 }
 .lecture-container
   .lecture-content
@@ -851,8 +892,20 @@
   font-size: 0.7rem;
   font-weight: 600;
   padding: 4px 10px;
-  margin-top: 0.5rem;
   cursor: pointer;
+}
+.lecture-container
+  .lecture-content
+  .lecture-detail
+  .lecture-content-section
+  .lecture-main
+  .menu-part
+  .part-item
+  .comment-responses-container
+  .more-responses
+  > button:hover {
+  background-color: rgba(217, 217, 217, 1);
+  scale: 1.05;
 }
 .lecture-container
   .lecture-content
@@ -869,17 +922,8 @@
   height: 0.8rem;
   margin-top: 1px;
 }
-.lecture-container
-  .lecture-content
-  .lecture-detail
-  .lecture-content-section
-  .lecture-main
-  .menu-part
-  .part-item
-  .comment-responses-container
-  .comment-response
-  .ava-holder
-  > img {
+
+.comment-response .ava-holder > img {
   width: 2rem;
   height: 2rem;
 
@@ -1552,4 +1596,20 @@
   box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
   background-color: #fafafa;
   border: 1px solid var(--border-gray);
+}
+.reply-to {
+  font-size: 0.7rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: absolute;
+  top: -1rem;
+  left: 0;
+}
+.reply-to > svg {
+  transform: scaleX(-1);
+  color: var(--main-color);
+}
+.reply-to > b {
+  color: var(--main-color);
 }

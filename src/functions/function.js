@@ -187,3 +187,66 @@ export const handleKeyDown = (event, handler) => {
     handler(); // Trigger passed handler function on Enter key press
   }
 };
+
+export const processCommentList = (commentList) => {
+  const mainList = [];
+  const replyObject = {};
+
+  // Step 1: Categorize comments
+  commentList.forEach((comment) => {
+    if (!comment.idCommentRef) {
+      // Main comment
+      mainList.push({
+        ...comment,
+        timestamp: parseRelativeTime(comment.relativeTime),
+      });
+      if (!replyObject[comment.idComment]) {
+        replyObject[comment.idComment] = [];
+      }
+    } else {
+      // Reply comment
+      if (replyObject[comment.idCommentRef]) {
+        const refComment = mainList.find(
+          (item) => item.idComment === comment.idCommentRef
+        );
+        const nameRep =
+          refComment && refComment.idUser === comment.idUser
+            ? refComment.fullName
+            : "";
+        replyObject[comment.idCommentRef].push({
+          ...comment,
+          nameRep,
+          timestamp: parseRelativeTime(comment.relativeTime),
+        });
+      } else {
+        // Handle nested replies
+        Object.keys(replyObject).forEach((key) => {
+          const nestedReply = replyObject[key].find(
+            (item) => item.idComment === comment.idCommentRef
+          );
+          if (nestedReply) {
+            replyObject[key].push({
+              ...comment,
+              nameRep:
+                nestedReply.idUser !== comment.idUser
+                  ? nestedReply.fullName
+                  : "",
+              timestamp: parseRelativeTime(comment.relativeTime),
+            });
+          }
+        });
+      }
+    }
+  });
+
+  // Step 2: Sort mainList and replies
+  mainList.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+
+  Object.keys(replyObject).forEach((key) => {
+    replyObject[key].sort(
+      (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
+    );
+  });
+
+  return { main: mainList, reply: replyObject };
+};

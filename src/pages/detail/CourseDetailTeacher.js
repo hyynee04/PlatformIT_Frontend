@@ -24,19 +24,21 @@ import { APIStatus, Role } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
   getCourseProgress,
-  getSectionDetail,
   postAddBoardNotificationForCourse,
   postAddSection,
+  updateSection,
 } from "../../services/courseService";
 
 const CourseDetailTeacher = (props) => {
   const {
     courseInfo,
-    setCourseInfo,
     idUser,
     fetchCourseDetail,
     notificationBoard,
     setAddedNotification,
+    setIsRemoved,
+    setIdSection,
+    fetchSectionDetail,
   } = props;
 
   const navigate = useNavigate();
@@ -123,17 +125,7 @@ const CourseDetailTeacher = (props) => {
         idUser
       );
       if (response.status === APIStatus.success) {
-        let newSections = await getSectionDetail(courseInfo.idCourse);
-        if (newSections.status === APIStatus.success) {
-          setCourseInfo({
-            ...courseInfo,
-            sectionsWithCourses: newSections.data,
-          });
-          setNewSection("");
-          setAddSection(false);
-        } else {
-          console.log(newSections.data);
-        }
+        fetchSectionDetail(courseInfo.idCourse);
       } else console.log(response.data);
     } catch (error) {
       console.error("Error posting data:", error);
@@ -154,31 +146,25 @@ const CourseDetailTeacher = (props) => {
     }
   };
 
+  const editSection = async (idSection, newSectionName, idUpdatedBy) => {
+    try {
+      let respone = await updateSection(idSection, newSectionName, idUpdatedBy);
+      if (respone.status === APIStatus.success) {
+        await fetchSectionDetail(courseInfo.idCourse);
+        setNewSectionTitle("");
+        setIsEdit({
+          ...isEdit,
+          [idSection]: !isEdit[idSection],
+        });
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
+
   useEffect(() => {
     fetchCourseProgress(courseInfo.idCourse);
   }, []);
-
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     console.log("runhere");
-  //     // Remove the item if the user refreshes or leaves the page
-  //     if (location.pathname === "/courseDetail") {
-  //       console.log("inside");
-  //       localStorage.removeItem("menuIndex");
-  //     }
-  //   };
-
-  //   // Handle refresh scenarios
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     // Handle navigation away from the page
-  //     if (location.pathname !== "/courseDetail") {
-  //       localStorage.removeItem("menuIndex");
-  //     }
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [location.pathname]);
 
   return (
     <>
@@ -239,7 +225,7 @@ const CourseDetailTeacher = (props) => {
                           })
                         }
                       >
-                        {!isEdit[index] ? (
+                        {!isEdit[section.idSection] ? (
                           <>
                             <span className="section-name">
                               <button
@@ -250,7 +236,7 @@ const CourseDetailTeacher = (props) => {
                                       (acc, key) => ({ ...acc, [key]: false }),
                                       {}
                                     ),
-                                    [index]: true,
+                                    [section.idSection]: true,
                                   });
                                   setNewSectionTitle(section.sectionName);
                                 }}
@@ -301,7 +287,17 @@ const CourseDetailTeacher = (props) => {
                               }
                             />
                             <div className="edit-button-container">
-                              <button>
+                              <button
+                                disabled={!newSectionTitle}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  editSection(
+                                    section.idSection,
+                                    newSectionTitle,
+                                    idUser
+                                  );
+                                }}
+                              >
                                 <LuCheck />
                               </button>
                               <button
@@ -310,7 +306,8 @@ const CourseDetailTeacher = (props) => {
                                   setNewSectionTitle("");
                                   setIsEdit({
                                     ...isEdit,
-                                    [index]: !isEdit[index],
+                                    [section.idSection]:
+                                      !isEdit[section.idSection],
                                   });
                                 }}
                               >
@@ -340,6 +337,7 @@ const CourseDetailTeacher = (props) => {
                                       idCourse: courseInfo.idCourse,
                                       idSection: section.idSection,
                                       idLecture: lecture.idLecture,
+                                      idTeacher: courseInfo.idTeacher,
                                     },
                                   });
                               }}
@@ -383,7 +381,13 @@ const CourseDetailTeacher = (props) => {
                                 </span>
                                 <span className="text">Add new lecture</span>
                               </button>
-                              <button className="remove-section">
+                              <button
+                                className="remove-section"
+                                onClick={() => {
+                                  setIdSection(section.idSection);
+                                  setIsRemoved(true);
+                                }}
+                              >
                                 <span className="icon">
                                   <LuTrash2 />
                                 </span>
@@ -413,7 +417,11 @@ const CourseDetailTeacher = (props) => {
                     <div className="edit-button-container">
                       <button
                         disabled={!newSection}
-                        onClick={() => addNewSection(newSection)}
+                        onClick={() => {
+                          setNewSection("");
+                          setAddSection(false);
+                          addNewSection(newSection);
+                        }}
                       >
                         <LuCheck />
                       </button>

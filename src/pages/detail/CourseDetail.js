@@ -37,12 +37,14 @@ import {
   getCourseProgressByIdStudent,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
+  getSectionDetail,
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
 import { IoReloadOutline } from "react-icons/io5";
 import { ConsoleLogger } from "@microsoft/signalr/dist/esm/Utils";
 import { getTestOfCourseStudent } from "../../services/assignmentService";
+import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -55,8 +57,9 @@ const CourseDetail = (props) => {
   const [courseInfo, setCourseInfo] = useState({});
   const [notificationBoard, setNotificationBoard] = useState([]);
   const [studentProgress, setStudentProgress] = useState({});
-  const [index, setIndex] = useState(null);
+  const [idSection, setIdSection] = useState(null);
 
+  const [isRemoved, setIsRemoved] = useState(false);
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [showedSections, setShowedSections] = useState({});
   const handleIsShowed = (index) => {
@@ -228,28 +231,21 @@ const CourseDetail = (props) => {
     }
   };
 
-  const progressValue = {
-    lecture:
-      studentProgress.assignmentCount > 0
-        ? `${
-            (studentProgress.courseStudentProgress[0].finishedAssignmentCount /
-              studentProgress.assignmentCount) *
-            100
-          }`
-        : 0,
+  const fetchSectionDetail = async () => {
+    try {
+      let newSections = await getSectionDetail(courseInfo.idCourse);
+      if (newSections.status === APIStatus.success) {
+        setCourseInfo({
+          ...courseInfo,
+          sectionsWithCourses: newSections.data,
+        });
+      } else {
+        console.log(newSections.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
   };
-
-  console.log(studentProgress);
-  console.log(
-    "Check: ",
-    studentProgress.assignmentCount > 0
-      ? `${
-          (studentProgress.courseStudentProgress[0].finishedAssignmentCount /
-            studentProgress.assignmentCount) *
-          100
-        }`
-      : 0
-  );
 
   if (loading) {
     return (
@@ -500,6 +496,9 @@ const CourseDetail = (props) => {
             setAddedNotification={setAddedNotification}
             notificationBoard={notificationBoard}
             fetchCourseDetail={fetchCourseDetail}
+            setIsRemoved={setIsRemoved}
+            setIdSection={setIdSection}
+            fetchSectionDetail={fetchSectionDetail}
           />
         ) : null}
 
@@ -513,14 +512,6 @@ const CourseDetail = (props) => {
                   <div className="progress-container">
                     <CircularProgressbar
                       strokeWidth={12}
-                      // value={`${
-                      //   studentProgress.lectureCount > 0
-                      //     ? (studentProgress.courseStudentProgress[0]
-                      //         .finishedLectureCount /
-                      //         studentProgress.LectureCount) *
-                      //       100
-                      //     : 0
-                      // }`}
                       value={`${
                         studentProgress.lectureCount > 0
                           ? (studentProgress.courseStudentProgress[0]
@@ -529,7 +520,6 @@ const CourseDetail = (props) => {
                             100
                           : 0
                       }`}
-                      // value={0}
                       text={`${
                         studentProgress.courseStudentProgress?.length > 0 &&
                         `${studentProgress.courseStudentProgress[0].finishedLectureCount}/${studentProgress.lectureCount}`
@@ -665,6 +655,7 @@ const CourseDetail = (props) => {
                                         idCourse: courseInfo.idCourse,
                                         idSection: section.idSection,
                                         idLecture: lecture.idLecture,
+                                        idTeacher: courseInfo.idTeacher,
                                       },
                                     });
                                 }}
@@ -784,6 +775,19 @@ const CourseDetail = (props) => {
             ) : null}
           </>
         ) : null}
+      </div>
+
+      <div>
+        <DiagDeleteConfirmation
+          isOpen={isRemoved}
+          onClose={() => setIsRemoved(false)}
+          object={{
+            id: idSection,
+            name: "section",
+            message: "Are you sure to delete this section?",
+          }}
+          fetchData={fetchSectionDetail}
+        />
       </div>
 
       <div>

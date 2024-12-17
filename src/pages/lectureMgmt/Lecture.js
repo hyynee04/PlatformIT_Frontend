@@ -6,6 +6,7 @@ import { APIStatus, Role } from "../../constants/constants";
 import {
   calculateRelativeTime,
   parseRelativeTime,
+  processCommentList,
 } from "../../functions/function";
 import {
   getCourseContentStructure,
@@ -14,6 +15,8 @@ import {
 } from "../../services/courseService";
 import LectureView from "./LectureView";
 import SectionView from "./SectionView";
+import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
+import { getAllCommentOfLecture } from "../../services/commentService";
 
 const Lecture = (props) => {
   const location = useLocation();
@@ -25,6 +28,8 @@ const Lecture = (props) => {
 
   const [lectureDetail, setLectureDetail] = useState({});
   const [sectionList, setSectionList] = useState([]);
+  const [mainCommentList, setMainCommentList] = useState([]);
+  const [replyCommentList, setReplyCommentList] = useState({});
 
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
@@ -32,6 +37,10 @@ const Lecture = (props) => {
   const [idCourse, setIdCourse] = useState(null);
   const [idSection, setIdSection] = useState(null);
   const [idLecture, setIdLecture] = useState(null);
+  const [idTeacher, setIdTeacher] = useState(null);
+  const [idComment, setIdComment] = useState(null);
+
+  const [isRemoved, setIsRemoved] = useState(false);
 
   const fetchLectureDetail = async (idLecture, idStudent) => {
     setLoading({ ...loading, lectureDetail: true });
@@ -86,13 +95,33 @@ const Lecture = (props) => {
     }
   };
 
+  const fetchAllCommentOfLecture = async (idLecture) => {
+    try {
+      let respone = await getAllCommentOfLecture(idLecture);
+      if (respone.status === APIStatus.success) {
+        let processedData = processCommentList(respone.data);
+        setMainCommentList(processedData.main);
+        setReplyCommentList(processedData.reply);
+      } else console.error(respone.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
   useEffect(() => {
     const state = location.state;
-
-    if (state && state.idCourse && state.idSection && state.idLecture) {
+    setLoading({ ...loading, lectureDetail: true });
+    if (
+      state &&
+      state.idCourse &&
+      state.idSection &&
+      state.idLecture &&
+      state.idTeacher
+    ) {
       setIdCourse(state.idCourse);
       setIdSection(state.idSection);
       setIdLecture(state.idLecture);
+      setIdTeacher(state.idTeacher);
 
       fetchLectureDetail(state.idLecture);
       if (idRole === Role.student) {
@@ -100,11 +129,19 @@ const Lecture = (props) => {
       } else {
         fetchCourseContentStructure(state.idCourse);
       }
+      fetchAllCommentOfLecture(state.idLecture);
     }
+    setLoading({ ...loading, lectureDetail: false });
   }, [location.state]);
 
   useEffect(() => {
-    fetchLectureDetail(idLecture);
+    setLoading({ ...loading, lectureDetail: true });
+    const reFetchData = async () => {
+      await fetchLectureDetail(idLecture);
+      await fetchAllCommentOfLecture(idLecture);
+      setLoading({ ...loading, lectureDetail: false });
+    };
+    reFetchData();
   }, [idLecture]);
 
   useEffect(() => {
@@ -113,6 +150,24 @@ const Lecture = (props) => {
         ...prevDetail,
         relativeTime: calculateRelativeTime(prevDetail.timestamp),
       }));
+
+      setMainCommentList((prevMain) =>
+        prevMain.map((main) => ({
+          ...main,
+          relativeTime: calculateRelativeTime(main.timestamp),
+        }))
+      );
+
+      setReplyCommentList((prevListSubCmt) => {
+        const updatedListSubCmt = {};
+        Object.keys(prevListSubCmt).forEach((key) => {
+          updatedListSubCmt[key] = prevListSubCmt[key].map((prevSub) => ({
+            ...prevSub,
+            relativeTime: calculateRelativeTime(prevSub.timestamp),
+          }));
+        });
+        return updatedListSubCmt;
+      });
     }, 60000);
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
@@ -129,7 +184,15 @@ const Lecture = (props) => {
                 <ImSpinner2 color="#397979" />
               </div>
             ) : (
-              <LectureView lectureDetail={lectureDetail} />
+              <LectureView
+                lectureDetail={lectureDetail}
+                idTeacher={idTeacher}
+                setIsRemoved={setIsRemoved}
+                setIdComment={setIdComment}
+                mainCommentList={mainCommentList}
+                replyCommentList={replyCommentList}
+                fetchAllCommentOfLecture={fetchAllCommentOfLecture}
+              />
             )}
           </div>
 
@@ -151,6 +214,26 @@ const Lecture = (props) => {
           </div>
         </div>
       </div>
+      <DiagDeleteConfirmation
+        isOpen={isRemoved}
+        onClose={() => setIsRemoved(false)}
+        object={
+          idComment
+            ? {
+                id: idComment,
+                name: "comment",
+                message: "Are you sure to delete this comment?",
+              }
+            : {
+                id: lectureDetail.idLecture,
+                name: "lecture",
+                message: "Are you sure to delete this lecture?",
+              }
+        }
+        fetchData={
+          idComment ? () => fetchAllCommentOfLecture(idLecture) : undefined
+        }
+      />
     </div>
   );
 };

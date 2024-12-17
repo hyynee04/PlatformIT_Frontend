@@ -201,6 +201,33 @@ const postAddSection = (sectionName, idCourse, idCreatedBy) => {
   });
 };
 
+const inactiveSection = (idSection, idCreatedBy) => {
+  return axios.post(`api/Lecture/InactiveSection`, null, {
+    params: {
+      idSection: idSection,
+      idCreatedBy: idCreatedBy,
+    },
+  });
+};
+const inactiveLecture = (idLecture, idCreatedBy) => {
+  return axios.post(`api/Lecture/InactiveLecture`, null, {
+    params: {
+      idLecture: idLecture,
+      idCreatedBy: idCreatedBy,
+    },
+  });
+};
+
+const updateSection = (idSection, newSectionName, idUpdatedBy) => {
+  return axios.post(`api/Course/UpdateSection`, null, {
+    params: {
+      idSection: idSection,
+      newSectionName: newSectionName,
+      idUpdatedBy: idUpdatedBy,
+    },
+  });
+};
+
 const postAddLecture = async (idList, lectureData) => {
   try {
     const formData = new FormData();
@@ -333,4 +360,7 @@ export {
   postEnrollCourse,
   getCourseProgressByIdStudent,
   getSectionDetail,
+  inactiveSection,
+  updateSection,
+  inactiveLecture,
 };

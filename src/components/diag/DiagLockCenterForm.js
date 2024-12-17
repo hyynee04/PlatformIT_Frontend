@@ -73,6 +73,7 @@ const DiagLockCenterForm = ({
               lineHeight: "1.5",
               margin: "16px 0",
               textAlign: "justify",
+              textWrap: "auto",
             }}
           >
             {idRole === Role.centerAdmin ? (
@@ -175,14 +176,7 @@ const DiagLockCenterForm = ({
 
           <div className="str-btns">
             <div className="act-btns">
-              <button
-                className="btn diag-btn"
-                // style={{
-                //   color: "var(--red-color)",
-                //   border: "1px solid var(--red-color)",
-                // }}
-                onClick={onClose}
-              >
+              <button className="btn diag-btn" onClick={onClose}>
                 Cancel
               </button>
               <button

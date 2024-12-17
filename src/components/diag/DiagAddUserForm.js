@@ -150,7 +150,7 @@ const DiagAddUserForm = ({ isOpen, onClose, roleAdded }) => {
                 }}
               >
                 {loading && (
-                  <ImSpinner2 className="icon-spin" color="#393979" />
+                  <ImSpinner2 className="icon-spin" color="#d9d9d9" />
                 )}
                 Submit
               </button>

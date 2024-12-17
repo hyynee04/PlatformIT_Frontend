@@ -633,64 +633,68 @@ const AddNewAssign = () => {
                         )}
                       </span>
                     </div>
-                    <div className="select-container">
-                      <input
-                        style={{ cursor: "default" }}
-                        type="text"
-                        className="input-form-pi"
-                        value={
-                          selectedSection
-                            ? selectedSection.title
-                            : "Select a section"
-                        }
-                        disabled={isTest}
-                        onClick={() => handleDropdownClick("section")}
-                      />
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                    {isDropdownSectionVisible && (
-                      <div className="list-options-container section">
-                        {listSection.map((section, index) => (
-                          <div
-                            key={index}
-                            className="option-course-container"
-                            onClick={() => handleSectionSelect(section)}
-                          >
-                            <div>{section.title}</div>
+                    {(!isLimitedTimeCourse || !isTest) && (
+                      <>
+                        <div className="select-container">
+                          <input
+                            style={{ cursor: "default" }}
+                            type="text"
+                            className="input-form-pi"
+                            value={
+                              selectedSection
+                                ? selectedSection.title
+                                : "Select a section"
+                            }
+                            disabled={isTest}
+                            onClick={() => handleDropdownClick("section")}
+                          />
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                        {isDropdownSectionVisible && (
+                          <div className="list-options-container section">
+                            {listSection.map((section, index) => (
+                              <div
+                                key={index}
+                                className="option-course-container"
+                                onClick={() => handleSectionSelect(section)}
+                              >
+                                <div>{section.title}</div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="select-container">
-                      <input
-                        style={{ cursor: "default" }}
-                        type="text"
-                        className="input-form-pi"
-                        value={
-                          selectedLecture
-                            ? selectedLecture.titleLecture
-                            : "Select a lecture"
-                        }
-                        onClick={() => handleDropdownClick("lecture")}
-                        disabled={isTest}
-                      />
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                    {isDropdownLectureVisible && (
-                      <div className="list-options-container lecture">
-                        {listLecture.map((lecture, index) => (
-                          <div
-                            key={index}
-                            className="option-course-container"
-                            onClick={() => handleLectureSelect(lecture)}
-                          >
-                            <div>{lecture.titleLecture}</div>
-                            <span className="section-lecture">
-                              {lecture.titleSection}
-                            </span>
+                        )}
+                        <div className="select-container">
+                          <input
+                            style={{ cursor: "default" }}
+                            type="text"
+                            className="input-form-pi"
+                            value={
+                              selectedLecture
+                                ? selectedLecture.titleLecture
+                                : "Select a lecture"
+                            }
+                            onClick={() => handleDropdownClick("lecture")}
+                            disabled={isTest}
+                          />
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                        {isDropdownLectureVisible && (
+                          <div className="list-options-container lecture">
+                            {listLecture.map((lecture, index) => (
+                              <div
+                                key={index}
+                                className="option-course-container"
+                                onClick={() => handleLectureSelect(lecture)}
+                              >
+                                <div>{lecture.titleLecture}</div>
+                                <span className="section-lecture">
+                                  {lecture.titleSection}
+                                </span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -783,6 +787,7 @@ const AddNewAssign = () => {
                               style={{
                                 color: "var(--red-color)",
                                 marginLeft: "auto",
+                                textAlign: "right",
                               }}
                             >
                               {errorMessage}

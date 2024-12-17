@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import { LuBuilding2, LuX } from "react-icons/lu";
@@ -50,7 +50,11 @@ const DiagActionCenterForm = ({
   };
 
   const handleRejectCenter = async () => {
-    if (reasonReject.trim()) {
+    if (reasonReject?.trim()) {
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        reject: true,
+      }));
       try {
         const resultAction = await dispatch(
           rejectCenter({ idCenterSelected, reasonReject, idUserUpdated })
@@ -61,6 +65,10 @@ const DiagActionCenterForm = ({
       } catch (error) {
         console.error("Error while rejecting center: ", error);
       }
+      setLoadingBtn((prevState) => ({
+        ...prevState,
+        reject: false,
+      }));
     } else {
       setErrorRejectString("Please enter reason for rejection");
       setTimeout(() => {
@@ -68,7 +76,11 @@ const DiagActionCenterForm = ({
       }, 3000);
     }
   };
-
+  // useEffect(() => {
+  //   document.querySelectorAll("button").forEach((button) => {
+  //     button.disabled = loadingBtn.approve || loadingBtn.reject;
+  //   });
+  // }, [loadingBtn.approve, loadingBtn.reject]);
   if (!isOpen) return null;
 
   return (
@@ -99,7 +111,7 @@ const DiagActionCenterForm = ({
                   }}
                 >
                   {loadingBtn.approve && (
-                    <ImSpinner2 className="icon-spin" color="#397979" />
+                    <ImSpinner2 className="icon-spin" color="#d9d9d9" />
                   )}
                   Yes
                 </button>
@@ -150,6 +162,9 @@ const DiagActionCenterForm = ({
                     await handleRejectCenter();
                   }}
                 >
+                  {loadingBtn.reject && (
+                    <ImSpinner2 className="icon-spin" color="#d9d9d9" />
+                  )}
                   Submit
                 </button>
               </div>

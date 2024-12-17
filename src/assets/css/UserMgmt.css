@@ -163,6 +163,7 @@
   width: 100%;
   border-collapse: collapse;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  /* table-layout: fixed; */
 }
 .list-container > table tr:nth-child(odd) {
   background-color: #f2f2f2;
@@ -186,6 +187,7 @@ td {
   max-width: 300px;
   word-wrap: break-word; /* Ngắt dòng nếu nội dung quá dài */
   white-space: nowrap; /* Không ngắt dòng trong ô */
+  text-overflow: hidden;
 }
 .list-container > table > tbody > tr > td > span {
   display: inline-block;

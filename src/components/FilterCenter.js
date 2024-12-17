@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/css/card/FilterCard.css";
 
-const FilterCenter = ({ onFilterChange }) => {
+const FilterCenter = ({ onFilterChange, onClose, filterButtonRef }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const handleFilterChange = () => {
@@ -10,10 +10,29 @@ const FilterCenter = ({ onFilterChange }) => {
       dateRange,
     });
   };
+  const filterRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   if (!isFilterFormVisible) return null;
   return (
     <>
-      <div className="filter-container user">
+      <div ref={filterRef} className="filter-container user">
         <div className="title-filter">
           <span>Filter</span>
         </div>

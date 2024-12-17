@@ -48,8 +48,8 @@
 }
 .assign-setting-option.published {
   position: absolute;
-  right: 0;
-  top: 30px;
+  right: 24px;
+  top: 60px;
 }
 .assign-setting-option .item {
   padding: 8px 12px;

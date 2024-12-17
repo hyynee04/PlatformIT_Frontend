@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuChevronLeft,
-  LuChevronRight,
   LuFilter,
   LuMoreHorizontal,
   LuSearch,
@@ -34,13 +32,15 @@ const PlatformAdCenterMgmt = () => {
   const [listCenter, setListCenter] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState({ field: "name", order: "asc" });
-  const [filterVisble, setFilterVisble] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(false);
+  const filterButtonRef = useRef(null);
   const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByButtonRef = useRef(null);
   const [selectedCenterId, setSelectedCenterId] = useState(null);
   const [approvedCenterId, setApprovedCenterId] = useState(null);
   const [rejectedCenterId, setRejectedCenterId] = useState(null);
   const [isModalActionOpen, setIsModalActionOpen] = useState(false);
-
+  const optionBtnRefs = useRef([]);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
   const fetchListCenter = async () => {
@@ -138,7 +138,6 @@ const PlatformAdCenterMgmt = () => {
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredCenters.slice(firstIndex, lastIndex);
   const npage = Math.ceil(filteredCenters.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   const handleStatusCenterClick = (centerStatus) => {
     dispatch(setActiveStatusCenter(centerStatus));
@@ -209,31 +208,39 @@ const PlatformAdCenterMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div
+            <button
+              ref={filterButtonRef}
               className="btn"
               onClick={() => {
-                setFilterVisble(!filterVisble);
-                setSortByVisible(false);
+                setFilterVisible((prev) => !prev);
               }}
             >
               <LuFilter className="icon" />
               <span>Filter</span>
-            </div>
-            {filterVisble && (
-              <FilterCenter onFilterChange={handleFilterChange} />
+            </button>
+            {filterVisible && (
+              <FilterCenter
+                onFilterChange={handleFilterChange}
+                onClose={() => setFilterVisible(false)}
+                filterButtonRef={filterButtonRef}
+              />
             )}
-            <div
+            <button
+              ref={sortByButtonRef}
               className="btn"
               onClick={() => {
-                setSortByVisible(!sortByVisible);
-                setFilterVisble(false);
+                setSortByVisible((prev) => !prev);
               }}
             >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
-            </div>
+            </button>
             {sortByVisible && (
-              <SortByCenter onSortByChange={handleSortByChange} />
+              <SortByCenter
+                onSortByChange={handleSortByChange}
+                onClose={() => setSortByVisible(false)}
+                sortByButtonRef={sortByButtonRef}
+              />
             )}
           </div>
           <div className="search-container">
@@ -424,13 +431,19 @@ const PlatformAdCenterMgmt = () => {
                                   ? "pending"
                                   : ""
                               }`}
-                              style={{ cursor: "pointer" }}
                             >
-                              <LuMoreHorizontal
+                              <div
+                                ref={(el) =>
+                                  (optionBtnRefs.current[index] = el)
+                                }
                                 onClick={() =>
                                   handleMoreIconClick(center.idCenter)
                                 }
-                              />
+                                style={{ cursor: "pointer" }}
+                              >
+                                <LuMoreHorizontal />
+                              </div>
+
                               {selectedCenterId === center.idCenter && (
                                 <CenterOption
                                   className="user-option"
@@ -443,6 +456,10 @@ const PlatformAdCenterMgmt = () => {
                                   onCenterOption={() =>
                                     setSelectedCenterId(null)
                                   }
+                                  optionBtnRef={() =>
+                                    optionBtnRefs.current[index]
+                                  }
+                                  onClose={() => setSelectedCenterId(null)}
                                 />
                               )}
                             </td>

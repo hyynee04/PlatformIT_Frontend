@@ -36,7 +36,7 @@ import {
 } from "../../functions/function";
 
 const ListAssignMgmt = () => {
-  const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
+  const idRole = Number(localStorage.getItem("idRole"));
   const [loading, setLoading] = useState(false);
   const [loadingBtn, setLoadingBtn] = useState({
     delete: false,
@@ -292,7 +292,6 @@ const ListAssignMgmt = () => {
 
   // Số trang
   const npage = Math.ceil(flatAssignments.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   // Nhóm assignments theo ngày
   const groupedAssignments = paginatedAssignments.reduce(
@@ -321,8 +320,6 @@ const ListAssignMgmt = () => {
   }, [activeStatus]);
   const handleStatusClick = (status) => {
     setActiveStatus(status);
-    // setClassName("");
-    // setClassName("slide-to-right");
     setSearchTerm("");
     setSortField("createdDate");
     setTempSortField("createdDate");
@@ -337,6 +334,7 @@ const ListAssignMgmt = () => {
     setTempAssignmentType("all");
   };
   const [selectedAssignment, setSelectedAssignment] = useState({});
+
   //PUBLISH ASSIGNMENT
   const [isModalPublishOpen, setIsModalPublishOpen] = useState(false);
 

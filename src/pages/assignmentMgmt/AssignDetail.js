@@ -18,13 +18,14 @@ import {
   LuChevronRight,
   LuFilter,
   LuChevronDown,
-  LuMoreHorizontal,
+  LuAlignJustify,
   LuCheckCircle,
   LuX,
   LuBell,
 } from "react-icons/lu";
 import { GoDotFill } from "react-icons/go";
 import { ImSpinner2 } from "react-icons/im";
+import { IoDuplicateSharp } from "react-icons/io5";
 
 import {
   formatDateTime,
@@ -43,16 +44,42 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const AssignDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const idRole = Number(localStorage.getItem("idRole"));
   const [loading, setLoading] = useState(false);
-  const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
+
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [overviewAssignment, setOverviewAssignment] = useState({});
   const [questions, setQuestions] = useState([]);
   const [activeChoice, setActiveChoice] = useState("question");
-  //SHOW ANSWER FOR STUDENT
+
   const [showAnswer, setShowAnswer] = useState(false);
   const [showAnswerSheet, setShowAnswerSheet] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState({});
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [filterVisble, setFilterVisble] = useState(false);
+  const filterRef = useRef(null);
+  const filterBtnRef = useRef(null);
+  const [statusSubmission, setStatusSubmission] = useState("all");
+
+  const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByRef = useRef(null);
+  const sortByBtnRef = useRef(null);
+  const [sortField, setSortField] = useState("createdDate");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [tempSortField, setTempSortField] = useState("createdDate");
+  const [tempSortOrder, setTempSortOrder] = useState("desc");
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [showOption, setShowOption] = useState(false);
+  const optionRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  const [startAssignmentWindow, setStartAssignmentWindow] = useState(null);
+  const [diagStartAssign, setDiagStartAssign] = useState(false);
+  const [diagNotSubmitted, setDiagNotSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchAssignmentData = async (idAssignment) => {
@@ -143,14 +170,14 @@ const AssignDetail = () => {
     setActiveChoice(choice);
   };
   const data = {
-    labels: ["Not Submitted", "Submitted"], // Labels for your chart
+    labels: ["Submitted", "Not Submitted"],
     datasets: [
       {
         data: [
-          overviewAssignment.notSubmittedCount,
           overviewAssignment.submittedCount,
-        ], // Data for each category
-        backgroundColor: ["#d9d9d9", "#14ae5c"], // Colors for the segments
+          overviewAssignment.notSubmittedCount,
+        ],
+        backgroundColor: ["#14ae5c", "#d9d9d9"],
         borderWidth: 1,
       },
     ],
@@ -175,11 +202,6 @@ const AssignDetail = () => {
       return dateB - dateA;
     });
 
-  const [searchTerm, setSearchTerm] = useState("");
-  //FILTER
-  const [filterVisble, setFilterVisble] = useState(false);
-  const filterRef = useRef(null);
-  const filterBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -197,12 +219,6 @@ const AssignDetail = () => {
     };
   }, [filterRef]);
 
-  const [statusSubmission, setStatusSubmission] = useState("all");
-
-  //SORT BY
-  const [sortByVisible, setSortByVisible] = useState(false);
-  const sortByRef = useRef(null);
-  const sortByBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -219,11 +235,6 @@ const AssignDetail = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [sortByRef]);
-  const [sortField, setSortField] = useState("createdDate");
-  const [sortOrder, setSortOrder] = useState("desc");
-
-  const [tempSortField, setTempSortField] = useState("createdDate");
-  const [tempSortOrder, setTempSortOrder] = useState("desc");
 
   const filteredSubmission = sortedSubmissions
     ?.filter((submission) => {
@@ -303,7 +314,7 @@ const AssignDetail = () => {
     });
 
   //PAGINATION
-  const [currentPage, setCurrentPage] = useState(1);
+
   const recordsPerPage = 10;
   const lastIndex = currentPage * recordsPerPage;
   const firstIndex = lastIndex - recordsPerPage;
@@ -316,9 +327,6 @@ const AssignDetail = () => {
   const npage = Math.ceil(activeList.length / recordsPerPage);
 
   //OPTION QUIZ
-  const [showOption, setShowOption] = useState(false);
-  const optionRef = useRef(null);
-  const buttonRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -374,14 +382,13 @@ const AssignDetail = () => {
   };
 
   //DO ASSIGNMENT
-  const [startAssignmentWindow, setStartAssignmentWindow] = useState(null);
-  const [diagStartAssign, setDiagStartAssign] = useState(false);
+
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
   };
 
   //NOTICE NOT SUBMITTED
-  const [diagNotSubmitted, setDiagNotSubmitted] = useState(false);
+
   const handleOpenNotSubmitted = () => {
     setDiagNotSubmitted(true);
   };
@@ -415,13 +422,19 @@ const AssignDetail = () => {
                         {totalQuestions}{" "}
                         {totalQuestions <= 1 ? "question" : "questions"}
                       </label>
-
                       <button
-                        ref={buttonRef}
                         className="btn"
-                        onClick={() => setShowOption(!showOption)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/duplicateAssignment", {
+                            state: {
+                              idAssignment: assignmentInfo.idAssignment,
+                              isDuplicate: true,
+                            },
+                          });
+                        }}
                       >
-                        <LuMoreHorizontal />
+                        <IoDuplicateSharp />
                       </button>
                     </>
                   )}
@@ -435,65 +448,6 @@ const AssignDetail = () => {
                   )}
                 </span>
               </div>
-              {showOption && (
-                <div
-                  className="container-options assign-setting-option published"
-                  ref={optionRef}
-                >
-                  <div className="item">
-                    <span>Question shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.isShufflingQuestion === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "isShufflingQuestion",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  {assignmentInfo.assignmentType === AssignmentType.quiz && (
-                    <>
-                      <div className="item">
-                        <span>Answer shuffling</span>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={assignmentInfo.isShufflingAnswer === 1}
-                            onChange={(e) =>
-                              handleUpdateAssignment(
-                                "isShufflingAnswer",
-                                e.target.checked ? 1 : 0
-                              )
-                            }
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                      <div className="item">
-                        <span>Show answer on submission</span>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={assignmentInfo.showAnswer === 1}
-                            onChange={(e) =>
-                              handleUpdateAssignment(
-                                "showAnswer",
-                                e.target.checked ? 1 : 0
-                              )
-                            }
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
             </div>
             <div className="info-row">
               <div className="name-container">
@@ -675,7 +629,78 @@ const AssignDetail = () => {
           {idRole === Role.teacher && (
             <>
               {activeChoice === "question" && (
-                <div className="questions-container">
+                <div
+                  className="questions-container"
+                  style={{ position: "relative" }}
+                >
+                  <button
+                    ref={buttonRef}
+                    className="btn"
+                    onClick={() => setShowOption(!showOption)}
+                    style={{ marginLeft: "auto", padding: "0", border: "none" }}
+                  >
+                    <LuAlignJustify style={{ width: "26px", height: "26px" }} />
+                  </button>
+                  {showOption && (
+                    <div
+                      className="container-options assign-setting-option published"
+                      ref={optionRef}
+                    >
+                      <div className="item">
+                        <span>Question shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.isShufflingQuestion === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "isShufflingQuestion",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      {assignmentInfo.assignmentType ===
+                        AssignmentType.quiz && (
+                        <>
+                          <div className="item">
+                            <span>Answer shuffling</span>
+                            <label className="switch">
+                              <input
+                                type="checkbox"
+                                checked={assignmentInfo.isShufflingAnswer === 1}
+                                onChange={(e) =>
+                                  handleUpdateAssignment(
+                                    "isShufflingAnswer",
+                                    e.target.checked ? 1 : 0
+                                  )
+                                }
+                              />
+                              <span className="slider"></span>
+                            </label>
+                          </div>
+                          <div className="item">
+                            <span>Show answer on submission</span>
+                            <label className="switch">
+                              <input
+                                type="checkbox"
+                                checked={assignmentInfo.showAnswer === 1}
+                                onChange={(e) =>
+                                  handleUpdateAssignment(
+                                    "showAnswer",
+                                    e.target.checked ? 1 : 0
+                                  )
+                                }
+                              />
+                              <span className="slider"></span>
+                            </label>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                   {records.map((question, index) => (
                     <div className="question-item" key={index}>
                       <div className="info-row">

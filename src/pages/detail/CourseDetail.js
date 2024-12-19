@@ -12,7 +12,9 @@ import {
   LuClock,
   LuFileEdit,
   LuFileQuestion,
+  LuPenLine,
   LuPlus,
+  LuTrash2,
 } from "react-icons/lu";
 import { RiChat3Line, RiGroupLine } from "react-icons/ri";
 import { TbCurrencyDong } from "react-icons/tb";
@@ -327,6 +329,29 @@ const CourseDetail = (props) => {
                 }`}
               </span>
               <span>{courseInfo.introduction}</span>
+              {idRole === Role.centerAdmin && (
+                <>
+                  <hr style={{ margin: "0.5rem 0" }}></hr>
+                  <span>
+                    <input type="checkbox" checked={true} readOnly /> Lecture
+                    approval required
+                  </span>
+                  <span>
+                    <input type="checkbox" checked={true} readOnly /> Lecture
+                    sequence required
+                  </span>
+                  <div className="setting-course">
+                    <div className="buttons-container">
+                      <button className="edit">
+                        <LuPenLine />
+                      </button>
+                      <button className="remove">
+                        <LuTrash2 />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             {(idRole === Role.student || !idRole) &&
               !isEnrolledCourse &&
@@ -646,10 +671,16 @@ const CourseDetail = (props) => {
                               <div
                                 key={index}
                                 className={`lecture-content ${
-                                  isEnrolledCourse ? "" : "nohover"
+                                  isEnrolledCourse ||
+                                  idRole === Role.platformAdmin
+                                    ? ""
+                                    : "nohover"
                                 } `}
                                 onClick={() => {
-                                  if (isEnrolledCourse)
+                                  if (
+                                    isEnrolledCourse ||
+                                    idRole === Role.platformAdmin
+                                  )
                                     navigate("/viewLecture", {
                                       state: {
                                         idCourse: courseInfo.idCourse,

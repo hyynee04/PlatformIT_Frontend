@@ -3,7 +3,7 @@ import { LuCheckCheck, LuTrash2, LuX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { inactiveLecture, inactiveSection } from "../../services/courseService";
 import { APIStatus } from "../../constants/constants";
-import { postDeleteComment } from "../../services/commentService";
+import { deleteComment } from "../../services/commentService";
 const DiagDeleteConfirmation = (props) => {
   const { isOpen, onClose, object, fetchData } = props;
   const navigate = useNavigate();
@@ -33,9 +33,9 @@ const DiagDeleteConfirmation = (props) => {
     }
   };
 
-  const deleteComment = async () => {
+  const removeComment = async () => {
     try {
-      let response = await postDeleteComment(object.id, idUser);
+      let response = await deleteComment(object.id, idUser);
       if (response.status === APIStatus.success) {
         setIsSucceed(true);
       }
@@ -91,7 +91,7 @@ const DiagDeleteConfirmation = (props) => {
                   } else {
                     if (object.name === "section") deleteSection();
                     else if (object.name === "lecture") deleteLecture();
-                    else if (object.name === "comment") deleteComment();
+                    else if (object.name === "comment") removeComment();
                   }
                 }}
               >

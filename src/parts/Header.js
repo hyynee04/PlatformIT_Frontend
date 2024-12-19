@@ -43,7 +43,11 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(null);
-  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(idUser);
+  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(
+    idUser,
+    null,
+    "notification"
+  );
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -124,6 +128,7 @@ const Header = () => {
       );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+
   useEffect(() => {
     dispatch(countTaskOfCenterAd("qualification"));
   }, [dispatch]);

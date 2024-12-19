@@ -27,8 +27,8 @@ const getAllCommentOfLecture = (idLecture) => {
   });
 };
 
-const postDeleteComment = (idComment, idUpdatedBy) => {
-  return axios.post(`api/Comment/DeleteComment`, null, {
+const deleteComment = (idComment, idUpdatedBy) => {
+  return axios.delete("api/Comment/DeleteComment", {
     params: {
       idComment: idComment,
       idUpdatedBy: idUpdatedBy,
@@ -36,4 +36,4 @@ const postDeleteComment = (idComment, idUpdatedBy) => {
   });
 };
 
-export { postAddComment, getAllCommentOfLecture, postDeleteComment };
+export { postAddComment, getAllCommentOfLecture, deleteComment };

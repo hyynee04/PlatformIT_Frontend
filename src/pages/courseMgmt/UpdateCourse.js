@@ -4,9 +4,15 @@ import { ImSpinner2 } from "react-icons/im";
 import { FaTrashAlt, FaChevronDown } from "react-icons/fa";
 import { RiAttachment2 } from "react-icons/ri";
 import { FaRegFile } from "react-icons/fa6";
-import { FiSettings } from "react-icons/fi";
+import { FiSettings, FiTrash2 } from "react-icons/fi";
 import { TbCurrencyDong } from "react-icons/tb";
-import { LuMoveRight, LuX } from "react-icons/lu";
+import {
+  LuMoveRight,
+  LuSettings,
+  LuSettings2,
+  LuTrash2,
+  LuX,
+} from "react-icons/lu";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import {
@@ -698,12 +704,18 @@ const UpdateCourse = () => {
                 </div>
               </div>
               <div className="alert-option">
-                <button
-                  className="circle-btn"
-                  onClick={() => openSettingModal()}
-                >
-                  <FiSettings className="icon" />
-                </button>
+                <div className="setting-container">
+                  <button
+                    className="setting"
+                    onClick={() => openSettingModal()}
+                  >
+                    <LuSettings className="icon" />
+                  </button>
+                  <button className="remove">
+                    <LuTrash2 />
+                  </button>
+                </div>
+
                 <div className="container-button">
                   <button
                     className="discard-changes"

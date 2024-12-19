@@ -9,17 +9,25 @@ import {
   LuX,
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
-import { Role } from "../../constants/constants";
+import { APIStatus, Role } from "../../constants/constants";
+import { useNavigate } from "react-router-dom";
+import { postAddSection, updateSection } from "../../services/courseService";
 const SectionView = (props) => {
   const {
-    idUser,
-    idLecture,
+    idCourse,
     idSection,
+    idLecture,
     sectionList,
+    fetchSectionList,
     setIdLecture,
     setIdSection,
+    courseTitle,
+    setIdSectionRemoved,
+    setIsRemoved,
   } = props;
+  const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
+  const idUser = +localStorage.getItem("idUser");
 
   const [isShowed, setIsShowed] = useState({});
   const [isEdit, setIsEdit] = useState({});
@@ -27,6 +35,30 @@ const SectionView = (props) => {
 
   const [editSectionName, setEditSectionName] = useState("");
   const [newSectionTitle, setNewSectionTitle] = useState("");
+
+  const addNewSection = async (sectionTitle) => {
+    try {
+      let response = await postAddSection(sectionTitle, idCourse, idUser);
+      if (response.status === APIStatus.success) {
+        await fetchSectionList();
+        setNewSectionTitle("");
+        setIsAddSection(false);
+      } else console.log(response.data);
+    } catch (error) {
+      console.error("Error posting data:", error);
+    }
+  };
+
+  const editSection = async (idSection, newSectionName, idUpdatedBy) => {
+    try {
+      let respone = await updateSection(idSection, newSectionName, idUpdatedBy);
+      if (respone.status === APIStatus.success) {
+        fetchSectionList();
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
 
   useEffect(() => {
     setIsShowed({ ...isShowed, [idSection]: true });
@@ -120,15 +152,20 @@ const SectionView = (props) => {
                     />
                     <div className="edit-section-buttons">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={async () => {
+                          await editSection(
+                            section.idSection,
+                            editSectionName,
+                            idUser
+                          );
+                          setIsEdit({ ...isEdit, [index]: false });
+                          setEditSectionName("");
                         }}
                       >
                         <LuCheck />
                       </button>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() => {
                           setIsEdit({ ...isEdit, [index]: false });
                           setEditSectionName("");
                         }}
@@ -152,7 +189,7 @@ const SectionView = (props) => {
                       className="lecture-item"
                       onClick={() => setIdLecture(lecture.idLecture)}
                     >
-                      <div className="lecture-info">
+                      <div className="lecture-info not-learn">
                         <span
                           className={`lecture-title ${
                             idLecture === lecture.idLecture ? "active" : ""
@@ -172,7 +209,7 @@ const SectionView = (props) => {
                     </div>
                   </div>
                 ))}
-              {idRole && idRole === Role.teacher && (
+              {idRole && idRole !== Role.student && (
                 <div
                   className={`section-lectures ${
                     isShowed[section.idSection] ? "" : "deactive"
@@ -180,26 +217,35 @@ const SectionView = (props) => {
                 >
                   <div className="lecture-item contain-button nohover">
                     <div className="option-container">
+                      {idRole === Role.teacher && (
+                        <button
+                          className="add-lecture"
+                          onClick={() =>
+                            navigate("/addNewLecture", {
+                              state: {
+                                idCourse: idCourse,
+                                idSection: idSection,
+                                idCreatedBy: idUser,
+                                courseTitle: courseTitle,
+                                sectionName: section.sectionName,
+                              },
+                            })
+                          }
+                        >
+                          <span className="icon">
+                            <LuPlus />
+                          </span>
+                          <span className="text">Add new lecture</span>
+                        </button>
+                      )}
+
                       <button
-                        className="add-lecture"
-                        // onClick={() =>
-                        //     navigate("/addNewLecture", {
-                        //         state: {
-                        //             idCourse: courseInfo.idCourse,
-                        //             idSection: section.idSection,
-                        //             idCreatedBy: idUser,
-                        //             courseTitle: courseInfo.courseTitle,
-                        //             sectionName: section.sectionName
-                        //         }
-                        //     })
-                        // }
+                        className="remove-section"
+                        onClick={() => {
+                          setIdSectionRemoved(section.idSection);
+                          setIsRemoved(true);
+                        }}
                       >
-                        <span className="icon">
-                          <LuPlus />
-                        </span>
-                        <span className="text">Add new lecture</span>
-                      </button>
-                      <button className="remove-section">
                         <span className="icon">
                           <LuTrash2 />
                         </span>
@@ -227,10 +273,20 @@ const SectionView = (props) => {
                       onChange={(e) => setNewSectionTitle(e.target.value)}
                     />
                     <div className="edit-section-buttons">
-                      <button>
+                      <button
+                        disabled={!newSectionTitle}
+                        onClick={() => {
+                          addNewSection(newSectionTitle);
+                        }}
+                      >
                         <LuCheck />
                       </button>
-                      <button onClick={() => setIsAddSection(!isAddSection)}>
+                      <button
+                        onClick={() => {
+                          setNewSectionTitle("");
+                          setIsAddSection(!isAddSection);
+                        }}
+                      >
                         <LuX />
                       </button>
                     </div>

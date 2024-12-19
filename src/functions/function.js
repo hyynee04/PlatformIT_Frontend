@@ -209,13 +209,9 @@ export const processCommentList = (commentList) => {
         const refComment = mainList.find(
           (item) => item.idComment === comment.idCommentRef
         );
-        const nameRep =
-          refComment && refComment.idUser === comment.idUser
-            ? refComment.fullName
-            : "";
         replyObject[comment.idCommentRef].push({
           ...comment,
-          nameRep,
+          commentRefName: "",
           timestamp: parseRelativeTime(comment.relativeTime),
         });
       } else {
@@ -227,10 +223,10 @@ export const processCommentList = (commentList) => {
           if (nestedReply) {
             replyObject[key].push({
               ...comment,
-              nameRep:
-                nestedReply.idUser !== comment.idUser
-                  ? nestedReply.fullName
-                  : "",
+              // nameRep:
+              //   nestedReply.idUser !== comment.idUser
+              //     ? nestedReply.fullName
+              //     : "",
               timestamp: parseRelativeTime(comment.relativeTime),
             });
           }

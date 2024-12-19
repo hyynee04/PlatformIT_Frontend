@@ -1,0 +1,61 @@
+.dashboard-container {
+  padding: 3rem 4rem;
+  background-color: #fafafa;
+}
+.dashboard-container.admin-center {
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+}
+.dashboard-container.admin-platform {
+}
+.dashboard-container > .left-section {
+  flex: 0 0 65%;
+  border: 1px solid black;
+}
+.dashboard-container > .right-section {
+  flex: 1;
+  border: 1px solid black;
+}
+.dashboard-container .left-section > .left-content-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.left-content-section .revenue-statistics .revenue-header > label {
+  color: var(--text-gray);
+}
+.left-content-section .revenue-statistics .revenue-header > .statistics-number {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  height: fit-content;
+}
+.revenue-header .statistics-number .main-number > span {
+  font-size: 2rem;
+  font-weight: 700;
+}
+.revenue-header .statistics-number .main-number > .currency {
+  text-decoration: underline;
+}
+.revenue-header .statistics-number > .swing-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.revenue-header .statistics-number > .swing-number.increase {
+  color: var(--main-color);
+}
+.revenue-header .statistics-number > .swing-number.decrease {
+  color: var(--red-color);
+}
+.revenue-header .statistics-number .swing-number > svg {
+  margin-bottom: 2px;
+}

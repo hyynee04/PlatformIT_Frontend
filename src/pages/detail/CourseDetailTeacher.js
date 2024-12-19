@@ -418,9 +418,9 @@ const CourseDetailTeacher = (props) => {
                       <button
                         disabled={!newSection}
                         onClick={() => {
+                          addNewSection(newSection);
                           setNewSection("");
                           setAddSection(false);
-                          addNewSection(newSection);
                         }}
                       >
                         <LuCheck />

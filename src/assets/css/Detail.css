@@ -214,7 +214,102 @@
   color: var(--text-gray);
   text-align: justify;
 }
-
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  span
+  > input {
+  accent-color: var(--main-color);
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  > .setting-course {
+  display: flex;
+  justify-content: flex-end;
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  > .buttons-container {
+  padding: 4px 8px;
+  border: 1px solid var(--main-color);
+  border-radius: 1.5rem;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  .buttons-container
+  > button {
+  border: none;
+  background-color: transparent;
+  font-size: 1.2rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-gray);
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  .buttons-container
+  > button.remove {
+  padding-left: 0.5rem;
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  .buttons-container
+  > button.remove:hover
+  svg {
+  scale: 1.1;
+  color: var(--red-color);
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  .buttons-container
+  > button.edit {
+  padding-right: 0.5rem;
+  border-right: 1px solid var(--main-color);
+}
+.detail-container
+  .left-container
+  .block-container
+  .biography-block
+  .center-information
+  .setting-course
+  .buttons-container
+  > button.edit:hover
+  svg {
+  scale: 1.1;
+  color: var(--main-color);
+}
 .detail-container
   .left-container
   .block-container
@@ -1039,6 +1134,7 @@
   > .lecture-content {
   padding: 1.3rem 2.3rem;
   border-bottom: 1px solid var(--border-gray);
+  cursor: pointer;
 }
 
 .detail-container
@@ -1367,6 +1463,14 @@
   > .lecture-description {
   font-size: 0.8rem;
   color: var(--text-gray);
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Show only 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  text-align: justify;
 }
 
 .detail-container

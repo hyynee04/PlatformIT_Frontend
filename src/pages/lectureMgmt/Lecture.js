@@ -17,6 +17,7 @@ import LectureView from "./LectureView";
 import SectionView from "./SectionView";
 import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 import { getAllCommentOfLecture } from "../../services/commentService";
+import FetchDataUpdated from "../../functions/FetchDataUpdated";
 
 const Lecture = (props) => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const Lecture = (props) => {
   const [sectionList, setSectionList] = useState([]);
   const [mainCommentList, setMainCommentList] = useState([]);
   const [replyCommentList, setReplyCommentList] = useState({});
+  const [updatedCommentList, setUpdatedCommentList] = useState([]);
 
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
@@ -39,6 +41,7 @@ const Lecture = (props) => {
   const [idLecture, setIdLecture] = useState(null);
   const [idTeacher, setIdTeacher] = useState(null);
   const [idComment, setIdComment] = useState(null);
+  const [idSectionRemoved, setIdSectionRemoved] = useState(null);
 
   const [isRemoved, setIsRemoved] = useState(false);
 
@@ -173,6 +176,12 @@ const Lecture = (props) => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
+  useEffect(() => {
+    const processedData = processCommentList(updatedCommentList);
+    setMainCommentList(processedData.main);
+    setReplyCommentList(processedData.reply);
+  }, [updatedCommentList]);
+
   return (
     <div className="lecture-container">
       <div className="lecture-content">
@@ -186,12 +195,14 @@ const Lecture = (props) => {
             ) : (
               <LectureView
                 lectureDetail={lectureDetail}
+                idLecture={lectureDetail.idLecture}
                 idTeacher={idTeacher}
                 setIsRemoved={setIsRemoved}
                 setIdComment={setIdComment}
                 mainCommentList={mainCommentList}
                 replyCommentList={replyCommentList}
                 fetchAllCommentOfLecture={fetchAllCommentOfLecture}
+                setUpdatedCommentList={setUpdatedCommentList}
               />
             )}
           </div>
@@ -203,12 +214,16 @@ const Lecture = (props) => {
               </div>
             ) : (
               <SectionView
-                idUser={idUser}
+                idCourse={idCourse}
                 idSection={idSection}
                 idLecture={idLecture}
                 sectionList={sectionList}
+                fetchSectionList={() => fetchCourseContentStructure(idCourse)}
                 setIdSection={setIdSection}
                 setIdLecture={setIdLecture}
+                courseTitle={lectureDetail.courseTitle}
+                setIsRemoved={setIsRemoved}
+                setIdSectionRemoved={setIdSectionRemoved}
               />
             )}
           </div>
@@ -216,13 +231,23 @@ const Lecture = (props) => {
       </div>
       <DiagDeleteConfirmation
         isOpen={isRemoved}
-        onClose={() => setIsRemoved(false)}
+        onClose={() => {
+          setIsRemoved(false);
+          if (idComment) setIdComment(null);
+          if (idSectionRemoved) setIdSectionRemoved(null);
+        }}
         object={
           idComment
             ? {
                 id: idComment,
                 name: "comment",
                 message: "Are you sure to delete this comment?",
+              }
+            : idSectionRemoved
+            ? {
+                id: idSectionRemoved,
+                name: "section",
+                message: "Are you sure to delete this section?",
               }
             : {
                 id: lectureDetail.idLecture,
@@ -231,7 +256,11 @@ const Lecture = (props) => {
               }
         }
         fetchData={
-          idComment ? () => fetchAllCommentOfLecture(idLecture) : undefined
+          idComment
+            ? () => fetchAllCommentOfLecture(idLecture)
+            : idSectionRemoved
+            ? () => fetchCourseContentStructure(idCourse)
+            : undefined
         }
       />
     </div>

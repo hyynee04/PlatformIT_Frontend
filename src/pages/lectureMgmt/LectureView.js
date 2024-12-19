@@ -27,15 +27,18 @@ import {
 import { useNavigate } from "react-router-dom";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import { postAddComment } from "../../services/commentService";
+import FetchDataUpdated from "../../functions/FetchDataUpdated";
 
 const LectureView = ({
   lectureDetail,
   idTeacher,
+  idLecture,
   mainCommentList,
   replyCommentList,
   fetchAllCommentOfLecture,
   setIsRemoved,
   setIdComment,
+  setUpdatedCommentList,
 }) => {
   const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
@@ -53,14 +56,15 @@ const LectureView = ({
     addComment: false,
   });
 
-  const [generalComment, setGeneralComment] = useState({
-    idLecture: lectureDetail.idLecture,
-    idSender: Number(localStorage.getItem("idUser")),
-    idReceiver: idRole === Role.student ? idTeacher : null,
-    idCommentRef: null,
-    content: "",
-  });
+  const [generalComment, setGeneralComment] = useState({});
+
   const [replyComment, setReplyComment] = useState({});
+
+  const { updatedComments } = FetchDataUpdated(
+    null,
+    lectureDetail.idLecture,
+    "comment"
+  );
 
   const [isLongContent, setIsLongContent] = useState({});
   const [isExpanded, setIsExpanded] = useState({});
@@ -90,6 +94,7 @@ const LectureView = ({
   ];
 
   const handleAddComment = async (commentData) => {
+    console.log(commentData);
     try {
       let response = await postAddComment(commentData);
       if (response.status === APIStatus.success) {
@@ -135,6 +140,20 @@ const LectureView = ({
   }, []);
 
   useEffect(() => {
+    setGeneralComment({
+      idLecture: idLecture,
+      idSender: Number(localStorage.getItem("idUser")),
+      idReceiver: idRole === Role.student ? idTeacher : null,
+      idCommentRef: null,
+      content: "",
+    });
+  }, [idLecture]);
+
+  useEffect(() => {
+    setUpdatedCommentList(updatedComments);
+  }, [updatedComments]);
+
+  useEffect(() => {
     const longContentFlags = {};
 
     // Check if each comment is long
@@ -162,20 +181,22 @@ const LectureView = ({
   }, [mainCommentList, replyCommentList]);
 
   useEffect(() => {
-    const handleClickOutsideOptionBox = (event) => {
-      if (
-        optionBoxRef.current &&
-        !optionBoxRef.current.contains(event.target) &&
-        !optionButtonRef.current.contains(event.target)
-      )
-        setIsOpenOption(false);
-    };
-    // Attach both event listeners
-    document.addEventListener("mousedown", handleClickOutsideOptionBox);
-    // Cleanup both event listeners on component unmount
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutsideOptionBox);
-    };
+    if (idRole !== Role.student) {
+      const handleClickOutsideOptionBox = (event) => {
+        if (
+          optionBoxRef.current &&
+          !optionBoxRef.current.contains(event.target) &&
+          !optionButtonRef.current.contains(event.target)
+        )
+          setIsOpenOption(false);
+      };
+      // Attach both event listeners
+      document.addEventListener("mousedown", handleClickOutsideOptionBox);
+      // Cleanup both event listeners on component unmount
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutsideOptionBox);
+      };
+    }
   }, []);
 
   return (
@@ -184,23 +205,26 @@ const LectureView = ({
         ref={optionBoxRef}
         className={`option-box ${isOpenOption ? "active" : ""}`}
       >
-        <button
-          onClick={() => {
-            setIsEdit(!isEdit);
-            setIsOpenOption(!isOpenOption);
-            setIndex(1);
-          }}
-        >
-          {isEdit ? (
-            <>
-              <LuAirplay /> Lecture View
-            </>
-          ) : (
-            <>
-              <LuPenLine /> Edit Lecture
-            </>
-          )}
-        </button>
+        {idRole === Role.teacher && (
+          <button
+            onClick={() => {
+              setIsEdit(!isEdit);
+              setIsOpenOption(!isOpenOption);
+              setIndex(1);
+            }}
+          >
+            {isEdit ? (
+              <>
+                <LuAirplay /> Lecture View
+              </>
+            ) : (
+              <>
+                <LuPenLine /> Edit Lecture
+              </>
+            )}
+          </button>
+        )}
+
         <button
           onClick={() => {
             setIsRemoved(true);
@@ -260,7 +284,7 @@ const LectureView = ({
             </>
           )}
         </div>
-        {!isEdit && (
+        {!isEdit && idRole !== Role.student && (
           <div className="option-container">
             <button
               className="setting-button"
@@ -791,8 +815,8 @@ const LectureView = ({
                                   >
                                     <span>
                                       <b>
-                                        {reply.nameRep
-                                          ? `@${reply.nameRep}`
+                                        {reply.commentRefName
+                                          ? `@${reply.commentRefName}`
                                           : ""}
                                       </b>
                                       &nbsp;

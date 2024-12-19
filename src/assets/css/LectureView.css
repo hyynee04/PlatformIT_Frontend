@@ -470,6 +470,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  text-align: justify;
 }
 .lecture-container
   .lecture-content
@@ -1210,6 +1211,14 @@
   display: flex;
   flex-direction: column;
   width: 90%;
+}
+.section-view-container
+  .section-display
+  .each-section
+  .section-lectures
+  .lecture-item
+  > .lecture-info.not-learn {
+  width: 100%;
 }
 .section-view-container
   .section-display

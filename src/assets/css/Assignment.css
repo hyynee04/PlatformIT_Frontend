@@ -252,7 +252,8 @@
   align-items: center;
   position: relative;
 }
-.container-left-assign .assign-info {
+.container-left-assign .assign-info,
+.container-right-assign .assign-info {
   padding: 0 24px;
   width: 100%;
   display: flex;
@@ -386,7 +387,8 @@
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   border-radius: 8px;
 }
-.action-btns-form .container-button .btn {
+.action-btns-form .container-button .btn,
+.testing-code .btn {
   padding: 6px 8px;
   border-radius: 8px;
   display: flex;
@@ -406,9 +408,14 @@
   display: inline;
 }
 
-.action-btns-form .container-button .btn.publish {
+.action-btns-form .container-button .btn.publish,
+.testing-code .btn {
   background-color: var(--main-color);
   color: var(--white-color);
+}
+.action-btns-form .container-button .btn.publish:hover,
+.testing-code .btn:hover {
+  background-color: rgb(97, 148, 148);
 }
 .action-btns-form .container-button .btn.save {
   border: 1px solid var(--main-color);
@@ -588,7 +595,49 @@ input:checked + .slider:before {
   height: auto;
   color: var(--black-color);
 }
-
+.container-right-assign table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.container-right-assign table th {
+  padding: 12px 10px;
+  font-size: 16px;
+  background-color: rgba(217, 217, 217, 0.3);
+}
+.container-right-assign table td {
+  font-size: 14px;
+  padding: 0;
+  background-color: var(--white-color);
+  text-overflow: ellipsis;
+}
+.container-right-assign table th,
+.container-right-assign table td {
+  border: 1px solid var(--border-gray);
+  text-align: center;
+  font-weight: normal;
+  color: var(--black-color);
+}
+.container-right-assign table td input[type="text"] {
+  border: none;
+  width: 100%;
+  padding: 12px 10px;
+  text-align: center;
+}
+.container-right-assign table td .add-new-record {
+  justify-self: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-gray);
+  font-size: 14px;
+  border: none;
+  margin: 4px;
+}
+.container-right-assign table td .add-new-record:hover {
+  color: var(--black-color);
+}
 .right-question-info .img-container {
   display: flex;
   flex-direction: row;

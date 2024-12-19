@@ -18,7 +18,7 @@ import {
   fetchCenters,
   setActiveStatusCenter,
 } from "../../store/listCenterSlice";
-import { getPagination } from "../../functions/function";
+import { formatDate, getPagination } from "../../functions/function";
 
 const PlatformAdCenterMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -396,18 +396,7 @@ const PlatformAdCenterMgmt = () => {
                             <td>{center.tin}</td>
                             <td>
                               {center.establishedDate &&
-                                (() => {
-                                  const date = new Date(center.submissionDate);
-                                  const day = String(date.getDate()).padStart(
-                                    2,
-                                    "0"
-                                  );
-                                  const month = String(
-                                    date.getMonth() + 1
-                                  ).padStart(2, "0");
-                                  const year = date.getFullYear();
-                                  return `${month}/${day}/${year}`;
-                                })()}
+                                formatDate(center.establishedDate)}
                             </td>
                             {activeStatusCenter === CenterStatus.inactive && (
                               <td

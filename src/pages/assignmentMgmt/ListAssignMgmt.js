@@ -16,6 +16,7 @@ import {
 } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
+import { RiGroupLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import {
   APIStatus,
@@ -784,9 +785,15 @@ const ListAssignMgmt = () => {
                           )}
                         </span>
                         {idRole === Role.teacher && (
-                          <span className="isExam-label">
-                            {assignment.isTest ? "Test" : "Exercise"}
-                          </span>
+                          <div className="studentCount-isExam-container">
+                            <span className="studentCount">
+                              {assignment.numberOfSubmittedStudent}/
+                              {assignment.numberOfStudent} <RiGroupLine />
+                            </span>
+                            <span className="isExam-label">
+                              {assignment.isTest ? "Test" : "Exercise"}
+                            </span>
+                          </div>
                         )}
                         {idRole === Role.student &&
                           (assignment.submittedDate ? (

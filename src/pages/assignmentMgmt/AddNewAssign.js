@@ -501,7 +501,11 @@ const AddNewAssign = () => {
             onClick={() => navigate(-1)}
           >
             <LuChevronLeft stroke-width="4" />
-            Create new assignment
+            {isAddByLecture
+              ? "Create new exercise"
+              : isAddByCourse
+              ? "Create new test"
+              : "Create new assignment"}
           </span>
           <div className="name-container">
             {isAddByCourse && (

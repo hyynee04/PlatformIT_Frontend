@@ -62,6 +62,7 @@ const AssignDetail = () => {
   const filterRef = useRef(null);
   const filterBtnRef = useRef(null);
   const [statusSubmission, setStatusSubmission] = useState("all");
+  const [tempStatusSubmisson, setTempStatusSubmission] = useState("all");
 
   const [sortByVisible, setSortByVisible] = useState(false);
   const sortByRef = useRef(null);
@@ -278,6 +279,25 @@ const AssignDetail = () => {
       if (statusSubmission === "notSubmitted" && submission.status === null) {
         return true;
       }
+      if (
+        statusSubmission === AssignmentResultStatus.submitted &&
+        overviewAssignment.isPastDue !== 1 &&
+        assignmentInfo.startDate &&
+        assignmentInfo.dueDate &&
+        submission.status === AssignmentResultStatus.onTime
+      ) {
+        return true;
+      }
+
+      // // Trường hợp 3: Lọc các phần tử có status là "Submitted" khi không có `isPastDue` và không có endDate
+      // if (
+      //   statusSubmission === "submitted" &&
+      //   overviewAssignment.isPastDue === null &&
+      //   !overviewAssignment.endDate &&
+      //   submission.status === AssignmentResultStatus.submitted
+      // ) {
+      //   return true;
+      // }
       if (
         statusSubmission !== "all" &&
         submission.status !== Number(statusSubmission)
@@ -940,13 +960,13 @@ const AssignDetail = () => {
                                       type="radio"
                                       value="manual"
                                       checked={
-                                        statusSubmission ===
+                                        tempStatusSubmisson ===
                                         (overviewAssignment.isPastDue === 1
                                           ? AssignmentResultStatus.onTime
                                           : AssignmentResultStatus.submitted)
                                       }
                                       onChange={() =>
-                                        setStatusSubmission(
+                                        setTempStatusSubmission(
                                           overviewAssignment.isPastDue === 1
                                             ? AssignmentResultStatus.onTime
                                             : AssignmentResultStatus.submitted
@@ -962,11 +982,11 @@ const AssignDetail = () => {
                                       type="radio"
                                       value="quiz"
                                       checked={
-                                        statusSubmission ===
+                                        tempStatusSubmisson ===
                                         AssignmentResultStatus.late
                                       }
                                       onChange={() =>
-                                        setStatusSubmission(
+                                        setTempStatusSubmission(
                                           AssignmentResultStatus.late
                                         )
                                       }
@@ -978,10 +998,10 @@ const AssignDetail = () => {
                                       type="radio"
                                       value="code"
                                       checked={
-                                        statusSubmission === "notSubmitted"
+                                        tempStatusSubmisson === "notSubmitted"
                                       }
                                       onChange={() =>
-                                        setStatusSubmission("notSubmitted")
+                                        setTempStatusSubmission("notSubmitted")
                                       }
                                     />
                                     Not submitted
@@ -990,9 +1010,9 @@ const AssignDetail = () => {
                                     <input
                                       type="radio"
                                       value="all"
-                                      checked={statusSubmission === "all"}
+                                      checked={tempStatusSubmisson === "all"}
                                       onChange={() =>
-                                        setStatusSubmission("all")
+                                        setTempStatusSubmission("all")
                                       }
                                     />
                                     All
@@ -1009,7 +1029,7 @@ const AssignDetail = () => {
                                 <button
                                   className="btn save-filter"
                                   onClick={() => {
-                                    setStatusSubmission(statusSubmission);
+                                    setStatusSubmission(tempStatusSubmisson);
                                     setFilterVisble(false);
                                   }}
                                 >

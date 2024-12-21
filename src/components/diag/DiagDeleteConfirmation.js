@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { LuCheckCheck, LuTrash2, LuX } from "react-icons/lu";
+import React, { useState } from "react";
+import { LuTrash2, LuX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-import { inactiveLecture, inactiveSection } from "../../services/courseService";
+import {
+  deleteCourse,
+  inactiveLecture,
+  inactiveSection,
+} from "../../services/courseService";
 import { APIStatus } from "../../constants/constants";
 import { deleteComment } from "../../services/commentService";
 const DiagDeleteConfirmation = (props) => {
@@ -44,6 +48,17 @@ const DiagDeleteConfirmation = (props) => {
     }
   };
 
+  const hanldeDeleteCourse = async () => {
+    try {
+      let response = await deleteCourse(object.id);
+      if (response.status === APIStatus.success) {
+        navigate("/centerAdCourse");
+      }
+    } catch (error) {
+      console.log("Error posting data: ", error);
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -67,7 +82,34 @@ const DiagDeleteConfirmation = (props) => {
           <LuX className="diag-icon" onClick={onClose} />
         </div>
         <div className="diag-body">
-          <span>{isSucceed ? "Remove successfully!" : object.message}</span>
+          {object.name === "course" ? (
+            <div>
+              <p>
+                <strong>Important Notice:</strong> Deleting the course will
+                result in:
+              </p>
+              <ul>
+                <li>
+                  Permanent removal of all sections, lectures, and comments.
+                </li>
+                <li>
+                  Notification to all students and teachers associated with the
+                  course.
+                </li>
+                <li>
+                  The course will no longer be available or searchable on the
+                  platform.
+                </li>
+              </ul>
+              <p>
+                <strong>Please Note:</strong> This action is irreversible, and
+                the course cannot be restored.
+              </p>
+            </div>
+          ) : (
+            <span>{isSucceed ? "Remove successfully!" : object.message}</span>
+          )}
+
           <div className="str-btns">
             <div className="act-btns">
               {!isSucceed && (
@@ -92,6 +134,7 @@ const DiagDeleteConfirmation = (props) => {
                     if (object.name === "section") deleteSection();
                     else if (object.name === "lecture") deleteLecture();
                     else if (object.name === "comment") removeComment();
+                    else if (object.name === "course") hanldeDeleteCourse();
                   }
                 }}
               >

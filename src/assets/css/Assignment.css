@@ -129,6 +129,35 @@
 /* .list-assign-container .assign-item .row-item .btn:hover {
   background-color: rgba(217, 217, 217, 0.3);
 } */
+.list-assign-container .assign-item .row-item .studentCount-isExam-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+}
+.list-assign-container
+  .assign-item
+  .row-item
+  .studentCount-isExam-container
+  .studentCount {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+  color: var(--main-color);
+  font-weight: 600;
+  font-size: 600;
+}
+.list-assign-container
+  .assign-item
+  .row-item
+  .studentCount-isExam-container
+  .studentCount
+  > svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1px;
+}
 .list-assign-container .assign-item .row-item .isExam-label {
   font-size: 14px;
   padding: 8px;

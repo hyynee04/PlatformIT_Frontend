@@ -37,6 +37,7 @@ import {
 import {
   getCourseDetail,
   getCourseProgressByIdStudent,
+  getIsChatAvailable,
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   getSectionDetail,
@@ -63,6 +64,7 @@ const CourseDetail = (props) => {
 
   const [isRemoved, setIsRemoved] = useState(false);
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
+  const [isChatAvailable, setIsChatAvailable] = useState(false);
   const [showedSections, setShowedSections] = useState({});
   const handleIsShowed = (index) => {
     setShowedSections((prev) => ({
@@ -96,6 +98,9 @@ const CourseDetail = (props) => {
       } else {
         setIsEnrolledCourse(false);
       }
+      if (idRole === Role.student) {
+      }
+      const responseIsChatAvailable = await getIsChatAvailable();
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -210,6 +215,12 @@ const CourseDetail = (props) => {
   // Generate pagination display numbers
 
   const paginationNumbers = getPagination(currentPage, totalPages);
+
+  //REMOVE COURSE
+  const [isModalRemoveOpen, setIsModalRemoveOpen] = useState(false);
+
+  const openRemoveModal = () => setIsModalRemoveOpen(true);
+  const closeRemoveModal = () => setIsModalRemoveOpen(false);
 
   //REGIST COURSE
   const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
@@ -342,10 +353,25 @@ const CourseDetail = (props) => {
                   </span>
                   <div className="setting-course">
                     <div className="buttons-container">
-                      <button className="edit">
+                      <button
+                        className="edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate("/updateCourse", {
+                            state: {
+                              idCourse: courseInfo.idCourse,
+                              hasStudent:
+                                courseInfo.studentCount > 0 ? true : false,
+                            },
+                          });
+                        }}
+                      >
                         <LuPenLine />
                       </button>
-                      <button className="remove">
+                      <button
+                        className="remove"
+                        onClick={() => openRemoveModal()}
+                      >
                         <LuTrash2 />
                       </button>
                     </div>
@@ -438,7 +464,10 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-          {idUser && idRole === Role.student && isEnrolledCourse ? (
+          {idUser &&
+          idRole === Role.student &&
+          isEnrolledCourse &&
+          courseInfo.sta ? (
             <>
               <button className="chat-button">
                 Chat <RiChat3Line />
@@ -818,6 +847,16 @@ const CourseDetail = (props) => {
             message: "Are you sure to delete this section?",
           }}
           fetchData={fetchSectionDetail}
+        />
+      </div>
+      <div>
+        <DiagDeleteConfirmation
+          isOpen={isModalRemoveOpen}
+          onClose={closeRemoveModal}
+          object={{
+            id: courseInfo.idCourse,
+            name: "course",
+          }}
         />
       </div>
 

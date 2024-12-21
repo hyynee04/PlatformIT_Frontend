@@ -104,7 +104,7 @@ const postUpdateCourse = async (courseInfo) => {
     const formData = new FormData();
     formData.append("IdCourse", courseInfo.idCourse);
     formData.append("Title", courseInfo.title);
-    formData.append("Introduction", courseInfo.introduction);
+    formData.append("Introduction", courseInfo.introduction || "");
     formData.append("CourseAvatar", courseInfo.coverImg);
     formData.append("IsLimitedTime", courseInfo.isLimitedTime);
     if (courseInfo.isLimitedTime === 1) {
@@ -118,10 +118,8 @@ const postUpdateCourse = async (courseInfo) => {
       formData.append("MaxAttendees", courseInfo.maxAttendees);
     }
     formData.append("IsPremiumCourse", courseInfo.isPremiumCourse);
-    if (courseInfo.isPremiumCourse === 1) {
-      formData.append("Price", courseInfo.price);
-      formData.append("DiscountedPrice", courseInfo.discountedPrice);
-    }
+    formData.append("Price", courseInfo.price || "");
+    formData.append("DiscountedPrice", courseInfo.discountedPrice || "");
     formData.append(
       "IsSequenced",
       courseInfo.isSequenced === 1 || courseInfo.isSequenced ? 1 : 0
@@ -155,6 +153,14 @@ const getIsEnRolledCourse = async (idCourse) => {
     params: {
       idStudent: idUser,
       idCourse: idCourse,
+    },
+  });
+};
+const getIsChatAvailable = async (idTeacher, idStudent) => {
+  return await axios.get("api/User/IsChatAvailble", {
+    params: {
+      idStudent: idStudent,
+      idTeacher: idTeacher,
     },
   });
 };
@@ -334,6 +340,14 @@ const getSectionDetail = (idCourse) => {
     },
   });
 };
+const deleteCourse = (idCourse) => {
+  return axios.delete("api/Course/DeleteCourse", {
+    params: {
+      idCourse: idCourse,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
@@ -350,6 +364,7 @@ export {
   getCourseProgress,
   getExerciseOfLecture,
   getIsEnRolledCourse,
+  getIsChatAvailable,
   getLectureDetail,
   getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
@@ -363,4 +378,5 @@ export {
   inactiveSection,
   updateSection,
   inactiveLecture,
+  deleteCourse,
 };

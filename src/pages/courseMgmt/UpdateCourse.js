@@ -4,20 +4,12 @@ import { ImSpinner2 } from "react-icons/im";
 import { FaTrashAlt, FaChevronDown } from "react-icons/fa";
 import { RiAttachment2 } from "react-icons/ri";
 import { FaRegFile } from "react-icons/fa6";
-import { FiSettings, FiTrash2 } from "react-icons/fi";
 import { TbCurrencyDong } from "react-icons/tb";
-import {
-  LuMoveRight,
-  LuSettings,
-  LuSettings2,
-  LuTrash2,
-  LuX,
-} from "react-icons/lu";
+import { LuMoveRight, LuSettings, LuTrash2, LuX } from "react-icons/lu";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import {
   getAllTagModel,
-  getCourseDetail,
   getViewCourse,
   postUpdateCourse,
 } from "../../services/courseService";
@@ -26,12 +18,16 @@ import TeacherCard from "../../components/Card/TeacherCard";
 import { getAllActiveTeacherCardsOfCenter } from "../../services/centerService";
 import DiagSettingCourseForm from "../../components/diag/DiagSettingCourseForm";
 import { APIStatus } from "../../constants/constants";
+import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
+import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 
 const UpdateCourse = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [loadingAct, setLoadingAct] = useState(false);
+  const [courseInfo, setCourseInfo] = useState({});
+  const [hasStudent, setHasStudent] = useState(false);
   //TAG
   const [tagOptions, setTagOptions] = useState([]);
   const [searchTagQuery, setSearchTagQuery] = useState("");
@@ -41,9 +37,19 @@ const UpdateCourse = () => {
     coverImgFile: null,
     coverImgUrl: "",
   });
+  const [teacherList, setTeacherList] = useState([]);
+  const [showTeacherList, setShowTeacherList] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [courseInfo, setCourseInfo] = useState({});
-  const [hasStudent, setHasStudent] = useState(false);
+
+  const [isModalSuccessOpen, setIsModalSuccessOpen] = useState(false);
+  const openSuccessModal = () => setIsModalSuccessOpen(true);
+  const closeSuccessModal = () => setIsModalSuccessOpen(false);
+
+  const [isModalRemoveOpen, setIsModalRemoveOpen] = useState(false);
+  const openRemoveModal = () => setIsModalRemoveOpen(true);
+  const closeRemoveModal = () => setIsModalRemoveOpen(false);
+
+  const [isModalSettingOpen, setIsModalSettingOpen] = useState(false);
 
   const formatNumber = (num) => {
     return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -82,55 +88,54 @@ const UpdateCourse = () => {
       durationValidate,
     }));
   };
-
-  useEffect(() => {
-    const fetchCourseInfo = async (idCourse) => {
-      setLoading(true);
-      try {
-        let response = await getViewCourse(idCourse);
-        if (response.status === APIStatus.success) {
-          setCourseInfo(response.data);
-          setCourseInfo((prev) => ({
-            ...prev,
-            price: response.data?.price,
-            priceDisplay: formatNumber(String(response.data?.price)),
-          }));
-          setCourseInfo((prev) => ({
-            ...prev,
-            discountedPrice: response.data?.discountedPrice,
-            discountedPriceDisplay: formatNumber(
-              String(response.data?.discountedPrice)
-            ),
-          }));
-          setCourseInfo((prev) => ({
-            ...prev,
-            registStartDate: response.data?.registStartDate?.split("T")[0],
-            registEndDate: response.data?.registEndDate?.split("T")[0],
-            startDate: response.data?.startDate?.split("T")[0],
-            endDate: response.data?.endDate?.split("T")[0],
-            registTimeValidate: "",
-            durationValidate: "",
-          }));
-          setCoverImage((prev) => ({
-            ...prev,
-            coverImgUrl: response.data.courseAvatar,
-          }));
-          setSelectedTeacher((prev) => ({
-            ...prev,
-            idUser: response.data?.idTeacher,
-            name: response.data?.fullName,
-            teachingMajor: response?.data.teachingMajor,
-            avatarPath: response?.data.avatarPath,
-            coursesCount: response?.data.courseCount,
-          }));
-          setSelectedTags(response.data.tags);
-        }
-      } catch (error) {
-        throw error;
-      } finally {
-        setLoading(false);
+  const fetchCourseInfo = async (idCourse) => {
+    setLoading(true);
+    try {
+      let response = await getViewCourse(idCourse);
+      if (response.status === APIStatus.success) {
+        setCourseInfo(response.data);
+        setCourseInfo((prev) => ({
+          ...prev,
+          price: response.data?.price,
+          priceDisplay: formatNumber(String(response.data?.price)),
+        }));
+        setCourseInfo((prev) => ({
+          ...prev,
+          discountedPrice: response.data?.discountedPrice,
+          discountedPriceDisplay: formatNumber(
+            String(response.data?.discountedPrice)
+          ),
+        }));
+        setCourseInfo((prev) => ({
+          ...prev,
+          registStartDate: response.data?.registStartDate?.split("T")[0],
+          registEndDate: response.data?.registEndDate?.split("T")[0],
+          startDate: response.data?.startDate?.split("T")[0],
+          endDate: response.data?.endDate?.split("T")[0],
+          registTimeValidate: "",
+          durationValidate: "",
+        }));
+        setCoverImage((prev) => ({
+          ...prev,
+          coverImgUrl: response.data.courseAvatar,
+        }));
+        setSelectedTeacher((prev) => ({
+          ...prev,
+          idUser: response.data?.idTeacher,
+          name: response.data?.fullName,
+          teachingMajor: response?.data.teachingMajor,
+          avatarPath: response?.data.avatarPath,
+          coursesCount: response?.data.courseCount,
+        }));
+        setSelectedTags(response.data.tags);
       }
-    };
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     const state = location.state;
     if (state?.idCourse) {
       fetchCourseInfo(state.idCourse);
@@ -284,14 +289,11 @@ const UpdateCourse = () => {
   };
 
   //SETTING COURSE
-  const [isModalSettingOpen, setIsModalSettingOpen] = useState(false);
 
   const openSettingModal = () => setIsModalSettingOpen(true);
   const closeSettingModal = () => setIsModalSettingOpen(false);
 
   //TEACHERS
-  const [teacherList, setTeacherList] = useState([]);
-  const [showTeacherList, setShowTeacherList] = useState(false);
 
   useEffect(() => {
     const fetchTeacher = async () => {
@@ -379,7 +381,8 @@ const UpdateCourse = () => {
     try {
       const response = await postUpdateCourse(dataToSubmit);
       if (response.status === APIStatus.success) {
-        navigate("/centerAdCourse");
+        // navigate("/centerAdCourse");
+        openSuccessModal();
       }
     } catch (error) {
       throw error;
@@ -528,7 +531,6 @@ const UpdateCourse = () => {
                             isPremiumCourse: value,
                           }));
                         }}
-                        disabled={hasStudent}
                       />
                       <label htmlFor="premium-course">Premium Course</label>
                     </div>
@@ -546,7 +548,6 @@ const UpdateCourse = () => {
                             className="input-form-pi"
                             value={courseInfo.priceDisplay || ""}
                             onChange={handleInputChangeNumberOnly("price")}
-                            disabled={hasStudent}
                           />
                           <TbCurrencyDong className="arrow-icon" />
                         </div>
@@ -565,7 +566,6 @@ const UpdateCourse = () => {
                             onChange={handleInputChangeNumberOnly(
                               "discountedPrice"
                             )}
-                            disabled={hasStudent}
                           />
                           <TbCurrencyDong className="arrow-icon" />
                         </div>
@@ -711,7 +711,7 @@ const UpdateCourse = () => {
                   >
                     <LuSettings className="icon" />
                   </button>
-                  <button className="remove">
+                  <button className="remove" onClick={() => openRemoveModal()}>
                     <LuTrash2 />
                   </button>
                 </div>
@@ -731,7 +731,7 @@ const UpdateCourse = () => {
                     onClick={() => handleUpdateCourse()}
                   >
                     {loadingAct && (
-                      <ImSpinner2 className="icon-spin" color="#397979" />
+                      <ImSpinner2 className="icon-spin" color="#d9d9d9" />
                     )}
                     Update Course
                   </button>
@@ -743,12 +743,12 @@ const UpdateCourse = () => {
                 Teacher <span className="required">*</span>
               </span>
               {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
-              {!showTeacherList && (
+              {!showTeacherList && !hasStudent && (
                 <div className="alert-option">
                   <button
                     className="main-action"
                     onClick={handleAssignClick}
-                    disabled={hasStudent}
+                    // disabled={hasStudent}
                   >
                     {!selectedTeacher ? "Assign Teacher" : "Change Teacher"}
                   </button>
@@ -794,6 +794,23 @@ const UpdateCourse = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <DiagSuccessfully
+          isOpen={isModalSuccessOpen}
+          onClose={closeSuccessModal}
+          notification={`The course "${courseInfo.title}" has been successfully updated.`}
+        />
+      </div>
+      <div>
+        <DiagDeleteConfirmation
+          isOpen={isModalRemoveOpen}
+          onClose={closeRemoveModal}
+          object={{
+            id: courseInfo.idCourse,
+            name: "course",
+          }}
+        />
       </div>
     </div>
   );

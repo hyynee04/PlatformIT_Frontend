@@ -6,13 +6,20 @@ import "../../assets/css/card/DiagForm.css";
 import { resetCenterPI } from "../../store/profileCenterSlice";
 import { resetUserPI } from "../../store/profileUserSlice";
 
-const DiagSignOutForm = ({ isOpen, onClose }) => {
+const DiagSignOutForm = ({
+  isOpen,
+  onClose,
+  resetUnreadCount = () => {},
+  resetNotifications = () => {},
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSignout = () => {
     localStorage.clear();
     dispatch(resetUserPI());
     dispatch(resetCenterPI());
+    resetUnreadCount();
+    resetNotifications();
     navigate("/");
   };
   if (!isOpen) return null;

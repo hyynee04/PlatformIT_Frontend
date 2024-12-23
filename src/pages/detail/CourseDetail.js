@@ -99,8 +99,17 @@ const CourseDetail = (props) => {
         setIsEnrolledCourse(false);
       }
       if (idRole === Role.student) {
+        const responseIsChatAvailable = await getIsChatAvailable(
+          Number(localStorage.getItem("idUser")),
+          response.data.idTeacher
+        );
+
+        if (responseIsChatAvailable.status === APIStatus.success) {
+          setIsChatAvailable(responseIsChatAvailable.data === true);
+        } else {
+          setIsChatAvailable(false);
+        }
       }
-      const responseIsChatAvailable = await getIsChatAvailable();
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -113,8 +122,6 @@ const CourseDetail = (props) => {
     try {
       let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
       if (progress.status === APIStatus.success) {
-        console.log("Response data: ", progress.data);
-
         setStudentProgress(progress.data);
       } else {
         console.warn(progress.data);
@@ -464,12 +471,22 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-          {idUser &&
-          idRole === Role.student &&
-          isEnrolledCourse &&
-          courseInfo.sta ? (
+          {idUser && idRole === Role.student && isChatAvailable ? (
             <>
-              <button className="chat-button">
+              <button
+                className="chat-button"
+                onClick={() =>
+                  navigate("/chat", {
+                    state: {
+                      selectedSender: {
+                        userId: courseInfo.idTeacher,
+                        name: courseInfo.teacherName,
+                        avatar: courseInfo.teacherAvatarPath,
+                      },
+                    },
+                  })
+                }
+              >
                 Chat <RiChat3Line />
               </button>
             </>

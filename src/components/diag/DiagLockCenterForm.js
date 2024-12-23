@@ -33,7 +33,7 @@ const DiagLockCenterForm = ({
       } else if (idRole === Role.platformAdmin) {
         let response = await postLockCenter(idCenterSelected);
         if (response.status === APIStatus.success) {
-          dispatch(fetchCenters(CenterStatus.inactive));
+          dispatch(fetchCenters(CenterStatus.active));
           onClose();
           onCenterOption();
         }

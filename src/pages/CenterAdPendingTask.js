@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  LuChevronDown,
-  LuSearch,
-  LuChevronLeft,
-  LuChevronRight,
-  LuCheck,
-  LuX,
-} from "react-icons/lu";
+import { LuChevronDown, LuSearch, LuCheck, LuX } from "react-icons/lu";
 import { FaRegFilePdf } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -20,7 +13,7 @@ import { getPagination } from "../functions/function";
 const CenterAdPendingTask = () => {
   const dispatch = useDispatch();
 
-  const { taskOfCenterAd, status, error, activeTypeOfTask } = useSelector(
+  const { taskOfCenterAd, activeTypeOfTask } = useSelector(
     (state) => state.taskOfCenterAd || {}
   );
 

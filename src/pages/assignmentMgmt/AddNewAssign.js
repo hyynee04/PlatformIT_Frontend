@@ -20,6 +20,7 @@ import {
   AssignmentType,
 } from "../../constants/constants";
 import {
+  getAllActiveLanguage,
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/assignmentService";
@@ -28,6 +29,7 @@ import {
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
 } from "../../services/courseService";
+import RunCode from "../../components/assigment/RunCode";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();
@@ -66,6 +68,8 @@ const AddNewAssign = () => {
   const [endDate, setEndDate] = useState("");
 
   const [questions, setQuestions] = useState([]);
+  const [listLanguagesCode, setListLanguagesCode] = useState([]);
+  const [selectedLanguage, setSelectedLanguage] = useState({});
   const inputFileRef = useRef([]);
 
   const [showOptionQuiz, setShowOptionQuiz] = useState(false);
@@ -224,6 +228,22 @@ const AddNewAssign = () => {
       }
     }
   }, [listCourse, listSection, selectedLecture, isAddByLecture]);
+  const fetchLaguages = async () => {
+    let response = await getAllActiveLanguage();
+    if (response.status === APIStatus.success) {
+      setListLanguagesCode(response.data);
+    }
+  };
+  useEffect(() => {
+    fetchLaguages();
+  }, [typeAssignment]);
+  const handleLanguageChange = (event) => {
+    const selectedLanguageTitle = event.target.value;
+    const language = listLanguagesCode.find(
+      (c) => c.languageName === selectedLanguageTitle
+    );
+    setSelectedLanguage(language);
+  };
 
   const isStartDateAfterNow = (startDate) => {
     const currentDate = new Date();
@@ -772,7 +792,7 @@ const AddNewAssign = () => {
                                 testCases: [
                                   {
                                     input: "",
-                                    output: "",
+                                    expectedOutput: "",
                                   },
                                 ],
                               });
@@ -1006,34 +1026,27 @@ const AddNewAssign = () => {
                 <div className="info" style={{ width: "50%" }}>
                   <span>Language</span>
                   <div className="select-container">
-                    <input
-                      style={{ cursor: "default" }}
-                      type="text"
+                    <select
                       className="input-form-pi"
-                      value={
-                        selectedLecture
-                          ? selectedLecture.titleLecture
-                          : "Select a language"
-                      }
-                    />
+                      onChange={handleLanguageChange}
+                    >
+                      <option value="" disabled selected hidden>
+                        {selectedLanguage
+                          ? selectedLanguage.languageName
+                          : "Select a section"}
+                      </option>
+                      {listLanguagesCode.map((language, index) => (
+                        <option
+                          value={language.languageName}
+                          key={index}
+                          className="option-container"
+                        >
+                          {language.languageName}
+                        </option>
+                      ))}
+                    </select>
                     <FaChevronDown className="arrow-icon" />
                   </div>
-                  {isDropdownLanguageVisible && (
-                    <div className="list-options-container lecture">
-                      {/* {listLecture.map((lecture, index) => (
-                        <div
-                          key={index}
-                          className="option-course-container"
-                          onClick={() => handleLectureSelect(lecture)}
-                        >
-                          <div>{lecture.titleLecture}</div>
-                          <span className="section-lecture">
-                            {lecture.titleSection}
-                          </span>
-                        </div>
-                      ))} */}
-                    </div>
-                  )}
                 </div>
                 <div className="info">
                   <span>Example</span>
@@ -1161,12 +1174,12 @@ const AddNewAssign = () => {
                             <td>
                               <input
                                 type="text"
-                                value={testCase.output}
+                                value={testCase.expectedOutput}
                                 onChange={(e) =>
                                   handleTableCodeChange(
                                     "testCases",
                                     index,
-                                    "output",
+                                    "expectedOutput",
                                     e.target.value
                                   )
                                 }
@@ -1279,89 +1292,10 @@ const AddNewAssign = () => {
                   </div>
                 </div>
               </div>
-              <div className="container-right-assign testing-code">
-                <span className="title-span">
-                  Testing with your code
-                  <button className="btn">Run code</button>
-                </span>
-                <div className="assign-info">
-                  <div className="info">
-                    <span>Your code</span>
-                    <Form.Control
-                      as="textarea"
-                      className="input-area-form-pi"
-                      placeholder="Type problem here..."
-                      value={questions.codeTest}
-                      // onChange={(e) =>
-                      //   handleQuestionChange("question", e.target.value)
-                      // }
-                    />
-                  </div>
-                  <div className="info" style={{ width: "50%" }}>
-                    <span>Language</span>
-                    <div className="select-container">
-                      <input
-                        style={{ cursor: "default" }}
-                        type="text"
-                        className="input-form-pi"
-                        value={
-                          selectedLecture
-                            ? selectedLecture.titleLecture
-                            : "Select a language"
-                        }
-                      />
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                  </div>
-                  <div className="info">
-                    <span>Result</span>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th></th>
-                          <th>Test case</th>
-                          <th>Result</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {questions.testCases.map((testCase, index) => (
-                          <tr key={index}>
-                            <td style={{ width: "64px" }}> {index + 1}</td>
-                            <td>
-                              <input
-                                type="text"
-                                value={testCase.input}
-                                onChange={(e) =>
-                                  handleTableCodeChange(
-                                    "testCases",
-                                    index,
-                                    "input",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="text"
-                                value={testCase.output}
-                                onChange={(e) =>
-                                  handleTableCodeChange(
-                                    "testCases",
-                                    index,
-                                    "output",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+              <RunCode
+                selectedLanguage={selectedLanguage}
+                testCases={questions.testCases}
+              />
             </>
           )}
         </div>

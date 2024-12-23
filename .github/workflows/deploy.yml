@@ -39,9 +39,6 @@ jobs:
     needs: build
 
     steps:
-      - name: Log in to GHCR in deploy job
-        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.0
         with:
@@ -50,6 +47,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ghcr.io/hyynee04/platformit_frontend/react-app:latest
             docker stop react-app || true
             docker rm react-app || true

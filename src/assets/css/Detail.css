@@ -620,6 +620,13 @@
   border: none;
 }
 .detail-container
+  .right-container
+  .block-container
+  .block-container-col
+  > .qualification.test.nohover:hover {
+  background-color: transparent;
+}
+.detail-container
   .left-container
   .block-container
   .block-container-col
@@ -1135,8 +1142,22 @@
   padding: 1.3rem 2.3rem;
   border-bottom: 1px solid var(--border-gray);
   cursor: pointer;
+  position: relative;
 }
-
+.detail-container
+  .right-container
+  .block-container
+  .block-container-col
+  .lecture
+  .lecture-block
+  .lecture-content
+  > svg {
+  position: absolute;
+  font-size: 1.2rem;
+  left: 0.6rem;
+  top: 1.6rem;
+  color: var(--green-color);
+}
 .detail-container
   .right-container
   .block-container
@@ -1451,6 +1472,30 @@
   font-size: 0.9rem;
   width: 20%;
   text-align: right;
+}
+.detail-container
+  .right-container
+  .block-container
+  .block-container-col
+  .lecture
+  .lecture-block
+  .lecture-content
+  .lecture-name
+  > .lecture-exercise-num.reject {
+  color: var(--red-color);
+  font-weight: 700;
+}
+.detail-container
+  .right-container
+  .block-container
+  .block-container-col
+  .lecture
+  .lecture-block
+  .lecture-content
+  .lecture-name
+  > .lecture-exercise-num.pending {
+  color: var(--yellow-color);
+  font-weight: 700;
 }
 
 .detail-container

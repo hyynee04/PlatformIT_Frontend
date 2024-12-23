@@ -3,7 +3,7 @@ name: Deploy React App
 on:
   push:
     branches:
-      - BoDeploy  # Hoặc nhánh bạn muốn deploy
+      - BoDeploy
 
 jobs:
   build:

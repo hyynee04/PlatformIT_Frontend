@@ -1,13 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/css/card/FilterCard.css";
-import {
-  CenterAdminLevel,
-  UserGender,
-  UserStatus,
-} from "../constants/constants";
+import { UserGender, UserStatus } from "../constants/constants";
 
-const FilterUser = ({ onFilterChange, onClose }) => {
+const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
   const [gender, setGender] = useState("all");
   const [level, setLevel] = useState("all");
@@ -25,9 +21,13 @@ const FilterUser = ({ onFilterChange, onClose }) => {
   };
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log("mousedown event triggered"); // Kiểm tra xem sự kiện mousedown có được kích hoạt không
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
-        onClose(); // Gọi hàm onClose khi click bên ngoài component
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target)
+      ) {
+        onClose();
       }
     };
 
@@ -91,8 +91,8 @@ const FilterUser = ({ onFilterChange, onClose }) => {
               <input
                 type="radio"
                 value="main"
-                checked={level === CenterAdminLevel.main}
-                onChange={() => setLevel(CenterAdminLevel.main)}
+                checked={level === "main"}
+                onChange={() => setLevel("main")}
               />
               Main
             </label>
@@ -100,10 +100,28 @@ const FilterUser = ({ onFilterChange, onClose }) => {
               <input
                 type="radio"
                 value="mem"
-                checked={level === CenterAdminLevel.mem}
-                onChange={() => setLevel(CenterAdminLevel.mem)}
+                checked={level === "mem"}
+                onChange={() => setLevel("mem")}
               />
               Sub
+            </label>
+            <label className="radio-container level">
+              <input
+                type="radio"
+                value="pending"
+                checked={level === "pending"}
+                onChange={() => setLevel("pending")}
+              />
+              Pending
+            </label>
+            <label className="radio-container level">
+              <input
+                type="radio"
+                value="rejected"
+                checked={level === "rejected"}
+                onChange={() => setLevel("rejected")}
+              />
+              Rejected
             </label>
             <label className="radio-container level">
               <input
@@ -163,6 +181,15 @@ const FilterUser = ({ onFilterChange, onClose }) => {
                 onChange={() => setStatus(UserStatus.inactive)}
               />
               Inactive
+            </label>
+            <label className="radio-container status">
+              <input
+                type="radio"
+                value="locked"
+                checked={status === UserStatus.locked}
+                onChange={() => setStatus(UserStatus.locked)}
+              />
+              Locked
             </label>
             <label className="radio-container status">
               <input

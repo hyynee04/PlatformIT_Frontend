@@ -485,6 +485,45 @@
   justify-content: space-between;
   align-items: flex-start;
 }
+.alert-option > .setting-container {
+  padding: 4px 8px;
+  border: 1px solid var(--main-color);
+  border-radius: 1.5rem;
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.alert-option .setting-container > button {
+  border: none;
+  background-color: transparent;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-gray);
+}
+.alert-option .setting-container button > svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.alert-option .setting-container > button.remove {
+  padding-left: 0.5rem;
+}
+.alert-option .setting-container > button.remove:hover svg {
+  scale: 1.1;
+  color: var(--red-color);
+}
+.alert-option .setting-container > button.setting {
+  padding-right: 0.5rem;
+  border-right: 1px solid var(--main-color);
+}
+.alert-option .setting-container > button.setting:hover svg {
+  scale: 1.1;
+  color: var(--main-color);
+}
 .alert-option .circle-btn {
   width: 40px;
   height: 40px;
@@ -496,7 +535,7 @@
   border: 1px solid var(--main-color);
   background-color: #ffffff;
 }
-.alert-option .circle-btn:hover {
+.alert-option > .alert-option .circle-btn:hover {
   background-color: rgba(217, 217, 217, 0.3);
 }
 .alert-option .circle-btn .icon {

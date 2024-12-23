@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../assets/css/card/FilterCard.css";
 
-const SortByUser = ({ onSortByChange }) => {
+const SortByUser = ({ onSortByChange, onClose, sortByButtonRef }) => {
   const [isSortByFormVisible, setIsSortByFormVisible] = useState(true);
   const [sortField, setSortField] = useState("fullname");
   const [sortOrder, setSortOrder] = useState("asc");
+  const sortByRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sortByRef.current &&
+        !sortByRef.current.contains(event.target) &&
+        sortByButtonRef.current &&
+        !sortByButtonRef.current.contains(event.target)
+      ) {
+        onClose();
+      }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose, sortByButtonRef]);
   if (!isSortByFormVisible) return null;
   const handleSave = () => {
     onSortByChange({ field: sortField, order: sortOrder });
@@ -13,7 +31,7 @@ const SortByUser = ({ onSortByChange }) => {
   };
   return (
     <>
-      <div className="filter-container user">
+      <div ref={sortByRef} className="filter-container user">
         <div className="title-filter">
           <span>Sort</span>
         </div>

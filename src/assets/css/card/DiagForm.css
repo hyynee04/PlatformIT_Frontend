@@ -80,6 +80,7 @@
   justify-content: space-between;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
+  text-wrap: auto;
 }
 
 .modal-container .diag-body > .login-message {
@@ -155,6 +156,11 @@
   font-size: 14px;
   outline: none;
   border: none;
+  transition: all 0.3s ease;
+}
+.modal-container .diag-body .str-btns .act-btns > .diag-btn:hover {
+  scale: 1.1;
+  transition: all 0.3s ease;
 }
 .modal-container .diag-body .str-btns .act-btns .diag-btn > svg {
   height: 0.85rem;
@@ -190,7 +196,16 @@
   background-color: rgba(57, 121, 121, 0.8);
   color: var(--white-color);
 }
-
+.modal-container .diag-body .str-btns .act-btns .remove {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background-color: var(--red-color);
+  color: var(--white-color);
+}
+.modal-container .diag-body .str-btns .act-btns .removel:hover {
+  background-color: rgba(192, 15, 12, 0.8);
+}
 .modal-container .diag-body > .container-diag-field {
   display: flex;
   flex-direction: row;

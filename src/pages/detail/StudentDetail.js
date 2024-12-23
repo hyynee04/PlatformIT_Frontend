@@ -23,6 +23,7 @@ const StudentDetail = (props) => {
   const [studentInfo, setStudentInfo] = useState({});
 
   const idRole = +localStorage.getItem("idRole");
+  const [idStudent, setIdStudent] = useState(null);
   const [courseTitle, setCourseTitle] = useState("");
 
   const fetchStudentDetail = async (idStudent, idCourse) => {
@@ -68,6 +69,7 @@ const StudentDetail = (props) => {
     if (state && state.idCourse && state.idStudent && state.courseTitle) {
       setCourseTitle(state.courseTitle);
       fetchStudentDetail(state.idStudent, state.idCourse);
+      setIdStudent(state.idStudent);
     } else if (state && state.idStudent) {
       fetchStudentPI(state.idStudent);
     }
@@ -132,7 +134,20 @@ const StudentDetail = (props) => {
         </div>
 
         {idRole === Role.teacher ? (
-          <button className="contact-block">
+          <button
+            className="contact-block"
+            onClick={() =>
+              navigate("/chat", {
+                state: {
+                  selectedSender: {
+                    userId: idStudent,
+                    name: studentInfo.fullName,
+                    avatar: studentInfo.avatarPath || studentInfo.avatar,
+                  },
+                },
+              })
+            }
+          >
             Contact <RiChat3Line />
           </button>
         ) : null}
@@ -143,6 +158,24 @@ const StudentDetail = (props) => {
           <div className="block-container">
             <span className="block-container-title">{courseTitle}</span>
             <div className="block-container-row">
+              <div className="progress-section">
+                <div className="progress-container">
+                  <CircularProgressbar
+                    strokeWidth={12}
+                    value={`${
+                      studentInfo.lectureTotal > 0
+                        ? (studentInfo.lectureProgress /
+                            studentInfo.lectureTotal) *
+                          100
+                        : 0
+                    }`}
+                    text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
+                  />
+                </div>
+
+                <label>Lecture</label>
+              </div>
+
               <div className="progress-section">
                 <div className="progress-container">
                   <CircularProgressbar
@@ -159,24 +192,6 @@ const StudentDetail = (props) => {
                     text={`${
                       studentInfo.exerciseProgress + studentInfo.testProgress
                     } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
-                  />
-                </div>
-
-                <label>Lecture</label>
-              </div>
-
-              <div className="progress-section">
-                <div className="progress-container">
-                  <CircularProgressbar
-                    strokeWidth={12}
-                    value={`${
-                      studentInfo.lectureTotal > 0
-                        ? (studentInfo.lectureProgress /
-                            studentInfo.lectureTotal) *
-                          100
-                        : 0
-                    }`}
-                    text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
                   />
                 </div>
                 <label>Assignment</label>

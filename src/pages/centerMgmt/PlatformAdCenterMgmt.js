@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuChevronLeft,
-  LuChevronRight,
   LuFilter,
   LuMoreHorizontal,
   LuSearch,
@@ -20,7 +18,7 @@ import {
   fetchCenters,
   setActiveStatusCenter,
 } from "../../store/listCenterSlice";
-import { getPagination } from "../../functions/function";
+import { formatDate, getPagination } from "../../functions/function";
 
 const PlatformAdCenterMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -34,13 +32,15 @@ const PlatformAdCenterMgmt = () => {
   const [listCenter, setListCenter] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState({ field: "name", order: "asc" });
-  const [filterVisble, setFilterVisble] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(false);
+  const filterButtonRef = useRef(null);
   const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByButtonRef = useRef(null);
   const [selectedCenterId, setSelectedCenterId] = useState(null);
   const [approvedCenterId, setApprovedCenterId] = useState(null);
   const [rejectedCenterId, setRejectedCenterId] = useState(null);
   const [isModalActionOpen, setIsModalActionOpen] = useState(false);
-
+  const optionBtnRefs = useRef([]);
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
   const fetchListCenter = async () => {
@@ -138,7 +138,6 @@ const PlatformAdCenterMgmt = () => {
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredCenters.slice(firstIndex, lastIndex);
   const npage = Math.ceil(filteredCenters.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   const handleStatusCenterClick = (centerStatus) => {
     dispatch(setActiveStatusCenter(centerStatus));
@@ -209,31 +208,39 @@ const PlatformAdCenterMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div
+            <button
+              ref={filterButtonRef}
               className="btn"
               onClick={() => {
-                setFilterVisble(!filterVisble);
-                setSortByVisible(false);
+                setFilterVisible((prev) => !prev);
               }}
             >
               <LuFilter className="icon" />
               <span>Filter</span>
-            </div>
-            {filterVisble && (
-              <FilterCenter onFilterChange={handleFilterChange} />
+            </button>
+            {filterVisible && (
+              <FilterCenter
+                onFilterChange={handleFilterChange}
+                onClose={() => setFilterVisible(false)}
+                filterButtonRef={filterButtonRef}
+              />
             )}
-            <div
+            <button
+              ref={sortByButtonRef}
               className="btn"
               onClick={() => {
-                setSortByVisible(!sortByVisible);
-                setFilterVisble(false);
+                setSortByVisible((prev) => !prev);
               }}
             >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
-            </div>
+            </button>
             {sortByVisible && (
-              <SortByCenter onSortByChange={handleSortByChange} />
+              <SortByCenter
+                onSortByChange={handleSortByChange}
+                onClose={() => setSortByVisible(false)}
+                sortByButtonRef={sortByButtonRef}
+              />
             )}
           </div>
           <div className="search-container">
@@ -249,7 +256,122 @@ const PlatformAdCenterMgmt = () => {
         </div>
 
         <div className="list-container">
-          {activeStatusCenter === CenterStatus.pending ? (
+          {activeStatusCenter === CenterStatus.active && (
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "center" }}>No.</th>
+                  <th>Center Name</th>
+                  <th>Center Email</th>
+                  <th>Center Admin Name</th>
+                  <th>Center Admin Email</th>
+                  <th>TIN</th>
+                  <th>Established Date</th>
+                  {/* <th>Status</th> */}
+                  {activeStatusCenter === CenterStatus.inactive && (
+                    <th>Reason Inactive</th>
+                  )}
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  let count = 0;
+                  const rows = records.map((center, index) => {
+                    const shouldDisplay =
+                      activeStatusCenter === CenterStatus.active &&
+                      center.centerStatus === CenterStatus.active;
+                    if (shouldDisplay) {
+                      count++;
+                      return (
+                        <React.Fragment key={index}>
+                          <tr>
+                            <td style={{ textAlign: "center" }}>{count}</td>
+                            <td>{center.centerName}</td>
+                            <td>{center.centerEmail}</td>
+                            <td>{center.centerAdminName}</td>
+                            <td>{center.centerAdminEmail}</td>
+                            <td>{center.tin}</td>
+                            <td>
+                              {center.establishedDate &&
+                                formatDate(center.establishedDate)}
+                            </td>
+                            {activeStatusCenter === CenterStatus.inactive && (
+                              <td
+                                style={{
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                                title={center.reason}
+                              >
+                                {center.reason
+                                  ? center.reason
+                                  : center.centerStatus === CenterStatus.locked
+                                  ? "Locked"
+                                  : ""}
+                              </td>
+                            )}
+                            <td
+                              className={`table-cell ${
+                                center.centerStatus === CenterStatus.pending
+                                  ? "pending"
+                                  : ""
+                              }`}
+                            >
+                              <div
+                                ref={(el) =>
+                                  (optionBtnRefs.current[index] = el)
+                                }
+                                onClick={() =>
+                                  handleMoreIconClick(center.idCenter)
+                                }
+                                style={{ cursor: "pointer" }}
+                              >
+                                <LuMoreHorizontal />
+                              </div>
+
+                              {selectedCenterId === center.idCenter && (
+                                <CenterOption
+                                  className="user-option"
+                                  idCenterSelected={center.idCenter}
+                                  statusCenterSelected={center.centerStatus}
+                                  {...(center.centerStatus ===
+                                    CenterStatus.locked && {
+                                    isReactivatable: true,
+                                  })}
+                                  onCenterOption={() =>
+                                    setSelectedCenterId(null)
+                                  }
+                                  optionBtnRef={() =>
+                                    optionBtnRefs.current[index]
+                                  }
+                                  onClose={() => setSelectedCenterId(null)}
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      );
+                    }
+                    return null;
+                  });
+                  if (count === 0) {
+                    rows.push(
+                      <tr key="no-records">
+                        <td colSpan="7" style={{ textAlign: "center" }}>
+                          "No centers available in this status."
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  return rows;
+                })()}
+              </tbody>
+            </table>
+          )}
+          {activeStatusCenter === CenterStatus.pending && (
             <table>
               <thead>
                 <tr>
@@ -270,7 +392,16 @@ const PlatformAdCenterMgmt = () => {
                       <td>{center.centerAdminName}</td>
                       <td>{center.centerAdminEmail}</td>
                       <td>{center.tin}</td>
-                      <td>{center.description}</td>
+                      <td
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                        title={center.description}
+                      >
+                        {center.description}
+                      </td>
                       <td>
                         {center.submissionDate &&
                           (() => {
@@ -340,121 +471,90 @@ const PlatformAdCenterMgmt = () => {
                 )}
               </tbody>
             </table>
-          ) : (
+          )}
+          {activeStatusCenter === CenterStatus.inactive && (
             <table>
               <thead>
                 <tr>
                   <th style={{ textAlign: "center" }}>No.</th>
                   <th>Center Name</th>
                   <th>Center Email</th>
-                  {/* <th>Center Admin Name</th> */}
+                  <th>Center Admin Name</th>
                   <th>Center Admin Email</th>
                   <th>TIN</th>
                   <th>Established Date</th>
-                  {/* <th>Status</th> */}
-                  {activeStatusCenter === CenterStatus.inactive && (
-                    <th>Reason Inactive</th>
-                  )}
-                  <th></th>
+                  <th>Reason Inactive</th>
                 </tr>
               </thead>
               <tbody>
-                {(() => {
-                  let count = 0;
-                  const rows = records.map((center, index) => {
-                    const shouldDisplay =
-                      (activeStatusCenter === CenterStatus.active &&
-                        center.centerStatus === CenterStatus.active) ||
-                      (activeStatusCenter === CenterStatus.inactive &&
-                        (center.centerStatus === CenterStatus.inactive ||
-                          center.centerStatus === CenterStatus.locked));
-                    if (shouldDisplay) {
-                      count++;
-                      return (
-                        <React.Fragment key={index}>
-                          <tr>
-                            <td style={{ textAlign: "center" }}>{count}</td>
-                            <td>{center.centerName}</td>
-                            <td>{center.centerEmail}</td>
-                            <td>{center.centerAdminEmail}</td>
-                            <td>{center.tin}</td>
-                            <td>
-                              {center.establishedDate &&
-                                (() => {
-                                  const date = new Date(center.submissionDate);
-                                  const day = String(date.getDate()).padStart(
-                                    2,
-                                    "0"
-                                  );
-                                  const month = String(
-                                    date.getMonth() + 1
-                                  ).padStart(2, "0");
-                                  const year = date.getFullYear();
-                                  return `${month}/${day}/${year}`;
-                                })()}
-                            </td>
-                            {activeStatusCenter === CenterStatus.inactive && (
-                              <td
-                                style={{
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                }}
-                                title={center.reason}
-                              >
-                                {center.reason
-                                  ? center.reason
-                                  : center.centerStatus === CenterStatus.locked
-                                  ? "Locked"
-                                  : ""}
-                              </td>
-                            )}
-                            <td
-                              className={`table-cell ${
-                                center.centerStatus === CenterStatus.pending
-                                  ? "pending"
-                                  : ""
-                              }`}
-                              style={{ cursor: "pointer" }}
-                            >
-                              <LuMoreHorizontal
-                                onClick={() =>
-                                  handleMoreIconClick(center.idCenter)
-                                }
-                              />
-                              {selectedCenterId === center.idCenter && (
-                                <CenterOption
-                                  className="user-option"
-                                  idCenterSelected={center.idCenter}
-                                  statusCenterSelected={center.centerStatus}
-                                  {...(center.centerStatus ===
-                                    CenterStatus.locked && {
-                                    isReactivatable: true,
-                                  })}
-                                  onCenterOption={() =>
-                                    setSelectedCenterId(null)
-                                  }
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        </React.Fragment>
-                      );
-                    }
-                    return null;
-                  });
-                  if (count === 0) {
-                    rows.push(
-                      <tr key="no-records">
-                        <td colSpan="7" style={{ textAlign: "center" }}>
-                          "No centers available in this status."
+                {records.length > 0 ? (
+                  records.map((center, index) => (
+                    <tr key={index}>
+                      <td style={{ textAlign: "center" }}>{index + 1}</td>
+                      <td>{center.centerName}</td>
+                      <td>{center.centerEmail}</td>
+                      <td>{center.centerAdminName}</td>
+                      <td>{center.centerAdminEmail}</td>
+                      <td>{center.tin}</td>
+                      <td>
+                        {center.establishedDate &&
+                          formatDate(center.establishedDate)}
+                      </td>
+                      {activeStatusCenter === CenterStatus.inactive && (
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                          title={center.reason}
+                        >
+                          {center.reason
+                            ? center.reason
+                            : center.centerStatus === CenterStatus.locked
+                            ? "Locked"
+                            : ""}
                         </td>
-                      </tr>
-                    );
-                  }
+                      )}
+                      <td
+                        className={`table-cell ${
+                          center.centerStatus === CenterStatus.pending
+                            ? "pending"
+                            : ""
+                        }`}
+                      >
+                        <div
+                          ref={(el) => (optionBtnRefs.current[index] = el)}
+                          onClick={() => handleMoreIconClick(center.idCenter)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <LuMoreHorizontal />
+                        </div>
 
-                  return rows;
-                })()}
+                        {selectedCenterId === center.idCenter && (
+                          <CenterOption
+                            className="user-option"
+                            idCenterSelected={center.idCenter}
+                            statusCenterSelected={center.centerStatus}
+                            {...(center.centerStatus ===
+                              CenterStatus.locked && {
+                              isReactivatable: true,
+                            })}
+                            onCenterOption={() => setSelectedCenterId(null)}
+                            optionBtnRef={() => optionBtnRefs.current[index]}
+                            onClose={() => setSelectedCenterId(null)}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: "center" }}>
+                      "No centers are pending approval at the moment."
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}

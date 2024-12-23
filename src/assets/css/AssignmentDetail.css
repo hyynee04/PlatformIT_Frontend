@@ -60,8 +60,6 @@
   width: 30px;
   height: 30px;
   border: none;
-  border-radius: 50%;
-  background-color: #f5f5f5;
   padding: 4px;
   color: var(--text-gray);
   display: flex;
@@ -74,8 +72,18 @@
   .info-row
   .detail-info
   .marks-questions
+  > .btn
+  > svg {
+  width: 24px;
+  height: 24px;
+}
+.main-contain-assign
+  .assign-info
+  .info-row
+  .detail-info
+  .marks-questions
   > .btn:hover {
-  background-color: var(--border-gray);
+  color: rgba(117, 117, 117, 0.8);
 }
 
 .main-contain-assign
@@ -223,6 +231,13 @@
   gap: 20px;
   width: 100%;
 }
+.main-contain-assign
+  .questions-overview-container
+  .questions-container
+  .btn
+  > svg:hover {
+  color: var(--text-gray);
+}
 
 .questions-overview-container .questions-container .question-item {
   border-radius: 4px;
@@ -313,7 +328,7 @@
   .chart {
   width: 100px;
   height: auto;
-  z-index: 9999;
+  /* z-index: 9999; */
 }
 .questions-overview-container .overview-container .chart-detail-container > div,
 .questions-overview-container

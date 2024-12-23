@@ -65,3 +65,9 @@ export const NotificationType = {
   assignedTeacher: 2,
   notificationBoard: 3,
 };
+export const LectureStatus = {
+  inactive: 0,
+  active: 1,
+  pending: 2,
+  rejected: 3,
+};

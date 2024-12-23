@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImSpinner2 } from "react-icons/im";
 import {
   LuChevronDown,
-  LuChevronLeft,
-  LuChevronRight,
   LuFilter,
   LuMoreHorizontal,
   LuSearch,
@@ -13,7 +11,6 @@ import FilterUser from "../../components/FilterUser";
 import UserOption from "../../components/option/UserOption";
 import SortByUser from "../../components/SortByUser";
 import {
-  CenterAdminLevel,
   CenterStatus,
   Role,
   UserGender,
@@ -22,7 +19,7 @@ import {
 import { fetchAllUsers } from "../../store/userSlice";
 
 import "../../assets/css/UserMgmt.css";
-import { getPagination } from "../../functions/function";
+import { formatDate, getPagination } from "../../functions/function";
 
 const PlatformAdUserMgmt = () => {
   const [loading, setLoading] = useState(false);
@@ -33,8 +30,10 @@ const PlatformAdUserMgmt = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [filterVisble, setFilterVisble] = useState(false);
+  const [filterVisible, setFilterVisible] = useState(false);
+  const filterButtonRef = useRef(null);
   const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByButtonRef = useRef(null);
 
   const [gender, setGender] = useState(null);
   const [level, setLevel] = useState(null);
@@ -48,7 +47,7 @@ const PlatformAdUserMgmt = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false); // Set loading to false after request completes
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -98,6 +97,8 @@ const PlatformAdUserMgmt = () => {
         return "Pending";
       case UserStatus.inactive:
         return "Inactive";
+      case UserStatus.locked:
+        return "Locked";
       default:
         return "";
     }
@@ -106,7 +107,7 @@ const PlatformAdUserMgmt = () => {
     return user.isMainCenterAdmin !== null
       ? user.isMainCenterAdmin === 1
         ? "Main"
-        : "Sub"
+        : "Mem"
       : user.status === UserStatus.inactive
       ? "Rejected"
       : "Pending";
@@ -134,9 +135,7 @@ const PlatformAdUserMgmt = () => {
         (activeRole === Role.centerAdmin &&
           roleDescription.includes(searchTermLower)) ||
         (user.joinedDate &&
-          new Date(user.joinedDate)
-            .toLocaleDateString("en-US")
-            .includes(searchTermLower)) ||
+          formatDate(user.joinedDate).includes(searchTermLower)) ||
         getStatusString(user.status).toLowerCase().includes(searchTermLower);
 
       const matchesGender =
@@ -146,9 +145,10 @@ const PlatformAdUserMgmt = () => {
         level === null ||
         level === undefined ||
         (activeRole === Role.centerAdmin &&
-          (level === CenterAdminLevel.main
-            ? user.isMainCenterAdmin
-            : !user.isMainCenterAdmin));
+          ((level === "main" && user.isMainCenterAdmin === 1) ||
+            (level === "mem" && user.isMainCenterAdmin === 0) ||
+            (level === "pending" && user.status === UserStatus.pending) ||
+            (level === "rejected" && user.status === UserStatus.inactive)));
 
       const matchesDateJoined =
         (!dateRange.startDate && !dateRange.endDate) ||
@@ -194,23 +194,13 @@ const PlatformAdUserMgmt = () => {
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredUser.slice(firstIndex, lastIndex);
   const npage = Math.ceil(filteredUser.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
+  const optionBtnRefs = useRef([]);
   const handleMoreIconClick = (idUser) => {
     setSelectedUserId((prevSelectedId) =>
       prevSelectedId === idUser ? null : idUser
     );
-    setFilterVisble(false);
-    setSortByVisible(false);
   };
-  // if (loading) {
-  //   // return <div>Loading...</div>;
-  //   return (
-  //     <div className="loading-container">
-  //       <Spinner animation="border" />;
-  //     </div>
-  //   );
-  // }
   const totalColumns =
     7 +
     (activeRole !== Role.student ? 1 : 0) +
@@ -256,34 +246,41 @@ const PlatformAdUserMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div
+            <button
+              ref={filterButtonRef}
               className="btn"
-              onClick={() => {
-                setFilterVisble(!filterVisble);
-                setSortByVisible(false);
+              onClick={(e) => {
+                e.stopPropagation();
+                setFilterVisible((prev) => !prev);
               }}
             >
               <LuFilter className="icon" />
               <span>Filter</span>
-            </div>
-            {filterVisble && (
+            </button>
+            {filterVisible && (
               <FilterUser
                 onFilterChange={handleFilterChange}
-                onClose={() => setFilterVisble(false)}
+                onClose={() => setFilterVisible(false)}
+                filterButtonRef={filterButtonRef}
               />
             )}
-            <div
+            <button
+              ref={sortByButtonRef}
               className="btn"
-              onClick={() => {
-                setSortByVisible(!sortByVisible);
-                setFilterVisble(false);
+              onClick={(e) => {
+                e.stopPropagation();
+                setSortByVisible((prev) => !prev);
               }}
             >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
-            </div>
+            </button>
             {sortByVisible && (
-              <SortByUser onSortByChange={handleSortByChange} />
+              <SortByUser
+                onSortByChange={handleSortByChange}
+                onClose={() => setSortByVisible(false)}
+                sortByButtonRef={sortByButtonRef}
+              />
             )}
           </div>
 
@@ -327,26 +324,13 @@ const PlatformAdUserMgmt = () => {
                         {user.isMainCenterAdmin !== null
                           ? user.isMainCenterAdmin === 1
                             ? "Main"
-                            : "Sub"
+                            : "Mem"
                           : user.status === UserStatus.inactive
                           ? "Rejected"
                           : "Pending"}
                       </td>
                     )}
-                    <td>
-                      {user.joinedDate &&
-                        (() => {
-                          const date = new Date(user.joinedDate);
-                          const day = String(date.getDate()).padStart(2, "0");
-                          const month = String(date.getMonth() + 1).padStart(
-                            2,
-                            "0"
-                          ); // Tháng trong JavaScript bắt đầu từ 0
-                          const year = date.getFullYear();
-
-                          return `${month}/${day}/${year}`;
-                        })()}
-                    </td>
+                    <td>{user.joinedDate && formatDate(user.joinedDate)}</td>
                     <td>
                       <span
                         className={`status ${
@@ -371,10 +355,17 @@ const PlatformAdUserMgmt = () => {
                           : ""}
                       </span>
                     </td>
-                    <td className="table-cell" style={{ cursor: "pointer" }}>
-                      <LuMoreHorizontal
-                        onClick={() => handleMoreIconClick(user.idUser)}
-                      />
+                    <td className="table-cell">
+                      <div
+                        ref={(el) => (optionBtnRefs.current[index] = el)}
+                        onClick={() => {
+                          handleMoreIconClick(user.idUser);
+                        }}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <LuMoreHorizontal />
+                      </div>
+
                       {selectedUserId === user.idUser && (
                         <UserOption
                           className="user-option"
@@ -390,6 +381,8 @@ const PlatformAdUserMgmt = () => {
                               }
                             : {})}
                           roleUserSelected={user.idRole}
+                          optionBtnRef={() => optionBtnRefs.current[index]}
+                          onClose={() => setSelectedUserId(null)}
                         />
                       )}
                     </td>

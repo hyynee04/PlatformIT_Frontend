@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-
+import { Role } from "./constants/constants";
 import App from "./App";
 import GuestRoute from "./GuestRoute";
 import PrivateRoute from "./PrivateRoute";
@@ -25,6 +25,7 @@ import CenterAdPendingTask from "./pages/CenterAdPendingTask";
 import CenterAdCenterMgmt from "./pages/centerMgmt/CenterAdCenterMgmt";
 import PendingApproveCenter from "./pages/centerMgmt/PendingApproveCenter";
 import AddNewCourse from "./pages/courseMgmt/AddNewCourse";
+import UpdateCourse from "./pages/courseMgmt/UpdateCourse";
 import CenterAdCourseMgmt from "./pages/courseMgmt/CenterAdCourseMgmt";
 import CenterAdminDashboard from "./pages/home/CenterAdminDashboard";
 import CenterAdUserMgmt from "./pages/userMgmt/CenterAdUserMgmt";
@@ -38,15 +39,13 @@ import TeacherCourseMgmt from "./pages/courseMgmt/TeacherCourseMgmt";
 import AddNewLecture from "./pages/lectureMgmt/AddNewLecture";
 
 import StartAssign from "./pages/assignmentMgmt/StartAssign";
+import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 
 import AllNotifications from "./pages/AllNotifications";
-import StudentCourseMgmt from "./pages/courseMgmt/StudentCourseMgmt";
 import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
-
-import { Role } from "./constants/constants";
-import UpdateCourse from "./pages/courseMgmt/UpdateCourse";
 import AdminCenterDetail from "./pages/detail/AdminCenterDetail";
+import Chat from "./pages/Chat";
 
 const Layout = (props) => {
   return (
@@ -335,6 +334,14 @@ const Layout = (props) => {
             element={
               <PrivateRoute>
                 <PendingApproveCenter />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <Chat />
               </PrivateRoute>
             }
           />

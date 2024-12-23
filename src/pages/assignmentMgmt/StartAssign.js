@@ -52,9 +52,9 @@ const StartAssign = () => {
                 ...item,
                 isSelected: false,
               }));
-              if (assignmentRes.data.isShufflingAnswer === 1) {
-                updatedItems = shuffleArray(updatedItems);
-              }
+              // if (assignmentRes.data.isShufflingAnswer === 1) {
+              //   updatedItems = shuffleArray(updatedItems);
+              // }
 
               return {
                 ...question,
@@ -104,24 +104,31 @@ const StartAssign = () => {
   }, [assignmentInfo?.duration]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime !== null && prevTime > 0) {
-          return prevTime - 1;
-        } else if (prevTime === 0) {
-          clearInterval(interval);
-          handleSubmitAssignment();
-          return 0;
-        }
-        return prevTime;
-      });
-      if (timeLeft === null) {
-        setTotalDuration((prevTotal) => prevTotal + 1);
-      }
-    }, 1000);
+    let interval;
 
-    return () => clearInterval(interval);
+    if (timeLeft !== null) {
+      interval = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime !== null && prevTime > 0) {
+            return prevTime - 1; // Đếm ngược khi có duration
+          } else if (prevTime === 0) {
+            clearInterval(interval); // Dừng khi hết thời gian
+            handleSubmitAssignment(); // Xử lý khi hết thời gian
+            return 0;
+          }
+          return prevTime;
+        });
+      }, 1000);
+    } else {
+      // Nếu không có duration (timeLeft === null), đếm xuôi và tăng dần thời gian
+      interval = setInterval(() => {
+        setTotalDuration((prevTotal) => prevTotal + 1); // Tăng tổng thời gian mỗi giây
+      }, 1000);
+    }
+
+    return () => clearInterval(interval); // Cleanup interval khi component unmount
   }, [timeLeft]);
+
   const minutes = Math.floor((timeLeft ?? totalDuration) / 60);
   const seconds = (timeLeft ?? totalDuration) % 60;
 
@@ -333,7 +340,9 @@ const StartAssign = () => {
   //SUBMIT
   const handleSubmitAssignment = async () => {
     //duration
-    const timeSpent = totalDuration - timeLeft;
+    const timeSpent = assignmentInfo?.duration
+      ? assignmentInfo.duration * 60 - timeLeft // Thời gian đã trôi qua khi đếm ngược
+      : totalDuration;
 
     //submittedDate
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -389,7 +398,7 @@ const StartAssign = () => {
       }
 
       if (response.status === APIStatus.success) {
-        navigate("/studentTest");
+        navigate(-1);
       } else {
         console.error("Failed to submit assignment:", response);
       }

@@ -16,6 +16,7 @@ import {
 } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
+import { RiGroupLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import {
   APIStatus,
@@ -36,7 +37,7 @@ import {
 } from "../../functions/function";
 
 const ListAssignMgmt = () => {
-  const [idRole, setIdRole] = useState(Number(localStorage.getItem("idRole")));
+  const idRole = Number(localStorage.getItem("idRole"));
   const [loading, setLoading] = useState(false);
   const [loadingBtn, setLoadingBtn] = useState({
     delete: false,
@@ -53,9 +54,15 @@ const ListAssignMgmt = () => {
   //FILTER
   const [filterVisble, setFilterVisble] = useState(false);
   const filterRef = useRef(null);
+  const filterBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterBtnRef.current &&
+        !filterBtnRef.current.contains(event.target)
+      ) {
         setFilterVisble(false);
       }
     };
@@ -74,9 +81,15 @@ const ListAssignMgmt = () => {
   //SORT BY
   const [sortByVisible, setSortByVisible] = useState(false);
   const sortByRef = useRef(null);
+  const sortByBtnRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sortByRef.current && !sortByRef.current.contains(event.target)) {
+      if (
+        sortByRef.current &&
+        !sortByRef.current.contains(event.target) &&
+        sortByBtnRef.current &&
+        !sortByBtnRef.current.contains(event.target)
+      ) {
         setSortByVisible(false);
       }
     };
@@ -228,12 +241,12 @@ const ListAssignMgmt = () => {
     });
   const formatDate = (date) => {
     const options = { weekday: "long" };
-    const weekday = new Date(date).toLocaleDateString("en-US", options); // Lấy tên ngày
+    const weekday = new Date(date).toLocaleDateString("en-US", options);
 
     const dateObj = new Date(date);
-    const month = (dateObj.getMonth() + 1).toString().padStart(2, "0"); // Tháng (bắt đầu từ 0 nên +1)
-    const day = dateObj.getDate().toString().padStart(2, "0"); // Ngày
-    const year = dateObj.getFullYear(); // Năm
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+    const day = dateObj.getDate().toString().padStart(2, "0");
+    const year = dateObj.getFullYear();
 
     return `${weekday}, ${month}/${day}/${year}`;
   };
@@ -280,7 +293,6 @@ const ListAssignMgmt = () => {
 
   // Số trang
   const npage = Math.ceil(flatAssignments.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   // Nhóm assignments theo ngày
   const groupedAssignments = paginatedAssignments.reduce(
@@ -309,8 +321,6 @@ const ListAssignMgmt = () => {
   }, [activeStatus]);
   const handleStatusClick = (status) => {
     setActiveStatus(status);
-    // setClassName("");
-    // setClassName("slide-to-right");
     setSearchTerm("");
     setSortField("createdDate");
     setTempSortField("createdDate");
@@ -325,6 +335,7 @@ const ListAssignMgmt = () => {
     setTempAssignmentType("all");
   };
   const [selectedAssignment, setSelectedAssignment] = useState({});
+
   //PUBLISH ASSIGNMENT
   const [isModalPublishOpen, setIsModalPublishOpen] = useState(false);
 
@@ -457,6 +468,7 @@ const ListAssignMgmt = () => {
           <div className="filter-search-assign">
             <div className="filter-sort-btns">
               <div
+                ref={filterBtnRef}
                 className="btn"
                 onClick={() => {
                   setFilterVisble(!filterVisble);
@@ -572,6 +584,7 @@ const ListAssignMgmt = () => {
                 </div>
               )}
               <div
+                ref={sortByBtnRef}
                 className="btn"
                 onClick={() => {
                   setSortByVisible(!sortByVisible);
@@ -772,9 +785,15 @@ const ListAssignMgmt = () => {
                           )}
                         </span>
                         {idRole === Role.teacher && (
-                          <span className="isExam-label">
-                            {assignment.isTest ? "Test" : "Exercise"}
-                          </span>
+                          <div className="studentCount-isExam-container">
+                            <span className="studentCount">
+                              {assignment.numberOfSubmittedStudent}/
+                              {assignment.numberOfStudent} <RiGroupLine />
+                            </span>
+                            <span className="isExam-label">
+                              {assignment.isTest ? "Test" : "Exercise"}
+                            </span>
+                          </div>
                         )}
                         {idRole === Role.student &&
                           (assignment.submittedDate ? (

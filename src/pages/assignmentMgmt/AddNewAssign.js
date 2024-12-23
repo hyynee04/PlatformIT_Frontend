@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FaCalendar, FaChevronDown, FaSave } from "react-icons/fa";
-import { LuAlignJustify, LuChevronLeft, LuChevronRight } from "react-icons/lu";
+import Form from "react-bootstrap/Form";
+import { FaCalendar, FaChevronDown, FaSave, FaTrashAlt } from "react-icons/fa";
+import {
+  LuAlignJustify,
+  LuChevronLeft,
+  LuChevronRight,
+  LuPlus,
+} from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
 import { ImSpinner2 } from "react-icons/im";
@@ -30,6 +36,7 @@ const AddNewAssign = () => {
     save: false,
     publish: false,
   });
+  const [loading, setLoading] = useState(false);
   const [isAddByCourse, setIsAddByCourse] = useState(false);
   const [isAddByLecture, setIsAddByLecture] = useState(false);
 
@@ -40,6 +47,8 @@ const AddNewAssign = () => {
   const [isDropdownCourseVisible, setDropdownCourseVisible] = useState(false);
   const [isDropdownSectionVisible, setDropdownSectionVisible] = useState(false);
   const [isDropdownLectureVisible, setDropdownLectureVisible] = useState(false);
+  const [isDropdownLanguageVisible, setDropdownLanguageVisible] =
+    useState(false);
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
@@ -237,7 +246,7 @@ const AddNewAssign = () => {
     }
 
     if (duration) {
-      const minEndDate = new Date(start.getTime() + duration * 60000); // Tính toán minEndDate
+      const minEndDate = new Date(start.getTime() + duration * 60000);
 
       if (end < minEndDate) {
         setErrorMessage("End date > start + duration.");
@@ -353,10 +362,32 @@ const AddNewAssign = () => {
   };
   const totalQuestions = questions.length;
 
-  const totalMarks = questions.reduce(
-    (acc, question) => acc + Number(question.mark),
-    0
-  );
+  const totalMarks =
+    Number(typeAssignment) !== AssignmentType.code
+      ? questions.reduce((acc, question) => acc + Number(question.mark), 0)
+      : 0;
+
+  const handleAddNewRecord = (fieldName) => {
+    setQuestions((prevQuestions) => ({
+      ...prevQuestions,
+      [fieldName]: [...prevQuestions[fieldName], { input: "", output: "" }],
+    }));
+  };
+  const handleDeleteRecord = (fieldName, index) => {
+    setQuestions((prevQuestions) => ({
+      ...prevQuestions,
+      [fieldName]: prevQuestions[fieldName].filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const handleTableCodeChange = (fieldName, index, field, value) => {
+    const updatedField = [...questions[fieldName]];
+    updatedField[index][field] = value;
+    setQuestions((prevQuestions) => ({
+      ...prevQuestions,
+      [fieldName]: updatedField,
+    }));
+  };
   //HANDLE ADD ASSIGNMENT
   const isFormValid = () => {
     if (title === "") return false;
@@ -365,16 +396,24 @@ const AddNewAssign = () => {
       return false;
     if (!typeAssignment) return false;
     if (errorMessage !== "") return false;
-    if (questions.length <= 0) return false;
-    for (const question of questions) {
-      if (!question.question || question.question.trim() === "") return false;
-      if (!question.mark || question.mark <= 0) return false;
-      if (+typeAssignment === AssignmentType.quiz) {
-        if (question.items.length < 2) return false;
-        const hasCorrectAnswer = question.items.some((item) => item.isCorrect);
-        if (!hasCorrectAnswer) return false;
-        for (const item of question.items) {
-          if (!item.content || item.content.trim() === "") return false; // Kiểm tra content của từng item
+    if (+typeAssignment === AssignmentType.code) {
+      if (!questions || typeof questions !== "object") return false;
+      if (!questions.question || questions.question.trim() === "") return false;
+      if (!questions.mark || questions.mark <= 0) return false;
+    } else {
+      if (!Array.isArray(questions) || questions.length <= 0) return false;
+      for (const question of questions) {
+        if (!question.question || question.question.trim() === "") return false;
+        if (!question.mark || question.mark <= 0) return false;
+        if (+typeAssignment === AssignmentType.quiz) {
+          if (question.items.length < 2) return false;
+          const hasCorrectAnswer = question.items.some(
+            (item) => item.isCorrect
+          );
+          if (!hasCorrectAnswer) return false;
+          for (const item of question.items) {
+            if (!item.content || item.content.trim() === "") return false;
+          }
         }
       }
     }
@@ -397,15 +436,16 @@ const AddNewAssign = () => {
       isShowAnswer: isShowAnswer,
       questions: questions,
     };
-    isPublish
-      ? setLoadingBtn((prevState) => ({
-          ...prevState,
-          publish: true,
-        }))
-      : setLoadingBtn((prevState) => ({
-          ...prevState,
-          save: true,
-        }));
+    // isPublish
+    //   ? setLoadingBtn((prevState) => ({
+    //       ...prevState,
+    //       publish: true,
+    //     }))
+    //   : setLoadingBtn((prevState) => ({
+    //       ...prevState,
+    //       save: true,
+    //     }));
+    setLoading(true);
     try {
       let response;
 
@@ -425,7 +465,7 @@ const AddNewAssign = () => {
             },
           });
         } else {
-          navigate("/teacherAssignment");
+          navigate(-1);
         }
       } else {
         console.error("Error adding assignment:", response?.message);
@@ -433,18 +473,25 @@ const AddNewAssign = () => {
     } catch (error) {
       console.error("Failed to add assignment:", error);
     } finally {
-      isPublish
-        ? setLoadingBtn((prevState) => ({
-            ...prevState,
-            publish: false,
-          }))
-        : setLoadingBtn((prevState) => ({
-            ...prevState,
-            save: false,
-          }));
+      setLoading(false);
+      // isPublish
+      //   ? setLoadingBtn((prevState) => ({
+      //       ...prevState,
+      //       publish: false,
+      //     }))
+      //   : setLoadingBtn((prevState) => ({
+      //       ...prevState,
+      //       save: false,
+      //     }));
     }
   };
-
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="assign-span">
@@ -454,7 +501,11 @@ const AddNewAssign = () => {
             onClick={() => navigate(-1)}
           >
             <LuChevronLeft stroke-width="4" />
-            Create new assignment
+            {isAddByLecture
+              ? "Create new exercise"
+              : isAddByCourse
+              ? "Create new test"
+              : "Create new assignment"}
           </span>
           <div className="name-container">
             {isAddByCourse && (
@@ -476,8 +527,11 @@ const AddNewAssign = () => {
           </div>
         </div>
 
-        <div className="action-btns-form">
-          <div className="container-button sticky">
+        <div
+          className="action-btns-form"
+          style={{ backgroundColor: "transparent" }}
+        >
+          <div className="container-button">
             <button
               className="btn save"
               disabled={!isFormValid()}
@@ -621,64 +675,68 @@ const AddNewAssign = () => {
                         )}
                       </span>
                     </div>
-                    <div className="select-container">
-                      <input
-                        style={{ cursor: "default" }}
-                        type="text"
-                        className="input-form-pi"
-                        value={
-                          selectedSection
-                            ? selectedSection.title
-                            : "Select a section"
-                        }
-                        disabled={isTest}
-                        onClick={() => handleDropdownClick("section")}
-                      />
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                    {isDropdownSectionVisible && (
-                      <div className="list-options-container section">
-                        {listSection.map((section, index) => (
-                          <div
-                            key={index}
-                            className="option-course-container"
-                            onClick={() => handleSectionSelect(section)}
-                          >
-                            <div>{section.title}</div>
+                    {(!isLimitedTimeCourse || !isTest) && (
+                      <>
+                        <div className="select-container">
+                          <input
+                            style={{ cursor: "default" }}
+                            type="text"
+                            className="input-form-pi"
+                            value={
+                              selectedSection
+                                ? selectedSection.title
+                                : "Select a section"
+                            }
+                            disabled={isTest}
+                            onClick={() => handleDropdownClick("section")}
+                          />
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                        {isDropdownSectionVisible && (
+                          <div className="list-options-container section">
+                            {listSection.map((section, index) => (
+                              <div
+                                key={index}
+                                className="option-course-container"
+                                onClick={() => handleSectionSelect(section)}
+                              >
+                                <div>{section.title}</div>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="select-container">
-                      <input
-                        style={{ cursor: "default" }}
-                        type="text"
-                        className="input-form-pi"
-                        value={
-                          selectedLecture
-                            ? selectedLecture.titleLecture
-                            : "Select a lecture"
-                        }
-                        onClick={() => handleDropdownClick("lecture")}
-                        disabled={isTest}
-                      />
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                    {isDropdownLectureVisible && (
-                      <div className="list-options-container lecture">
-                        {listLecture.map((lecture, index) => (
-                          <div
-                            key={index}
-                            className="option-course-container"
-                            onClick={() => handleLectureSelect(lecture)}
-                          >
-                            <div>{lecture.titleLecture}</div>
-                            <span className="section-lecture">
-                              {lecture.titleSection}
-                            </span>
+                        )}
+                        <div className="select-container">
+                          <input
+                            style={{ cursor: "default" }}
+                            type="text"
+                            className="input-form-pi"
+                            value={
+                              selectedLecture
+                                ? selectedLecture.titleLecture
+                                : "Select a lecture"
+                            }
+                            onClick={() => handleDropdownClick("lecture")}
+                            disabled={isTest}
+                          />
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                        {isDropdownLectureVisible && (
+                          <div className="list-options-container lecture">
+                            {listLecture.map((lecture, index) => (
+                              <div
+                                key={index}
+                                className="option-course-container"
+                                onClick={() => handleLectureSelect(lecture)}
+                              >
+                                <div>{lecture.titleLecture}</div>
+                                <span className="section-lecture">
+                                  {lecture.titleSection}
+                                </span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -693,8 +751,35 @@ const AddNewAssign = () => {
                         <select
                           className="input-form-pi"
                           onChange={(e) => {
-                            setTypeAssignment(e.target.value);
-                            setQuestions([]);
+                            const selectedValue = +e.target.value;
+                            setTypeAssignment(selectedValue);
+
+                            if (selectedValue === AssignmentType.code) {
+                              setQuestions({
+                                problem: "",
+                                languages: [],
+                                examples: [
+                                  {
+                                    input: "",
+                                    output: "",
+                                  },
+                                ],
+                                isPassTestCase: false,
+                                isPerformanceOnTime: false,
+                                timeValue: "",
+                                isPerformanceOnMemory: false,
+                                memoryValue: "",
+                                testCases: [
+                                  {
+                                    input: "",
+                                    output: "",
+                                  },
+                                ],
+                              });
+                            } else {
+                              setQuestions([]);
+                            }
+
                             setErrorAddQuestionMessage("");
                           }}
                         >
@@ -771,6 +856,7 @@ const AddNewAssign = () => {
                               style={{
                                 color: "var(--red-color)",
                                 marginLeft: "auto",
+                                textAlign: "right",
                               }}
                             >
                               {errorMessage}
@@ -783,44 +869,36 @@ const AddNewAssign = () => {
                 </div>
               </div>
             )}
-            <div className="info">
-              <span className="overall-span">
-                {totalQuestions}{" "}
-                {totalQuestions <= 1 ? "question" : "questions"} |{" "}
-                {totalMarks || 0} {totalMarks <= 1 ? "mark" : "marks"}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="container-right-assign">
-          <span className="title-span">
-            Questions
-            {+typeAssignment === AssignmentType.quiz ? (
-              <LuAlignJustify
-                style={{ cursor: "pointer" }}
-                onClick={() => setShowOptionQuiz(!showOptionQuiz)}
-              />
-            ) : (
+            {Number(typeAssignment) !== AssignmentType.code && (
               <div className="info">
-                <span>Question shuffling</span>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={isShufflingQuestion}
-                    onChange={(e) => {
-                      setIsShufflingQuestion(e.target.checked);
-                    }}
-                  />
-                  <span className="slider"></span>
-                </label>
+                <span className="overall-span">
+                  {totalQuestions}{" "}
+                  {totalQuestions <= 1 ? "question" : "questions"} |{" "}
+                  {totalMarks || 0} {totalMarks <= 1 ? "mark" : "marks"}
+                </span>
               </div>
             )}
-            {showOptionQuiz && (
-              <div
-                className="container-options assign-setting-option"
-                ref={optionQuizRef}
-              >
-                <div className="item">
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            width: "100%",
+          }}
+        >
+          <div className="container-right-assign">
+            <span className="title-span">
+              Questions
+              {+typeAssignment === AssignmentType.quiz && (
+                <LuAlignJustify
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+                />
+              )}
+              {+typeAssignment === AssignmentType.manual && (
+                <div className="info">
                   <span>Question shuffling</span>
                   <label className="switch">
                     <input
@@ -833,21 +911,10 @@ const AddNewAssign = () => {
                     <span className="slider"></span>
                   </label>
                 </div>
-                <div className="item">
-                  <span>Answer shuffling</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={isShufflingAnswer}
-                      onChange={(e) => {
-                        setIsShufflingAnswer(e.target.checked);
-                      }}
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
-                <div className="item">
-                  <span>Show answer on submission</span>
+              )}
+              {+typeAssignment === AssignmentType.code && (
+                <div className="info">
+                  <span>Show test cases on submission</span>
                   <label className="switch">
                     <input
                       type="checkbox"
@@ -859,37 +926,444 @@ const AddNewAssign = () => {
                     <span className="slider"></span>
                   </label>
                 </div>
+              )}
+              {showOptionQuiz && (
+                <div
+                  className="container-options assign-setting-option"
+                  ref={optionQuizRef}
+                >
+                  <div className="item">
+                    <span>Question shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={isShufflingQuestion}
+                        onChange={(e) => {
+                          setIsShufflingQuestion(e.target.checked);
+                        }}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Answer shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={isShufflingAnswer}
+                        onChange={(e) => {
+                          setIsShufflingAnswer(e.target.checked);
+                        }}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Show answer on submission</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={isShowAnswer}
+                        onChange={(e) => {
+                          setIsShowAnswer(e.target.checked);
+                        }}
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </span>
+            {+typeAssignment === AssignmentType.manual && (
+              <ManualQuestion
+                questions={questions}
+                setQuestions={setQuestions}
+                inputFileRef={inputFileRef}
+              />
+            )}
+            {+typeAssignment === AssignmentType.quiz && (
+              <QuizQuestion
+                questions={questions}
+                setQuestions={setQuestions}
+                inputFileRef={inputFileRef}
+              />
+            )}
+            {+typeAssignment === AssignmentType.code && (
+              <div className="assign-info">
+                <div className="info">
+                  <span>Problem</span>
+
+                  <Form.Control
+                    as="textarea"
+                    className="input-area-form-pi"
+                    placeholder="Type problem here..."
+                    value={questions.problem}
+                    // onChange={(e) =>
+                    //   handleQuestionChange("question", e.target.value)
+                    // }
+                  />
+                </div>
+                <div className="info" style={{ width: "50%" }}>
+                  <span>Language</span>
+                  <div className="select-container">
+                    <input
+                      style={{ cursor: "default" }}
+                      type="text"
+                      className="input-form-pi"
+                      value={
+                        selectedLecture
+                          ? selectedLecture.titleLecture
+                          : "Select a language"
+                      }
+                    />
+                    <FaChevronDown className="arrow-icon" />
+                  </div>
+                  {isDropdownLanguageVisible && (
+                    <div className="list-options-container lecture">
+                      {/* {listLecture.map((lecture, index) => (
+                        <div
+                          key={index}
+                          className="option-course-container"
+                          onClick={() => handleLectureSelect(lecture)}
+                        >
+                          <div>{lecture.titleLecture}</div>
+                          <span className="section-lecture">
+                            {lecture.titleSection}
+                          </span>
+                        </div>
+                      ))} */}
+                    </div>
+                  )}
+                </div>
+                <div className="info">
+                  <span>Example</span>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {questions.examples.map((example, index) => (
+                        <tr key={index}>
+                          <td style={{ width: "64px" }}> {index + 1}</td>
+                          <td>
+                            <input
+                              type="text"
+                              value={example.input}
+                              onChange={(e) =>
+                                handleTableCodeChange(
+                                  "examples",
+                                  index,
+                                  "input",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={example.output}
+                              onChange={(e) =>
+                                handleTableCodeChange(
+                                  "examples",
+                                  index,
+                                  "output",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td style={{ width: "64px" }}>
+                            <button
+                              className="del-question btn"
+                              style={{ border: "none" }}
+                              onClick={() =>
+                                handleDeleteRecord("examples", index)
+                              }
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
+                        <td colSpan={4}>
+                          <button
+                            className="btn add-new-record"
+                            onClick={() => handleAddNewRecord("examples")}
+                          >
+                            <LuPlus />
+                            Add new record
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
-          </span>
-          {+typeAssignment === AssignmentType.manual && (
-            <ManualQuestion
-              questions={questions}
-              setQuestions={setQuestions}
-              inputFileRef={inputFileRef}
-            />
+            <span
+              className={"warning-error"}
+              style={{
+                color: "var(--red-color)",
+                marginLeft: "60px",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              {errorAddQuestionMessage}
+            </span>
+            {!(Number(typeAssignment) === AssignmentType.code) && (
+              <button className="btn circle-btn" onClick={handleAddQuestion}>
+                <TiPlus className="icon" />
+              </button>
+            )}
+          </div>
+          {Number(typeAssignment) === AssignmentType.code && (
+            <>
+              <div className="container-right-assign test-case-scoring">
+                <span className="title-span">Test Cases and Scoring Rules</span>{" "}
+                <div className="assign-info">
+                  <div className="info">
+                    <span>Test case</span>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Input</th>
+                          <th>Output</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {questions.testCases.map((testCase, index) => (
+                          <tr key={index}>
+                            <td style={{ width: "64px" }}> {index + 1}</td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.input}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "input",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.output}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "output",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td style={{ width: "64px" }}>
+                              <button
+                                className="del-question btn"
+                                style={{ border: "none" }}
+                                onClick={() =>
+                                  handleDeleteRecord("testCases", index)
+                                }
+                              >
+                                <FaTrashAlt />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <td colSpan={4}>
+                            <button
+                              className="btn add-new-record"
+                              onClick={() => handleAddNewRecord("testCases")}
+                            >
+                              <LuPlus />
+                              Add new record
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="info" style={{ width: "50%" }}>
+                    <span>Scoring rules</span>
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isPassTestCase"
+                        checked={questions.isPassTestCase || false}
+                        onChange={(e) => {
+                          setQuestions((prevQuestions) => ({
+                            ...prevQuestions,
+                            isPassTestCase: e.target.checked,
+                          }));
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        Pass test cases
+                      </span>
+                    </div>
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isPerformanceOnTime"
+                        checked={questions.isPerformanceOnTime || false}
+                        onChange={(e) => {
+                          setQuestions((prevQuestions) => ({
+                            ...prevQuestions,
+                            isPerformanceOnTime: e.target.checked,
+                          }));
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        Performance on time
+                      </span>
+                    </div>
+                    {questions.isPerformanceOnTime && (
+                      <input
+                        type="number"
+                        className="input-form-pi"
+                        value={questions.timeValue}
+                        onChange={(e) =>
+                          setQuestions((prevQuestions) => ({
+                            ...prevQuestions,
+                            timeValue: e.target.value,
+                          }))
+                        }
+                      />
+                    )}
+
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isPerformanceOnMemory"
+                        checked={questions.isPerformanceOnMemory || false}
+                        onChange={(e) => {
+                          setQuestions((prevQuestions) => ({
+                            ...prevQuestions,
+                            isPerformanceOnMemory: e.target.checked,
+                          }));
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        Performance on memory
+                      </span>
+                    </div>
+                    {questions.isPerformanceOnMemory && (
+                      <input
+                        type="number"
+                        className="input-form-pi"
+                        value={questions.memoryValue}
+                        onChange={(e) =>
+                          setQuestions((prevQuestions) => ({
+                            ...prevQuestions,
+                            memoryValue: e.target.value,
+                          }))
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="container-right-assign testing-code">
+                <span className="title-span">
+                  Testing with your code
+                  <button className="btn">Run code</button>
+                </span>
+                <div className="assign-info">
+                  <div className="info">
+                    <span>Your code</span>
+                    <Form.Control
+                      as="textarea"
+                      className="input-area-form-pi"
+                      placeholder="Type problem here..."
+                      value={questions.codeTest}
+                      // onChange={(e) =>
+                      //   handleQuestionChange("question", e.target.value)
+                      // }
+                    />
+                  </div>
+                  <div className="info" style={{ width: "50%" }}>
+                    <span>Language</span>
+                    <div className="select-container">
+                      <input
+                        style={{ cursor: "default" }}
+                        type="text"
+                        className="input-form-pi"
+                        value={
+                          selectedLecture
+                            ? selectedLecture.titleLecture
+                            : "Select a language"
+                        }
+                      />
+                      <FaChevronDown className="arrow-icon" />
+                    </div>
+                  </div>
+                  <div className="info">
+                    <span>Result</span>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Test case</th>
+                          <th>Result</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {questions.testCases.map((testCase, index) => (
+                          <tr key={index}>
+                            <td style={{ width: "64px" }}> {index + 1}</td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.input}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "input",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.output}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "output",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-          {+typeAssignment === AssignmentType.quiz && (
-            <QuizQuestion
-              questions={questions}
-              setQuestions={setQuestions}
-              inputFileRef={inputFileRef}
-            />
-          )}
-          <span
-            className={"warning-error"}
-            style={{
-              color: "var(--red-color)",
-              marginLeft: "60px",
-              fontWeight: "600",
-              fontSize: "14px",
-            }}
-          >
-            {errorAddQuestionMessage}
-          </span>
-          <button className="btn circle-btn" onClick={handleAddQuestion}>
-            <TiPlus className="icon" />
-          </button>
         </div>
       </div>
     </div>

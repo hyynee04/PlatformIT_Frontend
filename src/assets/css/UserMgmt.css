@@ -80,9 +80,13 @@
   font-size: 14px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  border: none;
 }
 .filter-sort-btns .btn:hover {
   background-color: rgba(217, 217, 217, 0.3);
+}
+.filter-sort-btns .btn.save-filter:hover {
+  background-color: rgba(57, 121, 121, 0.8);
 }
 .filter-sort-btns .btn:active {
   border: none;
@@ -159,6 +163,7 @@
   width: 100%;
   border-collapse: collapse;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  /* table-layout: fixed; */
 }
 .list-container > table tr:nth-child(odd) {
   background-color: #f2f2f2;
@@ -182,6 +187,7 @@ td {
   max-width: 300px;
   word-wrap: break-word; /* Ngắt dòng nếu nội dung quá dài */
   white-space: nowrap; /* Không ngắt dòng trong ô */
+  text-overflow: hidden;
 }
 .list-container > table > tbody > tr > td > span {
   display: inline-block;
@@ -236,6 +242,12 @@ td {
 .list-container > table > tbody > tr > td > .btn.approve {
   background-color: var(--main-color);
   color: var(--white-color);
+}
+.list-container > table > tbody > tr > td > .btn.approve:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
+.list-container > table > tbody > tr > td > .btn.reject:hover {
+  background-color: rgba(217, 217, 217, 0.5);
 }
 .list-container > table > tbody > tr > td > .btn-group > .btn-task > .check {
   width: 40px;

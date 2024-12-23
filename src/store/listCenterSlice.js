@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { CenterStatus } from "../constants/constants";
 import {
   getAllCenter,
+  getInactiveLockedCenter,
   getPendingCenter,
   postApproveCenter,
   postRejectCenter,
@@ -13,6 +14,8 @@ export const fetchCenters = createAsyncThunk(
     let response;
     if (status === CenterStatus.pending) {
       response = await getPendingCenter();
+    } else if (status === CenterStatus.inactive) {
+      response = await getInactiveLockedCenter();
     } else {
       response = await getAllCenter();
     }

@@ -337,6 +337,8 @@ const postSubmitManualQuestion = async (dataToSubmit) => {
     formData.append("IdAssignment", dataToSubmit.idAssignment);
     formData.append("IdStudent", Number(localStorage.getItem("idUser")));
     formData.append("Duration", dataToSubmit.duration);
+    console.log(dataToSubmit.duration);
+
     formData.append(
       "AssignmentResultStatus",
       dataToSubmit.assignmentResultStatus

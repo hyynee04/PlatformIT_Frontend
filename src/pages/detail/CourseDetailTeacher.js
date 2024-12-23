@@ -20,12 +20,13 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { RiGroupLine } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 import default_ava from "../../assets/img/default_ava.png";
-import { APIStatus } from "../../constants/constants";
+import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
   getCourseProgress,
   postAddBoardNotificationForCourse,
   postAddSection,
+  updateSection,
 } from "../../services/courseService";
 
 const CourseDetailTeacher = (props) => {
@@ -35,12 +36,15 @@ const CourseDetailTeacher = (props) => {
     fetchCourseDetail,
     notificationBoard,
     setAddedNotification,
+    setIsRemoved,
+    setIdSection,
+    fetchSectionDetail,
   } = props;
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const idRole = +localStorage.getItem("idUser");
+  const idRole = +localStorage.getItem("idRole");
   const [loading, setLoading] = useState();
 
   const [notificationContent, setNotificationContent] = useState("");
@@ -75,7 +79,7 @@ const CourseDetailTeacher = (props) => {
   const menuItems = [
     { label: "Main content", index: 1 },
     { label: "Notification", index: 2 },
-    { label: "Attendance", index: 3 },
+    { label: "Attendee", index: 3 },
   ];
 
   const [showedSections, setShowedSections] = useState({});
@@ -83,8 +87,8 @@ const CourseDetailTeacher = (props) => {
 
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
-    ? courseInfo.sectionsWithCourses.reduce((total, section) => {
-        return total + (section.lectures ? section.lectures.length : 0);
+    ? courseInfo.sectionsWithCourses?.reduce((total, section) => {
+        return total + section.lectureCount;
       }, 0)
     : 0;
 
@@ -121,7 +125,7 @@ const CourseDetailTeacher = (props) => {
         idUser
       );
       if (response.status === APIStatus.success) {
-        fetchCourseDetail(courseInfo.idCourse);
+        fetchSectionDetail(courseInfo.idCourse);
       } else console.log(response.data);
     } catch (error) {
       console.error("Error posting data:", error);
@@ -142,31 +146,25 @@ const CourseDetailTeacher = (props) => {
     }
   };
 
+  const editSection = async (idSection, newSectionName, idUpdatedBy) => {
+    try {
+      let respone = await updateSection(idSection, newSectionName, idUpdatedBy);
+      if (respone.status === APIStatus.success) {
+        await fetchSectionDetail(courseInfo.idCourse);
+        setNewSectionTitle("");
+        setIsEdit({
+          ...isEdit,
+          [idSection]: !isEdit[idSection],
+        });
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
+
   useEffect(() => {
     fetchCourseProgress(courseInfo.idCourse);
   }, []);
-
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     console.log("runhere");
-  //     // Remove the item if the user refreshes or leaves the page
-  //     if (location.pathname === "/courseDetail") {
-  //       console.log("inside");
-  //       localStorage.removeItem("menuIndex");
-  //     }
-  //   };
-
-  //   // Handle refresh scenarios
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   return () => {
-  //     // Handle navigation away from the page
-  //     if (location.pathname !== "/courseDetail") {
-  //       localStorage.removeItem("menuIndex");
-  //     }
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [location.pathname]);
 
   return (
     <>
@@ -192,7 +190,7 @@ const CourseDetailTeacher = (props) => {
         <>
           <div
             className={`block-container ${
-              courseInfo.tests.length > 0 ? "content-test" : "content-teacher"
+              courseInfo.tests?.length > 0 ? "content-test" : "content-teacher"
             }`}
           >
             <div className="block-container-header">
@@ -207,7 +205,7 @@ const CourseDetailTeacher = (props) => {
                   : "0 section"}{" "}
                 -{" "}
                 {`${numberOfLectures} ${
-                  numberOfLectures >= 1 ? "lecture" : "lectures"
+                  numberOfLectures > 1 ? "lectures" : "lecture"
                 }`}
               </span>
             </div>
@@ -220,50 +218,59 @@ const CourseDetailTeacher = (props) => {
                         className={`lecture-header ${
                           showedSections[index] ? "" : "change-header"
                         } `}
-                        onClick={() =>
-                          setShowedSections({
-                            ...showedSections,
-                            [index]: !showedSections[index],
-                          })
-                        }
+                        onClick={() => {
+                          if (section.lectureCount > 0)
+                            setShowedSections({
+                              ...showedSections,
+                              [index]: !showedSections[index],
+                            });
+                        }}
                       >
-                        {!isEdit[index] ? (
+                        {!isEdit[section.idSection] ? (
                           <>
                             <span className="section-name">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setIsEdit({
-                                    ...Object.keys(isEdit).reduce(
-                                      (acc, key) => ({ ...acc, [key]: false }),
-                                      {}
-                                    ),
-                                    [index]: true,
-                                  });
-                                }}
-                              >
-                                <LuPenLine />
-                              </button>
+                              {idRole !== Role.platformAdmin && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsEdit({
+                                      ...Object.keys(isEdit).reduce(
+                                        (acc, key) => ({
+                                          ...acc,
+                                          [key]: false,
+                                        }),
+                                        {}
+                                      ),
+                                      [section.idSection]: true,
+                                    });
+                                    setNewSectionTitle(section.sectionName);
+                                  }}
+                                >
+                                  <LuPenLine />
+                                </button>
+                              )}
+
                               {section.sectionName}
                             </span>
                             <div className="section-info">
                               <span>
-                                {section.lectures
-                                  ? `${section.lectures.length} ${
-                                      section.lectures.length > 1
-                                        ? "lectures"
-                                        : "lecture"
-                                    }`
-                                  : "0 lecture"}
+                                {`${section.lectureCount} ${
+                                  section.lectureCount > 1
+                                    ? "lectures"
+                                    : "lecture"
+                                }`}
                               </span>
                               <button
                                 className="showhide-button"
-                                onClick={() =>
-                                  setShowedSections({
-                                    ...showedSections,
-                                    [index]: !showedSections[index],
-                                  })
-                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (section.lectureCount > 0)
+                                    setShowedSections({
+                                      ...showedSections,
+                                      [index]: !showedSections[index],
+                                    });
+                                }}
+                                disabled={section.lectureCount === 0}
                               >
                                 {showedSections[index] ? (
                                   <IoIosArrowUp />
@@ -288,7 +295,17 @@ const CourseDetailTeacher = (props) => {
                               }
                             />
                             <div className="edit-button-container">
-                              <button>
+                              <button
+                                disabled={!newSectionTitle}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  editSection(
+                                    section.idSection,
+                                    newSectionTitle,
+                                    idUser
+                                  );
+                                }}
+                              >
                                 <LuCheck />
                               </button>
                               <button
@@ -297,7 +314,8 @@ const CourseDetailTeacher = (props) => {
                                   setNewSectionTitle("");
                                   setIsEdit({
                                     ...isEdit,
-                                    [index]: !isEdit[index],
+                                    [section.idSection]:
+                                      !isEdit[section.idSection],
                                   });
                                 }}
                               >
@@ -307,124 +325,159 @@ const CourseDetailTeacher = (props) => {
                           </div>
                         )}
                       </div>
-                      {section.lectures && (
+                      {section.lectureStructures && (
                         <div
                           key={index}
                           className={`lecture-block ${
                             showedSections[index] ? "" : "adjust-lecture-block"
                           }`}
                         >
-                          {section.lectures.map((lecture, index) => (
-                            <div
-                              key={index}
-                              className={`lecture-content ${
-                                courseInfo.idTeacher === idRole ? "" : "nohover"
-                              }`}
-                              onClick={() => {
-                                if (courseInfo.idTeacher === idRole)
-                                  navigate("/viewLecture", {
-                                    state: {
-                                      idCourse: courseInfo.idCourse,
-                                      idSection: section.idSection,
-                                      idLecture: lecture.idLecture,
-                                    },
-                                  });
-                              }}
-                            >
-                              <div className="lecture-name">
-                                <span className="lecture-title">
-                                  {lecture.lectureTitle}
-                                </span>
-                                <span className="lecture-exercise-num">
-                                  {`${lecture.exerciseCount} ${
-                                    lecture.exerciseCount > 1
-                                      ? "exercises"
-                                      : "exercise"
-                                  }`}
-                                </span>
-                              </div>
-                              <span className="lecture-description">
-                                {lecture.lectureIntroduction}
-                              </span>
-                            </div>
+                          {section.lectureStructures.map((lecture, index) => (
+                            <>
+                              {lecture.lectureStatus !==
+                                LectureStatus.inactive && (
+                                <div
+                                  key={index}
+                                  className={`lecture-content`}
+                                  onClick={() => {
+                                    navigate("/viewLecture", {
+                                      state: {
+                                        idCourse: courseInfo.idCourse,
+                                        idSection: section.idSection,
+                                        idLecture: lecture.idLecture,
+                                        idTeacher: courseInfo.idTeacher,
+                                      },
+                                    });
+                                  }}
+                                >
+                                  <div className="lecture-name">
+                                    <span className="lecture-title">
+                                      {lecture.lectureTitle}
+                                    </span>
+                                    {lecture.lectureStatus ===
+                                    LectureStatus.active ? (
+                                      <span className="lecture-exercise-num">
+                                        {`${lecture.exerciseCount} ${
+                                          lecture.exerciseCount > 1
+                                            ? "exercises"
+                                            : "exercise"
+                                        }`}
+                                      </span>
+                                    ) : lecture.lectureStatus ===
+                                      LectureStatus.pending ? (
+                                      <span className="lecture-exercise-num pending">
+                                        Pending
+                                      </span>
+                                    ) : (
+                                      <span className="lecture-exercise-num reject">
+                                        Rejected
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="lecture-description">
+                                    {lecture.lectureIntroduction}
+                                  </span>
+                                </div>
+                              )}
+                            </>
                           ))}
+                          {idRole !== Role.platformAdmin && (
+                            <div className={`lecture-content nohover`}>
+                              <div className="option-container">
+                                {idRole === Role.teacher && (
+                                  <button
+                                    className="add-lecture"
+                                    onClick={() =>
+                                      navigate("/addNewLecture", {
+                                        state: {
+                                          idCourse: courseInfo.idCourse,
+                                          idSection: section.idSection,
+                                          idCreatedBy: idUser,
+                                          courseTitle: courseInfo.courseTitle,
+                                          sectionName: section.sectionName,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    <span className="icon">
+                                      <LuPlus />
+                                    </span>
+                                    <span className="text">
+                                      Add new lecture
+                                    </span>
+                                  </button>
+                                )}
 
-                          <div className={`lecture-content nohover`}>
-                            <div className="option-container">
-                              <button
-                                className="add-lecture"
-                                onClick={() =>
-                                  navigate("/addNewLecture", {
-                                    state: {
-                                      idCourse: courseInfo.idCourse,
-                                      idSection: section.idSection,
-                                      idCreatedBy: idUser,
-                                      courseTitle: courseInfo.courseTitle,
-                                      sectionName: section.sectionName,
-                                    },
-                                  })
-                                }
-                              >
-                                <span className="icon">
-                                  <LuPlus />
-                                </span>
-                                <span className="text">Add new lecture</span>
-                              </button>
-                              <button className="remove-section">
-                                <span className="icon">
-                                  <LuTrash2 />
-                                </span>
-                                <span className="text">
-                                  Remove this section
-                                </span>
-                              </button>
+                                <button
+                                  className="remove-section"
+                                  onClick={() => {
+                                    setIdSection(section.idSection);
+                                    setIsRemoved(true);
+                                  }}
+                                >
+                                  <span className="icon">
+                                    <LuTrash2 />
+                                  </span>
+                                  <span className="text">
+                                    Remove this section
+                                  </span>
+                                </button>
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               )}
-            {addSection ? (
-              <div>
-                <div className="add-section-container change-border-radius">
-                  <div className="edit-section-container">
-                    <input
-                      className="edit-section"
-                      value={newSection}
-                      type="text"
-                      placeholder="Section Name"
-                      onChange={(e) => setNewSection(e.target.value)}
-                    />
-                    <div className="edit-button-container">
-                      <button
-                        disabled={!newSection}
-                        onClick={() => addNewSection(newSection)}
-                      >
-                        <LuCheck />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setNewSectionTitle("");
-                          setAddSection(!addSection);
-                        }}
-                      >
-                        <LuX />
-                      </button>
+            {idRole === Role.teacher && (
+              <>
+                {!addSection ? (
+                  <div className="add-section-btn-container">
+                    <button
+                      className="add-section-btn"
+                      onClick={() => setAddSection(!addSection)}
+                    >
+                      <LuPlus /> Add new section
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="add-section-container change-border-radius">
+                      <div className="edit-section-container">
+                        <input
+                          className="edit-section"
+                          value={newSection}
+                          type="text"
+                          placeholder="Section Name"
+                          onChange={(e) => setNewSection(e.target.value)}
+                        />
+                        <div className="edit-button-container">
+                          <button
+                            disabled={!newSection}
+                            onClick={() => {
+                              addNewSection(newSection);
+                              setNewSection("");
+                              setAddSection(false);
+                            }}
+                          >
+                            <LuCheck />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setNewSection("");
+                              setAddSection(!addSection);
+                            }}
+                          >
+                            <LuX />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className="add-section-btn-container">
-                <button
-                  className="add-section-btn"
-                  onClick={() => setAddSection(!addSection)}
-                >
-                  <LuPlus /> Add new section
-                </button>
-              </div>
+                )}
+              </>
             )}
           </div>
 
@@ -443,7 +496,34 @@ const CourseDetailTeacher = (props) => {
               {courseInfo.tests && courseInfo.tests.length !== 0 && (
                 <div className="block-container-col">
                   {courseInfo.tests.map((test, index) => (
-                    <div key={index} className="qualification test">
+                    <div
+                      key={index}
+                      className={`qualification test ${
+                        idRole === Role.centerAdmin ||
+                        idRole === Role.platformAdmin
+                          ? "nohover"
+                          : ""
+                      }`}
+                      onClick={(e) => {
+                        console.log(idRole);
+                        e.stopPropagation();
+                        if (idRole === Role.teacher) {
+                          if (test.isPublish) {
+                            navigate("/teacherAssignDetail", {
+                              state: {
+                                idAssignment: test.idAssignment,
+                              },
+                            });
+                          } else {
+                            navigate("/updateAssignment", {
+                              state: {
+                                idAssignment: test.idAssignment,
+                              },
+                            });
+                          }
+                        }
+                      }}
+                    >
                       <div className="qualification-body">
                         <div className="test-header">
                           <span className="test-name teacher-view">
@@ -485,30 +565,32 @@ const CourseDetailTeacher = (props) => {
                         </span>
                         <div
                           className={`test-status-text ${
-                            courseInfo.isPublish ? "is-published" : "unpublish"
+                            test.isPublish ? "is-published" : "unpublish"
                           }`}
                         >
-                          {courseInfo.isPublish ? "Published" : "Unpublish"}
+                          {test.isPublish ? "Published" : "Unpublish"}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-              <div className="add-section-btn-container">
-                <button
-                  className="add-section-btn"
-                  onClick={() => {
-                    navigate("/addAssignment", {
-                      state: {
-                        selectedCourse: courseInfo,
-                      },
-                    });
-                  }}
-                >
-                  <LuPlus /> Add new test
-                </button>
-              </div>
+              {idRole === Role.teacher && (
+                <div className="add-section-btn-container">
+                  <button
+                    className="add-section-btn"
+                    onClick={() => {
+                      navigate("/addAssignment", {
+                        state: {
+                          selectedCourse: courseInfo,
+                        },
+                      });
+                    }}
+                  >
+                    <LuPlus /> Add new test
+                  </button>
+                </div>
+              )}
             </div>
           ) : null}
         </>
@@ -522,11 +604,13 @@ const CourseDetailTeacher = (props) => {
             <div className="block-container-col noti-size">
               {notificationBoard.map((notification, index) => (
                 <div key={index} className="notification">
-                  <div className="delete-button">
-                    <button>
-                      <LuMinus />
-                    </button>
-                  </div>
+                  {idRole === Role.teacher && (
+                    <div className="delete-button">
+                      <button>
+                        <LuMinus />
+                      </button>
+                    </div>
+                  )}
                   <div className="notification-body">
                     <span className="notification-content">
                       {notification.content}
@@ -539,12 +623,15 @@ const CourseDetailTeacher = (props) => {
               ))}
             </div>
           )}
-          <button
-            className="add-notification-button"
-            onClick={() => setPopupAdd(!popupAdd)}
-          >
-            <LuPlus />
-          </button>
+          {idRole === Role.teacher && (
+            <button
+              className="add-notification-button"
+              onClick={() => setPopupAdd(!popupAdd)}
+            >
+              <LuPlus />
+            </button>
+          )}
+
           <div className={`add-notification-popup ${popupAdd ? "active" : ""}`}>
             <span className="popup-title">Add new notification</span>
             <textarea

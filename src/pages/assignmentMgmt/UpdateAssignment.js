@@ -348,18 +348,22 @@ const UpdateAssignment = ({ isDuplicate }) => {
     );
   };
   useEffect(() => {
-    if (assignmentInfo.startDate && assignmentInfo.dueDate) {
-      setIsValid(
-        validateForm(
-          assignmentInfo.startDate,
-          assignmentInfo.dueDate,
-          assignmentInfo.duration,
-          selectedCourse
-            ? selectedCourse.courseEndDate
-            : assignmentInfo.courseEndDate
-        )
-      );
-    }
+    if (
+      selectedCourse?.isLimitedTime === 1 &&
+      assignmentInfo.isLimitedTime === 1
+    )
+      if (assignmentInfo.startDate && assignmentInfo.dueDate) {
+        setIsValid(
+          validateForm(
+            assignmentInfo.startDate,
+            assignmentInfo.dueDate,
+            assignmentInfo.duration,
+            selectedCourse
+              ? selectedCourse.courseEndDate
+              : assignmentInfo.courseEndDate
+          )
+        );
+      }
   }, [assignmentInfo, selectedCourse]);
   //QUESTION
 
@@ -518,7 +522,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       const response = await postUpdateAssignment(dataToSubmit);
 
       if (response.status === APIStatus.success) {
-        navigate("/teacherAssignment");
+        navigate(-1);
       } else {
         console.error("Error updating assignment:", response?.message);
       }
@@ -582,9 +586,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
               onClick={() => navigate(-1)}
             />{" "}
             {isDuplicate
-              ? `Create new ${
-                  assignmentInfo.isTest === 1 ? "test" : "exercise"
-                }`
+              ? "Create new assignment"
               : `Edit ${assignmentInfo.isTest === 1 ? "test" : "exercise"}`}
           </span>
           <div className="name-container">
@@ -614,7 +616,10 @@ const UpdateAssignment = ({ isDuplicate }) => {
           </div>
         </div>
 
-        <div className={`action-btns-form ${isSticky ? "sticky" : ""}`}>
+        <div
+          className="action-btns-form"
+          style={{ backgroundColor: "transparent" }}
+        >
           <div className="container-button">
             {!isDuplicate && (
               <div
@@ -716,9 +721,13 @@ const UpdateAssignment = ({ isDuplicate }) => {
       </div>
 
       <div className="container-assign">
-        <div className="container-left-assign">
+        <div className="container-left-assign sticky">
           <span className="title-span">
-            {assignmentInfo.isTest === 1 ? "Detail test" : "Detail exercise"}
+            {isDuplicate
+              ? "Detail assignment"
+              : assignmentInfo.isTest === 1
+              ? "Detail test"
+              : "Detail exercise"}
           </span>
           <div className="assign-info">
             <div className="info">
@@ -828,49 +837,53 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         )}
                       </span>
                     </div>
-                    <div className="select-container">
-                      <select
-                        className="input-form-pi"
-                        onChange={handleSectionChange}
-                        // disabled={isTest}
-                      >
-                        <option value="" disabled selected hidden>
-                          {selectedLecture
-                            ? selectedLecture.titleSection
-                            : "Select a section"}
-                        </option>
-                        {listSection.map((section, index) => (
-                          <option
-                            value={section.title}
-                            key={index}
-                            className="option-container"
+                    {(!isLimitedTimeCourse || !isTest) && (
+                      <>
+                        <div className="select-container">
+                          <select
+                            className="input-form-pi"
+                            onChange={handleSectionChange}
+                            // disabled={isTest}
                           >
-                            {section.title}
-                          </option>
-                        ))}
-                      </select>
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
-                    <div className="select-container">
-                      <select
-                        className="input-form-pi"
-                        onChange={handleLectureChange}
-                      >
-                        <option value="" disabled selected hidden>
-                          Select a lecture
-                        </option>
-                        {listLecture.map((lecture, index) => (
-                          <option
-                            value={lecture.titleLecture}
-                            key={index}
-                            className="option-container"
+                            <option value="" disabled selected hidden>
+                              {selectedLecture
+                                ? selectedLecture.titleSection
+                                : "Select a section"}
+                            </option>
+                            {listSection.map((section, index) => (
+                              <option
+                                value={section.title}
+                                key={index}
+                                className="option-container"
+                              >
+                                {section.title}
+                              </option>
+                            ))}
+                          </select>
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                        <div className="select-container">
+                          <select
+                            className="input-form-pi"
+                            onChange={handleLectureChange}
                           >
-                            {lecture.titleLecture}
-                          </option>
-                        ))}
-                      </select>
-                      <FaChevronDown className="arrow-icon" />
-                    </div>
+                            <option value="" disabled selected hidden>
+                              Select a lecture
+                            </option>
+                            {listLecture.map((lecture, index) => (
+                              <option
+                                value={lecture.titleLecture}
+                                key={index}
+                                className="option-container"
+                              >
+                                {lecture.titleLecture}
+                              </option>
+                            ))}
+                          </select>
+                          <FaChevronDown className="arrow-icon" />
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
                 <div className="container-field">
@@ -903,7 +916,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                       </div>
                     </div>
                     {(isDuplicate
-                      ? selectedCourse?.isLimitedTime
+                      ? selectedCourse?.isLimitedTime === 1
                       : assignmentInfo.isLimitedTime === 1) && (
                       <div className="info">
                         <div className="container-validate">
@@ -941,7 +954,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                       </div>
                     </div>
                     {(isDuplicate
-                      ? selectedCourse?.isLimitedTime
+                      ? selectedCourse?.isLimitedTime === 1
                       : assignmentInfo.isLimitedTime === 1) && (
                       <div className="info">
                         <div className="container-validate">

@@ -69,6 +69,58 @@ export const formatDateTime = (dateString) => {
     hour12: false,
   });
 };
+export const formatDateTimeWithTimeZone = (dateString) => {
+  const formattedDateString = dateString.split(".")[0] + "Z";
+  const date = new Date(formattedDateString);
+  const now = new Date();
+
+  // So sánh thời gian chính xác (bao gồm giờ, phút, giây)
+  const isSameDay =
+    now.getFullYear() === date.getFullYear() &&
+    now.getMonth() === date.getMonth() &&
+    now.getDate() === date.getDate();
+
+  // Kiểm tra xem ngày có phải là cùng tuần không
+  const currentDayOfWeek = now.getDay();
+
+  const isSameWeek =
+    now.getDate() - currentDayOfWeek <= date.getDate() &&
+    date.getDate() <= now.getDate() - currentDayOfWeek + 6;
+
+  if (isSameDay) {
+    return date.toLocaleString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } else if (isSameWeek) {
+    return date.toLocaleString("en-US", {
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } else if (date.getFullYear() === now.getFullYear()) {
+    return date.toLocaleString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } else {
+    console.log("different year");
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  }
+};
+
 export const isPastDateTime = (dateTimeString) => {
   let inputDateTime;
   // Parse the input date-time string into a Date object
@@ -186,4 +238,63 @@ export const handleKeyDown = (event, handler) => {
   if (event.key === "Enter") {
     handler(); // Trigger passed handler function on Enter key press
   }
+};
+
+export const processCommentList = (commentList) => {
+  const mainList = [];
+  const replyObject = {};
+
+  // Step 1: Categorize comments
+  commentList.forEach((comment) => {
+    if (!comment.idCommentRef) {
+      // Main comment
+      mainList.push({
+        ...comment,
+        timestamp: parseRelativeTime(comment.relativeTime),
+      });
+      if (!replyObject[comment.idComment]) {
+        replyObject[comment.idComment] = [];
+      }
+    } else {
+      // Reply comment
+      if (replyObject[comment.idCommentRef]) {
+        const refComment = mainList.find(
+          (item) => item.idComment === comment.idCommentRef
+        );
+        replyObject[comment.idCommentRef].push({
+          ...comment,
+          commentRefName: "",
+          timestamp: parseRelativeTime(comment.relativeTime),
+        });
+      } else {
+        // Handle nested replies
+        Object.keys(replyObject).forEach((key) => {
+          const nestedReply = replyObject[key].find(
+            (item) => item.idComment === comment.idCommentRef
+          );
+          if (nestedReply) {
+            replyObject[key].push({
+              ...comment,
+              // nameRep:
+              //   nestedReply.idUser !== comment.idUser
+              //     ? nestedReply.fullName
+              //     : "",
+              timestamp: parseRelativeTime(comment.relativeTime),
+            });
+          }
+        });
+      }
+    }
+  });
+
+  // Step 2: Sort mainList and replies
+  mainList.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+
+  Object.keys(replyObject).forEach((key) => {
+    replyObject[key].sort(
+      (a, b) => new Date(a.createdDate) - new Date(b.createdDate)
+    );
+  });
+
+  return { main: mainList, reply: replyObject };
 };

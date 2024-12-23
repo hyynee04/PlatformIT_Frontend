@@ -104,7 +104,7 @@ const postUpdateCourse = async (courseInfo) => {
     const formData = new FormData();
     formData.append("IdCourse", courseInfo.idCourse);
     formData.append("Title", courseInfo.title);
-    formData.append("Introduction", courseInfo.introduction);
+    formData.append("Introduction", courseInfo.introduction || "");
     formData.append("CourseAvatar", courseInfo.coverImg);
     formData.append("IsLimitedTime", courseInfo.isLimitedTime);
     if (courseInfo.isLimitedTime === 1) {
@@ -118,10 +118,8 @@ const postUpdateCourse = async (courseInfo) => {
       formData.append("MaxAttendees", courseInfo.maxAttendees);
     }
     formData.append("IsPremiumCourse", courseInfo.isPremiumCourse);
-    if (courseInfo.isPremiumCourse === 1) {
-      formData.append("Price", courseInfo.price);
-      formData.append("DiscountedPrice", courseInfo.discountedPrice);
-    }
+    formData.append("Price", courseInfo.price || "");
+    formData.append("DiscountedPrice", courseInfo.discountedPrice || "");
     formData.append(
       "IsSequenced",
       courseInfo.isSequenced === 1 || courseInfo.isSequenced ? 1 : 0
@@ -155,6 +153,14 @@ const getIsEnRolledCourse = async (idCourse) => {
     params: {
       idStudent: idUser,
       idCourse: idCourse,
+    },
+  });
+};
+const getIsChatAvailable = async (idStudent, idTeacher) => {
+  return await axios.get("api/User/IsChatAvailable", {
+    params: {
+      idStudent: idStudent,
+      idTeacher: idTeacher,
     },
   });
 };
@@ -201,6 +207,33 @@ const postAddSection = (sectionName, idCourse, idCreatedBy) => {
   });
 };
 
+const inactiveSection = (idSection, idCreatedBy) => {
+  return axios.post(`api/Lecture/InactiveSection`, null, {
+    params: {
+      idSection: idSection,
+      idCreatedBy: idCreatedBy,
+    },
+  });
+};
+const inactiveLecture = (idLecture, idCreatedBy) => {
+  return axios.post(`api/Lecture/InactiveLecture`, null, {
+    params: {
+      idLecture: idLecture,
+      idCreatedBy: idCreatedBy,
+    },
+  });
+};
+
+const updateSection = (idSection, newSectionName, idUpdatedBy) => {
+  return axios.post(`api/Course/UpdateSection`, null, {
+    params: {
+      idSection: idSection,
+      newSectionName: newSectionName,
+      idUpdatedBy: idUpdatedBy,
+    },
+  });
+};
+
 const postAddLecture = async (idList, lectureData) => {
   try {
     const formData = new FormData();
@@ -222,7 +255,7 @@ const postAddLecture = async (idList, lectureData) => {
 
     // Make the request with the required headers
     return await axios.post(
-      `http://localhost:5000/api/Lecture/AddLecture?idCreatedBy=${idList.idCreatedBy}`,
+      `api/Lecture/AddLecture?idCreatedBy=${idList.idCreatedBy}`,
       formData,
       {
         headers: {
@@ -300,6 +333,22 @@ const getCourseProgressByIdStudent = (idCourse, idStudent) => {
   });
 };
 
+const getSectionDetail = (idCourse) => {
+  return axios.get("api/Course/GetSectionDetail", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
+const deleteCourse = (idCourse) => {
+  return axios.delete("api/Course/DeleteCourse", {
+    params: {
+      idCourse: idCourse,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
+
 export {
   getAllActiveCourseOfTeacher,
   getAllActiveLecturesOfCoure,
@@ -315,6 +364,7 @@ export {
   getCourseProgress,
   getExerciseOfLecture,
   getIsEnRolledCourse,
+  getIsChatAvailable,
   getLectureDetail,
   getNotificationBoardOfCourse,
   postAddBoardNotificationForCourse,
@@ -324,4 +374,9 @@ export {
   postAddSection,
   postEnrollCourse,
   getCourseProgressByIdStudent,
+  getSectionDetail,
+  inactiveSection,
+  updateSection,
+  inactiveLecture,
+  deleteCourse,
 };

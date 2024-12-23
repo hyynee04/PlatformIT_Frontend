@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/OptionCard.css";
@@ -13,6 +13,8 @@ const UserOption = ({
   onUserInactivated,
   roleUserSelected,
   isReactivatable,
+  optionBtnRef,
+  onClose,
 }) => {
   const idRole = +localStorage.getItem("idRole");
   const navigate = useNavigate();
@@ -42,22 +44,23 @@ const UserOption = ({
     setIsOptionVisible(false);
     openTransmitModal();
   };
-  // const optionRef = useRef(null);
-  // useEffect(() => {
-  //   console.log("useEffect triggered"); // Kiểm tra xem useEffect có được gọi không
-  //   const handleClickOutside = (event) => {
-  //     console.log("mousedown event triggered"); // Kiểm tra xem sự kiện mousedown có được kích hoạt không
-  //     if (optionRef.current && !optionRef.current.contains(event.target)) {
-  //       onClose(); // Gọi hàm onClose khi click bên ngoài component
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [onClose]);
+  const optionRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        optionRef.current &&
+        !optionRef.current.contains(event.target) &&
+        optionBtnRef &&
+        !optionBtnRef().contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   return (
     <>
       {isModalInactiveOpen && (
@@ -89,7 +92,7 @@ const UserOption = ({
         !isModalReactiveOpen &&
         !isModalTransmitOpen &&
         isOptionVisible && (
-          <div className="container-options userOption">
+          <div ref={optionRef} className="container-options userOption">
             {statusUserSelected === UserStatus.active && (
               <button className="op-buts" onClick={handleInactiveClick}>
                 <span>Inactive user</span>

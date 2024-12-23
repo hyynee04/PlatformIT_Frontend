@@ -30,7 +30,7 @@ const DiagInactiveForm = ({
           }
         }
 
-        onUserInactivated(); //To not show option
+        onUserInactivated();
       } else {
         console.error("Failed to set user inactive.");
       }
@@ -70,7 +70,6 @@ const DiagInactiveForm = ({
                 className="btn diag-btn signout"
                 onClick={() => {
                   handleInactiverUser();
-                  // onClose();
                 }}
               >
                 Yes

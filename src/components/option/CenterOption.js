@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/OptionCard.css";
 import { CenterStatus } from "../../constants/constants";
@@ -9,6 +9,8 @@ const CenterOption = ({
   statusCenterSelected,
   onCenterOption,
   isReactivatable,
+  optionBtnRef,
+  onClose,
 }) => {
   const navigate = useNavigate();
   const [isOptionVisible, setIsOptionVisible] = useState(true);
@@ -28,6 +30,23 @@ const CenterOption = ({
     setIsOptionVisible(false);
     openUnlockCenterModal();
   };
+  const optionRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        optionRef.current &&
+        !optionRef.current.contains(event.target) &&
+        optionBtnRef &&
+        !optionBtnRef().contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   return (
     <>
       {isModalLockCenter && (
@@ -49,7 +68,7 @@ const CenterOption = ({
         />
       )}
       {!isModalLockCenter && isOptionVisible && (
-        <div className="container-options userOption">
+        <div ref={optionRef} className="container-options userOption">
           {statusCenterSelected === CenterStatus.active && (
             <button className="op-buts" onClick={handleLockCenter}>
               <span>Lock center</span>
@@ -63,14 +82,14 @@ const CenterOption = ({
           <button
             className="op-buts"
             onClick={() => {
-              navigate('/centerDetail', {
+              navigate("/centerDetail", {
                 state: {
                   idCenter: idCenterSelected,
                   idUser: localStorage.getItem("idUser"),
-                  idRole: localStorage.getItem("idRole")
-                }
+                  idRole: localStorage.getItem("idRole"),
+                },
               });
-              setIsOptionVisible(false)
+              setIsOptionVisible(false);
             }}
           >
             <span>View detail</span>

@@ -43,7 +43,11 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(null);
-  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(idUser);
+  const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(
+    idUser,
+    null,
+    "notification"
+  );
 
   const openSignoutModal = () => setIsModalSignoutOpen(true);
   const closeSignoutModal = () => setIsModalSignoutOpen(false);
@@ -124,6 +128,7 @@ const Header = () => {
       );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+
   useEffect(() => {
     dispatch(countTaskOfCenterAd("qualification"));
   }, [dispatch]);
@@ -143,7 +148,7 @@ const Header = () => {
     ],
     [Role.centerAdmin]: [
       { title: "Dashboard", path: "/centerAdDashboard" },
-      { title: "Course Management", path: "/centerAdCourse" }, //centerAdCourse
+      { title: "Course Management", path: "/centerAdCourse" },
       { title: "User Management", path: "/centerAdUser" },
       { title: "Center Management", path: "/centerAdCenter" },
     ],
@@ -179,6 +184,7 @@ const Header = () => {
   const buttonPaths = {
     clipboard: "/centerAdPendingTask",
     bell: "/allNotifications",
+    message: "/chat",
   };
   const toggleVisibility = () => {
     setShowOptionAva(!showOptionAva);
@@ -317,6 +323,8 @@ const Header = () => {
           <DiagSignOutForm
             isOpen={isModalSignoutOpen}
             onClose={closeSignoutModal}
+            resetUnreadCount={() => setUnreadCount(null)}
+            resetNotifications={() => setNotifications([])}
           />
         </div>
       )}

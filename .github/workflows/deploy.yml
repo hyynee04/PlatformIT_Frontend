@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-docker-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-docker-
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
 
-    - name: Build and push Docker image
-      env:
-        DOCKER_CLI_EXPERIMENTAL: enabled
-      run: |
-        docker build -t ghcr.io/${{ github.repository }}/react-app:latest .
-        docker push ghcr.io/${{ github.repository }}/react-app:latest
+      - name: Build and push Docker image
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          docker build -t ghcr.io/hyynee04/platformit_frontend/react-app:latest .
+          docker push ghcr.io/hyynee04/platformit_frontend/react-app:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,8 +44,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
           script: |
-            docker pull ghcr.io/${{ github.repository }}/react-app:latest
+            docker pull ghcr.io/hyynee04/platformit_frontend/react-app:latest
             docker stop react-app || true
             docker rm react-app || true
-            docker run -d -p 80:80 --name react-app ghcr.io/${{ github.repository }}/react-app:latest
-
+            docker run -d -p 80:80 --name react-app ghcr.io/hyynee04/platformit_frontend/react-app:latest

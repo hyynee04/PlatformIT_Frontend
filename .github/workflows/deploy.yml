@@ -24,6 +24,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-docker-
 
+      - name: Log in to GHCR
+        run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Build and push Docker image
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled

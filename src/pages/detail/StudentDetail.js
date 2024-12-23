@@ -23,6 +23,7 @@ const StudentDetail = (props) => {
   const [studentInfo, setStudentInfo] = useState({});
 
   const idRole = +localStorage.getItem("idRole");
+  const [idStudent, setIdStudent] = useState(null);
   const [courseTitle, setCourseTitle] = useState("");
 
   const fetchStudentDetail = async (idStudent, idCourse) => {
@@ -68,6 +69,7 @@ const StudentDetail = (props) => {
     if (state && state.idCourse && state.idStudent && state.courseTitle) {
       setCourseTitle(state.courseTitle);
       fetchStudentDetail(state.idStudent, state.idCourse);
+      setIdStudent(state.idStudent);
     } else if (state && state.idStudent) {
       fetchStudentPI(state.idStudent);
     }
@@ -132,7 +134,20 @@ const StudentDetail = (props) => {
         </div>
 
         {idRole === Role.teacher ? (
-          <button className="contact-block">
+          <button
+            className="contact-block"
+            onClick={() =>
+              navigate("/chat", {
+                state: {
+                  selectedSender: {
+                    userId: idStudent,
+                    name: studentInfo.fullName,
+                    avatar: studentInfo.avatarPath || studentInfo.avatar,
+                  },
+                },
+              })
+            }
+          >
             Contact <RiChat3Line />
           </button>
         ) : null}

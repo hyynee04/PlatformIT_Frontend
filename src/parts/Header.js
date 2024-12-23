@@ -184,6 +184,7 @@ const Header = () => {
   const buttonPaths = {
     clipboard: "/centerAdPendingTask",
     bell: "/allNotifications",
+    message: "/chat",
   };
   const toggleVisibility = () => {
     setShowOptionAva(!showOptionAva);

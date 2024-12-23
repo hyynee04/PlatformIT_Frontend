@@ -156,8 +156,8 @@ const getIsEnRolledCourse = async (idCourse) => {
     },
   });
 };
-const getIsChatAvailable = async (idTeacher, idStudent) => {
-  return await axios.get("api/User/IsChatAvailble", {
+const getIsChatAvailable = async (idStudent, idTeacher) => {
+  return await axios.get("api/User/IsChatAvailable", {
     params: {
       idStudent: idStudent,
       idTeacher: idTeacher,
@@ -255,7 +255,7 @@ const postAddLecture = async (idList, lectureData) => {
 
     // Make the request with the required headers
     return await axios.post(
-      `http://localhost:5000/api/Lecture/AddLecture?idCreatedBy=${idList.idCreatedBy}`,
+      `api/Lecture/AddLecture?idCreatedBy=${idList.idCreatedBy}`,
       formData,
       {
         headers: {

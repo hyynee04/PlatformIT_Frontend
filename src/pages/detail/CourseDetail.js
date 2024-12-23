@@ -4,7 +4,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/Detail.css";
 
-import { FaGraduationCap, FaRegFile } from "react-icons/fa6";
+import { FaCircleCheck, FaGraduationCap, FaRegFile } from "react-icons/fa6";
 import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import {
@@ -25,7 +25,7 @@ import default_image from "../../assets/img/default_image.png";
 
 import { FiCheckSquare } from "react-icons/fi";
 import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
-import { APIStatus, Role } from "../../constants/constants";
+import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import {
   calculateRelativeTime,
   formatDate,
@@ -35,6 +35,7 @@ import {
   parseRelativeTime,
 } from "../../functions/function";
 import {
+  getCourseContentStructure,
   getCourseDetail,
   getCourseProgressByIdStudent,
   getIsChatAvailable,
@@ -44,8 +45,6 @@ import {
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
-import { IoReloadOutline } from "react-icons/io5";
-import { ConsoleLogger } from "@microsoft/signalr/dist/esm/Utils";
 import { getTestOfCourseStudent } from "../../services/assignmentService";
 import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 
@@ -77,30 +76,34 @@ const CourseDetail = (props) => {
     try {
       let response = await getCourseDetail(idCourse);
       setCourseInfo(response.data);
+      if (response.status === APIStatus.success) {
+        if (idRole === Role.student || idRole === Role.teacher) {
+          // Get Notification Board
+          await fetchNotificationBoard(idCourse);
+        }
 
-      if (idRole === Role.student || idRole === Role.teacher) {
-        // Get Notification Board
-        let notifications = await getNotificationBoardOfCourse(idCourse);
-        if (notifications.status === APIStatus) {
-          const processedData = notifications.data.map((notification) => ({
-            ...notification,
-            timestamp: parseRelativeTime(notification.relativeTime),
-          }));
-          setNotificationBoard(processedData);
+        if (idRole === Role.student) {
+          await fetchCourseContentStructure(idCourse, idUser);
+
+          const responseIsChatAvailable = await getIsChatAvailable(
+            Number(localStorage.getItem("idUser")),
+            response.data.idTeacher
+          );
+          if (responseIsChatAvailable.status === APIStatus.success) {
+            setIsChatAvailable(responseIsChatAvailable.data === true);
+          } else {
+            setIsChatAvailable(false);
+          }
+        } else await fetchCourseContentStructure(idCourse);
+
+        const responseIsEnroll = await getIsEnRolledCourse(idCourse);
+        if (responseIsEnroll.data === true) {
+          await setIsEnrolledCourse(true);
+          fetchTestOfCourseStudent(courseInfo.idCourse, idUser);
         } else {
-          console.warn("Error fetching data: ", notifications.data);
+          setIsEnrolledCourse(false);
         }
       }
-
-      const responseIsEnroll = await getIsEnRolledCourse(idCourse);
-      if (responseIsEnroll.data === true) {
-        setIsEnrolledCourse(true);
-      } else {
-        setIsEnrolledCourse(false);
-      }
-      if (idRole === Role.student) {
-      }
-      const responseIsChatAvailable = await getIsChatAvailable();
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -113,8 +116,6 @@ const CourseDetail = (props) => {
     try {
       let progress = await getCourseProgressByIdStudent(idCourse, idStudent);
       if (progress.status === APIStatus.success) {
-        console.log("Response data: ", progress.data);
-
         setStudentProgress(progress.data);
       } else {
         console.warn(progress.data);
@@ -132,15 +133,54 @@ const CourseDetail = (props) => {
       setCourseInfo((prev) => ({
         ...prev,
         tests: [
-          ...response.data.map((test) => {
-            return {
-              ...test,
-              isPublish: true,
-            };
-          }),
+          ...response.data
+            .sort((a, b) => b.idAssignment - a.idAssignment)
+            .map((test) => {
+              return {
+                ...test,
+                isPublish: true,
+              };
+            }),
         ],
       }));
     } else console.warn(response.data);
+  };
+
+  const fetchCourseContentStructure = async (idCourse, idUser) => {
+    try {
+      const response = await getCourseContentStructure(idCourse, idUser);
+
+      if (response.status === APIStatus.success) {
+        if (response.data) {
+          setCourseInfo((prev) => ({
+            ...prev,
+            sectionsWithCourses: response.data.sectionStructures,
+          })); // Only update if data exists
+        } else {
+          console.warn("Received empty data for course content structure.");
+        }
+      } else {
+        console.error(
+          "Failed to fetch course content structure:",
+          response.data
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching course content structure:", error);
+    }
+  };
+
+  const fetchNotificationBoard = async (idCourse) => {
+    let notifications = await getNotificationBoardOfCourse(idCourse);
+    if (notifications.status === APIStatus) {
+      const processedData = notifications.data.map((notification) => ({
+        ...notification,
+        timestamp: parseRelativeTime(notification.relativeTime),
+      }));
+      setNotificationBoard(processedData);
+    } else {
+      console.warn("Error fetching data: ", notifications.data);
+    }
   };
 
   useEffect(() => {
@@ -153,7 +193,7 @@ const CourseDetail = (props) => {
   // Number of lectures
   const numberOfLectures = courseInfo.sectionsWithCourses
     ? courseInfo.sectionsWithCourses.reduce((total, section) => {
-        return total + (section.lectures ? section.lectures.length : 0);
+        return total + section.lectureCount;
       }, 0)
     : 0;
 
@@ -244,21 +284,8 @@ const CourseDetail = (props) => {
     }
   };
 
-  const fetchSectionDetail = async () => {
-    try {
-      let newSections = await getSectionDetail(courseInfo.idCourse);
-      if (newSections.status === APIStatus.success) {
-        setCourseInfo({
-          ...courseInfo,
-          sectionsWithCourses: newSections.data,
-        });
-      } else {
-        console.log(newSections.data);
-      }
-    } catch (error) {
-      console.error("Error fetching data: ", error);
-    }
-  };
+  console.log(courseInfo);
+  console.log("isEnrrolled: ", isEnrolledCourse);
 
   if (loading) {
     return (
@@ -340,42 +367,59 @@ const CourseDetail = (props) => {
                 }`}
               </span>
               <span>{courseInfo.introduction}</span>
-              {idRole === Role.centerAdmin && (
+              {(idRole === Role.platformAdmin ||
+                idRole === Role.centerAdmin ||
+                idRole === Role.teacher) && (
                 <>
                   <hr style={{ margin: "0.5rem 0" }}></hr>
                   <span>
-                    <input type="checkbox" checked={true} readOnly /> Lecture
-                    approval required
+                    <input
+                      type="checkbox"
+                      checked={courseInfo.isApprovedLecture}
+                      readOnly
+                    />{" "}
+                    Lecture approval required
                   </span>
                   <span>
-                    <input type="checkbox" checked={true} readOnly /> Lecture
-                    sequence required
+                    <input
+                      type="checkbox"
+                      checked={courseInfo.maxAttendees !== null}
+                      readOnly
+                    />{" "}
+                    Max attendees{" "}
+                    {`${
+                      courseInfo.maxAttendees
+                        ? `: ${courseInfo.maxAttendees}`
+                        : ""
+                    }`}
                   </span>
-                  <div className="setting-course">
-                    <div className="buttons-container">
-                      <button
-                        className="edit"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate("/updateCourse", {
-                            state: {
-                              idCourse: courseInfo.idCourse,
-                              hasStudent:
-                                courseInfo.studentCount > 0 ? true : false,
-                            },
-                          });
-                        }}
-                      >
-                        <LuPenLine />
-                      </button>
-                      <button
-                        className="remove"
-                        onClick={() => openRemoveModal()}
-                      >
-                        <LuTrash2 />
-                      </button>
+                  {idRole === Role.centerAdmin && (
+                    <div className="setting-course">
+                      <div className="buttons-container">
+                        <button
+                          className="edit"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate("/updateCourse", {
+                              state: {
+                                idCourse: courseInfo.idCourse,
+                                hasStudent:
+                                  courseInfo.studentCount > 0 ? true : false,
+                              },
+                            });
+                          }}
+                        >
+                          <LuPenLine />
+                        </button>
+                        <button
+                          className="remove"
+                          onClick={() => openRemoveModal()}
+                        >
+                          <LuTrash2 />
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </div>
@@ -386,8 +430,11 @@ const CourseDetail = (props) => {
               ) : new Date() >= new Date(courseInfo.registStartDate) &&
                 new Date() <= new Date(courseInfo.registEndDate) ? (
                 <button onClick={handleBuyCourse}>Buy Now</button>
+              ) : courseInfo.maxAttendees !== null &&
+                courseInfo.studentCount >= courseInfo.maxAttendees ? (
+                <button disabled>Fully bought</button>
               ) : (
-                <button disabled>Can't buy now</button>
+                <button disabled>Registration closed</button>
               ))}
           </div>
         </div>
@@ -464,12 +511,22 @@ const CourseDetail = (props) => {
               </div>
             </div>
           </div>
-          {idUser &&
-          idRole === Role.student &&
-          isEnrolledCourse &&
-          courseInfo.sta ? (
+          {idUser && idRole === Role.student && isChatAvailable ? (
             <>
-              <button className="chat-button">
+              <button
+                className="chat-button"
+                onClick={() =>
+                  navigate("/chat", {
+                    state: {
+                      selectedSender: {
+                        userId: courseInfo.idTeacher,
+                        name: courseInfo.teacherName,
+                        avatar: courseInfo.teacherAvatarPath,
+                      },
+                    },
+                  })
+                }
+              >
                 Chat <RiChat3Line />
               </button>
             </>
@@ -540,9 +597,9 @@ const CourseDetail = (props) => {
       </div>
 
       <div className="right-container slide-to-left">
-        {idUser &&
-        idRole === Role.teacher &&
-        courseInfo.idTeacher === idUser ? (
+        {(idRole === Role.teacher && courseInfo.idTeacher === idUser) ||
+        idRole === Role.centerAdmin ||
+        idRole === Role.platformAdmin ? (
           <CourseDetailTeacher
             courseInfo={courseInfo}
             setCourseInfo={setCourseInfo}
@@ -552,7 +609,9 @@ const CourseDetail = (props) => {
             fetchCourseDetail={fetchCourseDetail}
             setIsRemoved={setIsRemoved}
             setIdSection={setIdSection}
-            fetchSectionDetail={fetchSectionDetail}
+            fetchSectionDetail={() =>
+              fetchCourseContentStructure(courseInfo.idCourse)
+            }
           />
         ) : null}
 
@@ -628,7 +687,10 @@ const CourseDetail = (props) => {
           </>
         ) : null}
 
-        {idRole !== Role.teacher || idUser !== courseInfo.idTeacher ? (
+        {(idRole !== Role.teacher &&
+          idRole !== Role.centerAdmin &&
+          idRole !== Role.platformAdmin) ||
+        (idRole === Role.teacher && idUser !== courseInfo.idTeacher) ? (
           <>
             <div
               className={`block-container ${
@@ -647,7 +709,7 @@ const CourseDetail = (props) => {
                     : "0 section"}{" "}
                   -{" "}
                   {`${numberOfLectures} ${
-                    numberOfLectures >= 1 ? "lectures" : "lecture"
+                    numberOfLectures > 1 ? "lectures" : "lecture"
                   }`}
                 </span>
               </div>
@@ -660,25 +722,29 @@ const CourseDetail = (props) => {
                           className={`lecture-header ${
                             showedSections[index] ? "" : "change-header"
                           } `}
-                          onClick={() => handleIsShowed(index)}
+                          onClick={() => {
+                            if (section.lectureCount > 0) handleIsShowed(index);
+                          }}
                         >
                           <span className="section-name">
                             {section.sectionName}
                           </span>
                           <div className="section-info">
                             <span className="section-name">
-                              {section.lectures
-                                ? `${section.lectures.length} ${
-                                    section.lectures.length > 1
-                                      ? "lectures"
-                                      : "lecture"
-                                  }`
-                                : "0 lecture"}
+                              {`${section.lectureCount} ${
+                                section.lectureCount > 1
+                                  ? "lectures"
+                                  : "lecture"
+                              }`}
                             </span>
                             <button
                               className="showhide-button"
-                              onClick={() => handleIsShowed(index)}
-                              disabled={section.lectures.length === 0}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (section.lectureCount > 0)
+                                  handleIsShowed(index);
+                              }}
+                              disabled={section.lectureCount === 0}
                             >
                               {showedSections[index] ? (
                                 <IoIosArrowUp />
@@ -688,7 +754,7 @@ const CourseDetail = (props) => {
                             </button>
                           </div>
                         </div>
-                        {section.lectures && (
+                        {section.lectureStructures && (
                           <div
                             className={`lecture-block ${
                               showedSections[index]
@@ -696,46 +762,56 @@ const CourseDetail = (props) => {
                                 : "adjust-lecture-block"
                             }`}
                           >
-                            {section.lectures.map((lecture, index) => (
-                              <div
-                                key={index}
-                                className={`lecture-content ${
-                                  isEnrolledCourse ||
-                                  idRole === Role.platformAdmin
-                                    ? ""
-                                    : "nohover"
-                                } `}
-                                onClick={() => {
-                                  if (
-                                    isEnrolledCourse ||
-                                    idRole === Role.platformAdmin
-                                  )
-                                    navigate("/viewLecture", {
-                                      state: {
-                                        idCourse: courseInfo.idCourse,
-                                        idSection: section.idSection,
-                                        idLecture: lecture.idLecture,
-                                        idTeacher: courseInfo.idTeacher,
-                                      },
-                                    });
-                                }}
-                              >
-                                <div className="lecture-name">
-                                  <span className="lecture-title">
-                                    {lecture.lectureTitle}
-                                  </span>
-                                  <span className="lecture-exercise-num">
-                                    {`${lecture.exerciseCount} ${
-                                      lecture.exerciseCount > 1
-                                        ? "exercises"
-                                        : "exercise"
-                                    }`}
-                                  </span>
-                                </div>
-                                <span className="lecture-description">
-                                  {lecture.lectureIntroduction}
-                                </span>
-                              </div>
+                            {section.lectureStructures.map((lecture, index) => (
+                              <>
+                                {lecture.lectureStatus ===
+                                  LectureStatus.active && (
+                                  <div
+                                    key={index}
+                                    className={`lecture-content ${
+                                      isEnrolledCourse ||
+                                      idRole === Role.platformAdmin
+                                        ? ""
+                                        : "nohover"
+                                    } `}
+                                    onClick={() => {
+                                      if (
+                                        isEnrolledCourse ||
+                                        idRole === Role.platformAdmin
+                                      )
+                                        navigate("/viewLecture", {
+                                          state: {
+                                            idCourse: courseInfo.idCourse,
+                                            idSection: section.idSection,
+                                            idLecture: lecture.idLecture,
+                                            idTeacher: courseInfo.idTeacher,
+                                          },
+                                        });
+                                    }}
+                                  >
+                                    {idRole === Role.student &&
+                                      lecture.isFinishedLecture && (
+                                        <FaCircleCheck />
+                                      )}
+
+                                    <div className="lecture-name">
+                                      <span className="lecture-title">
+                                        {lecture.lectureTitle}
+                                      </span>
+                                      <span className="lecture-exercise-num">
+                                        {`${lecture.exerciseCount} ${
+                                          lecture.exerciseCount > 1
+                                            ? "exercises"
+                                            : "exercise"
+                                        }`}
+                                      </span>
+                                    </div>
+                                    <span className="lecture-description">
+                                      {lecture.lectureIntroduction}
+                                    </span>
+                                  </div>
+                                )}
+                              </>
                             ))}
                           </div>
                         )}
@@ -766,15 +842,22 @@ const CourseDetail = (props) => {
                     {courseInfo.tests.map((test, index) => (
                       <>
                         {test.isPublish ? (
-                          <div key={index} className="qualification test">
+                          <div
+                            key={index}
+                            className="qualification test"
+                            onClick={() => {
+                              if (isEnrolledCourse && idRole === Role.student)
+                                navigate("/studentAssignDetail", {
+                                  state: { idAssignment: test.idAssignment },
+                                });
+                            }}
+                          >
                             <div className="qualification-body">
                               <div className="test-header">
                                 <span className="test-name">
                                   {test.assignmentTitle}
                                 </span>
-                                {idUser &&
-                                isEnrolledCourse &&
-                                idRole === Role.student ? (
+                                {isEnrolledCourse && idRole === Role.student ? (
                                   <>
                                     {test.isSubmitted ? (
                                       <div className="test-info submitted">
@@ -846,7 +929,7 @@ const CourseDetail = (props) => {
             name: "section",
             message: "Are you sure to delete this section?",
           }}
-          fetchData={fetchSectionDetail}
+          fetchData={() => fetchCourseContentStructure(courseInfo.idCourse)}
         />
       </div>
       <div>

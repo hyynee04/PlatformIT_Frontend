@@ -17,7 +17,7 @@ const DiagUnlockCenterForm = ({
     setLoading(true);
     try {
       await postUnlockCenter(idCenterSelected);
-      dispatch(fetchCenters(CenterStatus.active));
+      dispatch(fetchCenters(CenterStatus.inactive));
       onCenterOption();
     } catch (error) {
       throw error;
@@ -65,7 +65,7 @@ const DiagUnlockCenterForm = ({
                 }}
               >
                 {loading && (
-                  <ImSpinner2 className="icon-spin" color="#393979" />
+                  <ImSpinner2 className="icon-spin" color="#d9d9d9" />
                 )}
                 Yes
               </button>

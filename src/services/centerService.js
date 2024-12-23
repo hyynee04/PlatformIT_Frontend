@@ -6,6 +6,9 @@ const getAllCenter = () => {
 const getPendingCenter = () => {
   return axios.get("api/Center/GetPendingCenter");
 };
+const getInactiveLockedCenter = () => {
+  return axios.get("api/Center/GetInactiveLockedCenter");
+};
 const getAllTeacherByIdCenter = (idCenter) => {
   return axios.get("api/Center/GetAllTeacherByIdCenter", {
     params: {
@@ -274,6 +277,7 @@ const getCenterDetail = (idCenter) => {
 export {
   getAllCenter,
   getPendingCenter,
+  getInactiveLockedCenter,
   getAllTeacherByIdCenter,
   getAllActiveTeacherCardsOfCenter,
   getAllStudentByIdCenter,

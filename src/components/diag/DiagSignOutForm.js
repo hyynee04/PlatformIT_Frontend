@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "../../assets/css/card/DiagForm.css";
 import { resetCenterPI } from "../../store/profileCenterSlice";
 import { resetUserPI } from "../../store/profileUserSlice";
+import { setActiveTypeOfTask } from "../../store/listTaskOfCenterAd";
 
 const DiagSignOutForm = ({
   isOpen,
@@ -18,6 +19,7 @@ const DiagSignOutForm = ({
     localStorage.clear();
     dispatch(resetUserPI());
     dispatch(resetCenterPI());
+    dispatch(setActiveTypeOfTask("lectures"));
     resetUnreadCount();
     resetNotifications();
     navigate("/");

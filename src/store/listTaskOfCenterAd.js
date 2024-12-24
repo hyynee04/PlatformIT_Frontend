@@ -4,12 +4,19 @@ import {
   postApproveQualification,
   postRejectQualification,
 } from "../services/userService";
+import {
+  getAllPendingLectureOfCenter,
+  postApproveLecture,
+  postRejectLecture,
+} from "../services/courseService";
 
 export const fetchTaskOfCenterAd = createAsyncThunk(
   "taskOfCenterAd/fetchTaskOfCenterAd",
   async (typeTask, thunkAPI) => {
     let response;
-    if (typeTask === "qualifications") {
+    if (typeTask === "lectures") {
+      response = await getAllPendingLectureOfCenter();
+    } else if (typeTask === "qualifications") {
       response = await getPendingQualifications();
     }
     return response.data || [];
@@ -40,6 +47,20 @@ export const rejectQualification = createAsyncThunk(
       idQualification,
       reason
     );
+    return response.data;
+  }
+);
+export const approveLecture = createAsyncThunk(
+  "taskOfCenterAd/approveLecture",
+  async ({ idLecture }) => {
+    const response = await postApproveLecture(idLecture);
+    return response.data;
+  }
+);
+export const rejectLecture = createAsyncThunk(
+  "taskOfCenterAd/rejectLecture",
+  async ({ idLecture, reason }) => {
+    const response = await postRejectLecture(idLecture, reason);
     return response.data;
   }
 );

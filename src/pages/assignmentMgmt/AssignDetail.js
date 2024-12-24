@@ -119,7 +119,7 @@ const AssignDetail = () => {
 
   const fetchOverviewData = async () => {
     if (idRole === Role.teacher && assignmentInfo?.idCourse) {
-      setLoading(true);
+      // setLoading(true);
       try {
         const responseOverview = await getOverviewAssignment(
           assignmentInfo.idAssignment,
@@ -130,9 +130,10 @@ const AssignDetail = () => {
         }
       } catch (error) {
         console.error("Error fetching overview assignment data", error);
-      } finally {
-        setLoading(false);
       }
+      // finally {
+      //   setLoading(false);
+      // }
     }
   };
   useEffect(() => {

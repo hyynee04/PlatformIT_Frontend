@@ -104,6 +104,7 @@ const postUpdateCourse = async (courseInfo) => {
     const formData = new FormData();
     formData.append("IdCourse", courseInfo.idCourse);
     formData.append("Title", courseInfo.title);
+    formData.append("IsDeletedFile", courseInfo.isDeletedFile);
     formData.append("Introduction", courseInfo.introduction || "");
     formData.append("CourseAvatar", courseInfo.coverImg);
     formData.append("IsLimitedTime", courseInfo.isLimitedTime);
@@ -348,6 +349,30 @@ const deleteCourse = (idCourse) => {
     },
   });
 };
+const getAllPendingLectureOfCenter = () => {
+  return axios.get("api/Lecture/GetAllPendingLectureOfCenter", {
+    params: {
+      idCenter: Number(localStorage.getItem("idCenter")),
+    },
+  });
+};
+const postApproveLecture = (idLecture) => {
+  return axios.post("api/Lecture/ApproveLecture", null, {
+    params: {
+      idLecture: idLecture,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
+const postRejectLecture = (idLecture, reason) => {
+  return axios.post("api/Lecture/RejectLecture", null, {
+    params: {
+      idLecture: idLecture,
+      reason: reason,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
@@ -379,4 +404,7 @@ export {
   updateSection,
   inactiveLecture,
   deleteCourse,
+  getAllPendingLectureOfCenter,
+  postApproveLecture,
+  postRejectLecture,
 };

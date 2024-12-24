@@ -65,3 +65,12 @@ export const NotificationType = {
   assignedTeacher: 2,
   notificationBoard: 3,
 };
+export const ExecutedCodeStatus = {
+  IN_QUEUE: 1,
+  PROCESSING: 2,
+  ACCEPTED: 3,
+  WRONG_ANSWER: 4,
+  COMPILATION_ERROR: 6,
+  INTERNAL_ERROR: 13,
+  EXEC_FORMAT_ERROR: 14,
+};

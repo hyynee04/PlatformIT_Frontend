@@ -30,6 +30,7 @@ import {
   getAllActiveSectionOfCourse,
 } from "../../services/courseService";
 import RunCode from "../../components/assigment/RunCode";
+import DiagNotiWarning from "../../components/diag/DiagNotiWarning";
 
 const AddNewAssign = () => {
   const navigate = useNavigate();
@@ -49,8 +50,6 @@ const AddNewAssign = () => {
   const [isDropdownCourseVisible, setDropdownCourseVisible] = useState(false);
   const [isDropdownSectionVisible, setDropdownSectionVisible] = useState(false);
   const [isDropdownLectureVisible, setDropdownLectureVisible] = useState(false);
-  const [isDropdownLanguageVisible, setDropdownLanguageVisible] =
-    useState(false);
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
@@ -408,39 +407,213 @@ const AddNewAssign = () => {
       [fieldName]: updatedField,
     }));
   };
+  const handleTimeChange = (e) => {
+    const inputValue = e.target.value;
+
+    // Cho phép số và một dấu "."
+    if (/^\d*\.?\d*$/.test(inputValue)) {
+      setQuestions((prevQuestions) => ({
+        ...prevQuestions,
+        timeValue: inputValue,
+      }));
+    }
+  };
   //HANDLE ADD ASSIGNMENT
-  const isFormValid = () => {
-    if (title === "") return false;
-    if (!selectedCourse) return false;
-    if (!isLimitedTimeCourse && (!selectedLecture || !selectedLecture))
+  const [isFormValidState, setIsFormValidState] = useState(false);
+  const [invalidHeader, setInvalidHeader] = useState("");
+  const [invalidMsg, setInvalidMessage] = useState("");
+  const [isModalInvalidOpen, setIsModalInvalidOpen] = useState(false);
+
+  const openInvalidModal = () => setIsModalInvalidOpen(true);
+  const closeInvalidModal = () => setIsModalInvalidOpen(false);
+  const handleOpenInvalidDiag = (header, msgBody) => {
+    setInvalidHeader(header);
+    setInvalidMessage(msgBody);
+    openInvalidModal();
+  };
+  const isFormValid = (isShowDiag) => {
+    if (title === "") {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Assignment Title",
+          "The assignment title is required. Please provide a valid title."
+        );
       return false;
-    if (!typeAssignment) return false;
-    if (errorMessage !== "") return false;
+    }
+    if (!selectedCourse) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Course",
+          "Please select a course to assign the assignment."
+        );
+      return false;
+    }
+    if (!isLimitedTimeCourse && (!selectedLecture || !selectedLecture)) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Lecture",
+          "Please select a lecture for this assignment."
+        );
+      return false;
+    }
+    if (!isTest && (!selectedSection || !selectedLecture)) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Lecture or Section",
+          "To create an exercise, select both a lecture and section, or uncheck the option to make it a course test."
+        );
+      return false;
+    }
+    if (!typeAssignment) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Assignment Type",
+          "Please select the type of assignment."
+        );
+      return false;
+    }
+    if (errorMessage !== "") {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Invalid Form",
+          "There are errors in the form. Please review and fix them."
+        );
+      return false;
+    }
     if (+typeAssignment === AssignmentType.code) {
-      if (!questions || typeof questions !== "object") return false;
-      if (!questions.question || questions.question.trim() === "") return false;
-      if (!questions.mark || questions.mark <= 0) return false;
+      if (!questions?.problem || questions.problem.trim() === "") {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Question",
+            "Please provide a valid problem for the coding assignment."
+          );
+        return false;
+      }
+      if (!selectedLanguage || Object.keys(selectedLanguage).length === 0) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Missing Programming Language",
+            "Please select a programming language for the coding assignment."
+          );
+        return false;
+      }
+      const hasInvalidExample = questions.examples.some(
+        (examples) =>
+          !examples.input ||
+          examples.input.trim() === "" ||
+          !examples.output ||
+          examples.output.trim() === ""
+      );
+
+      if (hasInvalidExample) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Example",
+            "Each example must have valid input and output."
+          );
+        return false;
+      }
+      if (!questions.testCases || questions.testCases.length === 0) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Missing Test Cases",
+            "Please add at least one test case to validate the code execution."
+          );
+        return false;
+      }
+
+      const hasInvalidTestCase = questions.testCases.some(
+        (testCase) =>
+          !testCase.input ||
+          testCase.input.trim() === "" ||
+          !testCase.expectedOutput ||
+          testCase.expectedOutput.trim() === ""
+      );
+
+      if (hasInvalidTestCase) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Test Case",
+            "Each test case must have valid input and expected output."
+          );
+        return false;
+      }
     } else {
-      if (!Array.isArray(questions) || questions.length <= 0) return false;
+      if (!Array.isArray(questions) || questions.length <= 0) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Missing Questions",
+            "You must add at least one question to proceed."
+          );
+        return false;
+      }
       for (const question of questions) {
-        if (!question.question || question.question.trim() === "") return false;
-        if (!question.mark || question.mark <= 0) return false;
+        if (!question.question || question.question.trim() === "") {
+          isShowDiag &&
+            handleOpenInvalidDiag(
+              "Invalid Questions",
+              "Each question must have valid content."
+            );
+          return false;
+        }
+        if (!question.mark || question.mark <= 0) {
+          isShowDiag &&
+            handleOpenInvalidDiag(
+              "Invalid Questions",
+              "Each question must have a mark greater than 0."
+            );
+          return false;
+        }
         if (+typeAssignment === AssignmentType.quiz) {
-          if (question.items.length < 2) return false;
+          if (question.items.length < 2) {
+            isShowDiag &&
+              handleOpenInvalidDiag(
+                "Invalid Questions",
+                "Each quiz question must have at least two options."
+              );
+            return false;
+          }
           const hasCorrectAnswer = question.items.some(
             (item) => item.isCorrect
           );
-          if (!hasCorrectAnswer) return false;
+          if (!hasCorrectAnswer) {
+            isShowDiag &&
+              handleOpenInvalidDiag(
+                "Invalid Questions",
+                "Each quiz question must have at least one correct answer."
+              );
+            return false;
+          }
           for (const item of question.items) {
-            if (!item.content || item.content.trim() === "") return false;
+            if (!item.content || item.content.trim() === "") {
+              isShowDiag &&
+                handleOpenInvalidDiag(
+                  "Invalid Questions",
+                  "Quiz options must have valid content."
+                );
+              return false;
+            }
           }
         }
       }
     }
-    if (!isTest && (!selectedSection || !selectedLecture)) return false;
+
     return true;
   };
+  useEffect(() => {
+    setIsFormValidState(isFormValid(false));
+  }, [
+    title,
+    selectedCourse,
+    selectedLecture,
+    questions,
+    typeAssignment,
+    errorMessage,
+  ]);
   const handleAddAssignment = async (isPublish) => {
+    if (!isFormValid(true)) {
+      return;
+    }
     const dataToSubmit = {
       title: title,
       idCourse: selectedCourse.idCourse,
@@ -456,15 +629,6 @@ const AddNewAssign = () => {
       isShowAnswer: isShowAnswer,
       questions: questions,
     };
-    // isPublish
-    //   ? setLoadingBtn((prevState) => ({
-    //       ...prevState,
-    //       publish: true,
-    //     }))
-    //   : setLoadingBtn((prevState) => ({
-    //       ...prevState,
-    //       save: true,
-    //     }));
     setLoading(true);
     try {
       let response;
@@ -494,15 +658,6 @@ const AddNewAssign = () => {
       console.error("Failed to add assignment:", error);
     } finally {
       setLoading(false);
-      // isPublish
-      //   ? setLoadingBtn((prevState) => ({
-      //       ...prevState,
-      //       publish: false,
-      //     }))
-      //   : setLoadingBtn((prevState) => ({
-      //       ...prevState,
-      //       save: false,
-      //     }));
     }
   };
   if (loading) {
@@ -553,8 +708,9 @@ const AddNewAssign = () => {
         >
           <div className="container-button">
             <button
-              className="btn save"
-              disabled={!isFormValid()}
+              className={`btn save ${
+                !isFormValidState ? "button-disabled" : ""
+              }`}
               onClick={() => handleAddAssignment(false)}
             >
               {loadingBtn.save ? (
@@ -565,8 +721,9 @@ const AddNewAssign = () => {
               Save
             </button>
             <button
-              className="btn publish"
-              disabled={!isFormValid()}
+              className={`btn publish ${
+                !isFormValidState ? "button-disabled" : ""
+              }`}
               onClick={() => handleAddAssignment(true)}
             >
               {loadingBtn.publish ? (
@@ -784,7 +941,7 @@ const AddNewAssign = () => {
                                     output: "",
                                   },
                                 ],
-                                isPassTestCase: false,
+                                isPassTestCase: true,
                                 isPerformanceOnTime: false,
                                 timeValue: "",
                                 isPerformanceOnMemory: false,
@@ -1018,9 +1175,12 @@ const AddNewAssign = () => {
                     className="input-area-form-pi"
                     placeholder="Type problem here..."
                     value={questions.problem}
-                    // onChange={(e) =>
-                    //   handleQuestionChange("question", e.target.value)
-                    // }
+                    onChange={(e) =>
+                      setQuestions((prevQuestions) => ({
+                        ...prevQuestions,
+                        problem: e.target.value,
+                      }))
+                    }
                   />
                 </div>
                 <div className="info" style={{ width: "50%" }}>
@@ -1214,7 +1374,7 @@ const AddNewAssign = () => {
                   </div>
                   <div className="info" style={{ width: "50%" }}>
                     <span>Scoring rules</span>
-                    <div className="check-container">
+                    {/* <div className="check-container">
                       <input
                         type="checkbox"
                         name="isPassTestCase"
@@ -1229,7 +1389,7 @@ const AddNewAssign = () => {
                       <span style={{ color: "var(--black-color)" }}>
                         Pass test cases
                       </span>
-                    </div>
+                    </div> */}
                     <div className="check-container">
                       <input
                         type="checkbox"
@@ -1247,17 +1407,15 @@ const AddNewAssign = () => {
                       </span>
                     </div>
                     {questions.isPerformanceOnTime && (
-                      <input
-                        type="number"
-                        className="input-form-pi"
-                        value={questions.timeValue}
-                        onChange={(e) =>
-                          setQuestions((prevQuestions) => ({
-                            ...prevQuestions,
-                            timeValue: e.target.value,
-                          }))
-                        }
-                      />
+                      <div className="select-container">
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          value={questions.timeValue}
+                          onChange={handleTimeChange}
+                        />
+                        <label className="arrow-icon">s</label>
+                      </div>
                     )}
 
                     <div className="check-container">
@@ -1277,17 +1435,20 @@ const AddNewAssign = () => {
                       </span>
                     </div>
                     {questions.isPerformanceOnMemory && (
-                      <input
-                        type="number"
-                        className="input-form-pi"
-                        value={questions.memoryValue}
-                        onChange={(e) =>
-                          setQuestions((prevQuestions) => ({
-                            ...prevQuestions,
-                            memoryValue: e.target.value,
-                          }))
-                        }
-                      />
+                      <div className="select-container">
+                        <input
+                          type="number"
+                          className="input-form-pi"
+                          value={questions.memoryValue}
+                          onChange={(e) =>
+                            setQuestions((prevQuestions) => ({
+                              ...prevQuestions,
+                              memoryValue: e.target.value,
+                            }))
+                          }
+                        />
+                        <label className="arrow-icon">kb</label>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1295,11 +1456,22 @@ const AddNewAssign = () => {
               <RunCode
                 selectedLanguage={selectedLanguage}
                 testCases={questions.testCases}
+                isPassTestCase={questions.isPassTestCase}
+                isPerformanceOnTime={questions.isPerformanceOnTime}
+                timeValue={questions.timeValue}
+                isPerformanceOnMemory={questions.isPerformanceOnMemory}
+                memoryValue={questions.memoryValue}
               />
             </>
           )}
         </div>
       </div>
+      <DiagNotiWarning
+        isOpen={isModalInvalidOpen}
+        onClose={closeInvalidModal}
+        invalidHeader={invalidHeader}
+        invalidMsg={invalidMsg}
+      />
     </div>
   );
 };

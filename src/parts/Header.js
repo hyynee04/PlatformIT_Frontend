@@ -185,8 +185,8 @@ const Header = () => {
     return links.map(({ title, path }, index) => (
       <NavLink
         key={index}
-        href={path}
-        className={currentPath === path ? "active" : ""}
+        to={path}
+        className={`nav-link ${currentPath === path ? "active" : ""}`}
       >
         {title}
       </NavLink>

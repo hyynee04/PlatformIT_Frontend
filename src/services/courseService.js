@@ -104,6 +104,7 @@ const postUpdateCourse = async (courseInfo) => {
     const formData = new FormData();
     formData.append("IdCourse", courseInfo.idCourse);
     formData.append("Title", courseInfo.title);
+    formData.append("IsDeletedFile", courseInfo.isDeletedFile);
     formData.append("Introduction", courseInfo.introduction || "");
     formData.append("CourseAvatar", courseInfo.coverImg);
     formData.append("IsLimitedTime", courseInfo.isLimitedTime);
@@ -348,6 +349,69 @@ const deleteCourse = (idCourse) => {
     },
   });
 };
+const postUpdateLecture = async (idList, lectureData, LectureStatus) => {
+  try {
+    const formData = new FormData();
+
+    // Append basic fields to formData
+    formData.append("IdLecture", idList.idLecture);
+    formData.append("IdCourse", idList.idCourse);
+    formData.append("IdSection", idList.idSection);
+    formData.append("LectureStatus", LectureStatus);
+    formData.append("Title", lectureData.Title);
+    formData.append("Introduction", lectureData.Introduction);
+
+    // Append lecture video
+    formData.append("LectureVideo", lectureData.LectureVideo);
+    // Append main materials
+    formData.append("MainMaterials", lectureData.MainMaterials);
+    // Append support materials (handling multiple)
+    lectureData.SupportMaterials.forEach((material) => {
+      formData.append(`SupportMaterials`, material); // each material is appended as SupportMaterials
+    });
+
+    // Make the request with the required headers
+    return await axios.post(
+      `api/Lecture/AddLecture?idUpdatedBy=${idList.idCreatedBy}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // needed for file uploads
+        },
+      }
+    );
+  } catch (error) {
+    console.error(
+      "Error adding lecture:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+const getAllPendingLectureOfCenter = () => {
+  return axios.get("api/Lecture/GetAllPendingLectureOfCenter", {
+    params: {
+      idCenter: Number(localStorage.getItem("idCenter")),
+    },
+  });
+};
+const postApproveLecture = (idLecture) => {
+  return axios.post("api/Lecture/ApproveLecture", null, {
+    params: {
+      idLecture: idLecture,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
+const postRejectLecture = (idLecture, reason) => {
+  return axios.post("api/Lecture/RejectLecture", null, {
+    params: {
+      idLecture: idLecture,
+      reason: reason,
+      idUpdatedBy: Number(localStorage.getItem("idUser")),
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
@@ -379,4 +443,8 @@ export {
   updateSection,
   inactiveLecture,
   deleteCourse,
+  postUpdateLecture,
+  getAllPendingLectureOfCenter,
+  postApproveLecture,
+  postRejectLecture,
 };

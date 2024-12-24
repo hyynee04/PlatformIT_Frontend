@@ -467,7 +467,7 @@ const ListAssignMgmt = () => {
           </div>
           <div className="filter-search-assign">
             <div className="filter-sort-btns">
-              <div
+              <button
                 ref={filterBtnRef}
                 className="btn"
                 onClick={() => {
@@ -476,7 +476,7 @@ const ListAssignMgmt = () => {
               >
                 <LuFilter className="icon" />
                 <span>Filter</span>
-              </div>
+              </button>
               {filterVisble && (
                 <div ref={filterRef} className="filter-container user">
                   <div className="title-filter">
@@ -583,7 +583,7 @@ const ListAssignMgmt = () => {
                   </div>
                 </div>
               )}
-              <div
+              <button
                 ref={sortByBtnRef}
                 className="btn"
                 onClick={() => {
@@ -592,7 +592,7 @@ const ListAssignMgmt = () => {
               >
                 <span>Sort by</span>
                 <LuChevronDown className="icon" />
-              </div>
+              </button>
               {sortByVisible && (
                 <div ref={sortByRef} className="filter-container user">
                   <div className="title-filter">
@@ -786,10 +786,12 @@ const ListAssignMgmt = () => {
                         </span>
                         {idRole === Role.teacher && (
                           <div className="studentCount-isExam-container">
-                            <span className="studentCount">
-                              {assignment.numberOfSubmittedStudent}/
-                              {assignment.numberOfStudent} <RiGroupLine />
-                            </span>
+                            {assignment.isPublish === 1 && (
+                              <span className="studentCount">
+                                {assignment.numberOfSubmittedStudent}/
+                                {assignment.numberOfStudent} <RiGroupLine />
+                              </span>
+                            )}
                             <span className="isExam-label">
                               {assignment.isTest ? "Test" : "Exercise"}
                             </span>

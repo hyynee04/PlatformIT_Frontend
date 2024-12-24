@@ -63,8 +63,6 @@ const Header = () => {
       } else if (idRole === Role.centerAdmin && currentPath === "/") {
         navigate("/centerAdDashboard");
       } else if (idRole === Role.teacher && currentPath === "/") {
-        console.log("zo day");
-
         navigate("/teacherHome");
       } else if (idRole === Role.student && currentPath === "/") {
         navigate("/studentHome");
@@ -185,13 +183,13 @@ const Header = () => {
 
   const renderNavLinksByRole = () => {
     return links.map(({ title, path }, index) => (
-      <Nav.Link
+      <NavLink
         key={index}
         href={path}
         className={currentPath === path ? "active" : ""}
       >
         {title}
-      </Nav.Link>
+      </NavLink>
     ));
   };
   const buttonPaths = {

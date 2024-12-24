@@ -284,9 +284,6 @@ const CourseDetail = (props) => {
     }
   };
 
-  console.log(courseInfo);
-  console.log("isEnrrolled: ", isEnrolledCourse);
-
   if (loading) {
     return (
       <div className="loading-page">
@@ -536,7 +533,7 @@ const CourseDetail = (props) => {
         <div className="block-container">
           <div className="block-container-header">
             <span className="block-container-title">Review</span>
-            {idUser && idRole === Role.student && isEnrolledCourse && (
+            {idRole === Role.student && isEnrolledCourse && (
               <button className="add-review-button">
                 <LuPlus /> Add review
               </button>
@@ -781,10 +778,7 @@ const CourseDetail = (props) => {
                                       )
                                         navigate("/viewLecture", {
                                           state: {
-                                            idCourse: courseInfo.idCourse,
-                                            idSection: section.idSection,
                                             idLecture: lecture.idLecture,
-                                            idTeacher: courseInfo.idTeacher,
                                           },
                                         });
                                     }}
@@ -844,7 +838,9 @@ const CourseDetail = (props) => {
                         {test.isPublish ? (
                           <div
                             key={index}
-                            className="qualification test"
+                            className={`qualification test ${
+                              idRole !== Role.student ? "nohover" : ""
+                            }`}
                             onClick={() => {
                               if (isEnrolledCourse && idRole === Role.student)
                                 navigate("/studentAssignDetail", {

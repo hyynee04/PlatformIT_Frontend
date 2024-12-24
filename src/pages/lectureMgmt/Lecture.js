@@ -18,6 +18,7 @@ import SectionView from "./SectionView";
 import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 import { getAllCommentOfLecture } from "../../services/commentService";
 import FetchDataUpdated from "../../functions/FetchDataUpdated";
+import DiagUpdateConfirmation from "../../components/diag/DiagUpdateConfirmation";
 
 const Lecture = (props) => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const Lecture = (props) => {
   });
 
   const [lectureDetail, setLectureDetail] = useState({});
+  const [editLecture, setEditLecture] = useState({});
   const [sectionList, setSectionList] = useState([]);
   const [mainCommentList, setMainCommentList] = useState([]);
   const [replyCommentList, setReplyCommentList] = useState({});
@@ -36,6 +38,7 @@ const Lecture = (props) => {
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
 
+  const [idList, setIdList] = useState({});
   const [idCourse, setIdCourse] = useState(null);
   const [idSection, setIdSection] = useState(null);
   const [idLecture, setIdLecture] = useState(null);
@@ -44,6 +47,8 @@ const Lecture = (props) => {
   const [idSectionRemoved, setIdSectionRemoved] = useState(null);
 
   const [isRemoved, setIsRemoved] = useState(false);
+  const [isEditLecture, setIsEditLecture] = useState(true);
+  const [lectureStatus, setLectureStatus] = useState(null);
 
   const fetchLectureDetail = async (idLecture, idStudent) => {
     setLoading({ ...loading, lectureDetail: true });
@@ -54,7 +59,8 @@ const Lecture = (props) => {
           ...response.data,
           timestamp: parseRelativeTime(response.data.relativeTime),
         });
-
+        setIdCourse(response.data.idCourse);
+        setIdSection(response.data.idSection);
         let exercises = await getExerciseOfLecture(idLecture, idStudent);
         if (exercises.status === APIStatus.success) {
           setLectureDetail((prevDetail) => ({
@@ -63,6 +69,15 @@ const Lecture = (props) => {
           }));
         } else {
           console.error("Fetching exercises: ", exercises.data);
+        }
+        if (idRole === Role.teacher) {
+          setDefaultToEditLecture(response.data);
+          setIdList({
+            idCourse: response.data.idCourse,
+            idSection: response.data.idSection,
+            idLecture: idLecture,
+            idCreatedBy: idUser,
+          });
         }
       } else {
         console.error("Fetching lecture detail: ", response.data);
@@ -81,7 +96,20 @@ const Lecture = (props) => {
 
       if (response.status === APIStatus.success) {
         if (response.data) {
-          setSectionList(response.data); // Only update if data exists
+          setSectionList(response.data);
+          setIdTeacher(response.data.idTeacher);
+
+          const section = response.data.sectionStructures.find(
+            (sec) => sec.idSection === idSection
+          );
+          if (section) {
+            const lecture = section.lectureStructures.find(
+              (lec) => lec.idLecture === idLecture
+            );
+            setLectureStatus(lecture ? lecture.lectureStatus : null);
+          } else {
+            setLectureStatus(null); // Section not found
+          }
         } else {
           console.warn("Received empty data for course content structure.");
         }
@@ -111,28 +139,32 @@ const Lecture = (props) => {
     }
   };
 
+  const setDefaultToEditLecture = (lectureDetail) => {
+    setEditLecture({
+      Title: lectureDetail.lectureTitle,
+      Introduction: lectureDetail.lectureIntroduction,
+      LectureVideo: lectureDetail.videoMaterial,
+      MainMaterials: lectureDetail.mainMaterials,
+      SupportMaterials: lectureDetail.supportMaterials,
+    });
+  };
+
   useEffect(() => {
+    window.scrollTo(0, 0);
     const state = location.state;
     setLoading({ ...loading, lectureDetail: true });
-    if (
-      state &&
-      state.idCourse &&
-      state.idSection &&
-      state.idLecture &&
-      state.idTeacher
-    ) {
-      setIdCourse(state.idCourse);
-      setIdSection(state.idSection);
-      setIdLecture(state.idLecture);
-      setIdTeacher(state.idTeacher);
-
-      fetchLectureDetail(state.idLecture);
-      if (idRole === Role.student) {
-        fetchCourseContentStructure(state.idCourse, idUser);
-      } else {
-        fetchCourseContentStructure(state.idCourse);
-      }
-      fetchAllCommentOfLecture(state.idLecture);
+    if (state && state.idLecture) {
+      const fetchData = async () => {
+        await setIdLecture(state.idLecture);
+        await fetchLectureDetail(state.idLecture);
+        if (idRole === Role.student) {
+          fetchCourseContentStructure(idCourse, idUser);
+        } else {
+          fetchCourseContentStructure(idCourse);
+        }
+        fetchAllCommentOfLecture(state.idLecture);
+      };
+      fetchData();
     }
     setLoading({ ...loading, lectureDetail: false });
   }, [location.state]);
@@ -146,6 +178,14 @@ const Lecture = (props) => {
     };
     reFetchData();
   }, [idLecture]);
+
+  useEffect(() => {
+    if (idRole === Role.student) {
+      fetchCourseContentStructure(idCourse, idUser);
+    } else {
+      fetchCourseContentStructure(idCourse);
+    }
+  }, [idCourse]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -195,7 +235,8 @@ const Lecture = (props) => {
             ) : (
               <LectureView
                 lectureDetail={lectureDetail}
-                idLecture={lectureDetail.idLecture}
+                editLecture={editLecture}
+                idLecture={idLecture}
                 idTeacher={idTeacher}
                 setIsRemoved={setIsRemoved}
                 setIdComment={setIdComment}
@@ -203,6 +244,12 @@ const Lecture = (props) => {
                 replyCommentList={replyCommentList}
                 fetchAllCommentOfLecture={fetchAllCommentOfLecture}
                 setUpdatedCommentList={setUpdatedCommentList}
+                lectureStatus={lectureStatus}
+                setDefaultToEditLecture={() =>
+                  setDefaultToEditLecture(lectureDetail)
+                }
+                setEditLecture={setEditLecture}
+                setIsEditLecture={setIsEditLecture}
               />
             )}
           </div>
@@ -218,7 +265,7 @@ const Lecture = (props) => {
                 idSection={idSection}
                 idLecture={idLecture}
                 sectionList={sectionList}
-                fetchSectionList={() => fetchCourseContentStructure(idCourse)}
+                fetchSectionList={fetchCourseContentStructure}
                 setIdSection={setIdSection}
                 setIdLecture={setIdLecture}
                 courseTitle={lectureDetail.courseTitle}
@@ -262,6 +309,11 @@ const Lecture = (props) => {
             ? () => fetchCourseContentStructure(idCourse)
             : undefined
         }
+      />
+      <DiagUpdateConfirmation
+        isOpen={isEditLecture}
+        onClose={() => setIsEditLecture(false)}
+        message={"Are you sure to save these changes?"}
       />
     </div>
   );

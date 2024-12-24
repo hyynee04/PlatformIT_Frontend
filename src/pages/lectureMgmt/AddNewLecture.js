@@ -6,19 +6,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/LectureAdd.css";
 import default_image from "../../assets/img/default_image.png";
 import DiagCreateSuccessfully from "../../components/diag/DiagCreateSuccessfully";
-import { APIStatus } from "../../constants/constants";
+import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import { getVideoType } from "../../functions/function";
-import { postAddLecture } from "../../services/courseService";
+import { getLectureDetail, postAddLecture } from "../../services/courseService";
+import { GoAlertFill } from "react-icons/go";
+import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
+import { TbNumber3Small } from "react-icons/tb";
 
 const AddNewLecture = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const idUser = +localStorage.getItem("idUser");
+  const idRole = +localStorage.getItem("idRole");
+
   const [loading, setLoading] = useState(false);
+  const [loadingDisplay, setLoadingDisplay] = useState(false);
   const [sectionName, setSectionName] = useState(null);
   const [courseTitle, setCourseTitle] = useState(null);
+  const [lectureStatus, setLectureStatus] = useState(null);
   const [isMissing, setIsMissing] = useState(0);
   const [isSucceeded, setIsSucceeded] = useState(false);
+  const [isRemoved, setIsRemoved] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [errorList, setErrorList] = useState({
     0: "",
     1: "Missing section name!",
@@ -28,6 +38,7 @@ const AddNewLecture = () => {
   const [idList, setIdList] = useState({
     idCourse: 0,
     idSection: 0,
+    idLecture: 0,
     idCreatedBy: 0,
   });
 
@@ -83,16 +94,48 @@ const AddNewLecture = () => {
       SupportMaterials: [],
     });
   };
+
+  const fetchLectureDetail = async (idLecture) => {
+    setLoadingDisplay(true);
+    try {
+      const response = await getLectureDetail(idLecture);
+      if (response.status === APIStatus.success) {
+        setIdList({
+          idCourse: response.data.idCourse,
+          idSection: response.data.idSection,
+          idLecture: response.data.idLecture,
+          idCreatedBy: idUser,
+        });
+        setLectureData({
+          Title: response.data.lectureTitle,
+          Introduction: response.data.lectureIntroduction,
+          LectureVideo: response.data.videoMaterial,
+          MainMaterials: response.data.mainMaterials,
+          SupportMaterials: response.data.supportMaterials,
+        });
+      } else console.error("Message: ", response.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoadingDisplay(false);
+    }
+  };
   useEffect(() => {
+    window.scrollTo(0, 0);
     const state = location.state;
     if (state) {
+      if (state.idLecture && state.lectureStatus) {
+        fetchLectureDetail(state.idLecture);
+        setLectureStatus(state.lectureStatus);
+      } else {
+        setIdList({
+          idCourse: state.idCourse,
+          idSection: state.idSection,
+          idCreatedBy: idUser,
+        });
+      }
       setSectionName(state.sectionName);
       setCourseTitle(state.courseTitle);
-      setIdList({
-        idCourse: state.idCourse,
-        idSection: state.idSection,
-        idCreatedBy: state.idCreatedBy,
-      });
     }
   }, [location.state]);
 
@@ -102,10 +145,24 @@ const AddNewLecture = () => {
     });
   }, [loading]);
 
-  console.log(idList);
+  console.log("Lecture Detail: ", lectureData);
+
+  if (loadingDisplay) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
   return (
     <div className="add-lecture-container">
-      <div className="page-header">
+      <div
+        className={`page-header ${
+          lectureStatus && lectureStatus !== LectureStatus.active
+            ? "another-status"
+            : ""
+        }`}
+      >
         <div className="back-to-course">
           <button onClick={() => navigate(-1)}>
             <IoIosArrowBack />
@@ -116,17 +173,65 @@ const AddNewLecture = () => {
           <span className="lecture-place">
             {courseTitle} <IoIosArrowForward /> {sectionName}
           </span>
+          {lectureStatus && (
+            <>
+              {lectureStatus === LectureStatus.pending ? (
+                <span
+                  className="status-text pending-color"
+                  style={{ padding: "0" }}
+                >
+                  <GoAlertFill /> This lecture is pending
+                </span>
+              ) : lectureStatus === LectureStatus.rejected ? (
+                <span
+                  className="status-text rejected-color"
+                  style={{ padding: "0" }}
+                >
+                  <GoAlertFill /> This lecture is rejected
+                </span>
+              ) : null}
+            </>
+          )}
         </div>
+
         <div className="create-lecture">
-          <button
-            disabled={isMissing}
-            onClick={() => {
-              setIsMissing(0);
-              createNewLecture(idList, lectureData);
-            }}
-          >
-            {loading && <ImSpinner2 className="icon-spin" />} Create
-          </button>
+          {lectureStatus && lectureStatus !== LectureStatus.active ? (
+            <>
+              <button
+                className={`${
+                  idRole === Role.teacher ? "delete-lecture-btn" : ""
+                }`}
+                onClick={() => setIsRemoved(true)}
+              >
+                Delete
+              </button>
+              {idRole === Role.teacher && (
+                <button
+                  disabled={isMissing}
+                  // onClick={() => {
+                  //   setIsMissing(0);
+                  //   createNewLecture(idList, lectureData);
+                  // }}
+                >
+                  {loading && <ImSpinner2 className="icon-spin" />} Update
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {idRole === Role.teacher ? (
+                <button
+                  disabled={isMissing}
+                  onClick={() => {
+                    setIsMissing(0);
+                    createNewLecture(idList, lectureData);
+                  }}
+                >
+                  {loading && <ImSpinner2 className="icon-spin" />} Create
+                </button>
+              ) : null}
+            </>
+          )}
         </div>
       </div>
       <div className="page-body">
@@ -148,6 +253,7 @@ const AddNewLecture = () => {
                   setLectureData({ ...lectureData, Title: event.target.value });
                   setIsMissing(0);
                 }}
+                readOnly={!(idRole === Role.teacher)}
               />
               {isMissing === 1 && (
                 <span className="error-inform">
@@ -162,6 +268,7 @@ const AddNewLecture = () => {
                 Introduction &#40;Optional&#41;
               </label>
               <textarea
+                value={lectureData.Introduction}
                 onChange={(e) => {
                   setLectureData({
                     ...lectureData,
@@ -170,6 +277,7 @@ const AddNewLecture = () => {
                   setIsMissing(0);
                 }}
                 placeholder="Tell a little thing about this lecture..."
+                readOnly={!(idRole === Role.teacher)}
               ></textarea>
             </div>
           </div>
@@ -207,7 +315,6 @@ const AddNewLecture = () => {
                     }
                   }}
                 />
-                {console.log(lectureData.LectureVideo)}
                 {lectureData.LectureVideo ? (
                   <video
                     className="video-player"
@@ -218,10 +325,19 @@ const AddNewLecture = () => {
                         : "invalid-video"
                     }
                   >
-                    {lectureData.LectureVideo instanceof File ? (
+                    {lectureData.LectureVideo.path ||
+                    lectureData.LectureVideo instanceof File ? (
                       <source
-                        src={URL.createObjectURL(lectureData.LectureVideo)}
-                        type={getVideoType(lectureData.LectureVideo.name)}
+                        src={
+                          lectureData.LectureVideo.path
+                            ? lectureData.LectureVideo.path
+                            : URL.createObjectURL(lectureData.LectureVideo)
+                        }
+                        type={getVideoType(
+                          lectureData.LectureVideo.path
+                            ? lectureData.LectureVideo.path
+                            : lectureData.LectureVideo.name
+                        )}
                       />
                     ) : (
                       <p>Error: Invalid file</p>
@@ -232,37 +348,40 @@ const AddNewLecture = () => {
                   <img src={default_image} alt="lecture video" />
                 )}
               </div>
-              <div className="video-button-container">
-                <button
-                  className="remove-btn"
-                  disabled={!lectureData.LectureVideo}
-                  onClick={() => {
-                    setLectureData({ ...lectureData, LectureVideo: "" });
-                    if (videoInputRef.current) {
-                      videoInputRef.current.value = ""; // Reset the file input value
-                    }
-                  }}
-                >
-                  <LuTrash2 /> Remove
-                </button>
-                <button
-                  className="upload-btn"
-                  onClick={() => videoInputRef.current.click()}
-                >
-                  <LuUpload /> Upload Video
-                </button>
-              </div>
+              {idRole === Role.teacher && (
+                <div className="video-button-container">
+                  <button
+                    className="remove-btn"
+                    disabled={!lectureData.LectureVideo}
+                    onClick={() => {
+                      setLectureData({ ...lectureData, LectureVideo: "" });
+                      if (videoInputRef.current) {
+                        videoInputRef.current.value = ""; // Reset the file input value
+                      }
+                    }}
+                  >
+                    <LuTrash2 /> Remove
+                  </button>
+                  <button
+                    className="upload-btn"
+                    onClick={() => videoInputRef.current.click()}
+                  >
+                    <LuUpload /> Upload Video
+                  </button>
+                </div>
+              )}
             </div>
             <div className="sub-content">
               <label className="sub-title">Main Material</label>
-              {!lectureData.MainMaterials && (
-                <button
-                  className="attach-file-button"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  <LuPaperclip /> Attach file
-                </button>
-              )}
+              {(!lectureData.MainMaterials || !lectureData?.MainMaterials[0]) &&
+                idRole === Role.teacher && (
+                  <button
+                    className="attach-file-button"
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    <LuPaperclip /> Attach file
+                  </button>
+                )}
               <input
                 className="file-container"
                 type="file"
@@ -276,29 +395,41 @@ const AddNewLecture = () => {
                   }
                 }}
               />
-              {lectureData.MainMaterials && (
+              {console.log(lectureData.MainMaterials)}
+              {(lectureData.MainMaterials instanceof File ||
+                lectureData?.MainMaterials[0]) && (
                 <div className="file-display">
                   <div
                     className="file-block"
-                    onClick={() =>
-                      window.open(
-                        URL.createObjectURL(lectureData.MainMaterials),
-                        "_blank",
-                        "noopener,noreferrer"
-                      )
-                    }
+                    onClick={() => {
+                      lectureData.MainMaterials[0]
+                        ? window.open(lectureData.MainMaterials[0].path)
+                        : window.open(
+                            URL.createObjectURL(lectureData.MainMaterials),
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                    }}
                   >
-                    <span>{lectureData.MainMaterials.name}</span>
+                    <span>
+                      {lectureData.MainMaterials.name ||
+                        lectureData?.MainMaterials[0]?.fileName}
+                    </span>
                   </div>
-                  <div className="file-buttons">
-                    <button
-                      onClick={() => {
-                        setLectureData({ ...lectureData, MainMaterials: "" });
-                      }}
-                    >
-                      <LuTrash2 />
-                    </button>
-                  </div>
+                  {idRole === Role.teacher && (
+                    <div className="file-buttons">
+                      <button
+                        onClick={() => {
+                          setLectureData({
+                            ...lectureData,
+                            MainMaterials: "",
+                          });
+                        }}
+                      >
+                        <LuTrash2 />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -306,12 +437,15 @@ const AddNewLecture = () => {
               <label className="sub-title">
                 Supporting Materials &#40;Optional&#41;
               </label>
-              <button
-                className="attach-file-button"
-                onClick={() => listFileInputRef.current.click()}
-              >
-                <LuPaperclip /> Attach file
-              </button>
+              {idRole === Role.teacher && (
+                <button
+                  className="attach-file-button"
+                  onClick={() => listFileInputRef.current.click()}
+                >
+                  <LuPaperclip /> Attach file
+                </button>
+              )}
+
               <input
                 className="file-container"
                 ref={listFileInputRef}
@@ -333,22 +467,35 @@ const AddNewLecture = () => {
                   }
                 }}
               />
-              {lectureData.SupportMaterials.length > 0 &&
+              {lectureData?.SupportMaterials?.length > 0 &&
                 lectureData.SupportMaterials.map((file, index) => (
                   <div key={index} className="file-display">
-                    <div className="file-block">
-                      <span>{file.name}</span>
+                    <div
+                      className="file-block"
+                      onClick={() => {
+                        file.path
+                          ? window.open(file.path)
+                          : window.open(
+                              URL.createObjectURL(file),
+                              "_blank",
+                              "noopener,noreferrer"
+                            );
+                      }}
+                    >
+                      <span>{file.name || file.fileName}</span>
                     </div>
-                    <div className="file-buttons">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(index);
-                        }}
-                      >
-                        <LuTrash2 />
-                      </button>
-                    </div>
+                    {idRole === Role.teacher && (
+                      <div className="file-buttons">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(index);
+                          }}
+                        >
+                          <LuTrash2 />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
             </div>
@@ -360,6 +507,17 @@ const AddNewLecture = () => {
         onClose={() => setIsSucceeded(false)}
         notification={"Create new lecture successfully!"}
         clearData={clearData}
+      />
+      <DiagDeleteConfirmation
+        isOpen={isRemoved}
+        onClose={() => {
+          setIsRemoved(false);
+        }}
+        object={{
+          id: idList.idLecture,
+          name: "lecture",
+          message: "Are you sure to delete this lecture?",
+        }}
       />
     </div>
   );

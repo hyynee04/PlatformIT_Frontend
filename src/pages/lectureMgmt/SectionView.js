@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+
 import {
   LuCheck,
   LuCheckCircle,
@@ -9,7 +10,7 @@ import {
   LuX,
 } from "react-icons/lu";
 import "../../assets/css/LectureView.css";
-import { APIStatus, Role } from "../../constants/constants";
+import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import { useNavigate } from "react-router-dom";
 import { postAddSection, updateSection } from "../../services/courseService";
 const SectionView = (props) => {
@@ -40,7 +41,7 @@ const SectionView = (props) => {
     try {
       let response = await postAddSection(sectionTitle, idCourse, idUser);
       if (response.status === APIStatus.success) {
-        await fetchSectionList();
+        await fetchSectionList(idCourse);
         setNewSectionTitle("");
         setIsAddSection(false);
       } else console.log(response.data);
@@ -53,7 +54,7 @@ const SectionView = (props) => {
     try {
       let respone = await updateSection(idSection, newSectionName, idUpdatedBy);
       if (respone.status === APIStatus.success) {
-        fetchSectionList();
+        fetchSectionList(idCourse);
       }
     } catch (error) {
       console.error("Error posting data: ", error);
@@ -87,30 +88,34 @@ const SectionView = (props) => {
                   isShowed[section.idSection] ? "active" : ""
                 }`}
                 onClick={() => {
-                  setIsShowed({
-                    ...isShowed,
-                    [section.idSection]: !isShowed[section.idSection],
-                  });
+                  if (section.lectureCount > 0)
+                    setIsShowed({
+                      ...isShowed,
+                      [section.idSection]: !isShowed[section.idSection],
+                    });
                 }}
               >
                 {!isEdit[index] ? (
                   <>
                     <span className="each-section-name">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditSectionName(section.sectionName);
-                          setIsEdit({
-                            ...Object.keys(isEdit).reduce(
-                              (acc, key) => ({ ...acc, [key]: false }),
-                              {}
-                            ),
-                            [index]: true,
-                          });
-                        }}
-                      >
-                        <LuPenLine />
-                      </button>
+                      {idRole === Role.teacher && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditSectionName(section.sectionName);
+                            setIsEdit({
+                              ...Object.keys(isEdit).reduce(
+                                (acc, key) => ({ ...acc, [key]: false }),
+                                {}
+                              ),
+                              [index]: true,
+                            });
+                          }}
+                        >
+                          <LuPenLine />
+                        </button>
+                      )}
+
                       {section.sectionName}
                     </span>
 
@@ -122,11 +127,13 @@ const SectionView = (props) => {
                       </span>
                       <button
                         onClick={() => {
-                          setIsShowed({
-                            ...isShowed,
-                            [section.idSection]: !isShowed[section.idSection],
-                          });
+                          if (section.lectureCount > 0)
+                            setIsShowed({
+                              ...isShowed,
+                              [section.idSection]: !isShowed[section.idSection],
+                            });
                         }}
+                        disabled={section.lectureCount === 0}
                         className="dropdown-button"
                       >
                         {isShowed[section.idSection] ? (
@@ -179,35 +186,66 @@ const SectionView = (props) => {
               {section.lectureStructures &&
                 section.lectureStructures.length > 0 &&
                 section.lectureStructures.map((lecture) => (
-                  <div
-                    key={lecture.idLecture}
-                    className={`section-lectures ${
-                      isShowed[section.idSection] ? "" : "deactive"
-                    }`}
-                  >
-                    <div
-                      className="lecture-item"
-                      onClick={() => setIdLecture(lecture.idLecture)}
-                    >
-                      <div className="lecture-info not-learn">
-                        <span
-                          className={`lecture-title ${
-                            idLecture === lecture.idLecture ? "active" : ""
-                          }`}
+                  <>
+                    {((idRole === Role.student &&
+                      lecture.lectureStatus === LectureStatus.active) ||
+                      (idRole !== Role.student &&
+                        lecture.lectureStatus !== LectureStatus.inactive)) && (
+                      <div
+                        key={lecture.idLecture}
+                        className={`section-lectures ${
+                          isShowed[section.idSection] ? "" : "deactive"
+                        }`}
+                      >
+                        <div
+                          className="lecture-item"
+                          onClick={() => setIdLecture(lecture.idLecture)}
                         >
-                          {lecture.lectureTitle}
-                        </span>
-                        <span className="exercise-num">
-                          {`${lecture.exerciseCount} ${
-                            lecture.exerciseCount > 1 ? "exercises" : "exercise"
-                          }`}
-                        </span>
+                          <div
+                            className={`lecture-info ${
+                              lecture.isFinishedLecture &&
+                              idRole === Role.student
+                                ? ""
+                                : "not-learn"
+                            }`}
+                          >
+                            <span
+                              className={`lecture-title ${
+                                idLecture === lecture.idLecture ? "active" : ""
+                              }`}
+                            >
+                              {lecture.lectureTitle}
+                            </span>
+                            {idRole !== Role.student && (
+                              <>
+                                {lecture.lectureStatus ===
+                                LectureStatus.active ? (
+                                  <span className="exercise-num">
+                                    {`${lecture.exerciseCount} ${
+                                      lecture.exerciseCount > 1
+                                        ? "exercises"
+                                        : "exercise"
+                                    }`}
+                                  </span>
+                                ) : lecture.lectureStatus ===
+                                  LectureStatus.pending ? (
+                                  <span className="exercise-num pending-color">
+                                    Pending
+                                  </span>
+                                ) : (
+                                  <span className="exercise-num rejected-color">
+                                    Rejected
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </div>
+                          {idRole === Role.student &&
+                            lecture.isFinishedLecture && <LuCheckCircle />}
+                        </div>
                       </div>
-                      {idRole === Role.student && lecture.isFinishedLecture && (
-                        <LuCheckCircle />
-                      )}
-                    </div>
-                  </div>
+                    )}
+                  </>
                 ))}
               {idRole && idRole !== Role.student && (
                 <div

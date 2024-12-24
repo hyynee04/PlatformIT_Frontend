@@ -446,6 +446,21 @@
 .testing-code .btn:hover {
   background-color: rgb(97, 148, 148);
 }
+.testing-code .input-code-area-form-pi {
+  padding: 8px 16px;
+  min-height: 160px;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid rgb(204, 204, 204);
+  color: var(--black-gray);
+  font-size: 14px;
+  background-color: #fff;
+  font-family: "Fira Code", "Courier New", monospace;
+}
+.testing-code .input-code-area-form-pi:focus {
+  border: 1px solid rgb(172, 172, 172);
+  box-shadow: none;
+}
 .action-btns-form .container-button .btn.save {
   border: 1px solid var(--main-color);
   color: var(--main-color);
@@ -460,6 +475,11 @@
 .action-btns-form .container-button .btn.delete:active {
   outline: none;
   border: none;
+}
+.action-btns-form .container-button .btn.button-disabled {
+  /* background-color: #cccccc;
+  color: #666666; */
+  opacity: 0.6;
 }
 .container-right-assign > .title-span > .info {
   color: var(--black-color);
@@ -628,6 +648,7 @@ input:checked + .slider:before {
   width: 100%;
   border-collapse: collapse;
 }
+
 .container-right-assign table th {
   padding: 12px 10px;
   font-size: 16px;
@@ -666,6 +687,25 @@ input:checked + .slider:before {
 }
 .container-right-assign table td .add-new-record:hover {
   color: var(--black-color);
+}
+.container-right-assign table.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.container-right-assign table.result-table td {
+  width: 100%;
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 14px;
+}
+.container-right-assign table.result-table td.passed {
+  color: var(--green-color);
+  font-weight: bold;
+}
+.container-right-assign table.result-table td.failed {
+  color: var(--red-color);
+  font-weight: bold;
 }
 .right-question-info .img-container {
   display: flex;

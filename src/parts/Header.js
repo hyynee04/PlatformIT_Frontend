@@ -26,6 +26,7 @@ import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
 import { countTaskOfCenterAd } from "../store/listTaskOfCenterAd";
+import { getAllUserConversations } from "../services/messageService";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -43,6 +44,7 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(null);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(null);
   const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(
     idUser,
     null,
@@ -84,6 +86,16 @@ const Header = () => {
       console.log(response.data);
     }
   };
+  const fetchUnreadMessageCount = async () => {
+    let response = await getAllUserConversations();
+    if (response.status === APIStatus.success) {
+      let unread = response.data.filter(
+        (message) => message.isRead === 0
+      ).length;
+      setUnreadMsgCount(unread > 99 ? "99+" : unread);
+      setNotifications(response.data);
+    }
+  };
 
   useEffect(() => {
     const fetchAvatar = async () => {
@@ -98,6 +110,7 @@ const Header = () => {
     };
     fetchAvatar();
     fetchUserNotification(idUser);
+    fetchUnreadMessageCount();
     const interval = setInterval(() => {
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) => ({
@@ -243,14 +256,21 @@ const Header = () => {
             ) : (
               <div className="auth-buttons">
                 {(idRole === Role.student || idRole === Role.teacher) && (
-                  <button
-                    className={`circle-buts ${
-                      activeButton === "message" ? "clicked" : ""
-                    }`}
-                    onClick={() => handleButtonClick("message")}
-                  >
-                    <LuMessageCircle className="header-icon" />
-                  </button>
+                  <>
+                    <button
+                      className={`circle-buts ${
+                        activeButton === "message" ? "clicked" : ""
+                      }`}
+                      onClick={() => handleButtonClick("message")}
+                    >
+                      <LuMessageCircle className="header-icon" />
+                    </button>
+                    {unreadMsgCount ? (
+                      <div className="number-unseen message">
+                        {unreadMsgCount}
+                      </div>
+                    ) : null}
+                  </>
                 )}
                 {idRole === Role.centerAdmin && (
                   <>

@@ -118,6 +118,7 @@ const UpdateCourse = () => {
         setCoverImage((prev) => ({
           ...prev,
           coverImgUrl: response.data.courseAvatar,
+          isDeletedFile: false,
         }));
         setSelectedTeacher((prev) => ({
           ...prev,
@@ -267,6 +268,10 @@ const UpdateCourse = () => {
         const fileUrl = URL.createObjectURL(blobFile);
         setCoverImage((prev) => ({
           ...prev,
+          isDeletedFile: false,
+        }));
+        setCoverImage((prev) => ({
+          ...prev,
           coverImgFile: blobFile,
           coverImgUrl: fileUrl,
         }));
@@ -283,6 +288,10 @@ const UpdateCourse = () => {
       coverImgFile: null,
       coverImgUrl: "",
     });
+    setCoverImage((prev) => ({
+      ...prev,
+      isDeletedFile: true,
+    }));
     if (inputFileRef.current) {
       inputFileRef.current.value = "";
     }
@@ -362,6 +371,7 @@ const UpdateCourse = () => {
       title: courseInfo.title,
       introduction: courseInfo.introduction,
       coverImg: coverImage.coverImgFile || null,
+      isDeletedFile: coverImage.isDeletedFile ? 1 : 0,
       startDate: courseInfo.startDate,
       endDate: courseInfo.endDate,
       price: courseInfo.price,

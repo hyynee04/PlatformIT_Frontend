@@ -11,7 +11,11 @@ import {
   postUpdateReadStatus,
 } from "../services/messageService";
 import { APIStatus, Role } from "../constants/constants";
-import { formatDateTimeWithTimeZone } from "../functions/function";
+import {
+  calculateRelativeTime,
+  formatDateTimeWithTimeZone,
+  parseRelativeTime,
+} from "../functions/function";
 import { getIsChatAvailable } from "../services/courseService";
 import { useLocation } from "react-router-dom";
 
@@ -39,13 +43,17 @@ const Chat = () => {
     try {
       let response = await getAllUserConversations();
       if (response.status === APIStatus.success) {
-        setListConversations(response.data);
-        console.log(selectedSender);
-
-        // if (Object.keys(selectedSender).length === 0) {
-        //   setSelectedSender(response.data[0]);
-        //   console.log("zooooo");
-        // }
+        const state = location.state;
+        if (state?.selectedSender) {
+          setSelectedSender(state.selectedSender);
+        } else {
+          setSelectedSender(response.data[0]);
+        }
+        const processedData = response.data.map((conversation) => ({
+          ...conversation,
+          timestamp: parseRelativeTime(conversation.relativeTime),
+        }));
+        setListConversations(processedData);
       }
     } catch (error) {
       throw error;
@@ -86,11 +94,16 @@ const Chat = () => {
     }
   };
   useEffect(() => {
-    const state = location.state;
-    if (state?.selectedSender) {
-      setSelectedSender(state.selectedSender);
-    }
     fetchListConversations();
+    const interval = setInterval(() => {
+      setListConversations((prevNotifications) =>
+        prevNotifications.map((conversation) => ({
+          ...conversation,
+          relativeTime: calculateRelativeTime(conversation.timestamp),
+        }))
+      );
+    }, 60000);
+    return () => clearInterval(interval);
   }, []);
   useEffect(() => {
     if (selectedSender?.userId) {

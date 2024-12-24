@@ -1,47 +1,41 @@
 import React, { useState } from "react";
+import { ImSpinner2 } from "react-icons/im";
+import { LuClipboardCheck, LuClipboardX, LuX } from "react-icons/lu";
 import { Alert } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
-import { LuBuilding2, LuX } from "react-icons/lu";
-import { ImSpinner2 } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import {
-  approveCenter,
-  fetchCenters,
-  rejectCenter,
-} from "../../store/listCenterSlice";
+  approveLecture,
+  fetchTaskOfCenterAd,
+  rejectLecture,
+} from "../../store/listTaskOfCenterAd";
 
-import "../../assets/css/card/DiagForm.css";
-const DiagActionCenterForm = ({
+const DiagActionLectureForm = ({
   isOpen,
   onClose,
-  idCenterSelected,
-  activeStatus,
+  idLecture,
+  activeTypeOfTask,
   isApproveAction,
 }) => {
   const dispatch = useDispatch();
-  const idUserUpdated = +localStorage.getItem("idUser");
-  const [reasonReject, setReasonReject] = useState(null);
-  const [errorRejectString, setErrorRejectString] = useState("");
   const [loadingBtn, setLoadingBtn] = useState({
     approve: false,
     reject: false,
   });
-
-  const handleApproveCenter = async () => {
+  const [reason, setReason] = useState(null);
+  const [errorRejectString, setErrorRejectString] = useState("");
+  const handleApproveLecture = async () => {
     setLoadingBtn((prevState) => ({
       ...prevState,
       approve: true,
     }));
     try {
-      const resultAction = await dispatch(
-        approveCenter({ idCenterSelected: idCenterSelected, idUserUpdated })
-      );
-      if (approveCenter.fulfilled.match(resultAction)) {
-        dispatch(fetchCenters(activeStatus));
-        onClose();
+      const resultAction = await dispatch(approveLecture({ idLecture }));
+      if (approveLecture.fulfilled.match(resultAction)) {
+        dispatch(fetchTaskOfCenterAd(activeTypeOfTask));
       }
     } catch (error) {
-      console.error("Error while approving center: ", error);
+      console.error("Error while approving lecture: ", error);
     } finally {
       setLoadingBtn((prevState) => ({
         ...prevState,
@@ -49,22 +43,22 @@ const DiagActionCenterForm = ({
       }));
     }
   };
-
-  const handleRejectCenter = async () => {
-    if (reasonReject?.trim()) {
+  const handleRejectLecture = async () => {
+    if (reason) {
       setLoadingBtn((prevState) => ({
         ...prevState,
         reject: true,
       }));
       try {
         const resultAction = await dispatch(
-          rejectCenter({ idCenterSelected, reasonReject, idUserUpdated })
+          rejectLecture({ idLecture, reason })
         );
-        if (rejectCenter.fulfilled.match(resultAction)) {
-          dispatch(fetchCenters(activeStatus));
+        if (rejectLecture.fulfilled.match(resultAction)) {
+          dispatch(fetchTaskOfCenterAd(activeTypeOfTask));
+          onClose();
         }
       } catch (error) {
-        console.error("Error while rejecting center: ", error);
+        console.error("Error while rejecting lecture: ", error);
       } finally {
         setLoadingBtn((prevState) => ({
           ...prevState,
@@ -75,32 +69,26 @@ const DiagActionCenterForm = ({
       setErrorRejectString("Please enter reason for rejection");
       setTimeout(() => {
         setErrorRejectString("");
-      }, 3000);
+      }, 1000);
     }
   };
-  // useEffect(() => {
-  //   document.querySelectorAll("button").forEach((button) => {
-  //     button.disabled = loadingBtn.approve || loadingBtn.reject;
-  //   });
-  // }, [loadingBtn.approve, loadingBtn.reject]);
   if (!isOpen) return null;
-
   return (
     <div className="modal-overlay" onClick={onClose}>
       {isApproveAction === true ? (
         <div
-          className="modal-container slide-to-bottom"
+          className="modal-container  slide-to-bottom"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="diag-header">
             <div className="container-title">
-              <LuBuilding2 className="diag-icon" />
-              <span className="diag-title">Approve Center</span>
+              <LuClipboardCheck className="diag-icon" />
+              <span className="diag-title">Approve Lecture</span>
             </div>
             <LuX className="diag-icon" onClick={onClose} />
           </div>
           <div className="diag-body">
-            <span>Are you sure to Approve this center?</span>
+            <span>Are you sure to Approve this lecture?</span>
             <div className="str-btns">
               <div className="act-btns">
                 <button className="btn diag-btn cancel" onClick={onClose}>
@@ -109,7 +97,8 @@ const DiagActionCenterForm = ({
                 <button
                   className="btn diag-btn signout"
                   onClick={async () => {
-                    await handleApproveCenter();
+                    await handleApproveLecture();
+                    onClose();
                   }}
                 >
                   {loadingBtn.approve && (
@@ -123,13 +112,13 @@ const DiagActionCenterForm = ({
         </div>
       ) : (
         <div
-          className="modal-container slide-to-bottom"
+          className="modal-container  slide-to-bottom"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="diag-header">
             <div className="container-title">
-              <LuBuilding2 className="diag-icon" />
-              <span className="diag-title">Reject Center</span>
+              <LuClipboardX className="diag-icon" />
+              <span className="diag-title">Reject Lecture</span>
             </div>
             <LuX className="diag-icon" onClick={onClose} />
           </div>
@@ -140,8 +129,8 @@ const DiagActionCenterForm = ({
                 as="textarea"
                 className="input-area-form-diag"
                 placeholder="Write the reason here..."
-                value={reasonReject || ""}
-                onChange={(e) => setReasonReject(e.target.value)}
+                value={reason || ""}
+                onChange={(e) => setReason(e.target.value)}
               />
             </div>
             <div className="str-btns">
@@ -161,7 +150,7 @@ const DiagActionCenterForm = ({
                 <button
                   className="btn diag-btn signout"
                   onClick={async () => {
-                    await handleRejectCenter();
+                    await handleRejectLecture();
                   }}
                 >
                   {loadingBtn.reject && (
@@ -178,4 +167,4 @@ const DiagActionCenterForm = ({
   );
 };
 
-export default DiagActionCenterForm;
+export default DiagActionLectureForm;

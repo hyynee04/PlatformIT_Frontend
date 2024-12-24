@@ -145,3 +145,6 @@
   top: -0.5rem;
   right: 2.8rem;
 }
+.auth-buttons > .number-unseen.message {
+  right: 6rem;
+}

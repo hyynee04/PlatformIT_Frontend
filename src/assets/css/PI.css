@@ -374,6 +374,10 @@
   bottom: 20px;
   width: 24px;
   height: 24px;
+  cursor: pointer;
+}
+.info .password-icon:hover {
+  color: rgba(117, 117, 117, 0.7);
 }
 .info .arrow-icon {
   position: absolute;

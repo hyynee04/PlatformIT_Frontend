@@ -53,6 +53,17 @@ const getAssignmentAnswer = async (idAssignment, idStudent) => {
     },
   });
 };
+const getTestOfCourseStudent = (idCourse, idStudent) => {
+  return axios.get("api/Course/GetTestOfCourseStudent", {
+    params: {
+      idCourse: idCourse,
+      idStudent: idStudent,
+    },
+  });
+};
+const getAllActiveLanguage = async () => {
+  return await axios.get("api/CodeExecution/GetAllActiveLanguage");
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -395,11 +406,11 @@ const deleteAssignment = async (idAssignment) => {
     throw error;
   }
 };
-const getTestOfCourseStudent = (idCourse, idStudent) => {
-  return axios.get("api/Course/GetTestOfCourseStudent", {
-    params: {
-      idCourse: idCourse,
-      idStudent: idStudent,
+
+const postRunCodeTest = async (requestData) => {
+  return await axios.post("api/CodeExecution/RunCodeTest", requestData, {
+    headers: {
+      "Content-Type": "application/json",
     },
   });
 };
@@ -412,6 +423,8 @@ export {
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
   getAssignmentAnswer,
+  getTestOfCourseStudent,
+  getAllActiveLanguage,
   postAddManualAssignment,
   postAddQuizAssignment,
   postPublishAssignment,
@@ -420,5 +433,5 @@ export {
   postSubmitManualQuestion,
   postGradingManualAssignment,
   deleteAssignment,
-  getTestOfCourseStudent,
+  postRunCodeTest,
 };

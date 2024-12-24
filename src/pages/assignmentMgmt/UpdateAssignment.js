@@ -33,6 +33,7 @@ import {
   getAllActiveLecturesOfCoure,
   getAllActiveSectionOfCourse,
 } from "../../services/courseService";
+import DiagNotiWarning from "../../components/diag/DiagNotiWarning";
 const UpdateAssignment = ({ isDuplicate }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -410,37 +411,173 @@ const UpdateAssignment = ({ isDuplicate }) => {
   };
 
   //HANDLE EDIT ASSIGNMENT
-  const isFormValid = () => {
-    if (assignmentInfo.title === "") return false;
-    if (isDuplicate && !selectedCourse) return false;
+
+  const [invalidHeader, setInvalidHeader] = useState("");
+  const [invalidMsg, setInvalidMessage] = useState("");
+  const [isModalInvalidOpen, setIsModalInvalidOpen] = useState(false);
+
+  const openInvalidModal = () => setIsModalInvalidOpen(true);
+  const closeInvalidModal = () => setIsModalInvalidOpen(false);
+  const handleOpenInvalidDiag = (header, msgBody) => {
+    setInvalidHeader(header);
+    setInvalidMessage(msgBody);
+    openInvalidModal();
+  };
+  const isFormValid = (isShowDiag) => {
+    if (assignmentInfo.title === "") {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Assignment Title",
+          "The assignment title is required. Please provide a valid title."
+        );
+      return false;
+    }
+    if (isDuplicate && !selectedCourse) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Course",
+          "Please select a course to assign the assignment."
+        );
+      return false;
+    }
     if (
       isDuplicate &&
       !isLimitedTimeCourse &&
       (!selectedSection || !selectedLecture)
-    )
-      return false;
-    if (!assignmentInfo.assignmentType) return false;
-    if (errorMessage !== "") return false;
-    if (questions.filter((q) => q.assignmentItemStatus === 1).length <= 0) {
+    ) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Lecture",
+          "Please select a lecture for this assignment."
+        );
       return false;
     }
-    for (const question of questions) {
-      if (!question.question || question.question.trim() === "") return false;
-      if (!question.mark || question.mark <= 0) return false;
-      if (+assignmentInfo.assignmentType === AssignmentType.quiz) {
-        if (question.items.length < 2) return false;
-        const hasCorrectAnswer = question.items.some((item) => item.isCorrect);
-        if (!hasCorrectAnswer) return false;
-        for (const item of question.items) {
-          if (!item.content || item.content.trim() === "") return false; // Kiểm tra content của từng item
+    if (isDuplicate && !isTest && (!selectedSection || !selectedLecture)) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Lecture or Section",
+          "To create an exercise, select both a lecture and section, or uncheck the option to make it a course test."
+        );
+      return false;
+    }
+    if (!assignmentInfo.assignmentType) {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Missing Assignment Type",
+          "Please select the type of assignment."
+        );
+      return false;
+    }
+    if (errorMessage !== "") {
+      isShowDiag &&
+        handleOpenInvalidDiag(
+          "Invalid Form",
+          "There are errors in the form. Please review and fix them."
+        );
+      return false;
+    }
+    if (+assignmentInfo.assignmentType === AssignmentType.code) {
+      if (!questions || typeof questions !== "object") {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Questions",
+            "Please provide a valid question and mark for the coding assignment."
+          );
+        return false;
+      }
+      if (!questions.question || questions.question.trim() === "") {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Questions",
+            "Please provide a valid question for the coding assignment."
+          );
+        return false;
+      }
+      if (!questions.mark || questions.mark <= 0) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Questions",
+            "Please provide a valid mark greater than 0 for the coding assignment."
+          );
+        return false;
+      }
+    } else {
+      if (!Array.isArray(questions) || questions.length <= 0) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Missing Questions",
+            "You must add at least one question to proceed."
+          );
+        return false;
+      }
+      for (const question of questions) {
+        if (!question.question || question.question.trim() === "") {
+          isShowDiag &&
+            handleOpenInvalidDiag(
+              "Invalid Questions",
+              "Each question must have valid content."
+            );
+          return false;
+        }
+        if (!question.mark || question.mark <= 0) {
+          isShowDiag &&
+            handleOpenInvalidDiag(
+              "Invalid Questions",
+              "Each question must have a mark greater than 0."
+            );
+          return false;
+        }
+        if (+assignmentInfo.assignmentType === AssignmentType.quiz) {
+          if (question.items.length < 2) {
+            isShowDiag &&
+              handleOpenInvalidDiag(
+                "Invalid Questions",
+                "Each quiz question must have at least two options."
+              );
+            return false;
+          }
+          const hasCorrectAnswer = question.items.some(
+            (item) => item.isCorrect
+          );
+          if (!hasCorrectAnswer) {
+            isShowDiag &&
+              handleOpenInvalidDiag(
+                "Invalid Questions",
+                "Each quiz question must have at least one correct answer."
+              );
+            return false;
+          }
+          for (const item of question.items) {
+            if (!item.content || item.content.trim() === "") {
+              isShowDiag &&
+                handleOpenInvalidDiag(
+                  "Invalid Questions",
+                  "Quiz options must have valid content."
+                );
+              return false;
+            }
+          }
         }
       }
     }
-    if (isDuplicate && !isTest && (!selectedSection || !selectedLecture))
-      return false;
+
     return true;
   };
+  const [isFormValidState, setIsFormValidState] = useState(false);
+  useEffect(() => {
+    setIsFormValidState(isFormValid(false));
+  }, [
+    assignmentInfo.title,
+    selectedCourse,
+    selectedLecture,
+    questions,
+    assignmentInfo.assignmentType,
+    errorMessage,
+  ]);
   const handleDuplicateAssignment = async (isPublish) => {
+    if (!isFormValid(true)) {
+      return;
+    }
     const dataToSubmit = {
       title: assignmentInfo.title,
       idCourse: selectedCourse.idCourse,
@@ -494,6 +631,9 @@ const UpdateAssignment = ({ isDuplicate }) => {
     }
   };
   const handleEditAssignment = async (isPublish) => {
+    if (!isFormValid(true)) {
+      return;
+    }
     const dataToSubmit = {
       idAssignment: assignmentInfo.idAssignment,
       title: assignmentInfo.title,
@@ -685,8 +825,9 @@ const UpdateAssignment = ({ isDuplicate }) => {
               </div>
             )}
             <button
-              className="btn save"
-              disabled={!isFormValid()}
+              className={`btn save ${
+                !isFormValidState ? "button-disabled" : ""
+              }`}
               onClick={() => {
                 isDuplicate
                   ? handleDuplicateAssignment(false)
@@ -701,7 +842,9 @@ const UpdateAssignment = ({ isDuplicate }) => {
               Save
             </button>
             <button
-              className="btn publish"
+              className={`btn publish ${
+                !isFormValidState ? "button-disabled" : ""
+              }`}
               disabled={!isFormValid()}
               onClick={() => {
                 isDuplicate
@@ -1145,6 +1288,12 @@ const UpdateAssignment = ({ isDuplicate }) => {
           </div>
         </div>
       )}
+      <DiagNotiWarning
+        isOpen={isModalInvalidOpen}
+        onClose={closeInvalidModal}
+        invalidHeader={invalidHeader}
+        invalidMsg={invalidMsg}
+      />
     </div>
   );
 };

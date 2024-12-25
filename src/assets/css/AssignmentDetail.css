@@ -18,6 +18,7 @@
   align-items: center;
   justify-content: space-between;
   position: relative;
+  gap: 40px;
 }
 .questions-overview-container
   .questions-container

@@ -5,6 +5,7 @@ import {
   getAssignmentInfo,
   getDetailAssignmentForStudent,
   getOverviewAssignment,
+  getViewCodeAssignment,
   postUpdateAssignment,
 } from "../../services/assignmentService";
 import {
@@ -38,6 +39,7 @@ import default_image from "../../assets/img/default_image.png";
 import default_ava from "../../assets/img/default_ava.png";
 import "../../assets/css/AssignmentDetail.css";
 import AnswerSheet from "../../components/assigment/AnswerSheet";
+import RunCode from "../../components/assigment/RunCode";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -50,6 +52,7 @@ const AssignDetail = () => {
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [overviewAssignment, setOverviewAssignment] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [codeProblem, setCodeProblem] = useState({});
   const [activeChoice, setActiveChoice] = useState("question");
 
   const [showAnswer, setShowAnswer] = useState(false);
@@ -102,7 +105,14 @@ const AssignDetail = () => {
           const fetchedAssignmentInfo = response.data;
           setAssignmentInfo(fetchedAssignmentInfo);
           if (idRole === Role.teacher) {
-            setQuestions(fetchedAssignmentInfo.assignmentItems);
+            if (fetchedAssignmentInfo.assignmentType === AssignmentType.code) {
+              let responseCode = await getViewCodeAssignment(idAssignment);
+              if (responseCode.status === APIStatus.success) {
+                setCodeProblem(responseCode.data);
+              }
+            } else {
+              setQuestions(fetchedAssignmentInfo.assignmentItems);
+            }
           }
         }
       } catch (error) {
@@ -668,34 +678,36 @@ const AssignDetail = () => {
                       className="container-options assign-setting-option published"
                       ref={optionRef}
                     >
-                      <div className="item">
-                        <span>Question shuffling</span>
-                        <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={assignmentInfo.isShufflingQuestion === 1}
-                            onChange={(e) =>
-                              handleUpdateAssignment(
-                                "isShufflingQuestion",
-                                e.target.checked ? 1 : 0
-                              )
-                            }
-                          />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                      {assignmentInfo.assignmentType ===
-                        AssignmentType.quiz && (
+                      {assignmentInfo.assignmentType === AssignmentType.code ? (
+                        <div className="item">
+                          <span>Show test cases on submission</span>
+                          <label className="switch">
+                            <input
+                              type="checkbox"
+                              checked={codeProblem.showTestcase === 1}
+                              // onChange={(e) =>
+                              //   handleUpdateAssignment(
+                              //     "isShufflingQuestion",
+                              //     e.target.checked ? 1 : 0
+                              //   )
+                              // }
+                            />
+                            <span className="slider"></span>
+                          </label>
+                        </div>
+                      ) : (
                         <>
                           <div className="item">
-                            <span>Answer shuffling</span>
+                            <span>Question shuffling</span>
                             <label className="switch">
                               <input
                                 type="checkbox"
-                                checked={assignmentInfo.isShufflingAnswer === 1}
+                                checked={
+                                  assignmentInfo.isShufflingQuestion === 1
+                                }
                                 onChange={(e) =>
                                   handleUpdateAssignment(
-                                    "isShufflingAnswer",
+                                    "isShufflingQuestion",
                                     e.target.checked ? 1 : 0
                                   )
                                 }
@@ -703,145 +715,268 @@ const AssignDetail = () => {
                               <span className="slider"></span>
                             </label>
                           </div>
-                          <div className="item">
-                            <span>Show answer on submission</span>
-                            <label className="switch">
-                              <input
-                                type="checkbox"
-                                checked={assignmentInfo.showAnswer === 1}
-                                onChange={(e) =>
-                                  handleUpdateAssignment(
-                                    "showAnswer",
-                                    e.target.checked ? 1 : 0
-                                  )
-                                }
-                              />
-                              <span className="slider"></span>
-                            </label>
-                          </div>
+                          {assignmentInfo.assignmentType ===
+                            AssignmentType.quiz && (
+                            <>
+                              <div className="item">
+                                <span>Answer shuffling</span>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={
+                                      assignmentInfo.isShufflingAnswer === 1
+                                    }
+                                    onChange={(e) =>
+                                      handleUpdateAssignment(
+                                        "isShufflingAnswer",
+                                        e.target.checked ? 1 : 0
+                                      )
+                                    }
+                                  />
+                                  <span className="slider"></span>
+                                </label>
+                              </div>
+                              <div className="item">
+                                <span>Show answer on submission</span>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={assignmentInfo.showAnswer === 1}
+                                    onChange={(e) =>
+                                      handleUpdateAssignment(
+                                        "showAnswer",
+                                        e.target.checked ? 1 : 0
+                                      )
+                                    }
+                                  />
+                                  <span className="slider"></span>
+                                </label>
+                              </div>
+                            </>
+                          )}
                         </>
                       )}
                     </div>
                   )}
-                  {records.map((question, index) => (
-                    <div className="question-item" key={index}>
-                      <div className="info-row">
-                        <label className="question-idx">{`Question ${
-                          firstIndex + index + 1
-                        }`}</label>
-                        <label className="question-mark">{`${question.mark} ${
-                          question.mark <= 1 ? "mark" : "marks"
-                        }`}</label>
-                      </div>
-                      <div className="info-row question-text">
-                        <p style={{ whiteSpace: "pre-wrap" }}>
-                          {question.question.trim()}
-                        </p>
-                        {assignmentInfo.assignmentType ===
-                          AssignmentType.quiz &&
-                          question.attachedFile && (
-                            <img
-                              className="question-img"
-                              src={question.attachedFile || default_image}
-                              alt=""
-                            />
-                          )}
-                      </div>
-                      {assignmentInfo.assignmentType ===
-                        AssignmentType.manual && (
-                        <>
-                          <div className="info-row">
-                            <div className="info">
-                              {question.attachedFile && (
-                                <>
-                                  <span>Reference material:</span>
-
-                                  <div className="select-container">
-                                    <input
-                                      type="text"
-                                      style={{ cursor: "pointer" }}
-                                      className="input-form-pi"
-                                      title={question.nameFile}
-                                      defaultValue={
-                                        question.nameFile?.length > 54
-                                          ? question.nameFile.slice(0, 54) +
-                                            "..."
-                                          : question.nameFile
-                                      }
-                                      onClick={() => {
-                                        if (
-                                          typeof question.attachedFile ===
-                                          "string"
-                                        ) {
-                                          // Kiểm tra nếu attachedFile là URL
-                                          const fileUrl = question.attachedFile;
-                                          window.open(fileUrl, "_blank");
-                                        }
-                                      }}
-                                      readOnly
-                                    />
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          <div className="info-row answer-manual-type">
+                  {assignmentInfo.assignmentType === AssignmentType.code ? (
+                    <>
+                      <div className="question-item">
+                        <div className="info-row">
+                          <label className="question-idx">Problem</label>
+                        </div>
+                        <div
+                          className="info-row question-text"
+                          style={{ width: "100%" }}
+                        >
+                          <p style={{ whiteSpace: "pre-wrap" }}>
+                            {codeProblem.problem.trim()}
+                          </p>
+                        </div>
+                        <div className="info-row">
+                          <span>
+                            <label>
+                              Language:{" "}
+                              <strong>{codeProblem.languageName}</strong>
+                            </label>
+                          </span>
+                        </div>
+                        <div className="info-row container-right-assign">
+                          <div className="info" style={{ flex: "1" }}>
                             <span>
-                              <label style={{ color: "var(--text-gray)" }}>
-                                Type of anwer:{" "}
-                              </label>
-                              <label>
-                                {question.assignmentItemAnswerType ===
-                                AssignmentItemAnswerType.attached_file
-                                  ? " Attach file"
-                                  : " Text"}
+                              <label style={{ color: "var(--black-color)" }}>
+                                Example
                               </label>
                             </span>
+                            <table className="result-table">
+                              <thead>
+                                <tr>
+                                  <th>Input</th>
+                                  <th>Output</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {codeProblem.examples.map((example, index) => (
+                                  <tr key={index}>
+                                    <td>{example.input}</td>
+                                    <td>{example.output}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
-                        </>
-                      )}
-                      {assignmentInfo.assignmentType ===
-                        AssignmentType.quiz && (
-                        <div className="info-row choices-container">
-                          <label style={{ fontSize: "14px", fontWeight: 800 }}>
-                            Choices
-                          </label>
-                          {question.items.map(
-                            (choice, choiceIdx) =>
-                              choice.multipleAssignmentItemStatus === 1 && (
-                                <div
-                                  className="info-in-row"
-                                  key={choiceIdx}
-                                  style={{ width: "100%" }}
-                                >
-                                  <label className="radio-choice">
-                                    <input
-                                      type={
-                                        question.isMultipleAnswer
-                                          ? "checkbox"
-                                          : "radio"
-                                      }
-                                      name={`question_${index}`}
-                                      checked={!!choice.isCorrect}
-                                      readOnly
-                                    />
-                                  </label>
-                                  <div className="info" style={{ flex: "1" }}>
-                                    <input
-                                      type="text"
-                                      className="input-form-pi"
-                                      placeholder="Type a choice"
-                                      defaultValue={choice.content}
-                                      readOnly
-                                    />
-                                  </div>
-                                </div>
-                              )
-                          )}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        <div className="info-row container-right-assign">
+                          <div className="info" style={{ flex: "1" }}>
+                            <span>
+                              <label style={{ color: "var(--black-color)" }}>
+                                Test case
+                              </label>
+                            </span>
+                            <table className="result-table">
+                              <thead>
+                                <tr>
+                                  <th>Input</th>
+                                  <th>Output</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {codeProblem.testCases.map(
+                                  (testCase, index) => (
+                                    <tr key={index}>
+                                      <td>{testCase.input}</td>
+                                      <td>{testCase.expectedOutput}</td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        className="question-item"
+                        style={{ padding: "24px 0" }}
+                      >
+                        <RunCode
+                          selectedLanguage={{
+                            idLanguage: codeProblem.idLanguage,
+                            languageName: codeProblem.languageName,
+                          }}
+                          testCases={codeProblem.testCases}
+                          isPassTestCase={true}
+                          isPerformanceOnTime={codeProblem.isPerformanceOnTime}
+                          timeValue={codeProblem.timeValue}
+                          isPerformanceOnMemory={
+                            codeProblem.isPerformanceOnMemory
+                          }
+                          memoryValue={codeProblem.memoryValue}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    records.map((question, index) => (
+                      <div className="question-item" key={index}>
+                        <div className="info-row">
+                          <label className="question-idx">{`Question ${
+                            firstIndex + index + 1
+                          }`}</label>
+                          <label className="question-mark">{`${question.mark} ${
+                            question.mark <= 1 ? "mark" : "marks"
+                          }`}</label>
+                        </div>
+                        <div className="info-row question-text">
+                          <p style={{ whiteSpace: "pre-wrap" }}>
+                            {question.question.trim()}
+                          </p>
+                          {assignmentInfo.assignmentType ===
+                            AssignmentType.quiz &&
+                            question.attachedFile && (
+                              <img
+                                className="question-img"
+                                src={question.attachedFile || default_image}
+                                alt=""
+                              />
+                            )}
+                        </div>
+                        {assignmentInfo.assignmentType ===
+                          AssignmentType.manual && (
+                          <>
+                            <div className="info-row">
+                              <div className="info">
+                                {question.attachedFile && (
+                                  <>
+                                    <span>Reference material:</span>
+
+                                    <div className="select-container">
+                                      <input
+                                        type="text"
+                                        style={{ cursor: "pointer" }}
+                                        className="input-form-pi"
+                                        title={question.nameFile}
+                                        defaultValue={
+                                          question.nameFile?.length > 54
+                                            ? question.nameFile.slice(0, 54) +
+                                              "..."
+                                            : question.nameFile
+                                        }
+                                        onClick={() => {
+                                          if (
+                                            typeof question.attachedFile ===
+                                            "string"
+                                          ) {
+                                            // Kiểm tra nếu attachedFile là URL
+                                            const fileUrl =
+                                              question.attachedFile;
+                                            window.open(fileUrl, "_blank");
+                                          }
+                                        }}
+                                        readOnly
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="info-row answer-manual-type">
+                              <span>
+                                <label style={{ color: "var(--text-gray)" }}>
+                                  Type of anwer:{" "}
+                                </label>
+                                <label>
+                                  {question.assignmentItemAnswerType ===
+                                  AssignmentItemAnswerType.attached_file
+                                    ? " Attach file"
+                                    : " Text"}
+                                </label>
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {assignmentInfo.assignmentType ===
+                          AssignmentType.quiz && (
+                          <div className="info-row choices-container">
+                            <label
+                              style={{ fontSize: "14px", fontWeight: 800 }}
+                            >
+                              Choices
+                            </label>
+                            {question.items.map(
+                              (choice, choiceIdx) =>
+                                choice.multipleAssignmentItemStatus === 1 && (
+                                  <div
+                                    className="info-in-row"
+                                    key={choiceIdx}
+                                    style={{ width: "100%" }}
+                                  >
+                                    <label className="radio-choice">
+                                      <input
+                                        type={
+                                          question.isMultipleAnswer
+                                            ? "checkbox"
+                                            : "radio"
+                                        }
+                                        name={`question_${index}`}
+                                        checked={!!choice.isCorrect}
+                                        readOnly
+                                      />
+                                    </label>
+                                    <div className="info" style={{ flex: "1" }}>
+                                      <input
+                                        type="text"
+                                        className="input-form-pi"
+                                        placeholder="Type a choice"
+                                        defaultValue={choice.content}
+                                        readOnly
+                                      />
+                                    </div>
+                                  </div>
+                                )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
               {!showAnswerSheet && activeChoice === "overview" && (

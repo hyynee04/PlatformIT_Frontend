@@ -21,6 +21,7 @@ import {
 } from "../../constants/constants";
 import {
   getAllActiveLanguage,
+  postAddCodeAssignment,
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/assignmentService";
@@ -61,6 +62,7 @@ const AddNewAssign = () => {
   const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
   const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
   const [isShowAnswer, setIsShowAnswer] = useState(false);
+  const [isShowTestCases, setIsShowTestCases] = useState(false);
   const [typeAssignment, setTypeAssignment] = useState(null);
   const [duration, setDuration] = useState(0);
   const [startDate, setStartDate] = useState("");
@@ -243,6 +245,18 @@ const AddNewAssign = () => {
     );
     setSelectedLanguage(language);
   };
+  // useEffect(() => {
+  //   if (
+  //     selectedLanguage &&
+  //     typeof questions === "object" &&
+  //     questions !== null
+  //   ) {
+  //     setQuestions((prevQuestions) => ({
+  //       ...prevQuestions,
+  //       idLanguage: selectedLanguage.idLanguage,
+  //     }));
+  //   }
+  // }, [selectedLanguage, questions]);
 
   const isStartDateAfterNow = (startDate) => {
     const currentDate = new Date();
@@ -614,7 +628,7 @@ const AddNewAssign = () => {
     if (!isFormValid(true)) {
       return;
     }
-    const dataToSubmit = {
+    let dataToSubmit = {
       title: title,
       idCourse: selectedCourse.idCourse,
       isTest: isTest,
@@ -627,8 +641,21 @@ const AddNewAssign = () => {
       isShufflingQuestion: isShufflingQuestion,
       isShufflingAnswer: isShufflingAnswer,
       isShowAnswer: isShowAnswer,
-      questions: questions,
+      isShowTestCase: isShowTestCases,
+      idLanguage: selectedLanguage.idLanguage,
+      // questions: questions,
     };
+    if (+typeAssignment === AssignmentType.code) {
+      dataToSubmit = {
+        ...dataToSubmit,
+        ...questions,
+      };
+    } else {
+      dataToSubmit = {
+        ...dataToSubmit,
+        questions: questions,
+      };
+    }
     setLoading(true);
     try {
       let response;
@@ -637,6 +664,8 @@ const AddNewAssign = () => {
         response = await postAddManualAssignment(dataToSubmit);
       } else if (+typeAssignment === AssignmentType.quiz) {
         response = await postAddQuizAssignment(dataToSubmit);
+      } else if (+typeAssignment === AssignmentType.code) {
+        response = await postAddCodeAssignment(dataToSubmit);
       }
 
       if (response?.status === APIStatus.success) {
@@ -934,7 +963,6 @@ const AddNewAssign = () => {
                             if (selectedValue === AssignmentType.code) {
                               setQuestions({
                                 problem: "",
-                                languages: [],
                                 examples: [
                                   {
                                     input: "",
@@ -943,9 +971,9 @@ const AddNewAssign = () => {
                                 ],
                                 isPassTestCase: true,
                                 isPerformanceOnTime: false,
-                                timeValue: "",
+                                timeValue: 0,
                                 isPerformanceOnMemory: false,
-                                memoryValue: "",
+                                memoryValue: 0,
                                 testCases: [
                                   {
                                     input: "",
@@ -1095,9 +1123,9 @@ const AddNewAssign = () => {
                   <label className="switch">
                     <input
                       type="checkbox"
-                      checked={isShowAnswer}
+                      checked={isShowTestCases}
                       onChange={(e) => {
-                        setIsShowAnswer(e.target.checked);
+                        setIsShowTestCases(e.target.checked);
                       }}
                     />
                     <span className="slider"></span>

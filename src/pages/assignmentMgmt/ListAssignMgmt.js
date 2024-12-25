@@ -686,7 +686,9 @@ const ListAssignMgmt = () => {
                         if (idRole === Role.teacher) {
                           if (assignment.isPublish === 1) {
                             navigate("/teacherAssignDetail", {
-                              state: { idAssignment: assignment.idAssignment },
+                              state: {
+                                idAssignment: assignment.idAssignment,
+                              },
                             });
                           } else {
                             navigate("/updateAssignment", {
@@ -739,15 +741,18 @@ const ListAssignMgmt = () => {
                             </label>
                           </div>
                         )}
-                        <div className="attribute-item">
-                          <LuCheckSquare className="icon-attribute-assign" />
-                          <label htmlFor="">
-                            {assignment.questionQuantity}{" "}
-                            {assignment.questionQuantity > 1
-                              ? "questions"
-                              : "question"}
-                          </label>
-                        </div>
+                        {assignment.assignmentType !== AssignmentType.code && (
+                          <div className="attribute-item">
+                            <LuCheckSquare className="icon-attribute-assign" />
+                            <label htmlFor="">
+                              {assignment.questionQuantity}{" "}
+                              {assignment.questionQuantity > 1
+                                ? "questions"
+                                : "question"}
+                            </label>
+                          </div>
+                        )}
+
                         {idRole === Role.teacher && assignment.startDate && (
                           <div className="attribute-item">
                             <LuCalendar className="icon-attribute-assign" />

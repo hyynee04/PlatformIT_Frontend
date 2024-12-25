@@ -327,14 +327,17 @@ const Chat = () => {
                 );
               })}
               <div className="message-end">
-                {!loading && !loadingMsg && !isChatAvailable && (
-                  <label htmlFor="">
-                    You can't message this{" "}
-                    {idRole === Role.teacher ? " student" : " teacher"} as your
-                    courses have expired. They look forward to seeing you in
-                    future courses!
-                  </label>
-                )}
+                {!loading &&
+                  !loadingMsg &&
+                  selectedSender?.userId &&
+                  !isChatAvailable && (
+                    <label htmlFor="">
+                      You can't message this{" "}
+                      {idRole === Role.teacher ? " student" : " teacher"} as
+                      your courses have expired. They look forward to seeing you
+                      in future courses!
+                    </label>
+                  )}
               </div>
               <div ref={messagesEndRef} />
             </div>

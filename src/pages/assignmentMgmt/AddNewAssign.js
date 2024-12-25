@@ -401,11 +401,23 @@ const AddNewAssign = () => {
       : 0;
 
   const handleAddNewRecord = (fieldName) => {
-    setQuestions((prevQuestions) => ({
-      ...prevQuestions,
-      [fieldName]: [...prevQuestions[fieldName], { input: "", output: "" }],
-    }));
+    setQuestions((prevQuestions) => {
+      if (fieldName === "testCases") {
+        return {
+          ...prevQuestions,
+          [fieldName]: [
+            ...prevQuestions[fieldName],
+            { input: "", expectedOutput: "" },
+          ],
+        };
+      }
+      return {
+        ...prevQuestions,
+        [fieldName]: [...prevQuestions[fieldName], { input: "", output: "" }],
+      };
+    });
   };
+
   const handleDeleteRecord = (fieldName, index) => {
     setQuestions((prevQuestions) => ({
       ...prevQuestions,

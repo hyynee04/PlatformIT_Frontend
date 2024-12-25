@@ -445,15 +445,22 @@ const AssignDetail = () => {
                 <span className="marks-questions">
                   {idRole === Role.teacher && (
                     <>
-                      <label>
-                        {totalMarks || 0} {totalMarks <= 1 ? "mark" : "marks"}
-                      </label>
+                      {assignmentInfo.assignmentType !==
+                        AssignmentType.code && (
+                        <>
+                          <label>
+                            {totalMarks || 0}{" "}
+                            {totalMarks <= 1 ? "mark" : "marks"}
+                          </label>
 
-                      <GoDotFill strokeWidth={1} />
-                      <label>
-                        {totalQuestions}{" "}
-                        {totalQuestions <= 1 ? "question" : "questions"}
-                      </label>
+                          <GoDotFill strokeWidth={1} />
+                          <label>
+                            {totalQuestions}{" "}
+                            {totalQuestions <= 1 ? "question" : "questions"}
+                          </label>
+                        </>
+                      )}
+
                       <button
                         className="btn"
                         onClick={(e) => {
@@ -820,7 +827,7 @@ const AssignDetail = () => {
                                 </tr>
                               </thead>
                               <tbody>
-                                {codeProblem.testCases.map(
+                                {codeProblem.testCases?.map(
                                   (testCase, index) => (
                                     <tr key={index}>
                                       <td>{testCase.input}</td>

@@ -9,11 +9,13 @@
 }
 .add-lecture-container > .page-header {
   width: 100%;
-  /* height: fit-content; */
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-between;
+}
+.add-lecture-container > .page-header.another-status {
+  align-items: center;
 }
 .add-lecture-container .page-header > .back-to-course {
   width: fit-content;
@@ -37,7 +39,7 @@
 .add-lecture-container .page-header > .page-title {
   display: flex;
   flex-direction: column;
-  width: 85%;
+  flex: 1;
 }
 .add-lecture-container .page-header .page-title > .title {
   color: var(--black-color);
@@ -53,15 +55,16 @@
   align-items: center;
 }
 .add-lecture-container .page-header > .create-lecture {
-  width: 10%;
+  width: fit-content;
   height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: end;
   align-items: end;
+  margin-left: 25px;
 }
 .add-lecture-container .page-header .create-lecture > button {
-  padding: 4px 8px;
+  padding: 4px 12px;
   border: none;
   border-radius: 0.25rem;
   background-color: var(--main-color);
@@ -391,6 +394,7 @@
   overflow-x: hidden;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 .add-lecture-container
   .page-body
@@ -473,4 +477,22 @@
   > svg {
   width: 1.3rem;
   height: 1.3rem;
+}
+.add-lecture-container
+  .page-header
+  .create-lecture
+  > button.delete-lecture-btn {
+  background-color: transparent;
+  color: var(--text-gray);
+  font-weight: 500;
+  margin-right: 10px;
+  box-shadow: none;
+}
+.add-lecture-container
+  .page-header
+  .create-lecture
+  > button.delete-lecture-btn:hover {
+  background-color: rgba(217, 217, 217, 0.5);
+  color: var(--black-color);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }

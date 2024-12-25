@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import { GoAlertFill } from "react-icons/go";
 import { BsReplyFill, BsTrash3Fill } from "react-icons/bs";
 import {
   LuAirplay,
@@ -18,7 +19,12 @@ import {
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
-import { APIStatus, AssignmentType, Role } from "../../constants/constants";
+import {
+  APIStatus,
+  AssignmentType,
+  LectureStatus,
+  Role,
+} from "../../constants/constants";
 import {
   formatDateTime,
   getVideoType,
@@ -28,9 +34,11 @@ import { useNavigate } from "react-router-dom";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import { postAddComment } from "../../services/commentService";
 import FetchDataUpdated from "../../functions/FetchDataUpdated";
+import { Title } from "chart.js";
 
 const LectureView = ({
   lectureDetail,
+  editLecture,
   idTeacher,
   idLecture,
   mainCommentList,
@@ -39,6 +47,10 @@ const LectureView = ({
   setIsRemoved,
   setIdComment,
   setUpdatedCommentList,
+  lectureStatus,
+  setDefaultToEditLecture,
+  setEditLecture,
+  setIsEditLecture,
 }) => {
   const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
@@ -47,8 +59,6 @@ const LectureView = ({
   const [index, setIndex] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
 
-  const [editLecture, setEditLecture] = useState({ ...lectureDetail });
-
   const avaImg = useSelector((state) => state.profileUser.avaImg);
 
   const [loading, setLoading] = useState({
@@ -56,15 +66,15 @@ const LectureView = ({
     addComment: false,
   });
 
+  const fileInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const listFileInputRef = useRef(null);
+
   const [generalComment, setGeneralComment] = useState({});
 
   const [replyComment, setReplyComment] = useState({});
 
-  const { updatedComments } = FetchDataUpdated(
-    null,
-    lectureDetail.idLecture,
-    "comment"
-  );
+  const { updatedComments } = FetchDataUpdated(null, idLecture, "comment");
 
   const [isLongContent, setIsLongContent] = useState({});
   const [isExpanded, setIsExpanded] = useState({});
@@ -119,6 +129,14 @@ const LectureView = ({
       ...isHovered,
       [idComment]: false,
     });
+  };
+
+  const handleDelete = (index) => {
+    // Implement your deletion logic here
+    const updatedFiles = editLecture.SupportMaterials.filter(
+      (_, i) => i !== index
+    );
+    setEditLecture({ ...editLecture, SupportMaterials: updatedFiles });
   };
 
   useEffect(() => {
@@ -199,6 +217,8 @@ const LectureView = ({
     }
   }, []);
 
+  console.log(editLecture);
+
   return (
     <>
       <div
@@ -208,6 +228,7 @@ const LectureView = ({
         {idRole === Role.teacher && (
           <button
             onClick={() => {
+              if (isEdit) setDefaultToEditLecture();
               setIsEdit(!isEdit);
               setIsOpenOption(!isOpenOption);
               setIndex(1);
@@ -224,7 +245,6 @@ const LectureView = ({
             )}
           </button>
         )}
-
         <button
           onClick={() => {
             setIsRemoved(true);
@@ -234,16 +254,32 @@ const LectureView = ({
           Remove Lecture
         </button>
       </div>
+      {lectureStatus === LectureStatus.pending ? (
+        <span className="status-text pending-color">
+          <GoAlertFill /> This lecture is pending
+        </span>
+      ) : lectureStatus === LectureStatus.rejected ? (
+        <span className="status-text rejected-color">
+          <GoAlertFill /> This lecture is rejected
+        </span>
+      ) : null}
+
       {isEdit && (
         <div className="lecture-header">
           <div className="lecture-head-info edit-view slide-to-bottom">
             <span className="lecture-title">Edit Lecture</span>
           </div>
           <div className="option-container">
-            <button className="changes-button discard slide-to-bottom">
+            <button
+              className="changes-button discard slide-to-bottom"
+              onClick={() => setDefaultToEditLecture()}
+            >
               Discard changes
             </button>
-            <button className="changes-button save slide-to-bottom">
+            <button
+              className="changes-button save slide-to-bottom"
+              onClick={() => setIsEditLecture(true)}
+            >
               Save changes
             </button>
             <button
@@ -271,8 +307,11 @@ const LectureView = ({
               <input
                 className="edit-title slide-to-bottom"
                 type="text"
-                value={editLecture.lectureTitle}
-                placeholder={editLecture.lectureTitle}
+                value={editLecture.Title}
+                placeholder={editLecture.Title}
+                onChange={(e) => {
+                  setEditLecture({ ...editLecture, Title: e.target.value });
+                }}
               />
             </>
           ) : (
@@ -310,22 +349,73 @@ const LectureView = ({
               <div className="edit-video-header">
                 <label className="field-label">Lecture video</label>
                 <div className="video-button-container">
-                  <button className="remove-btn">
+                  <button
+                    className="remove-btn"
+                    disabled={
+                      !lectureDetail.videoMaterial || !editLecture.LectureVideo
+                    }
+                    onClick={() => {
+                      setEditLecture({ ...editLecture, LectureVideo: "" });
+                      if (videoInputRef.current) {
+                        videoInputRef.current.value = ""; // Reset the file input value
+                      }
+                    }}
+                  >
                     <LuTrash2 /> Remove
                   </button>
-                  <button className="upload-btn">
+                  <button
+                    className="upload-btn"
+                    onClick={() => videoInputRef.current.click()}
+                  >
                     <LuUpload /> Upload video
                   </button>
                 </div>
               </div>
+              <input
+                type="file"
+                ref={videoInputRef}
+                style={{ display: "none" }}
+                accept="video/mp4, video/webm, video/ogg"
+                onChange={(event) => {
+                  // setIsMissing(0);
+                  console.log("Go here");
+                  const file = event.target.files[0]; // Get the selected file
+                  if (file) {
+                    console.log("Go there");
+                    setEditLecture({ ...editLecture, LectureVideo: file });
+                  }
+                }}
+              />
             </>
           )}
-          {lectureDetail.videoMaterial ? (
-            <video className="video-player" controls>
-              {lectureDetail?.videoMaterial?.path ? (
+          {lectureDetail.videoMaterial || editLecture.LectureVideo ? (
+            <video
+              className="video-player"
+              controls
+              key={
+                editLecture.LectureVideo instanceof File
+                  ? editLecture?.LectureVideo.name
+                  : "invalid-video"
+              }
+            >
+              {lectureDetail?.videoMaterial?.path ||
+              editLecture?.LectureVideo?.path ||
+              editLecture?.LectureVideo instanceof File ? (
                 <source
-                  src={lectureDetail.videoMaterial.path}
-                  type={getVideoType(lectureDetail.videoMaterial.path)}
+                  src={
+                    lectureDetail?.videoMaterial?.path
+                      ? lectureDetail?.videoMaterial?.path
+                      : editLecture?.LectureVideo?.path
+                      ? editLecture?.LectureVideo?.path
+                      : URL.createObjectURL(editLecture.LectureVideo)
+                  }
+                  type={getVideoType(
+                    lectureDetail?.videoMaterial?.path
+                      ? lectureDetail?.videoMaterial?.path
+                      : editLecture?.LectureVideo?.path
+                      ? editLecture?.LectureVideo?.path
+                      : editLecture.LectureVideo.name
+                  )}
                 />
               ) : (
                 <p>Error: Invalid file</p>
@@ -340,35 +430,73 @@ const LectureView = ({
         </div>
       ) : null}
 
-      {((lectureDetail.mainMaterials &&
-        lectureDetail.mainMaterials.length > 0) ||
+      {(lectureDetail.mainMaterials?.length > 0 ||
+        editLecture.MainMaterials?.length > 0 ||
         isEdit) && (
         <div className="main-material slide-to-right slide-to-bottom">
           <span className="title">Main Material</span>
           {isEdit && (
-            <button
-              className="attach-file-button"
-              // onClick={() => fileInputRef.current.click()}
-            >
-              <LuPaperclip /> Attach file
-            </button>
-          )}
-          <input
-            className="file-container"
-            type="file"
-            style={{ display: "none" }}
-          />
-          <div className="material-content">
-            <div
-              onClick={() => window.open(lectureDetail.mainMaterials[0].path)}
-              className="content-file"
-            >
-              <span>{lectureDetail.mainMaterials[0].fileName}</span>
-            </div>
-            {isEdit && (
-              <button className="file-buttons">
-                <LuTrash2 />
+            <>
+              <button
+                className="attach-file-button"
+                onClick={() => fileInputRef.current.click()}
+              >
+                <LuPaperclip /> Attach file
               </button>
+              <input
+                className="file-container"
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={(event) => {
+                  // setIsMissing(0);
+                  const file = event.target.files[0]; // Get the selected file
+                  if (file) {
+                    setEditLecture({ ...editLecture, MainMaterials: file });
+                  }
+                }}
+              />
+            </>
+          )}
+          <div className="material-content">
+            {isEdit &&
+            (editLecture.MainMaterials[0] ||
+              editLecture.MainMaterials instanceof File) ? (
+              <>
+                <div
+                  onClick={() =>
+                    window.open(
+                      editLecture?.MainMaterials[0]?.path ||
+                        URL.createObjectURL(editLecture.MainMaterials)
+                    )
+                  }
+                  className="content-file"
+                >
+                  <span>
+                    {editLecture?.MainMaterials[0]?.fileName ||
+                      editLecture.MainMaterials.name}
+                  </span>
+                </div>
+                <button
+                  className="file-buttons"
+                  onClick={() =>
+                    setEditLecture({ ...editLecture, MainMaterials: "" })
+                  }
+                >
+                  <LuTrash2 />
+                </button>
+              </>
+            ) : (
+              !isEdit && (
+                <div
+                  onClick={() =>
+                    window.open(lectureDetail?.mainMaterials[0]?.path)
+                  }
+                  className="content-file"
+                >
+                  <span>{lectureDetail?.mainMaterials[0]?.fileName}</span>
+                </div>
+              )
             )}
           </div>
         </div>
@@ -395,7 +523,17 @@ const LectureView = ({
             <>
               {isEdit ? (
                 <>
-                  <textarea placeholder="Tell a little thing about this lecture..."></textarea>
+                  <textarea
+                    placeholder="Tell a little thing about this lecture..."
+                    value={editLecture.Introduction}
+                    onChange={(e) => {
+                      setEditLecture({
+                        ...editLecture,
+                        Introduction: e.target.value,
+                      });
+                      // setIsMissing(0);
+                    }}
+                  ></textarea>
                 </>
               ) : (
                 <div className="part-item">
@@ -414,34 +552,95 @@ const LectureView = ({
                 <div className="add-exercise-container">
                   <button
                     className="attach-file-button"
-                    // onClick={() => fileInputRef.current.click()}
+                    onClick={() => listFileInputRef.current.click()}
                   >
                     <LuPaperclip /> Attach file
                   </button>
+                  <input
+                    className="file-container"
+                    ref={listFileInputRef}
+                    type="file"
+                    style={{ display: "none" }}
+                    multiple
+                    onChange={(event) => {
+                      const files = event.target.files; // Get the selected files
+                      console.log("files: ", files);
+                      if (files && files.length > 0) {
+                        const filesArray = Array.from(files);
+                        console.log("file Array: ", filesArray);
+
+                        setEditLecture((prevState) => ({
+                          ...prevState,
+                          SupportMaterials: [
+                            ...(prevState.SupportMaterials || []),
+                            ...filesArray,
+                          ],
+                        }));
+                      }
+                    }}
+                  />
                 </div>
               ) : null}
               <div className="part-item">
-                {lectureDetail.supportMaterials &&
-                  lectureDetail.supportMaterials.length > 0 && (
-                    <span className="intro-content">
-                      {lectureDetail.supportMaterials.map((material, index) => (
+                {(lectureDetail.supportMaterials?.length > 0 ||
+                  editLecture.SupportMaterials?.length > 0 ||
+                  isEdit) && (
+                  <span className="intro-content">
+                    {isEdit && editLecture.SupportMaterials?.length > 0 ? (
+                      <>
+                        {editLecture.SupportMaterials.map((material, index) => (
+                          <>
+                            <div
+                              key={index}
+                              className="content-file"
+                              onClick={() => {
+                                material.path
+                                  ? window.open(material.path)
+                                  : window.open(
+                                      URL.createObjectURL(material),
+                                      "_blank",
+                                      "noopener,noreferrer"
+                                    );
+                              }}
+                            >
+                              <span>
+                                Edit {material.fileName || material.name}
+                              </span>
+                              <button
+                                className="file-buttons"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(index);
+                                }}
+                              >
+                                <LuTrash2 />
+                              </button>
+                            </div>
+                          </>
+                        ))}
+                      </>
+                    ) : (
+                      !isEdit &&
+                      lectureDetail.supportMaterials?.length > 0 && (
                         <>
-                          <div
-                            key={index}
-                            className="content-file"
-                            onClick={() => window.open(material.path)}
-                          >
-                            <span>{material.fileName}</span>
-                          </div>
-                          {isEdit && (
-                            <button className="file-buttons">
-                              <LuTrash2 />
-                            </button>
+                          {lectureDetail.supportMaterials.map(
+                            (material, index) => (
+                              <>
+                                <div
+                                  key={index}
+                                  className="content-file"
+                                  onClick={() => window.open(material.path)}
+                                >
+                                  <span>View {material.fileName}</span>
+                                </div>
+                              </>
+                            )
                           )}
                         </>
-                      ))}
-                    </span>
-                  )}
+                      )
+                    )}
+                  </span>
+                )}
               </div>
             </>
           )}
@@ -567,13 +766,13 @@ const LectureView = ({
                                   className={`${
                                     exercise.isPublish
                                       ? "published"
-                                      : "unpublished"
+                                      : "unpublish"
                                   }`}
                                 >
                                   {`${
                                     exercise.isPublish
                                       ? "Published"
-                                      : "Unpublished"
+                                      : "Unpublish"
                                   }`}
                                 </span>
                               </div>
@@ -588,54 +787,59 @@ const LectureView = ({
           )}
           {index === 4 && (
             <>
-              <div className="part-item">
-                <div className="comment-display" style={{ marginBottom: "0" }}>
-                  <div className="ava-holder">
-                    <img src={avaImg || default_ava} />
-                  </div>
-                  <div className="comment-content" style={{ width: "100%" }}>
-                    <textarea
-                      placeholder="Write your comment..."
-                      className="comment-entering"
-                      value={generalComment.content}
-                      onChange={(e) => {
-                        setGeneralComment({
-                          ...generalComment,
-                          content: e.target.value,
-                        });
-                      }}
-                      rows="1"
-                    ></textarea>
-                    {generalComment.content && (
-                      <div className="button-container">
-                        <button
-                          className="cancel"
-                          onClick={() => {
-                            setGeneralComment({
-                              ...generalComment,
-                              content: "",
-                            });
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="comment"
-                          onClick={() => {
-                            setGeneralComment({
-                              ...generalComment,
-                              content: "",
-                            });
-                            handleAddComment(generalComment);
-                          }}
-                        >
-                          Comment
-                        </button>
-                      </div>
-                    )}
+              {(idRole === Role.teacher || idRole === Role.student) && (
+                <div className="part-item">
+                  <div
+                    className="comment-display"
+                    style={{ marginBottom: "0" }}
+                  >
+                    <div className="ava-holder">
+                      <img src={avaImg || default_ava} />
+                    </div>
+                    <div className="comment-content" style={{ width: "100%" }}>
+                      <textarea
+                        placeholder="Write your comment..."
+                        className="comment-entering"
+                        value={generalComment.content}
+                        onChange={(e) => {
+                          setGeneralComment({
+                            ...generalComment,
+                            content: e.target.value,
+                          });
+                        }}
+                        rows="1"
+                      ></textarea>
+                      {generalComment.content && (
+                        <div className="button-container">
+                          <button
+                            className="cancel"
+                            onClick={() => {
+                              setGeneralComment({
+                                ...generalComment,
+                                content: "",
+                              });
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="comment"
+                            onClick={() => {
+                              setGeneralComment({
+                                ...generalComment,
+                                content: "",
+                              });
+                              handleAddComment(generalComment);
+                            }}
+                          >
+                            Comment
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {mainCommentList?.length > 0 &&
                 mainCommentList.map((comment, index) => (
@@ -706,33 +910,37 @@ const LectureView = ({
                           </div>
                         )}
                       </div>
-                      <button
-                        className={`action-button ${
-                          isHovered[comment.idComment] ? "active" : ""
-                        }`}
-                        onClick={() => {
-                          setIsReplied({
-                            ...isReplied,
-                            [comment.idComment]: true,
-                          });
-                          setReplyComment({
-                            ...replyComment,
-                            [comment.idComment]: {
-                              idLecture: lectureDetail.idLecture,
-                              idSender: +localStorage.getItem("idUser"),
-                              idReceiver:
-                                comment.idUser === idUser
-                                  ? null
-                                  : comment.idUser,
-                              idCommentRef: comment.idComment,
-                              content: "",
-                            },
-                          });
-                        }}
-                      >
-                        <BsReplyFill color="#397979" />
-                      </button>
-                      {comment.idUser === idUser ? (
+                      {(idRole === Role.teacher || idRole === Role.student) && (
+                        <button
+                          className={`action-button ${
+                            isHovered[comment.idComment] ? "active" : ""
+                          }`}
+                          onClick={() => {
+                            setIsReplied({
+                              ...isReplied,
+                              [comment.idComment]: true,
+                            });
+                            setReplyComment({
+                              ...replyComment,
+                              [comment.idComment]: {
+                                idLecture: lectureDetail.idLecture,
+                                idSender: +localStorage.getItem("idUser"),
+                                idReceiver:
+                                  comment.idUser === idUser
+                                    ? null
+                                    : comment.idUser,
+                                idCommentRef: comment.idComment,
+                                content: "",
+                              },
+                            });
+                          }}
+                        >
+                          <BsReplyFill color="#397979" />
+                        </button>
+                      )}
+                      {comment.idUser === idUser ||
+                      idRole === Role.centerAdmin ||
+                      idRole === Role.platformAdmin ? (
                         <button
                           className={`action-button ${
                             isHovered[comment.idComment] ? "active" : ""
@@ -857,38 +1065,43 @@ const LectureView = ({
                                     </div>
                                   )}
                                 </div>
-                                <button
-                                  className={`action-button ${
-                                    isHovered[reply.idComment] ? "active" : ""
-                                  }`}
-                                  onClick={() => {
-                                    setIsReplied({
-                                      ...isReplied,
-                                      [comment.idComment]: true,
-                                    });
-                                    setReplyComment({
-                                      ...replyComment,
-                                      [comment.idComment]: {
-                                        idLecture: lectureDetail.idLecture,
-                                        idSender:
-                                          +localStorage.getItem("idUser"),
-                                        idReceiver:
-                                          reply.idUser === idUser
-                                            ? null
-                                            : reply.idUser,
-                                        idCommentRef: reply.idComment,
-                                        content: "",
-                                        nameRep:
-                                          reply.idUser === idUser
-                                            ? "Yourself"
-                                            : reply.fullName,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  <BsReplyFill color="#397979" />
-                                </button>
-                                {reply.idUser === idUser ? (
+                                {(idRole === Role.teacher ||
+                                  idRole === Role.student) && (
+                                  <button
+                                    className={`action-button ${
+                                      isHovered[reply.idComment] ? "active" : ""
+                                    }`}
+                                    onClick={() => {
+                                      setIsReplied({
+                                        ...isReplied,
+                                        [comment.idComment]: true,
+                                      });
+                                      setReplyComment({
+                                        ...replyComment,
+                                        [comment.idComment]: {
+                                          idLecture: lectureDetail.idLecture,
+                                          idSender:
+                                            +localStorage.getItem("idUser"),
+                                          idReceiver:
+                                            reply.idUser === idUser
+                                              ? null
+                                              : reply.idUser,
+                                          idCommentRef: reply.idComment,
+                                          content: "",
+                                          nameRep:
+                                            reply.idUser === idUser
+                                              ? "Yourself"
+                                              : reply.fullName,
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    <BsReplyFill color="#397979" />
+                                  </button>
+                                )}
+                                {reply.idUser === idUser ||
+                                idRole === Role.centerAdmin ||
+                                idRole === Role.platformAdmin ? (
                                   <button
                                     className={`action-button ${
                                       isHovered[reply.idComment] ? "active" : ""

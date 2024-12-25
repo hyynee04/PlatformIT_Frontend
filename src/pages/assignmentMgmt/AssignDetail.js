@@ -86,6 +86,7 @@ const AssignDetail = () => {
   const [diagNotSubmitted, setDiagNotSubmitted] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchAssignmentData = async (idAssignment) => {
       setLoading(true);
       try {

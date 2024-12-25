@@ -74,3 +74,9 @@ export const ExecutedCodeStatus = {
   INTERNAL_ERROR: 13,
   EXEC_FORMAT_ERROR: 14,
 };
+export const LectureStatus = {
+  inactive: 0,
+  active: 1,
+  pending: 2,
+  rejected: 3,
+};

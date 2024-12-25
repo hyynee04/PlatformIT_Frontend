@@ -256,7 +256,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.06);
 
   position: absolute;
-  top: 4rem;
+  top: 3rem;
   right: 2rem;
   z-index: -1;
   opacity: 0;
@@ -618,6 +618,7 @@
   > span.published {
   background-color: var(--border-gray);
   color: var(--main-color);
+  font-weight: 600;
 }
 .lecture-container
   .lecture-content
@@ -631,6 +632,7 @@
   > span.unpublish {
   background-color: var(--border-gray);
   color: var(--text-gray);
+  font-weight: 600;
 }
 .lecture-container
   .lecture-content
@@ -1308,10 +1310,10 @@
   color: var(--black-color);
   padding: 0.5rem 1.5rem 0.5rem 1rem;
 
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   align-items: center;
-
+  position: relative;
   cursor: pointer;
 }
 .content-file > span {
@@ -1569,7 +1571,7 @@
   position: relative;
 }
 .main-material .material-content > button,
-.intro-content > button {
+.intro-content .content-file > button {
   background-color: transparent;
   border: none;
   border-radius: 50%;
@@ -1585,7 +1587,7 @@
   top: 0;
 }
 .main-material .material-content > button:hover,
-.intro-content > button:hover {
+.intro-content .content-file > button:hover {
   color: var(--black-color);
   scale: 1.1;
 }
@@ -1621,4 +1623,24 @@
 }
 .reply-to > b {
   color: var(--main-color);
+}
+.status-text {
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.status-text > svg {
+  font-size: 1.2rem;
+}
+.pending-color {
+  color: var(--yellow-color) !important;
+  font-weight: 700;
+}
+.rejected-color {
+  color: var(--red-color) !important;
+  font-weight: 700;
 }

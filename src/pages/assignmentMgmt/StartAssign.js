@@ -4,6 +4,7 @@ import { format, fromZonedTime } from "date-fns-tz";
 import {
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
+  getViewCodeAssignment,
   postSubmitManualQuestion,
   postSubmitQuizAssignment,
 } from "../../services/assignmentService";
@@ -21,54 +22,66 @@ import { ImSpinner2 } from "react-icons/im";
 import Form from "react-bootstrap/Form";
 import default_image from "../../assets/img/default_image.png";
 import "../../assets/css/AssignmentDetail.css";
+import RunCode from "../../components/assigment/RunCode";
 
 const StartAssign = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [codeProblem, setCodeProblem] = useState({});
 
   useEffect(() => {
     const fetchData = async (idAssignment) => {
       setLoading(true);
       try {
-        const [assignmentRes, questionsRes] = await Promise.all([
-          getDetailAssignmentForStudent(idAssignment),
-          getDetailAssignmentItemForStudent(idAssignment),
-        ]);
+        const responseAssignInfo = await getDetailAssignmentForStudent(
+          idAssignment
+        );
 
-        if (assignmentRes.status === APIStatus.success) {
-          setAssignmentInfo(assignmentRes.data);
-        }
-        if (questionsRes.status === APIStatus.success) {
-          let updatedQuestions = questionsRes.data;
-          if (assignmentRes.data.isShufflingQuestion === 1) {
-            updatedQuestions = shuffleArray(updatedQuestions);
-          }
+        if (responseAssignInfo.status === APIStatus.success) {
+          setAssignmentInfo(responseAssignInfo.data);
+          if (responseAssignInfo.data.assignmentType === AssignmentType.code) {
+            const responseCode = await getViewCodeAssignment(idAssignment);
+            if (responseCode.status === APIStatus.success) {
+              setCodeProblem(responseCode.data);
+            }
+          } else {
+            const responseQuestion = await getDetailAssignmentItemForStudent(
+              idAssignment
+            );
+            if (responseQuestion.status === APIStatus.success) {
+              let updatedQuestions = responseQuestion.data;
+              if (responseAssignInfo.data.isShufflingQuestion === 1) {
+                updatedQuestions = shuffleArray(updatedQuestions);
+              }
 
-          if (assignmentRes.data.assignmentType === AssignmentType.quiz) {
-            updatedQuestions = updatedQuestions.map((question) => {
-              let updatedItems = question.items.map((item) => ({
-                ...item,
-                isSelected: false,
-              }));
-              // if (assignmentRes.data.isShufflingAnswer === 1) {
-              //   updatedItems = shuffleArray(updatedItems);
-              // }
+              if (
+                responseAssignInfo.data.assignmentType === AssignmentType.quiz
+              ) {
+                updatedQuestions = updatedQuestions.map((question) => {
+                  let updatedItems = question.items.map((item) => ({
+                    ...item,
+                    isSelected: false,
+                  }));
+                  return {
+                    ...question,
+                    items: updatedItems,
+                  };
+                });
+              }
 
-              return {
-                ...question,
-                items: updatedItems,
-              };
-            });
+              if (
+                responseAssignInfo.data.assignmentType === AssignmentType.manual
+              ) {
+                updatedQuestions = updatedQuestions.map((question) => ({
+                  ...question,
+                  answer: "",
+                }));
+              }
+              setQuestions(updatedQuestions);
+            }
           }
-          if (assignmentRes.data.assignmentType === AssignmentType.manual) {
-            updatedQuestions = updatedQuestions.map((question) => ({
-              ...question,
-              answer: "",
-            }));
-          }
-          setQuestions(updatedQuestions);
         }
       } catch (error) {
         console.error(error);
@@ -434,194 +447,267 @@ const StartAssign = () => {
         </div>
         <div className="questions-overview-container">
           <div className="questions-container">
-            {records.map((question, index) => (
-              <div className="question-item" key={index}>
-                <div className="info-row">
-                  <label className="question-idx">{`Question ${
-                    firstIndex + index + 1
-                  }`}</label>
-                </div>
-                <div className="info-row">
-                  <p style={{ whiteSpace: "pre-wrap" }}>
-                    {question.question.trim()}
-                  </p>
-                  {assignmentInfo.assignmentType === AssignmentType.quiz &&
-                    question.attachedFile && (
-                      <img
-                        className="question-img"
-                        src={question.attachedFile || default_image}
-                        alt=""
-                      />
-                    )}
-                </div>
-                {assignmentInfo.assignmentType === AssignmentType.manual && (
-                  <>
-                    {question.attachedFile && (
-                      <div className="info-row">
-                        <div className="info">
-                          <>
-                            <span>Reference material:</span>
-
-                            <div className="select-container">
-                              <input
-                                type="text"
-                                style={{ cursor: "pointer" }}
-                                className="input-form-pi"
-                                title={question.nameFile}
-                                value={
-                                  question.nameFile?.length > 54
-                                    ? question.nameFile.slice(0, 54) + "..."
-                                    : question.nameFile
-                                }
-                                onClick={() => {
-                                  if (
-                                    typeof question.attachedFile === "string"
-                                  ) {
-                                    // Kiểm tra nếu attachedFile là URL
-                                    const fileUrl = question.attachedFile;
-                                    window.open(fileUrl, "_blank");
-                                  }
-                                }}
-                                readOnly
-                              />
-                            </div>
-                          </>
-                        </div>
-                      </div>
-                    )}
-                    <div className="info-row">
-                      {question.assignmentItemAnswerType ===
-                        AssignmentItemAnswerType.text && (
-                        <div className="info">
-                          <span>Your answer: </span>
-                          <Form.Control
-                            as="textarea"
-                            className="input-area-form-pi"
-                            value={question.answer || ""}
-                            onChange={(e) =>
-                              handleManualAnswerChange(
-                                index,
-                                "answer",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      )}
-                      {question.assignmentItemAnswerType ===
-                        AssignmentItemAnswerType.attached_file && (
-                        <div className="info">
-                          <span>Your answer: </span>
-                          {question.answer ? (
-                            <div className="select-container">
-                              <input
-                                type="text"
-                                style={{ cursor: "pointer" }}
-                                className="input-form-pi"
-                                title={
-                                  question.attachedFile?.name ||
-                                  question.nameFile
-                                }
-                                value={
-                                  question.answer.name.length > 54
-                                    ? question.answer.name.slice(0, 54) + "..."
-                                    : question.answer.name
-                                }
-                                onClick={() => {
-                                  if (question.answer.url) {
-                                    // Kiểm tra nếu answer chứa URL
-                                    window.open(question.answer.url, "_blank");
-                                  }
-                                }}
-                                readOnly
-                              />
-                              <FaTrashAlt
-                                className="arrow-icon del-question"
-                                style={{
-                                  cursor: "pointer",
-                                  pointerEvents: "all",
-                                }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteFile(index);
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <button
-                              className="file-btn"
-                              onClick={() =>
-                                handleOpenReferenceAnswerFile(index)
-                              }
-                            >
-                              <RiAttachment2 className="icon" />
-                              Attach file
-                            </button>
-                          )}
-                        </div>
-                      )}
-                      <input
-                        type="file"
-                        ref={(el) => (inputFileRef.current[index] = el)}
-                        style={{ display: "none" }}
-                        accept="*"
-                        onChange={(e) => handleReferenceFileChange(e, index)}
-                      />
-                    </div>
-                  </>
-                )}
-                {assignmentInfo.assignmentType === AssignmentType.quiz && (
-                  <div className="info-row choices-container">
-                    <label style={{ fontSize: "14px", fontWeight: 800 }}>
-                      Choices{" "}
-                      {question.totalCorrect > 1 &&
-                        `| Select exactly ${question.totalCorrect} correct answers.`}
+            {assignmentInfo.assignmentType === AssignmentType.code ? (
+              <>
+                <div className="question-item">
+                  <div className="info-row">
+                    <label
+                      className="question-idx"
+                      style={{ fontSize: "20px" }}
+                    >
+                      Problem
                     </label>
-                    {question.items.map(
-                      (choice, choiceIdx) =>
-                        choice.multipleAssignmentItemStatus === 1 && (
-                          <div
-                            className="info-in-row"
-                            key={choiceIdx}
-                            style={{ width: "100%" }}
-                          >
-                            <label className="radio-choice">
-                              <input
-                                type={
-                                  question.totalCorrect > 1
-                                    ? "checkbox"
-                                    : "radio"
-                                }
-                                name={`question_${index}`}
-                                checked={choice.isSelected}
-                                // onChange={(e) =>
-                                //   handleChoiceChange(e, choiceIdx, index)
-                                // }
-                                onChange={(e) =>
-                                  handleChoiceChange(
-                                    e,
-                                    choice.idMultipleAssignmentItem, // Truyền idMultipleAssignmentItem thay vì index
-                                    question.idAssignmentItem // Truyền idAssignmentItem thay vì index
-                                  )
-                                }
-                              />
-                            </label>
-                            <div className="info" style={{ flex: "1" }}>
-                              <input
-                                type="text"
-                                className="input-form-pi"
-                                placeholder="Type a choice"
-                                defaultValue={choice.content}
-                                readOnly
-                              />
-                            </div>
-                          </div>
-                        )
-                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                  <div
+                    className="info-row question-text"
+                    style={{ width: "100%" }}
+                  >
+                    <p style={{ whiteSpace: "pre-wrap" }}>
+                      {codeProblem.problem.trim()}
+                    </p>
+                  </div>
+                  <div className="info-row">
+                    <span>
+                      <label>
+                        Language: <strong>{codeProblem.languageName}</strong>
+                      </label>
+                    </span>
+                  </div>
+                  <div className="info-row container-right-assign">
+                    <div className="info" style={{ flex: "1" }}>
+                      <span>
+                        <label style={{ color: "var(--black-color)" }}>
+                          Example
+                        </label>
+                      </span>
+                      <table className="result-table">
+                        <thead>
+                          <tr>
+                            <th>Input</th>
+                            <th>Output</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {codeProblem.examples.map((example, index) => (
+                            <tr key={index}>
+                              <td>{example.input}</td>
+                              <td>{example.output}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div className="question-item" style={{ padding: "24px 0" }}>
+                  <RunCode
+                    selectedLanguage={{
+                      idLanguage: codeProblem.idLanguage,
+                      languageName: codeProblem.languageName,
+                    }}
+                    testCases={codeProblem.testCases}
+                    isPassTestCase={true}
+                    isPerformanceOnTime={codeProblem.isPerformanceOnTime}
+                    timeValue={codeProblem.timeValue}
+                    isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
+                    memoryValue={codeProblem.memoryValue}
+                  />
+                </div>
+              </>
+            ) : (
+              records.map((question, index) => (
+                <div className="question-item" key={index}>
+                  <div className="info-row">
+                    <label className="question-idx">{`Question ${
+                      firstIndex + index + 1
+                    }`}</label>
+                  </div>
+                  <div className="info-row">
+                    <p style={{ whiteSpace: "pre-wrap" }}>
+                      {question.question.trim()}
+                    </p>
+                    {assignmentInfo.assignmentType === AssignmentType.quiz &&
+                      question.attachedFile && (
+                        <img
+                          className="question-img"
+                          src={question.attachedFile || default_image}
+                          alt=""
+                        />
+                      )}
+                  </div>
+                  {assignmentInfo.assignmentType === AssignmentType.manual && (
+                    <>
+                      {question.attachedFile && (
+                        <div className="info-row">
+                          <div className="info">
+                            <>
+                              <span>Reference material:</span>
+
+                              <div className="select-container">
+                                <input
+                                  type="text"
+                                  style={{ cursor: "pointer" }}
+                                  className="input-form-pi"
+                                  title={question.nameFile}
+                                  value={
+                                    question.nameFile?.length > 54
+                                      ? question.nameFile.slice(0, 54) + "..."
+                                      : question.nameFile
+                                  }
+                                  onClick={() => {
+                                    if (
+                                      typeof question.attachedFile === "string"
+                                    ) {
+                                      // Kiểm tra nếu attachedFile là URL
+                                      const fileUrl = question.attachedFile;
+                                      window.open(fileUrl, "_blank");
+                                    }
+                                  }}
+                                  readOnly
+                                />
+                              </div>
+                            </>
+                          </div>
+                        </div>
+                      )}
+                      <div className="info-row">
+                        {question.assignmentItemAnswerType ===
+                          AssignmentItemAnswerType.text && (
+                          <div className="info">
+                            <span>Your answer: </span>
+                            <Form.Control
+                              as="textarea"
+                              className="input-area-form-pi"
+                              value={question.answer || ""}
+                              onChange={(e) =>
+                                handleManualAnswerChange(
+                                  index,
+                                  "answer",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+                        {question.assignmentItemAnswerType ===
+                          AssignmentItemAnswerType.attached_file && (
+                          <div className="info">
+                            <span>Your answer: </span>
+                            {question.answer ? (
+                              <div className="select-container">
+                                <input
+                                  type="text"
+                                  style={{ cursor: "pointer" }}
+                                  className="input-form-pi"
+                                  title={
+                                    question.attachedFile?.name ||
+                                    question.nameFile
+                                  }
+                                  value={
+                                    question.answer.name.length > 54
+                                      ? question.answer.name.slice(0, 54) +
+                                        "..."
+                                      : question.answer.name
+                                  }
+                                  onClick={() => {
+                                    if (question.answer.url) {
+                                      // Kiểm tra nếu answer chứa URL
+                                      window.open(
+                                        question.answer.url,
+                                        "_blank"
+                                      );
+                                    }
+                                  }}
+                                  readOnly
+                                />
+                                <FaTrashAlt
+                                  className="arrow-icon del-question"
+                                  style={{
+                                    cursor: "pointer",
+                                    pointerEvents: "all",
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteFile(index);
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <button
+                                className="file-btn"
+                                onClick={() =>
+                                  handleOpenReferenceAnswerFile(index)
+                                }
+                              >
+                                <RiAttachment2 className="icon" />
+                                Attach file
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          ref={(el) => (inputFileRef.current[index] = el)}
+                          style={{ display: "none" }}
+                          accept="*"
+                          onChange={(e) => handleReferenceFileChange(e, index)}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {assignmentInfo.assignmentType === AssignmentType.quiz && (
+                    <div className="info-row choices-container">
+                      <label style={{ fontSize: "14px", fontWeight: 800 }}>
+                        Choices{" "}
+                        {question.totalCorrect > 1 &&
+                          `| Select exactly ${question.totalCorrect} correct answers.`}
+                      </label>
+                      {question.items.map(
+                        (choice, choiceIdx) =>
+                          choice.multipleAssignmentItemStatus === 1 && (
+                            <div
+                              className="info-in-row"
+                              key={choiceIdx}
+                              style={{ width: "100%" }}
+                            >
+                              <label className="radio-choice">
+                                <input
+                                  type={
+                                    question.totalCorrect > 1
+                                      ? "checkbox"
+                                      : "radio"
+                                  }
+                                  name={`question_${index}`}
+                                  checked={choice.isSelected}
+                                  // onChange={(e) =>
+                                  //   handleChoiceChange(e, choiceIdx, index)
+                                  // }
+                                  onChange={(e) =>
+                                    handleChoiceChange(
+                                      e,
+                                      choice.idMultipleAssignmentItem, // Truyền idMultipleAssignmentItem thay vì index
+                                      question.idAssignmentItem // Truyền idAssignmentItem thay vì index
+                                    )
+                                  }
+                                />
+                              </label>
+                              <div className="info" style={{ flex: "1" }}>
+                                <input
+                                  type="text"
+                                  className="input-form-pi"
+                                  placeholder="Type a choice"
+                                  defaultValue={choice.content}
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+                          )
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </div>
         <div className="pagination">

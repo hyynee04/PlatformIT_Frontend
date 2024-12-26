@@ -245,18 +245,6 @@ const AddNewAssign = () => {
     );
     setSelectedLanguage(language);
   };
-  // useEffect(() => {
-  //   if (
-  //     selectedLanguage &&
-  //     typeof questions === "object" &&
-  //     questions !== null
-  //   ) {
-  //     setQuestions((prevQuestions) => ({
-  //       ...prevQuestions,
-  //       idLanguage: selectedLanguage.idLanguage,
-  //     }));
-  //   }
-  // }, [selectedLanguage, questions]);
 
   const isStartDateAfterNow = (startDate) => {
     const currentDate = new Date();
@@ -655,7 +643,6 @@ const AddNewAssign = () => {
       isShowAnswer: isShowAnswer,
       isShowTestCase: isShowTestCases,
       idLanguage: selectedLanguage.idLanguage,
-      // questions: questions,
     };
     if (+typeAssignment === AssignmentType.code) {
       dataToSubmit = {
@@ -1331,7 +1318,7 @@ const AddNewAssign = () => {
             >
               {errorAddQuestionMessage}
             </span>
-            {!(Number(typeAssignment) === AssignmentType.code) && (
+            {Number(typeAssignment) !== AssignmentType.code && (
               <button className="btn circle-btn" onClick={handleAddQuestion}>
                 <TiPlus className="icon" />
               </button>

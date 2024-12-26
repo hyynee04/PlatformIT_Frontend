@@ -5,6 +5,7 @@ import {
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
   getViewCodeAssignment,
+  postSubmitCodeAssignment,
   postSubmitManualQuestion,
   postSubmitQuizAssignment,
 } from "../../services/assignmentService";
@@ -30,6 +31,7 @@ const StartAssign = () => {
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [questions, setQuestions] = useState([]);
   const [codeProblem, setCodeProblem] = useState({});
+  const [sourceCodeStudent, setSourceCodeStudent] = useState("");
 
   useEffect(() => {
     const fetchData = async (idAssignment) => {
@@ -243,39 +245,6 @@ const StartAssign = () => {
   const records = questions.slice(firstIndex, lastIndex);
   const npage = Math.ceil(questions.length / recordsPerPage);
 
-  //QUIZ
-  // const handleChoiceChange = (e, choiceIdx, questionIndex) => {
-  //   const updatedQuestions = [...questions];
-  //   const currentQuestion = updatedQuestions[questionIndex];
-  //   const currentChoices = currentQuestion.items;
-
-  //   const selectedChoices = currentChoices.filter(
-  //     (choice) => choice.isSelected === true
-  //   );
-
-  //   if (currentQuestion.totalCorrect === 1) {
-  //     currentChoices.forEach((choice, idx) => {
-  //       choice.isSelected = idx === choiceIdx;
-  //     });
-  //   } else {
-  //     if (e.target.checked) {
-  //       if (selectedChoices.length < currentQuestion.totalCorrect) {
-  //         currentChoices[choiceIdx].isSelected = true;
-  //       } else {
-  //         const firstSelectedChoiceIndex = currentChoices.findIndex(
-  //           (choice) => choice.isSelected
-  //         );
-  //         if (firstSelectedChoiceIndex !== -1) {
-  //           currentChoices[firstSelectedChoiceIndex].isSelected = false;
-  //         }
-  //         currentChoices[choiceIdx].isSelected = true;
-  //       }
-  //     } else {
-  //       currentChoices[choiceIdx].isSelected = false;
-  //     }
-  //   }
-  //   setQuestions(updatedQuestions);
-  // };
   const handleChoiceChange = (e, choiceId, questionId) => {
     const updatedQuestions = [...questions];
     const currentQuestion = updatedQuestions.find(
@@ -396,9 +365,11 @@ const StartAssign = () => {
       idAssignment: assignmentInfo.idAssignment,
       idStudent: Number(localStorage.getItem("idUser")),
       duration: timeSpent,
-      assignmentResultStatus, // Trạng thái kết quả bài nộp
+      assignmentResultStatus,
       submittedDate: submittedDate,
-      answers: answers,
+      ...(assignmentInfo.assignmentType === AssignmentType.code
+        ? { idLanguage: codeProblem.idLanguage, sourceCode: sourceCodeStudent }
+        : { answers: answers }),
     };
 
     try {
@@ -408,6 +379,8 @@ const StartAssign = () => {
         response = await postSubmitQuizAssignment(requestData);
       } else if (assignmentInfo.assignmentType === AssignmentType.manual) {
         response = await postSubmitManualQuestion(requestData);
+      } else if (assignmentInfo.assignmentType === AssignmentType.code) {
+        response = await postSubmitCodeAssignment(requestData);
       }
 
       if (response.status === APIStatus.success) {
@@ -507,10 +480,12 @@ const StartAssign = () => {
                     }}
                     testCases={codeProblem.testCases}
                     isPassTestCase={true}
+                    isAllowRunCode={codeProblem.isAllowRunCode}
                     isPerformanceOnTime={codeProblem.isPerformanceOnTime}
                     timeValue={codeProblem.timeValue}
                     isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
                     memoryValue={codeProblem.memoryValue}
+                    updateParentSourceCode={setSourceCodeStudent}
                   />
                 </div>
               </>

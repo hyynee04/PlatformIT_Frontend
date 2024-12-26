@@ -1,18 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { ImSpinner2 } from "react-icons/im";
 import { postRunCodeTest } from "../../services/assignmentService";
-import { APIStatus } from "../../constants/constants";
+import { APIStatus, Role } from "../../constants/constants";
 import DiagNotiWarning from "../diag/DiagNotiWarning";
 const RunCode = ({
   selectedLanguage,
   testCases,
   isPassTestCase,
+  isAllowRunCode,
   isPerformanceOnTime,
   timeValue,
   isPerformanceOnMemory,
   memoryValue,
+  updateParentSourceCode,
 }) => {
+  const idRole = Number(localStorage.getItem("idRole"));
   const [sourceCode, setSourceCode] = useState("");
   const [resultOfExecution, setResultOfExecution] = useState([]);
   const [executingLoading, setExecutingLoading] = useState(false);
@@ -27,6 +30,10 @@ const RunCode = ({
     setInvalidMessage(msgBody);
     openInvalidModal();
   };
+  useEffect(() => {
+    updateParentSourceCode(sourceCode);
+  }, [sourceCode, updateParentSourceCode]);
+
   const handleRunTestCode = async () => {
     if (!selectedLanguage?.idLanguage) {
       handleOpenInvalidDiag(
@@ -42,7 +49,7 @@ const RunCode = ({
       );
       return;
     }
-    if (isPassTestCase) {
+    if (isPassTestCase && idRole === Role.teacher) {
       if (testCases.length === 0) {
         handleOpenInvalidDiag(
           "Missing Test Case",
@@ -89,13 +96,15 @@ const RunCode = ({
   return (
     <div className="container-right-assign testing-code">
       <span className="title-span">
-        Testing with your code
-        <button className="btn" onClick={() => handleRunTestCode()}>
-          {executingLoading && (
-            <ImSpinner2 className="icon-spin" color="#d9d9d9" />
-          )}
-          Run code
-        </button>
+        {idRole === Role.teacher ? "Testing with your code" : "Your answer"}
+        {isAllowRunCode && (
+          <button className="btn" onClick={() => handleRunTestCode()}>
+            {executingLoading && (
+              <ImSpinner2 className="icon-spin" color="#d9d9d9" />
+            )}
+            Run code
+          </button>
+        )}
       </span>
       <div
         className="assign-info"

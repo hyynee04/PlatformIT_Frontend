@@ -1483,7 +1483,8 @@ const AddNewAssign = () => {
               <RunCode
                 selectedLanguage={selectedLanguage}
                 testCases={questions.testCases}
-                isPassTestCase={questions.isPassTestCase}
+                isPassTestCase={true}
+                isAllowRunCode={true}
                 isPerformanceOnTime={questions.isPerformanceOnTime}
                 timeValue={questions.timeValue}
                 isPerformanceOnMemory={questions.isPerformanceOnMemory}

@@ -194,6 +194,9 @@
   background-color: rgba(57, 121, 121, 0.3);
   border-radius: 90px;
 }
+.detail-body .messages-container .message-left .message-content {
+  background-color: var(--border-gray);
+}
 .detail-body .messages-container .message-end {
   color: var(--red-color);
   display: flex;

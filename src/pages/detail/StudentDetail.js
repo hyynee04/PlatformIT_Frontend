@@ -9,7 +9,10 @@ import { RiChat3Line } from "react-icons/ri";
 import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
 import Carousel from "../../components/Carousel";
-import { getAllCourseCardsByIdStudent } from "../../services/courseService";
+import {
+  getAllCourseCardsByIdStudent,
+  getIsChatAvailable,
+} from "../../services/courseService";
 import { APIStatus, Object, Role } from "../../constants/constants";
 import { getPI, getStudentDetail } from "../../services/userService";
 import { ImSpinner2 } from "react-icons/im";
@@ -19,12 +22,15 @@ import { formatDate } from "../../functions/function";
 const StudentDetail = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [studentInfo, setStudentInfo] = useState({});
 
+  const idUser = Number(localStorage.getItem("idUser"));
   const idRole = +localStorage.getItem("idRole");
   const [idStudent, setIdStudent] = useState(null);
   const [courseTitle, setCourseTitle] = useState("");
+  const [isChatAvailable, setIsChatAvailable] = useState(false);
 
   const fetchStudentDetail = async (idStudent, idCourse) => {
     setLoading(true);
@@ -63,6 +69,19 @@ const StudentDetail = (props) => {
     }
   };
 
+  const fetchIsChatAvailable = async (idStudent) => {
+    setLoading(true);
+    try {
+      let responseCanChat = await getIsChatAvailable(idStudent, idUser);
+      if (responseCanChat.status === APIStatus.success) {
+        setIsChatAvailable(responseCanChat.data);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     const state = location.state;
 
@@ -70,6 +89,9 @@ const StudentDetail = (props) => {
       setCourseTitle(state.courseTitle);
       fetchStudentDetail(state.idStudent, state.idCourse);
       setIdStudent(state.idStudent);
+      if (idRole === Role.teacher) {
+        fetchIsChatAvailable(state.idStudent);
+      }
     } else if (state && state.idStudent) {
       fetchStudentPI(state.idStudent);
     }
@@ -133,7 +155,7 @@ const StudentDetail = (props) => {
           </div>
         </div>
 
-        {idRole === Role.teacher ? (
+        {idRole === Role.teacher && isChatAvailable ? (
           <button
             className="contact-block"
             onClick={() =>
@@ -148,7 +170,7 @@ const StudentDetail = (props) => {
               })
             }
           >
-            Contact <RiChat3Line />
+            Chat <RiChat3Line />
           </button>
         ) : null}
       </div>

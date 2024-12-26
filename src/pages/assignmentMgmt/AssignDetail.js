@@ -345,8 +345,8 @@ const AssignDetail = () => {
     (idRole === Role.teacher && activeChoice === "question")
       ? questions
       : filteredSubmission;
-  const records = activeList.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(activeList.length / recordsPerPage);
+  const records = activeList?.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(activeList?.length / recordsPerPage);
 
   //OPTION QUIZ
 
@@ -876,12 +876,14 @@ const AssignDetail = () => {
                           }}
                           testCases={codeProblem.testCases}
                           isPassTestCase={true}
+                          isAllowRunCode={true}
                           isPerformanceOnTime={codeProblem.isPerformanceOnTime}
                           timeValue={codeProblem.timeValue}
                           isPerformanceOnMemory={
                             codeProblem.isPerformanceOnMemory
                           }
                           memoryValue={codeProblem.memoryValue}
+                          updateParentSourceCode={() => {}}
                         />
                       </div>
                     </>
@@ -1303,12 +1305,17 @@ const AssignDetail = () => {
                             <th>Submitted Date</th>
                             <th>Status</th>
                             <th>Duration</th>
-                            <th>Marks</th>
+                            <th>
+                              {assignmentInfo.assignmentType ===
+                              AssignmentType.code
+                                ? "Result"
+                                : "Mark"}
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {records.length > 0 ? (
-                            records.map((submission, index) => (
+                          {records?.length > 0 ? (
+                            records?.map((submission, index) => (
                               <tr
                                 key={index}
                                 style={{ cursor: "pointer" }}
@@ -1373,7 +1380,13 @@ const AssignDetail = () => {
                                   {submission.studentDuration &&
                                     formatDuration(submission.studentDuration)}
                                 </td>
-                                <td>{submission.studentTotalMark}</td>
+                                <td>
+                                  {submission.studentTotalMark
+                                    ? `${submission.studentTotalMark}`
+                                    : submission.studentCodeResult
+                                    ? `${submission.studentCodeResult * 100}%`
+                                    : ""}
+                                </td>
                               </tr>
                             ))
                           ) : (

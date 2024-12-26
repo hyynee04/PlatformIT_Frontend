@@ -142,8 +142,10 @@ const ListAssignMgmt = () => {
         }
         if (activeStatus === AssignmentStatus.pastDue) {
           return (
-            assignment.isPastDue === 1 ||
-            (assignment.endDate && new Date(assignment.endDate) < new Date())
+            (assignment.isPastDue === 1 && assignment.isPublish === 1) ||
+            (assignment.endDate &&
+              new Date(assignment.endDate) < new Date() &&
+              assignment.isPublish === 1)
           );
         }
       } else if (idRole === Role.student) {

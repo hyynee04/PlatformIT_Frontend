@@ -73,6 +73,14 @@ const getTestOfCourseStudent = (idCourse, idStudent) => {
 const getAllActiveLanguage = async () => {
   return await axios.get("api/CodeExecution/GetAllActiveLanguage");
 };
+const getCodeAssignmentResult = async (idAssignment, idStudent) => {
+  return await axios.get("api/CodeExecution/GetCodeAssignmentResult", {
+    params: {
+      idAssignment: idAssignment,
+      idStudent: idStudent,
+    },
+  });
+};
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
   try {
@@ -229,6 +237,7 @@ const postAddCodeAssignment = async (requestData) => {
     isTest: requestData.isTest ? 1 : 0,
     isPublish: requestData.isPublish ? 1 : 0,
     isShowTestcase: requestData.isShowTestCase ? 1 : 0,
+    isAllowRunCode: requestData.isAllowRunCode ? 1 : 0,
     isPassTestCase: requestData.isPassTestCase ? 1 : 0,
     isPerformanceOnMemory: requestData.isPerformanceOnMemory ? 1 : 0,
     isPerformanceOnTime: requestData.isPerformanceOnTime ? 1 : 0,
@@ -446,6 +455,19 @@ const postSubmitManualQuestion = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postSubmitCodeAssignment = async (requestData) => {
+  console.log(requestData);
+
+  try {
+    return await axios.post("api/CodeExecution/SubmitCode", requestData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const postGradingManualAssignment = async (requestData) => {
   try {
     return await axios.post(
@@ -497,6 +519,7 @@ export {
   getAssignmentAnswer,
   getTestOfCourseStudent,
   getAllActiveLanguage,
+  getCodeAssignmentResult,
   postAddManualAssignment,
   postAddQuizAssignment,
   postAddCodeAssignment,
@@ -505,6 +528,7 @@ export {
   postUpdateCodeAssignment,
   postSubmitQuizAssignment,
   postSubmitManualQuestion,
+  postSubmitCodeAssignment,
   postGradingManualAssignment,
   deleteAssignment,
   postRunCodeTest,

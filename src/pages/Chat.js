@@ -62,7 +62,7 @@ const Chat = () => {
     }
   };
   const handleReadMessage = async (idSendUser) => {
-    const response = await postUpdateReadStatus(idUser, idSendUser);
+    const response = await postUpdateReadStatus(idSendUser, idUser);
     if (response.status === APIStatus.success) {
       setListConversations((prev) =>
         prev.map((conversation) =>
@@ -80,12 +80,12 @@ const Chat = () => {
       if (response.status === APIStatus.success) {
         setDetailConversation(response.data);
       }
-      let responseCanChat = await getIsChatAvailable({
-        idStudent: idRole === Role.student ? idUser : idSender,
-        idTeacher: idRole === Role.teacher ? idUser : idSender,
-      });
+      let responseCanChat = await getIsChatAvailable(
+        idRole === Role.student ? idUser : idSender,
+        idRole === Role.teacher ? idUser : idSender
+      );
       if (responseCanChat.status === APIStatus.success) {
-        setIsChatAvailable(response.data);
+        setIsChatAvailable(responseCanChat.data);
       }
     } catch (error) {
       throw error;
@@ -256,7 +256,7 @@ const Chat = () => {
                 <div className="name-last-message">
                   <label className="name-user">{conversation.name}</label>
                   <label className="last-message">
-                    {conversation.idLassMessageSender === idUser && "You: "}
+                    {conversation.idLastMessageSender === idUser && "You: "}
                     {conversation.lastMessage}
                   </label>
                 </div>

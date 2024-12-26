@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import { ImSpinner2 } from "react-icons/im";
 import {
   LuCalendar,
   LuCheck,
+  LuChevronDown,
   LuClock,
   LuFileEdit,
   LuFileQuestion,
@@ -11,6 +12,7 @@ import {
   LuMinus,
   LuPenLine,
   LuPlus,
+  LuSearch,
   LuTrash2,
   LuX,
 } from "react-icons/lu";
@@ -42,7 +44,6 @@ const CourseDetailTeacher = (props) => {
   } = props;
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const idRole = +localStorage.getItem("idRole");
   const [loading, setLoading] = useState();
@@ -52,6 +53,7 @@ const CourseDetailTeacher = (props) => {
   const [newSectionTitle, setNewSectionTitle] = useState("");
   const [newSection, setNewSection] = useState("");
   const [attendanceList, setAttendanceList] = useState([]);
+  const [attendanceListCurrent, setAttendanceListCurrent] = useState([]);
 
   const [popupAdd, setPopupAdd] = useState(false);
   const [addSection, setAddSection] = useState(false);
@@ -138,6 +140,7 @@ const CourseDetailTeacher = (props) => {
       let response = await getCourseProgress(idCourse);
       if (response.status === APIStatus.success) {
         setAttendanceList(response.data);
+        setAttendanceListCurrent(response.data);
       } else {
         console.log(response.data);
       }
@@ -164,6 +167,78 @@ const CourseDetailTeacher = (props) => {
 
   useEffect(() => {
     fetchCourseProgress(courseInfo.idCourse);
+  }, []);
+
+  const sortButtonRef = useRef(null);
+  const sortBoxRef = useRef(null);
+
+  const [searchText, setSearchText] = useState("");
+  const [activeSortby, setActiveSortby] = useState(false);
+  const [condition, setCondition] = useState({
+    field: "",
+    direction: "",
+  });
+
+  const resetCondition = () => {
+    setCondition({ field: "", direction: "" });
+    setAttendanceListCurrent({
+      ...attendanceListCurrent,
+      courseStudentProgress: attendanceList.courseStudentProgress,
+    });
+  };
+
+  const handleChangeData = (content) => {
+    const filteredCourse = attendanceList.courseStudentProgress
+      ?.sort((a, b) => {
+        console.log(a, b);
+
+        // Ensure sortConditionCourse has valid values
+        if (!condition.field || !condition.direction) {
+          return 0; // If no sort condition is provided, return the list as is
+        }
+        const { field, direction } = condition;
+        const dirMultiplier = direction === "asc" ? 1 : -1;
+
+        // Get values directly and handle date fields by converting to timestamps if necessary
+        const aValue = a[field];
+        const bValue = b[field];
+        console.log("avalue: ", aValue, "bvalue: ", bValue);
+
+        // Comparison logic with direction
+        if (aValue < bValue) return -1 * dirMultiplier;
+        if (aValue > bValue) return 1 * dirMultiplier;
+        return 0; // If values are the same, return 0
+      })
+      .filter(
+        (attendance) =>
+          attendance.fullName?.toLowerCase().includes(content?.toLowerCase()) ||
+          attendance.email?.toLowerCase().includes(content?.toLowerCase())
+      );
+    setAttendanceListCurrent({
+      ...attendanceListCurrent,
+      courseStudentProgress: filteredCourse,
+    });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        sortBoxRef.current &&
+        !sortBoxRef.current.contains(event.target) &&
+        (!sortButtonRef.current ||
+          (sortButtonRef.current.style.display !== "none" &&
+            sortButtonRef.current.style.visibility !== "hidden" &&
+            !sortButtonRef.current.contains(event.target)))
+      ) {
+        setActiveSortby(false);
+      }
+    };
+    // Attach both event listeners
+    document.addEventListener("mousedown", handleClickOutside);
+    // Cleanup both event listeners on component unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   return (
@@ -345,6 +420,7 @@ const CourseDetailTeacher = (props) => {
                                       navigate("/viewLecture", {
                                         state: {
                                           idLecture: lecture.idLecture,
+                                          idCourse: courseInfo.idCourse,
                                         },
                                       });
                                     else {
@@ -352,7 +428,6 @@ const CourseDetailTeacher = (props) => {
                                         state: {
                                           idLecture: lecture.idLecture,
                                           lectureStatus: lecture.lectureStatus,
-                                          courseTitle: courseInfo.courseTitle,
                                           sectionName: section.sectionName,
                                         },
                                       });
@@ -681,81 +756,176 @@ const CourseDetailTeacher = (props) => {
 
       {/* Teacher View: Attendance */}
       {menuIndex === 3 ? (
-        <div className="block-container course-teacher-attendance">
-          {attendanceList.courseStudentProgress &&
-            attendanceList.courseStudentProgress.length > 0 &&
-            attendanceList.courseStudentProgress.map((attendance, index) => (
+        <>
+          <div className="filter-search-section">
+            <div className="filter-sort-btns">
               <div
-                key={index}
-                className="attendance-progress-container"
-                onClick={() =>
-                  navigate("/studentdetail", {
-                    state: {
-                      idStudent: attendance.idStudent,
-                      idCourse: courseInfo.idCourse,
-                      courseTitle: courseInfo.courseTitle,
-                    },
-                  })
-                }
+                ref={sortButtonRef}
+                className="button"
+                onClick={() => {
+                  setActiveSortby(!activeSortby);
+                }}
               >
-                <div className="attendance-progress-content">
-                  <div className="attendance-ava">
-                    <img src={attendance.avatarPath || default_ava} />
-                  </div>
-                  <div className="attendance-progress-body">
-                    <span className="attendance-name">
-                      {attendance.fullName}
-                    </span>
-                    <span className="attendance-mail">
-                      <LuMail color="#003B57" /> {attendance.email}
-                    </span>
-                    <div className="attendance-progress">
-                      <label>Lectures</label>
-                      <div className="progress-line">
-                        <div
-                          className="progress-line-inner"
-                          style={{
-                            width: `${
-                              attendanceList.lectureCount > 0
-                                ? (attendance.finishedLectureCount /
-                                    attendanceList.lectureCount) *
-                                  100
-                                : 0
-                            }%`,
-                          }}
-                        ></div>
-                      </div>
-                      <span className="proportion-number">
-                        {attendance.finishedLectureCount}/
-                        {attendanceList.lectureCount}
-                      </span>
-                    </div>
-                    <div className="attendance-progress">
-                      <label>Assignments</label>
-                      <div className="progress-line">
-                        <div
-                          className="progress-line-inner"
-                          style={{
-                            width: `${
-                              attendanceList.assignmentCount > 0
-                                ? (attendance.finishedAssignmentCount /
-                                    attendanceList.assignmentCount) *
-                                  100
-                                : 0
-                            }%`,
-                          }}
-                        ></div>
-                      </div>
-                      <span className="proportion-number">
-                        {attendance.finishedAssignmentCount}/
-                        {attendanceList.assignmentCount}
-                      </span>
-                    </div>
-                  </div>
+                <span>Sort by</span>
+                <LuChevronDown color="#397979" />
+              </div>
+            </div>
+            <div className="search-container">
+              <input
+                type="text"
+                className="search-field"
+                placeholder="Search"
+                value={searchText}
+                onChange={(event) => {
+                  setSearchText(event.target.value);
+                  handleChangeData(event.target.value);
+                }}
+              />
+              <LuSearch color="#397979" />
+            </div>
+            <div
+              ref={sortBoxRef}
+              className={`filter-sort-box ${activeSortby ? "active" : ""}`}
+            >
+              <span className="box-title">Sort</span>
+              <div className="main-box">
+                <div className="field">
+                  <select
+                    className="select-sortby"
+                    onChange={(e) =>
+                      setCondition({
+                        ...condition,
+                        field: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Field</option>
+                    <option value="finishedLectureCount">Lecture</option>
+                    <option value="finishedAssignmentCount">Assignment</option>
+                  </select>
+                  <select
+                    className="select-sortby"
+                    onChange={(e) =>
+                      setCondition({
+                        ...condition,
+                        direction: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Direction</option>
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                  </select>
                 </div>
               </div>
-            ))}
-        </div>
+              <div className="box-footer">
+                <button
+                  className="cancel"
+                  onClick={() => {
+                    resetCondition();
+                    setActiveSortby(false);
+                  }}
+                >
+                  Clear
+                </button>
+                <button
+                  className="save"
+                  onClick={() => {
+                    handleChangeData(searchText);
+                    setActiveSortby(false);
+                  }}
+                >
+                  Sort
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="block-container course-teacher-attendance">
+            {attendanceListCurrent.courseStudentProgress &&
+              attendanceListCurrent.courseStudentProgress.length > 0 &&
+              attendanceListCurrent.courseStudentProgress.map(
+                (attendance, index) => (
+                  <div
+                    key={index}
+                    className="attendance-progress-container"
+                    onClick={() => {
+                      if (idRole === Role.teacher) {
+                        navigate("/studentdetail", {
+                          state: {
+                            idStudent: attendance.idStudent,
+                            idCourse: courseInfo.idCourse,
+                            courseTitle: courseInfo.courseTitle,
+                          },
+                        });
+                      } else {
+                        navigate("/studentdetail", {
+                          state: {
+                            idStudent: attendance.idStudent,
+                          },
+                        });
+                      }
+                    }}
+                  >
+                    <div className="attendance-progress-content">
+                      <div className="attendance-ava">
+                        <img src={attendance.avatarPath || default_ava} />
+                      </div>
+                      <div className="attendance-progress-body">
+                        <span className="attendance-name">
+                          {attendance.fullName}
+                        </span>
+                        <span className="attendance-mail">
+                          <LuMail color="#003B57" /> {attendance.email}
+                        </span>
+                        <div className="attendance-progress">
+                          <label>Lectures</label>
+                          <div className="progress-line">
+                            <div
+                              className="progress-line-inner"
+                              style={{
+                                width: `${
+                                  attendanceListCurrent.lectureCount > 0
+                                    ? (attendance.finishedLectureCount /
+                                        attendanceListCurrent.lectureCount) *
+                                      100
+                                    : 0
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="proportion-number">
+                            {attendance.finishedLectureCount}/
+                            {attendanceListCurrent.lectureCount}
+                          </span>
+                        </div>
+                        <div className="attendance-progress">
+                          <label>Assignments</label>
+                          <div className="progress-line">
+                            <div
+                              className="progress-line-inner"
+                              style={{
+                                width: `${
+                                  attendanceListCurrent.assignmentCount > 0
+                                    ? (attendance.finishedAssignmentCount /
+                                        attendanceListCurrent.assignmentCount) *
+                                      100
+                                    : 0
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="proportion-number">
+                            {attendance.finishedAssignmentCount}/
+                            {attendanceListCurrent.assignmentCount}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              )}
+          </div>
+        </>
       ) : null}
     </>
   );

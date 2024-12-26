@@ -13,7 +13,7 @@ import { TbCurrencyDong } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
 import "../assets/css/ViewAll.css";
-import { Role } from "../constants/constants";
+import { APIStatus, Role } from "../constants/constants";
 import { getPagination } from "../functions/function";
 import {
   getAllCourseCards,
@@ -83,8 +83,16 @@ const CourseMgmt = (props) => {
       } else {
         response = await getAllCourseCards();
       }
-      setCourseList(response.data);
-      setCurrentCourses(response.data);
+
+      if (response.status === APIStatus.success) {
+        const sortList = response.data.sort(
+          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+        );
+        setCourseList(sortList);
+        setCurrentCourses(sortList);
+      } else {
+        console.error(response.data);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {

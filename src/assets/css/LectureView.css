@@ -90,6 +90,7 @@
   align-items: flex-start;
   justify-content: space-between;
   padding: 0 1.5rem;
+  position: relative;
 }
 .lecture-container
   .lecture-content
@@ -1643,4 +1644,9 @@
 .rejected-color {
   color: var(--red-color) !important;
   font-weight: 700;
+}
+.lecture-header > .error-inform {
+  position: absolute;
+  bottom: -1.7rem;
+  right: 1.5rem;
 }

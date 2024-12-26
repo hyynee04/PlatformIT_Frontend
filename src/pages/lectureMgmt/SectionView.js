@@ -20,8 +20,8 @@ const SectionView = (props) => {
     idLecture,
     sectionList,
     fetchSectionList,
-    setIdLecture,
-    setIdSection,
+    setIdLectureChange,
+    setIdSectionChange,
     courseTitle,
     setIdSectionRemoved,
     setIsRemoved,
@@ -199,7 +199,22 @@ const SectionView = (props) => {
                       >
                         <div
                           className="lecture-item"
-                          onClick={() => setIdLecture(lecture.idLecture)}
+                          onClick={() => {
+                            if (
+                              lecture.lectureStatus === LectureStatus.active
+                            ) {
+                              setIdLectureChange(lecture.idLecture);
+                              setIdSectionChange(lecture.idSection);
+                            } else {
+                              navigate("/addNewLecture", {
+                                state: {
+                                  idLecture: lecture.idLecture,
+                                  lectureStatus: lecture.lectureStatus,
+                                  sectionName: section.sectionName,
+                                },
+                              });
+                            }
+                          }}
                         >
                           <div
                             className={`lecture-info ${
@@ -216,7 +231,8 @@ const SectionView = (props) => {
                             >
                               {lecture.lectureTitle}
                             </span>
-                            {idRole !== Role.student && (
+
+                            {idRole !== Role.student ? (
                               <>
                                 {lecture.lectureStatus ===
                                 LectureStatus.active ? (
@@ -238,6 +254,16 @@ const SectionView = (props) => {
                                   </span>
                                 )}
                               </>
+                            ) : (
+                              idRole === Role.student && (
+                                <span className="exercise-num">
+                                  {`${lecture.exerciseCount} ${
+                                    lecture.exerciseCount > 1
+                                      ? "exercises"
+                                      : "exercise"
+                                  }`}
+                                </span>
+                              )
                             )}
                           </div>
                           {idRole === Role.student &&

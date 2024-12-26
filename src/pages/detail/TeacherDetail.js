@@ -85,10 +85,12 @@ const TeacherDetail = (props) => {
               {teacherInfo.teacherDescription && (
                 <span>{teacherInfo.teacherDescription}</span>
               )}
-              <span className="teaching-major">
-                <FaGraduationCap color="#757575" />
-                {teacherInfo.teachingMajor || ""}
-              </span>
+              {teacherInfo.teachingMajor && (
+                <span className="teaching-major">
+                  <FaGraduationCap color="#757575" />
+                  {teacherInfo.teachingMajor}
+                </span>
+              )}
               <span className="number-course">
                 <FaRegFile color="#757575" />
                 {`${teacherInfo.coursesCount} ${

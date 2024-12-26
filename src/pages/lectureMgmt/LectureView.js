@@ -5,6 +5,7 @@ import { GoAlertFill } from "react-icons/go";
 import { BsReplyFill, BsTrash3Fill } from "react-icons/bs";
 import {
   LuAirplay,
+  LuAlertTriangle,
   LuCheckSquare,
   LuClock,
   LuFileEdit,
@@ -19,15 +20,11 @@ import {
 import "../../assets/css/LectureView.css";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
-import {
-  APIStatus,
-  AssignmentType,
-  LectureStatus,
-  Role,
-} from "../../constants/constants";
+import { APIStatus, AssignmentType, Role } from "../../constants/constants";
 import {
   formatDateTime,
   getVideoType,
+  handleNavigateDetailStudent,
   isPastDateTime,
 } from "../../functions/function";
 import { useNavigate } from "react-router-dom";
@@ -47,24 +44,20 @@ const LectureView = ({
   setIsRemoved,
   setIdComment,
   setUpdatedCommentList,
-  lectureStatus,
   setDefaultToEditLecture,
   setEditLecture,
   setIsEditLecture,
+  index,
+  setIndex,
+  isFinishedLecture,
+  setIsFinishedLecture,
 }) => {
   const navigate = useNavigate();
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
-
-  const [index, setIndex] = useState(1);
   const [isEdit, setIsEdit] = useState(false);
 
   const avaImg = useSelector((state) => state.profileUser.avaImg);
-
-  const [loading, setLoading] = useState({
-    loadComment: false,
-    addComment: false,
-  });
 
   const fileInputRef = useRef(null);
   const videoInputRef = useRef(null);
@@ -103,8 +96,15 @@ const LectureView = ({
     { label: "Comment", index: 4 },
   ];
 
+  const [isMissing, setIsMissing] = useState(0);
+  const [errorList, setErrorList] = useState({
+    0: "",
+    1: "Missing section name!",
+    2: "Missing Lecture Video or Material!",
+    3: "",
+  });
+
   const handleAddComment = async (commentData) => {
-    console.log(commentData);
     try {
       let response = await postAddComment(commentData);
       if (response.status === APIStatus.success) {
@@ -139,6 +139,39 @@ const LectureView = ({
     setEditLecture({ ...editLecture, SupportMaterials: updatedFiles });
   };
 
+  const handleSaveData = async (editLecture) => {
+    const keepFiles = [];
+    if (!editLecture.Title) {
+      setIsMissing(1);
+      return;
+    }
+    if (!editLecture.LectureVideo && !editLecture.MainMaterials) {
+      setIsMissing(2);
+      return;
+    }
+    if (
+      editLecture.LectureVideo &&
+      typeof editLecture.LectureVideo === "object"
+    )
+      keepFiles.push(editLecture.LectureVideo.idFile);
+    if (
+      editLecture.MainMaterials &&
+      typeof editLecture.MainMaterials === "object"
+    )
+      keepFiles.push(editLecture.MainMaterials.idFile);
+    if (editLecture.SupportMaterials?.length > 0) {
+      editLecture.SupportMaterials.forEach((item) => {
+        if (typeof item === "object" && !(item instanceof File)) {
+          keepFiles.push(item.idFile);
+        }
+      });
+    }
+    const updated = { ...editLecture, IdFileNotDelete: keepFiles };
+    setEditLecture(updated);
+
+    setIsEditLecture(true);
+  };
+
   useEffect(() => {
     // Get all textareas with the class "auto-expand"
     const textareaElements = document.querySelectorAll(".comment-entering");
@@ -165,7 +198,7 @@ const LectureView = ({
       idCommentRef: null,
       content: "",
     });
-  }, [idLecture]);
+  }, [idLecture, idTeacher]);
 
   useEffect(() => {
     setUpdatedCommentList(updatedComments);
@@ -217,7 +250,62 @@ const LectureView = ({
     }
   }, []);
 
-  console.log(editLecture);
+  const handleNavigateDetailStudent = (idUserComment) => {
+    if (idUser === idUserComment) {
+      navigate("/pi");
+    } else if (idUserComment === idTeacher) {
+      navigate("/teacherDetail", {
+        state: {
+          idTeacher: idUserComment,
+          idRole: idRole,
+          idUser: idUser,
+        },
+      });
+    } else if (idRole === Role.teacher) {
+      navigate("/studentdetail", {
+        state: {
+          idStudent: idUserComment,
+          idCourse: lectureDetail.idCourse,
+          courseTitle: lectureDetail.courseTitle,
+        },
+      });
+    } else {
+      navigate("/studentdetail", {
+        state: {
+          idStudent: idUserComment,
+        },
+      });
+    }
+  };
+
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    if (isFinishedLecture) return;
+    else if (!lectureDetail?.videoMaterial?.path) {
+      const timer = setTimeout(() => {
+        setIsFinishedLecture(true);
+        console.log("User has watched for 2 minutes (no video).");
+      }, 1 * 60 * 1000); // 2 minutes in milliseconds
+
+      return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
+    }
+  }, [lectureDetail.videoMaterial, isFinishedLecture]);
+
+  const handleTimeUpdate = () => {
+    if (isFinishedLecture) return;
+
+    const video = videoRef.current;
+    if (video) {
+      const halfwayPoint = video.duration / 2;
+
+      // Check if the user has watched at least half
+      if (video.currentTime >= halfwayPoint && !isFinishedLecture) {
+        setIsFinishedLecture(true);
+        console.log("User has watched at least half of the video.");
+      }
+    }
+  };
 
   return (
     <>
@@ -254,45 +342,47 @@ const LectureView = ({
           Remove Lecture
         </button>
       </div>
-      {lectureStatus === LectureStatus.pending ? (
-        <span className="status-text pending-color">
-          <GoAlertFill /> This lecture is pending
-        </span>
-      ) : lectureStatus === LectureStatus.rejected ? (
-        <span className="status-text rejected-color">
-          <GoAlertFill /> This lecture is rejected
-        </span>
-      ) : null}
 
       {isEdit && (
-        <div className="lecture-header">
-          <div className="lecture-head-info edit-view slide-to-bottom">
-            <span className="lecture-title">Edit Lecture</span>
+        <>
+          <div className="lecture-header">
+            <div className="lecture-head-info edit-view slide-to-bottom">
+              <span className="lecture-title">Edit Lecture</span>
+            </div>
+            {isMissing !== 0 && (
+              <span className="error-inform">
+                <LuAlertTriangle /> {errorList[isMissing]}
+              </span>
+            )}
+
+            <div className="option-container">
+              <button
+                className="changes-button discard slide-to-bottom"
+                onClick={() => setDefaultToEditLecture()}
+              >
+                Discard changes
+              </button>
+              <button
+                className="changes-button save slide-to-bottom"
+                onClick={() => {
+                  setIsMissing(0);
+                  handleSaveData(editLecture);
+                }}
+              >
+                Save changes
+              </button>
+              <button
+                className="setting-button"
+                ref={optionButtonRef}
+                onClick={() => {
+                  setIsOpenOption(!isOpenOption);
+                }}
+              >
+                <LuSettings />
+              </button>
+            </div>
           </div>
-          <div className="option-container">
-            <button
-              className="changes-button discard slide-to-bottom"
-              onClick={() => setDefaultToEditLecture()}
-            >
-              Discard changes
-            </button>
-            <button
-              className="changes-button save slide-to-bottom"
-              onClick={() => setIsEditLecture(true)}
-            >
-              Save changes
-            </button>
-            <button
-              className="setting-button"
-              ref={optionButtonRef}
-              onClick={() => {
-                setIsOpenOption(!isOpenOption);
-              }}
-            >
-              <LuSettings />
-            </button>
-          </div>
-        </div>
+        </>
       )}
       <div className="lecture-header slide-to-bottom">
         <div className={`lecture-head-info ${isEdit ? "" : "teacher-view"}`}>
@@ -310,6 +400,7 @@ const LectureView = ({
                 value={editLecture.Title}
                 placeholder={editLecture.Title}
                 onChange={(e) => {
+                  setIsMissing(0);
                   setEditLecture({ ...editLecture, Title: e.target.value });
                 }}
               />
@@ -377,20 +468,23 @@ const LectureView = ({
                 style={{ display: "none" }}
                 accept="video/mp4, video/webm, video/ogg"
                 onChange={(event) => {
-                  // setIsMissing(0);
-                  console.log("Go here");
+                  setIsMissing(0);
                   const file = event.target.files[0]; // Get the selected file
                   if (file) {
-                    console.log("Go there");
                     setEditLecture({ ...editLecture, LectureVideo: file });
                   }
                 }}
               />
             </>
           )}
-          {lectureDetail.videoMaterial || editLecture.LectureVideo ? (
+          {(!isEdit && lectureDetail?.videoMaterial) ||
+          (isEdit &&
+            (editLecture?.LectureVideo ||
+              editLecture?.LectureVideo instanceof File)) ? (
             <video
+              ref={videoRef}
               className="video-player"
+              onTimeUpdate={handleTimeUpdate}
               controls
               key={
                 editLecture.LectureVideo instanceof File
@@ -398,23 +492,24 @@ const LectureView = ({
                   : "invalid-video"
               }
             >
-              {lectureDetail?.videoMaterial?.path ||
-              editLecture?.LectureVideo?.path ||
-              editLecture?.LectureVideo instanceof File ? (
+              {(!isEdit && lectureDetail?.videoMaterial?.path) ||
+              (isEdit &&
+                (editLecture?.LectureVideo?.path ||
+                  editLecture?.LectureVideo instanceof File)) ? (
                 <source
                   src={
-                    lectureDetail?.videoMaterial?.path
-                      ? lectureDetail?.videoMaterial?.path
-                      : editLecture?.LectureVideo?.path
+                    isEdit
                       ? editLecture?.LectureVideo?.path
-                      : URL.createObjectURL(editLecture.LectureVideo)
+                        ? editLecture?.LectureVideo?.path
+                        : URL.createObjectURL(editLecture.LectureVideo)
+                      : lectureDetail?.videoMaterial?.path
                   }
                   type={getVideoType(
-                    lectureDetail?.videoMaterial?.path
-                      ? lectureDetail?.videoMaterial?.path
-                      : editLecture?.LectureVideo?.path
+                    isEdit
                       ? editLecture?.LectureVideo?.path
-                      : editLecture.LectureVideo.name
+                        ? editLecture?.LectureVideo?.path
+                        : editLecture.LectureVideo.name
+                      : lectureDetail?.videoMaterial?.path
                   )}
                 />
               ) : (
@@ -430,9 +525,7 @@ const LectureView = ({
         </div>
       ) : null}
 
-      {(lectureDetail.mainMaterials?.length > 0 ||
-        editLecture.MainMaterials?.length > 0 ||
-        isEdit) && (
+      {((!isEdit && lectureDetail.mainMaterials?.length > 0) || isEdit) && (
         <div className="main-material slide-to-right slide-to-bottom">
           <span className="title">Main Material</span>
           {isEdit && (
@@ -449,7 +542,7 @@ const LectureView = ({
                 ref={fileInputRef}
                 style={{ display: "none" }}
                 onChange={(event) => {
-                  // setIsMissing(0);
+                  setIsMissing(0);
                   const file = event.target.files[0]; // Get the selected file
                   if (file) {
                     setEditLecture({ ...editLecture, MainMaterials: file });
@@ -460,20 +553,20 @@ const LectureView = ({
           )}
           <div className="material-content">
             {isEdit &&
-            (editLecture.MainMaterials[0] ||
+            (editLecture.MainMaterials ||
               editLecture.MainMaterials instanceof File) ? (
               <>
                 <div
                   onClick={() =>
                     window.open(
-                      editLecture?.MainMaterials[0]?.path ||
+                      editLecture?.MainMaterials.path ||
                         URL.createObjectURL(editLecture.MainMaterials)
                     )
                   }
                   className="content-file"
                 >
                   <span>
-                    {editLecture?.MainMaterials[0]?.fileName ||
+                    {editLecture?.MainMaterials.fileName ||
                       editLecture.MainMaterials.name}
                   </span>
                 </div>
@@ -564,10 +657,8 @@ const LectureView = ({
                     multiple
                     onChange={(event) => {
                       const files = event.target.files; // Get the selected files
-                      console.log("files: ", files);
                       if (files && files.length > 0) {
                         const filesArray = Array.from(files);
-                        console.log("file Array: ", filesArray);
 
                         setEditLecture((prevState) => ({
                           ...prevState,
@@ -603,9 +694,7 @@ const LectureView = ({
                                     );
                               }}
                             >
-                              <span>
-                                Edit {material.fileName || material.name}
-                              </span>
+                              <span>{material.fileName || material.name}</span>
                               <button
                                 className="file-buttons"
                                 onClick={(e) => {
@@ -631,7 +720,7 @@ const LectureView = ({
                                   className="content-file"
                                   onClick={() => window.open(material.path)}
                                 >
-                                  <span>View {material.fileName}</span>
+                                  <span>{material.fileName}</span>
                                 </div>
                               </>
                             )
@@ -701,7 +790,7 @@ const LectureView = ({
                           <div className="exercise-body">
                             <span className="item-title">{exercise.title}</span>
                             <div className="exercise-description">
-                              {exercise.assignmentType && (
+                              {exercise.assignmentType ? (
                                 <span>
                                   <LuFileEdit color="#003B57" />
                                   &nbsp;
@@ -713,8 +802,8 @@ const LectureView = ({
                                     ? "CODE"
                                     : "QUIZ"}
                                 </span>
-                              )}
-                              {exercise.duration && (
+                              ) : null}
+                              {exercise.duration ? (
                                 <span>
                                   <LuClock color="#003B57" />
                                   &nbsp;
@@ -722,8 +811,8 @@ const LectureView = ({
                                     exercise.duration > 1 ? "mins" : "min"
                                   }`}
                                 </span>
-                              )}
-                              {exercise.questionQuantity && (
+                              ) : null}
+                              {exercise.questionQuantity ? (
                                 <span>
                                   <LuFileQuestion color="#003B57" />
                                   &nbsp;
@@ -733,7 +822,7 @@ const LectureView = ({
                                       : "question"
                                   }`}
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                           </div>
                           {idRole === Role.student ? (
@@ -793,7 +882,11 @@ const LectureView = ({
                     className="comment-display"
                     style={{ marginBottom: "0" }}
                   >
-                    <div className="ava-holder">
+                    <div
+                      className="ava-holder"
+                      onClick={() => handleNavigateDetailStudent(idUser)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <img src={avaImg || default_ava} />
                     </div>
                     <div className="comment-content" style={{ width: "100%" }}>
@@ -855,12 +948,38 @@ const LectureView = ({
                             : "1rem",
                       }}
                     >
-                      <div className="ava-holder">
+                      <div
+                        className="ava-holder"
+                        onClick={() =>
+                          handleNavigateDetailStudent(comment.idUser)
+                        }
+                        style={{
+                          cursor:
+                            idRole !== Role.student ||
+                            (idRole === Role.student &&
+                              comment.idUser === idTeacher)
+                              ? "pointer"
+                              : "default",
+                        }}
+                      >
                         <img src={comment.avatarPath || default_ava} />
                       </div>
                       <div className="comment-content">
                         <div className="comment-header">
-                          <span className="commentator-name">
+                          <span
+                            className="commentator-name"
+                            onClick={() =>
+                              handleNavigateDetailStudent(comment.idUser)
+                            }
+                            style={{
+                              cursor:
+                                idRole !== Role.student ||
+                                (idRole === Role.student &&
+                                  comment.idUser === idTeacher)
+                                  ? "pointer"
+                                  : "default",
+                            }}
+                          >
                             {comment.fullName}
                           </span>
                           <span className="comment-time">
@@ -998,12 +1117,40 @@ const LectureView = ({
                                   showReply[comment.idComment] ? "active" : ""
                                 }`}
                               >
-                                <div className="ava-holder">
+                                <div
+                                  className="ava-holder"
+                                  onClick={() =>
+                                    handleNavigateDetailStudent(reply.idUser)
+                                  }
+                                  style={{
+                                    cursor:
+                                      idRole !== Role.student ||
+                                      (idRole === Role.student &&
+                                        reply.idUser === idTeacher)
+                                        ? "pointer"
+                                        : "default",
+                                  }}
+                                >
                                   <img src={reply.avatarPath || default_ava} />
                                 </div>
                                 <div className="comment-content">
                                   <div className="comment-header">
-                                    <span className="commentator-name">
+                                    <span
+                                      className="commentator-name"
+                                      onClick={() =>
+                                        handleNavigateDetailStudent(
+                                          reply.idUser
+                                        )
+                                      }
+                                      style={{
+                                        cursor:
+                                          idRole !== Role.student ||
+                                          (idRole === Role.student &&
+                                            reply.idUser === idTeacher)
+                                            ? "pointer"
+                                            : "default",
+                                      }}
+                                    >
                                       {reply.fullName}
                                     </span>
                                     <span className="comment-time">

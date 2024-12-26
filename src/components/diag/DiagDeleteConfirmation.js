@@ -3,6 +3,7 @@ import { LuTrash2, LuX } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import {
   deleteCourse,
+  deleteReview,
   inactiveLecture,
   inactiveSection,
 } from "../../services/courseService";
@@ -56,6 +57,17 @@ const DiagDeleteConfirmation = (props) => {
       }
     } catch (error) {
       console.log("Error posting data: ", error);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    try {
+      const respone = await deleteReview(object.id, idUser);
+      if (respone.status === APIStatus.success) {
+        setIsSucceed(true);
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
     }
   };
 
@@ -135,6 +147,7 @@ const DiagDeleteConfirmation = (props) => {
                     else if (object.name === "lecture") deleteLecture();
                     else if (object.name === "comment") removeComment();
                     else if (object.name === "course") hanldeDeleteCourse();
+                    else if (object.name === "review") handleDeleteReview();
                   }
                 }}
               >

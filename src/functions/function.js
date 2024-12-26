@@ -1,6 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
-import { NotificationType } from "../constants/constants";
+import { APIStatus, NotificationType, Role } from "../constants/constants";
+import { getLectureInfoForCmtNoti } from "../services/courseService";
 
 export const getPagination = (currentPage, totalPages) => {
   if (totalPages <= 5) {
@@ -140,7 +142,20 @@ export const formatDuration = (seconds) => {
 
   return `${formattedMinutes}:${formattedSeconds}`;
 };
-export const handleNotificationNavigate = (notification, navigate) => {
+export const handleNotificationNavigate = async (notification, navigate) => {
+  let idCourse;
+  if (notification.idComment) {
+    try {
+      const respone = await getLectureInfoForCmtNoti(notification.idLecture);
+      if (respone.status === APIStatus.success) {
+        idCourse = respone.data.idCourse;
+      } else {
+        console.error(Response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  }
   if (notification.notificationType === NotificationType.qualification) {
     navigate("/pi", {
       state: { action: "specializedPI" },
@@ -165,6 +180,14 @@ export const handleNotificationNavigate = (notification, navigate) => {
         idCourse: notification.idCourse,
         idUser: localStorage.getItem("idUser"),
         idRole: localStorage.getItem("idRole"),
+      },
+    });
+  } else if (notification.notificationType === NotificationType.comment) {
+    navigate("/viewLecture", {
+      state: {
+        idLecture: notification.idLecture,
+        idCourse: idCourse,
+        idComment: notification.idComment,
       },
     });
   }

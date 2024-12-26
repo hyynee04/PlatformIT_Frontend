@@ -22,10 +22,13 @@ import DiagUpdateConfirmation from "../../components/diag/DiagUpdateConfirmation
 
 const Lecture = (props) => {
   const location = useLocation();
+  const [index, setIndex] = useState(1);
 
   const [loading, setLoading] = useState({
     lectureDetail: false,
     sectionList: false,
+    comment: false,
+    exercise: false,
   });
 
   const [lectureDetail, setLectureDetail] = useState({});
@@ -46,12 +49,16 @@ const Lecture = (props) => {
   const [idComment, setIdComment] = useState(null);
   const [idSectionRemoved, setIdSectionRemoved] = useState(null);
 
-  const [isRemoved, setIsRemoved] = useState(false);
-  const [isEditLecture, setIsEditLecture] = useState(true);
-  const [lectureStatus, setLectureStatus] = useState(null);
+  const [idLectureChange, setIdLectureChange] = useState(null);
+  const [idSectionChange, setIdSectionChange] = useState(null);
 
-  const fetchLectureDetail = async (idLecture, idStudent) => {
-    setLoading({ ...loading, lectureDetail: true });
+  const [isRemoved, setIsRemoved] = useState(false);
+  const [isEditLecture, setIsEditLecture] = useState(false);
+  const [lectureStatus, setLectureStatus] = useState(null);
+  const [isFinishedLecture, setIsFinishedLecture] = useState(null);
+
+  const fetchLectureDetail = async (idLecture, idUser) => {
+    setLoading((prev) => ({ ...prev, lectureDetail: true }));
     try {
       let response = await getLectureDetail(idLecture);
       if (response.status === APIStatus.success) {
@@ -59,17 +66,8 @@ const Lecture = (props) => {
           ...response.data,
           timestamp: parseRelativeTime(response.data.relativeTime),
         });
-        setIdCourse(response.data.idCourse);
         setIdSection(response.data.idSection);
-        let exercises = await getExerciseOfLecture(idLecture, idStudent);
-        if (exercises.status === APIStatus.success) {
-          setLectureDetail((prevDetail) => ({
-            ...prevDetail, // Keep previous lecture details
-            exercises: exercises.data,
-          }));
-        } else {
-          console.error("Fetching exercises: ", exercises.data);
-        }
+
         if (idRole === Role.teacher) {
           setDefaultToEditLecture(response.data);
           setIdList({
@@ -85,12 +83,24 @@ const Lecture = (props) => {
     } catch (error) {
       console.error("Error fetching data: ", error);
     } finally {
-      setLoading({ ...loading, lectureDetail: false });
+      setLoading((prev) => ({ ...prev, lectureDetail: false }));
+    }
+  };
+
+  const fetchExerciseOfLecture = async (idLecture, idUser) => {
+    let exercises = await getExerciseOfLecture(idLecture, idUser);
+    if (exercises.status === APIStatus.success) {
+      setLectureDetail((prevDetail) => ({
+        ...prevDetail, // Keep previous lecture details
+        exercises: exercises.data,
+      }));
+    } else {
+      console.error("Fetching exercises: ", exercises.data);
     }
   };
 
   const fetchCourseContentStructure = async (idCourse, idStudent) => {
-    setLoading((prev) => ({ ...prev, sectionList: true })); // Safe state update
+    setLoading((prev) => ({ ...prev, sectionList: true }));
     try {
       const response = await getCourseContentStructure(idCourse, idStudent);
 
@@ -98,18 +108,11 @@ const Lecture = (props) => {
         if (response.data) {
           setSectionList(response.data);
           setIdTeacher(response.data.idTeacher);
-
-          const section = response.data.sectionStructures.find(
-            (sec) => sec.idSection === idSection
+          getIsFinishedLectureOfStudent(
+            response.data,
+            response.data.idSection,
+            response.data.idLecture
           );
-          if (section) {
-            const lecture = section.lectureStructures.find(
-              (lec) => lec.idLecture === idLecture
-            );
-            setLectureStatus(lecture ? lecture.lectureStatus : null);
-          } else {
-            setLectureStatus(null); // Section not found
-          }
         } else {
           console.warn("Received empty data for course content structure.");
         }
@@ -122,7 +125,7 @@ const Lecture = (props) => {
     } catch (error) {
       console.error("Error fetching course content structure:", error);
     } finally {
-      setLoading((prev) => ({ ...prev, sectionList: false })); // Safe state update
+      setLoading((prev) => ({ ...prev, sectionList: false }));
     }
   };
 
@@ -141,51 +144,72 @@ const Lecture = (props) => {
 
   const setDefaultToEditLecture = (lectureDetail) => {
     setEditLecture({
-      Title: lectureDetail.lectureTitle,
-      Introduction: lectureDetail.lectureIntroduction,
-      LectureVideo: lectureDetail.videoMaterial,
-      MainMaterials: lectureDetail.mainMaterials,
-      SupportMaterials: lectureDetail.supportMaterials,
+      Title: lectureDetail.lectureTitle || "",
+      Introduction: lectureDetail.lectureIntroduction || "",
+      LectureVideo: lectureDetail.videoMaterial || "",
+      MainMaterials: lectureDetail.mainMaterials[0] || "",
+      SupportMaterials: lectureDetail.supportMaterials || [],
     });
   };
 
+  const getIsFinishedLectureOfStudent = (sectionList, idSection, idLecture) => {
+    const section = sectionList.sectionStructures.find(
+      (sec) => sec.idSection === idSection
+    );
+    if (section) {
+      const lecture = section.lectureStructures.find(
+        (lec) => lec.idLecture === idLecture
+      );
+      setIsFinishedLecture(lecture ? lecture.isFinishedLecture : null);
+    } else {
+      setIsFinishedLecture(null);
+    }
+    console.log("RUN");
+  };
   useEffect(() => {
     window.scrollTo(0, 0);
     const state = location.state;
-    setLoading({ ...loading, lectureDetail: true });
-    if (state && state.idLecture) {
-      const fetchData = async () => {
-        await setIdLecture(state.idLecture);
-        await fetchLectureDetail(state.idLecture);
-        if (idRole === Role.student) {
-          fetchCourseContentStructure(idCourse, idUser);
-        } else {
-          fetchCourseContentStructure(idCourse);
-        }
+    if (state && state.idLecture && state.idCourse) {
+      setIdCourse(state.idCourse);
+      setIdLecture(state.idLecture);
+      setIdLectureChange(state.idLecture);
+
+      if (state.idComment) {
+        setIndex(4);
+      }
+
+      if (idRole === Role.student) {
+        fetchCourseContentStructure(state.idCourse, idUser);
+      } else {
+        fetchCourseContentStructure(state.idCourse);
+      }
+      const FetchData = async () => {
+        await fetchLectureDetail(state.idLecture, idUser);
         fetchAllCommentOfLecture(state.idLecture);
+        fetchExerciseOfLecture(state.idLecture, idUser);
       };
-      fetchData();
+
+      FetchData();
     }
-    setLoading({ ...loading, lectureDetail: false });
   }, [location.state]);
 
   useEffect(() => {
-    setLoading({ ...loading, lectureDetail: true });
-    const reFetchData = async () => {
-      await fetchLectureDetail(idLecture);
-      await fetchAllCommentOfLecture(idLecture);
-      setLoading({ ...loading, lectureDetail: false });
+    const FetchData = async (idLecture) => {
+      await fetchLectureDetail(idLecture, idUser);
+      fetchAllCommentOfLecture(idLecture);
+      fetchExerciseOfLecture(idLecture, idUser);
     };
-    reFetchData();
-  }, [idLecture]);
-
-  useEffect(() => {
-    if (idRole === Role.student) {
-      fetchCourseContentStructure(idCourse, idUser);
-    } else {
-      fetchCourseContentStructure(idCourse);
+    if (idLecture !== idLectureChange) {
+      setIdLecture(idLectureChange);
+      setIdSection(idSectionChange);
+      getIsFinishedLectureOfStudent(
+        sectionList,
+        idSectionChange,
+        idLectureChange
+      );
+      FetchData(idLectureChange);
     }
-  }, [idCourse]);
+  }, [idLectureChange, idSectionChange]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -221,14 +245,14 @@ const Lecture = (props) => {
     setMainCommentList(processedData.main);
     setReplyCommentList(processedData.reply);
   }, [updatedCommentList]);
-
   return (
     <div className="lecture-container">
       <div className="lecture-content">
         <span className="course-name">{lectureDetail.courseTitle}</span>
         <div className="lecture-detail">
           <div className="lecture-content-section">
-            {loading.lectureDetail ? (
+            {loading.lectureDetail ||
+            Object.keys(lectureDetail).length === 0 ? (
               <div className="loading-page component">
                 <ImSpinner2 color="#397979" />
               </div>
@@ -244,12 +268,15 @@ const Lecture = (props) => {
                 replyCommentList={replyCommentList}
                 fetchAllCommentOfLecture={fetchAllCommentOfLecture}
                 setUpdatedCommentList={setUpdatedCommentList}
-                lectureStatus={lectureStatus}
                 setDefaultToEditLecture={() =>
                   setDefaultToEditLecture(lectureDetail)
                 }
                 setEditLecture={setEditLecture}
                 setIsEditLecture={setIsEditLecture}
+                index={index}
+                setIndex={setIndex}
+                isFinishedLecture={isFinishedLecture}
+                setIsFinishedLecture={setIsFinishedLecture}
               />
             )}
           </div>
@@ -266,8 +293,8 @@ const Lecture = (props) => {
                 idLecture={idLecture}
                 sectionList={sectionList}
                 fetchSectionList={fetchCourseContentStructure}
-                setIdSection={setIdSection}
-                setIdLecture={setIdLecture}
+                setIdSectionChange={setIdSectionChange}
+                setIdLectureChange={setIdLectureChange}
                 courseTitle={lectureDetail.courseTitle}
                 setIsRemoved={setIsRemoved}
                 setIdSectionRemoved={setIdSectionRemoved}
@@ -314,6 +341,9 @@ const Lecture = (props) => {
         isOpen={isEditLecture}
         onClose={() => setIsEditLecture(false)}
         message={"Are you sure to save these changes?"}
+        idList={idList}
+        editLecture={editLecture}
+        fetchData={() => fetchLectureDetail(idLecture, idUser)}
       />
     </div>
   );

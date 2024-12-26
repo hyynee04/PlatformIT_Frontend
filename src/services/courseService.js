@@ -369,10 +369,13 @@ const postUpdateLecture = async (idList, lectureData, LectureStatus) => {
     lectureData.SupportMaterials.forEach((material) => {
       formData.append(`SupportMaterials`, material); // each material is appended as SupportMaterials
     });
+    lectureData.IdFileNotDelete.forEach((id) => {
+      formData.append("IdFileNotDelete", id);
+    });
 
     // Make the request with the required headers
     return await axios.post(
-      `api/Lecture/AddLecture?idUpdatedBy=${idList.idCreatedBy}`,
+      `api/Lecture/UpdateLecture?idUpdatedBy=${idList.idCreatedBy}`,
       formData,
       {
         headers: {
@@ -412,6 +415,36 @@ const postRejectLecture = (idLecture, reason) => {
     },
   });
 };
+const getLectureInfoForCmtNoti = (idLecture) => {
+  return axios.get("api/Lecture/GetLectureInfoForCmtNoti", {
+    params: {
+      idLecture: idLecture,
+    },
+  });
+};
+const postAddReview = (idUser, idCourse, rating) => {
+  return axios.post("api/Course/AddRating", {
+    idUser: idUser,
+    idCourse: idCourse,
+    content: rating.content,
+    ratingNumber: rating.number,
+  });
+};
+const deleteReview = (idRating, idUpdatedBy) => {
+  return axios.delete("api/Course/DeleteRating", {
+    params: {
+      idRating: idRating,
+      idUpdatedBy: idUpdatedBy,
+    },
+  });
+};
+const getAllRatingsOfCourse = (idCourse) => {
+  return axios.get("api/Course/GetAllRatingsOfCourse", {
+    params: {
+      idCourse: idCourse,
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
@@ -447,4 +480,8 @@ export {
   getAllPendingLectureOfCenter,
   postApproveLecture,
   postRejectLecture,
+  getLectureInfoForCmtNoti,
+  postAddReview,
+  getAllRatingsOfCourse,
+  deleteReview,
 };

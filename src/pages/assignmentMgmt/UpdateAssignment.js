@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import Form from "react-bootstrap/Form";
 import { FaCalendar, FaChevronDown, FaSave, FaTrashAlt } from "react-icons/fa";
 import { HiRefresh } from "react-icons/hi";
 import { ImSpinner2 } from "react-icons/im";
@@ -9,6 +10,7 @@ import {
   LuChevronRight,
   LuMinusCircle,
   LuX,
+  LuPlus,
 } from "react-icons/lu";
 import { MdPublish } from "react-icons/md";
 import { TiPlus } from "react-icons/ti";
@@ -23,10 +25,14 @@ import {
 import { formatDate } from "../../functions/function";
 import {
   deleteAssignment,
+  getAllActiveLanguage,
   getAssignmentInfo,
+  getViewCodeAssignment,
+  postAddCodeAssignment,
   postAddManualAssignment,
   postAddQuizAssignment,
   postUpdateAssignment,
+  postUpdateCodeAssignment,
 } from "../../services/assignmentService";
 import {
   getAllActiveCourseOfTeacher,
@@ -34,6 +40,7 @@ import {
   getAllActiveSectionOfCourse,
 } from "../../services/courseService";
 import DiagNotiWarning from "../../components/diag/DiagNotiWarning";
+import RunCode from "../../components/assigment/RunCode";
 const UpdateAssignment = ({ isDuplicate }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,18 +49,37 @@ const UpdateAssignment = ({ isDuplicate }) => {
     save: false,
     publish: false,
   });
-  const [listCourse, setListCourse] = useState([]);
+
   const [assignmentInfo, setAssignmentInfo] = useState({});
   const [originAssignInfo, setOriginAssignInfo] = useState({});
   const [questions, setQuestions] = useState([]);
+  const [codeProblem, setCodeProblem] = useState({});
 
-  // Hàm xử lý cập nhật thông tin
-  const handleUpdateAssignment = (key, value) => {
-    setAssignmentInfo((prevInfo) => ({
-      ...prevInfo,
-      [key]: value,
-    }));
-  };
+  const [listCourse, setListCourse] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [isLimitedTimeCourse, setIsLimitedTimeCourse] = useState(false);
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+  const [listSection, setListSection] = useState([]);
+  const [selectedSection, setSelectedSection] = useState(null);
+
+  const [listLecture, setListLecture] = useState([]);
+  const [selectedLecture, setSelectedLecture] = useState(null);
+
+  const [listLanguagesCode, setListLanguagesCode] = useState([]);
+
+  const [isTest, setIsTest] = useState(false);
+  const [showOptionQuiz, setShowOptionQuiz] = useState(false);
+  const optionQuizRef = useRef(null);
+
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [invalidHeader, setInvalidHeader] = useState("");
+  const [invalidMsg, setInvalidMessage] = useState("");
+  const [isModalInvalidOpen, setIsModalInvalidOpen] = useState(false);
+  const [isFormValidState, setIsFormValidState] = useState(false);
+  const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
+
   useEffect(() => {
     const fetchAssignmentData = async (idAssignment) => {
       setLoading(true);
@@ -90,7 +116,31 @@ const UpdateAssignment = ({ isDuplicate }) => {
               })
             ),
           });
-          setQuestions(fetchedAssignmentInfo.assignmentItems);
+          if (fetchedAssignmentInfo.assignmentType === AssignmentType.code) {
+            let responseCode = await getViewCodeAssignment(idAssignment);
+            if (responseCode.status === APIStatus.success) {
+              let dataCodeProblem = responseCode.data;
+              delete dataCodeProblem.title;
+              setCodeProblem({
+                ...dataCodeProblem,
+                isShowTestcase:
+                  dataCodeProblem.isShowTestcase === 1 ? true : false,
+                isPerformanceOnTime:
+                  dataCodeProblem.isPerformanceOnTime === 1 ? true : false,
+                isPerformanceOnMemory:
+                  dataCodeProblem.isPerformanceOnMemory === 1 ? true : false,
+                testCases: !dataCodeProblem.testCases
+                  ? []
+                  : dataCodeProblem.testCases,
+              });
+            }
+            let responseLanguage = await getAllActiveLanguage();
+            if (responseLanguage.status === APIStatus.success) {
+              setListLanguagesCode(responseLanguage.data);
+            }
+          } else {
+            setQuestions(fetchedAssignmentInfo.assignmentItems);
+          }
         }
       } catch (error) {
         throw error;
@@ -125,36 +175,6 @@ const UpdateAssignment = ({ isDuplicate }) => {
       fetchListCourse();
     }
   }, [location, isDuplicate]);
-  //IS TEST
-  const [isTest, setIsTest] = useState(false);
-  //COURSE
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [isLimitedTimeCourse, setIsLimitedTimeCourse] = useState(false);
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const handleInputClick = () => {
-    setDropdownVisible(!isDropdownVisible);
-  };
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
-    setDropdownVisible(false);
-  };
-  const formatTimeCourse = (courseStartDate, courseEndDate) => {
-    const now = new Date();
-    const startDate = new Date(courseStartDate);
-    const endDate = new Date(courseEndDate);
-
-    if (now >= startDate && now <= endDate) {
-      return "Ongoing";
-    } else if (now < startDate) {
-      return "Starting soon";
-    } else {
-      return "Ended";
-    }
-  };
-
-  //SECTION
-  const [listSection, setListSection] = useState([]);
-  const [selectedSection, setSelectedSection] = useState(null);
 
   useEffect(() => {
     const fectchSection = async () => {
@@ -178,14 +198,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
     };
     fectchSection();
   }, [selectedCourse]);
-  const handleSectionChange = (event) => {
-    const selectedSectionTitle = event.target.value;
-    const section = listSection.find((c) => c.title === selectedSectionTitle);
-    setSelectedSection(section);
-  };
-  //LECTURE
-  const [listLecture, setListLecture] = useState([]);
-  const [selectedLecture, setSelectedLecture] = useState(null);
+
   useEffect(() => {
     const fetchLectures = async () => {
       if (selectedCourse && selectedCourse.idCourse) {
@@ -215,17 +228,6 @@ const UpdateAssignment = ({ isDuplicate }) => {
     };
     fetchLectures();
   }, [selectedCourse, selectedSection]);
-  const handleLectureChange = (event) => {
-    const selectedLectureTitle = event.target.value;
-    const lecture = listLecture.find(
-      (c) => c.titleLecture === selectedLectureTitle
-    );
-    setSelectedLecture(lecture);
-  };
-
-  //OPTION QUIZ
-  const [showOptionQuiz, setShowOptionQuiz] = useState(false);
-  const optionQuizRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -239,10 +241,70 @@ const UpdateAssignment = ({ isDuplicate }) => {
     };
   }, []);
 
-  //TIME VALIDATE
-  const [isValid, setIsValid] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    if (
+      selectedCourse?.isLimitedTime === 1 &&
+      assignmentInfo.isLimitedTime === 1
+    )
+      if (assignmentInfo.startDate && assignmentInfo.dueDate) {
+        setIsValid(
+          validateForm(
+            assignmentInfo.startDate,
+            assignmentInfo.dueDate,
+            assignmentInfo.duration,
+            selectedCourse
+              ? selectedCourse.courseEndDate
+              : assignmentInfo.courseEndDate
+          )
+        );
+      }
+  }, [assignmentInfo, selectedCourse]);
 
+  useEffect(() => {
+    setIsFormValidState(isFormValid(false));
+  }, [
+    assignmentInfo.title,
+    selectedCourse,
+    selectedLecture,
+    questions,
+    codeProblem,
+    assignmentInfo.assignmentType,
+    errorMessage,
+  ]);
+
+  const formatTimeCourse = (courseStartDate, courseEndDate) => {
+    const now = new Date();
+    const startDate = new Date(courseStartDate);
+    const endDate = new Date(courseEndDate);
+
+    if (now >= startDate && now <= endDate) {
+      return "Ongoing";
+    } else if (now < startDate) {
+      return "Starting soon";
+    } else {
+      return "Ended";
+    }
+  };
+
+  const handleInputClick = () => {
+    setDropdownVisible(!isDropdownVisible);
+  };
+  const handleCourseSelect = (course) => {
+    setSelectedCourse(course);
+    setDropdownVisible(false);
+  };
+  const handleSectionChange = (event) => {
+    const selectedSectionTitle = event.target.value;
+    const section = listSection.find((c) => c.title === selectedSectionTitle);
+    setSelectedSection(section);
+  };
+  const handleLectureChange = (event) => {
+    const selectedLectureTitle = event.target.value;
+    const lecture = listLecture.find(
+      (c) => c.titleLecture === selectedLectureTitle
+    );
+    setSelectedLecture(lecture);
+  };
   const isStartDateAfterNow = (startDate) => {
     const currentDate = new Date();
     const selectedDate = new Date(startDate);
@@ -348,26 +410,56 @@ const UpdateAssignment = ({ isDuplicate }) => {
       )
     );
   };
-  useEffect(() => {
-    if (
-      selectedCourse?.isLimitedTime === 1 &&
-      assignmentInfo.isLimitedTime === 1
-    )
-      if (assignmentInfo.startDate && assignmentInfo.dueDate) {
-        setIsValid(
-          validateForm(
-            assignmentInfo.startDate,
-            assignmentInfo.dueDate,
-            assignmentInfo.duration,
-            selectedCourse
-              ? selectedCourse.courseEndDate
-              : assignmentInfo.courseEndDate
-          )
-        );
+  const handleUpdateAssignment = (key, value) => {
+    setAssignmentInfo((prevInfo) => ({
+      ...prevInfo,
+      [key]: value,
+    }));
+  };
+  //CODE PROBLEM
+  const handleTimeChange = (e) => {
+    const inputValue = e.target.value;
+    if (/^\d*\.?\d*$/.test(inputValue)) {
+      setCodeProblem((prevCodeProblem) => ({
+        ...prevCodeProblem,
+        timeValue: inputValue,
+      }));
+    }
+  };
+  const handleAddNewRecord = (fieldName) => {
+    setCodeProblem((prevCodeProblem) => {
+      if (fieldName === "testCases") {
+        return {
+          ...prevCodeProblem,
+          [fieldName]: [
+            ...prevCodeProblem[fieldName],
+            { input: "", expectedOutput: "" },
+          ],
+        };
       }
-  }, [assignmentInfo, selectedCourse]);
-  //QUESTION
+      return {
+        ...prevCodeProblem,
+        [fieldName]: [...prevCodeProblem[fieldName], { input: "", output: "" }],
+      };
+    });
+  };
 
+  const handleDeleteRecord = (fieldName, index) => {
+    setCodeProblem((prevCodeProblem) => ({
+      ...prevCodeProblem,
+      [fieldName]: prevCodeProblem[fieldName].filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const handleTableCodeChange = (fieldName, index, field, value) => {
+    const updatedField = [...codeProblem[fieldName]];
+    updatedField[index][field] = value;
+    setCodeProblem((prevCodeProblem) => ({
+      ...prevCodeProblem,
+      [fieldName]: updatedField,
+    }));
+  };
+  //QUESTION
   const inputFileRef = useRef([]);
   const totalQuestions = questions.length;
 
@@ -410,12 +502,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
     setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
   };
 
-  //HANDLE EDIT ASSIGNMENT
-
-  const [invalidHeader, setInvalidHeader] = useState("");
-  const [invalidMsg, setInvalidMessage] = useState("");
-  const [isModalInvalidOpen, setIsModalInvalidOpen] = useState(false);
-
+  //HANDLE EDIT/DUPLICATE ASSIGNMENT
   const openInvalidModal = () => setIsModalInvalidOpen(true);
   const closeInvalidModal = () => setIsModalInvalidOpen(false);
   const handleOpenInvalidDiag = (header, msgBody) => {
@@ -477,27 +564,61 @@ const UpdateAssignment = ({ isDuplicate }) => {
       return false;
     }
     if (+assignmentInfo.assignmentType === AssignmentType.code) {
-      if (!questions || typeof questions !== "object") {
+      if (!codeProblem.problem || codeProblem.problem.trim() === "") {
         isShowDiag &&
           handleOpenInvalidDiag(
-            "Invalid Questions",
-            "Please provide a valid question and mark for the coding assignment."
+            "Invalid Question",
+            "Please provide a valid problem for the coding assignment."
+          );
+
+        return false;
+      }
+      if (!codeProblem.idLanguage) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Missing Programming Language",
+            "Please select a programming language for the coding assignment."
           );
         return false;
       }
-      if (!questions.question || questions.question.trim() === "") {
+      const hasInvalidExample = codeProblem.examples.some(
+        (examples) =>
+          !examples.input ||
+          examples.input.trim() === "" ||
+          !examples.output ||
+          examples.output.trim() === ""
+      );
+
+      if (hasInvalidExample) {
         isShowDiag &&
           handleOpenInvalidDiag(
-            "Invalid Questions",
-            "Please provide a valid question for the coding assignment."
+            "Invalid Example",
+            "Each example must have valid input and output."
           );
         return false;
       }
-      if (!questions.mark || questions.mark <= 0) {
+      if (!codeProblem.testCases || codeProblem.testCases.length === 0) {
         isShowDiag &&
           handleOpenInvalidDiag(
-            "Invalid Questions",
-            "Please provide a valid mark greater than 0 for the coding assignment."
+            "Missing Test Cases",
+            "Please add at least one test case to validate the code execution."
+          );
+        return false;
+      }
+
+      const hasInvalidTestCase = codeProblem.testCases.some(
+        (testCase) =>
+          !testCase.input ||
+          testCase.input.trim() === "" ||
+          !testCase.expectedOutput ||
+          testCase.expectedOutput.trim() === ""
+      );
+
+      if (hasInvalidTestCase) {
+        isShowDiag &&
+          handleOpenInvalidDiag(
+            "Invalid Test Case",
+            "Each test case must have valid input and expected output."
           );
         return false;
       }
@@ -563,22 +684,12 @@ const UpdateAssignment = ({ isDuplicate }) => {
 
     return true;
   };
-  const [isFormValidState, setIsFormValidState] = useState(false);
-  useEffect(() => {
-    setIsFormValidState(isFormValid(false));
-  }, [
-    assignmentInfo.title,
-    selectedCourse,
-    selectedLecture,
-    questions,
-    assignmentInfo.assignmentType,
-    errorMessage,
-  ]);
+
   const handleDuplicateAssignment = async (isPublish) => {
     if (!isFormValid(true)) {
       return;
     }
-    const dataToSubmit = {
+    let dataToSubmit = {
       title: assignmentInfo.title,
       idCourse: selectedCourse.idCourse,
       isTest: isTest,
@@ -591,8 +702,18 @@ const UpdateAssignment = ({ isDuplicate }) => {
       isShufflingQuestion: assignmentInfo.isShufflingQuestion,
       isShufflingAnswer: assignmentInfo.isShufflingAnswer,
       isShowAnswer: assignmentInfo.isShowAnswer,
-      questions: questions,
     };
+    if (Number(assignmentInfo.assignmentType) === AssignmentType.code) {
+      dataToSubmit = {
+        ...dataToSubmit,
+        ...codeProblem,
+      };
+    } else {
+      dataToSubmit = {
+        ...dataToSubmit,
+        questions: questions,
+      };
+    }
     isPublish
       ? setLoadingBtn((prevState) => ({
           ...prevState,
@@ -609,6 +730,8 @@ const UpdateAssignment = ({ isDuplicate }) => {
         response = await postAddManualAssignment(dataToSubmit);
       } else if (+assignmentInfo.assignmentType === AssignmentType.quiz) {
         response = await postAddQuizAssignment(dataToSubmit);
+      } else if (+assignmentInfo.assignmentType === AssignmentType.code) {
+        response = await postAddCodeAssignment(dataToSubmit);
       }
 
       if (response?.status === APIStatus.success) {
@@ -634,7 +757,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
     if (!isFormValid(true)) {
       return;
     }
-    const dataToSubmit = {
+    let dataToSubmit = {
       idAssignment: assignmentInfo.idAssignment,
       title: assignmentInfo.title,
       isTest: isTest,
@@ -647,8 +770,18 @@ const UpdateAssignment = ({ isDuplicate }) => {
       isShufflingAnswer: assignmentInfo.isShufflingAnswer,
       isShowAnswer: assignmentInfo.isShowAnswer,
       assignmentStatus: assignmentInfo.assignmentStatus,
-      questions: questions,
     };
+    if (Number(assignmentInfo.assignmentType) === AssignmentType.code) {
+      dataToSubmit = {
+        ...dataToSubmit,
+        ...codeProblem,
+      };
+    } else {
+      dataToSubmit = {
+        ...dataToSubmit,
+        questions: questions,
+      };
+    }
     isPublish
       ? setLoadingBtn((prevState) => ({
           ...prevState,
@@ -659,7 +792,12 @@ const UpdateAssignment = ({ isDuplicate }) => {
           save: true,
         }));
     try {
-      const response = await postUpdateAssignment(dataToSubmit);
+      let response;
+      if (Number(assignmentInfo.assignmentType) === AssignmentType.code) {
+        response = await postUpdateCodeAssignment(dataToSubmit);
+      } else {
+        response = await postUpdateAssignment(dataToSubmit);
+      }
 
       if (response.status === APIStatus.success) {
         navigate(-1);
@@ -680,7 +818,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
           }));
     }
   };
-  const [diagDeleteVisible, setDiagDeleteVisible] = useState(false);
+
   const handleOpenDeleteDiag = () => {
     setDiagDeleteVisible(true);
   };
@@ -695,18 +833,6 @@ const UpdateAssignment = ({ isDuplicate }) => {
       throw error;
     }
   };
-  const [isSticky, setIsSticky] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 100); // Cố định khi cuộn qua 100px
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
   if (loading) {
     return (
       <div className="loading-page">
@@ -799,8 +925,6 @@ const UpdateAssignment = ({ isDuplicate }) => {
                         items: JSON.parse(JSON.stringify(item?.items)),
                       }))
                     );
-
-                    // setQuestions(fetchedAssignmentInfo.assignmentItems);
                   }}
                 >
                   <HiRefresh />
@@ -864,7 +988,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
       </div>
 
       <div className="container-assign">
-        <div className="container-left-assign sticky">
+        <div className="container-left-assign">
           <span className="title-span">
             {isDuplicate
               ? "Detail assignment"
@@ -1048,13 +1172,6 @@ const UpdateAssignment = ({ isDuplicate }) => {
                               : "Code"
                           }
                           readOnly
-                          // onChange={(e) => {
-                          //   handleUpdateAssignment(
-                          //     "assignmentType",
-                          //     e.target.value
-                          //   );
-                          //   setQuestions([]);
-                          // }}
                         />
                       </div>
                     </div>
@@ -1131,47 +1248,36 @@ const UpdateAssignment = ({ isDuplicate }) => {
                 </div>
               </div>
             }
-            <div className="info">
-              <span className="overall-span">
-                {totalQuestions}{" "}
-                {totalQuestions <= 1 ? "question" : "questions"} |{" "}
-                {totalMarks || 0} {totalMarks <= 1 ? "mark" : "marks"}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="container-right-assign">
-          <span className="title-span">
-            Questions
-            {+assignmentInfo.assignmentType === AssignmentType.quiz ? (
-              <LuAlignJustify
-                style={{ cursor: "pointer" }}
-                onClick={() => setShowOptionQuiz(!showOptionQuiz)}
-              />
-            ) : (
+            {Number(assignmentInfo.assignmentType) !== AssignmentType.code && (
               <div className="info">
-                <span>Question shuffling</span>
-                <label className="switch">
-                  <input
-                    type="checkbox"
-                    checked={assignmentInfo.isShufflingQuestion === 1}
-                    onChange={(e) =>
-                      handleUpdateAssignment(
-                        "isShufflingQuestion",
-                        e.target.checked ? 1 : 0
-                      )
-                    }
-                  />
-                  <span className="slider"></span>
-                </label>
+                <span className="overall-span">
+                  {totalQuestions}{" "}
+                  {totalQuestions <= 1 ? "question" : "questions"} |{" "}
+                  {totalMarks || 0} {totalMarks <= 1 ? "mark" : "marks"}
+                </span>
               </div>
             )}
-            {showOptionQuiz && (
-              <div
-                className="container-options assign-setting-option"
-                ref={optionQuizRef}
-              >
-                <div className="item">
+          </div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            width: "100%",
+          }}
+        >
+          <div className="container-right-assign">
+            <span className="title-span">
+              Questions
+              {+assignmentInfo.assignmentType === AssignmentType.quiz && (
+                <LuAlignJustify
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+                />
+              )}
+              {+assignmentInfo.assignmentType === AssignmentType.manual && (
+                <div className="info">
                   <span>Question shuffling</span>
                   <label className="switch">
                     <input
@@ -1187,60 +1293,373 @@ const UpdateAssignment = ({ isDuplicate }) => {
                     <span className="slider"></span>
                   </label>
                 </div>
-                <div className="item">
-                  <span>Answer shuffling</span>
+              )}
+              {+assignmentInfo.assignmentType === AssignmentType.code && (
+                <div className="info">
+                  <span>Show test cases on submission</span>
                   <label className="switch">
                     <input
                       type="checkbox"
-                      checked={assignmentInfo.isShufflingAnswer === 1}
+                      checked={codeProblem.isShowTestcase}
                       onChange={(e) =>
-                        handleUpdateAssignment(
-                          "isShufflingAnswer",
-                          e.target.checked ? 1 : 0
-                        )
+                        setCodeProblem((prevCodeProblem) => ({
+                          ...prevCodeProblem,
+                          isShowTestcase: e.target.checked,
+                        }))
                       }
                     />
                     <span className="slider"></span>
                   </label>
                 </div>
-                <div className="item">
-                  <span>Show answer on submission</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={assignmentInfo.showAnswer === 1}
+              )}
+              {showOptionQuiz && (
+                <div
+                  className="container-options assign-setting-option"
+                  ref={optionQuizRef}
+                >
+                  <div className="item">
+                    <span>Question shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.isShufflingQuestion === 1}
+                        onChange={(e) =>
+                          handleUpdateAssignment(
+                            "isShufflingQuestion",
+                            e.target.checked ? 1 : 0
+                          )
+                        }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Answer shuffling</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.isShufflingAnswer === 1}
+                        onChange={(e) =>
+                          handleUpdateAssignment(
+                            "isShufflingAnswer",
+                            e.target.checked ? 1 : 0
+                          )
+                        }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                  <div className="item">
+                    <span>Show answer on submission</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={assignmentInfo.showAnswer === 1}
+                        onChange={(e) =>
+                          handleUpdateAssignment(
+                            "showAnswer",
+                            e.target.checked ? 1 : 0
+                          )
+                        }
+                      />
+                      <span className="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </span>
+            {+assignmentInfo.assignmentType === AssignmentType.manual && (
+              <ManualQuestion
+                questions={questions}
+                setQuestions={setQuestions}
+                inputFileRef={inputFileRef}
+                isUpdate={!isDuplicate}
+              />
+            )}
+            {+assignmentInfo.assignmentType === AssignmentType.quiz && (
+              <QuizQuestion
+                questions={questions}
+                setQuestions={setQuestions}
+                inputFileRef={inputFileRef}
+                isUpdate={!isDuplicate}
+              />
+            )}
+            {+assignmentInfo.assignmentType === AssignmentType.code && (
+              <div className="assign-info">
+                <div className="info">
+                  <span>Problem</span>
+
+                  <Form.Control
+                    as="textarea"
+                    className="input-area-form-pi"
+                    placeholder="Type problem here..."
+                    value={codeProblem.problem}
+                    onChange={(e) =>
+                      setCodeProblem((prevCodeProblem) => ({
+                        ...prevCodeProblem,
+                        problem: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="info" style={{ width: "50%" }}>
+                  <span>Language</span>
+                  <div className="select-container">
+                    <select
+                      className="input-form-pi"
+                      value={codeProblem.idLanguage}
                       onChange={(e) =>
-                        handleUpdateAssignment(
-                          "showAnswer",
-                          e.target.checked ? 1 : 0
-                        )
+                        setCodeProblem({
+                          ...codeProblem,
+                          idLanguage: Number(e.target.value),
+                        })
                       }
-                    />
-                    <span className="slider"></span>
-                  </label>
+                    >
+                      {listLanguagesCode.map((language, index) => (
+                        <option
+                          value={language.idLanguage}
+                          key={index}
+                          className="option-container"
+                        >
+                          {language.languageName}
+                        </option>
+                      ))}
+                    </select>
+                    <FaChevronDown className="arrow-icon" />
+                  </div>
+                </div>
+                <div className="info">
+                  <span>Example</span>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Input</th>
+                        <th>Output</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {codeProblem?.examples?.map((example, index) => (
+                        <tr key={index}>
+                          <td style={{ width: "64px" }}> {index + 1}</td>
+                          <td>
+                            <input
+                              type="text"
+                              value={example.input}
+                              onChange={(e) =>
+                                handleTableCodeChange(
+                                  "examples",
+                                  index,
+                                  "input",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              value={example.output}
+                              onChange={(e) =>
+                                handleTableCodeChange(
+                                  "examples",
+                                  index,
+                                  "output",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </td>
+                          <td style={{ width: "64px" }}>
+                            <button
+                              className="del-question btn"
+                              style={{ border: "none" }}
+                              onClick={() =>
+                                handleDeleteRecord("examples", index)
+                              }
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
+                        <td colSpan={4}>
+                          <button
+                            className="btn add-new-record"
+                            onClick={() => handleAddNewRecord("examples")}
+                          >
+                            <LuPlus />
+                            Add new record
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
-          </span>
-          {+assignmentInfo.assignmentType === AssignmentType.manual && (
-            <ManualQuestion
-              questions={questions}
-              setQuestions={setQuestions}
-              inputFileRef={inputFileRef}
-              isUpdate={!isDuplicate}
-            />
+            {assignmentInfo.assignmentType !== AssignmentType.code && (
+              <button className="btn circle-btn" onClick={handleAddQuestion}>
+                <TiPlus className="icon" />
+              </button>
+            )}
+          </div>
+          {+assignmentInfo.assignmentType === AssignmentType.code && (
+            <>
+              <div className="container-right-assign test-case-scoring">
+                <span className="title-span">Test Cases and Scoring Rules</span>{" "}
+                <div className="assign-info">
+                  <div className="info">
+                    <span>Test case</span>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th>Input</th>
+                          <th>Output</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {codeProblem?.testCases?.map((testCase, index) => (
+                          <tr key={index}>
+                            <td style={{ width: "64px" }}> {index + 1}</td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.input}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "input",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                value={testCase.expectedOutput}
+                                onChange={(e) =>
+                                  handleTableCodeChange(
+                                    "testCases",
+                                    index,
+                                    "expectedOutput",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </td>
+                            <td style={{ width: "64px" }}>
+                              <button
+                                className="del-question btn"
+                                style={{ border: "none" }}
+                                onClick={() =>
+                                  handleDeleteRecord("testCases", index)
+                                }
+                              >
+                                <FaTrashAlt />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <td colSpan={4}>
+                            <button
+                              className="btn add-new-record"
+                              onClick={() => handleAddNewRecord("testCases")}
+                            >
+                              <LuPlus />
+                              Add new record
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="info" style={{ width: "50%" }}>
+                    <span>Scoring rules</span>
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isPerformanceOnTime"
+                        checked={codeProblem.isPerformanceOnTime || false}
+                        onChange={(e) => {
+                          setCodeProblem((prevCodeProblem) => ({
+                            ...prevCodeProblem,
+                            isPerformanceOnTime: e.target.checked,
+                          }));
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        Performance on time
+                      </span>
+                    </div>
+                    {codeProblem.isPerformanceOnTime && (
+                      <div className="select-container">
+                        <input
+                          type="text"
+                          className="input-form-pi"
+                          value={codeProblem.timeValue}
+                          onChange={handleTimeChange}
+                        />
+                        <label className="arrow-icon">s</label>
+                      </div>
+                    )}
+
+                    <div className="check-container">
+                      <input
+                        type="checkbox"
+                        name="isPerformanceOnMemory"
+                        checked={codeProblem.isPerformanceOnMemory}
+                        onChange={(e) => {
+                          setCodeProblem((prevCodeProblem) => ({
+                            ...prevCodeProblem,
+                            isPerformanceOnMemory: e.target.checked,
+                          }));
+                        }}
+                      />
+                      <span style={{ color: "var(--black-color)" }}>
+                        Performance on memory
+                      </span>
+                    </div>
+                    {codeProblem.isPerformanceOnMemory && (
+                      <div className="select-container">
+                        <input
+                          type="number"
+                          className="input-form-pi"
+                          value={codeProblem.memoryValue}
+                          onChange={(e) =>
+                            setCodeProblem((prevCodeProblem) => ({
+                              ...prevCodeProblem,
+                              memoryValue: e.target.value,
+                            }))
+                          }
+                        />
+                        <label className="arrow-icon">kb</label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <RunCode
+                selectedLanguage={{
+                  idLanguage: codeProblem.idLanguage,
+                  languageName: codeProblem.languageName,
+                }}
+                testCases={codeProblem.testCases}
+                isPassTestCase={true}
+                isPerformanceOnTime={codeProblem.isPerformanceOnTime}
+                timeValue={codeProblem.timeValue}
+                isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
+                memoryValue={codeProblem.memoryValue}
+              />
+            </>
           )}
-          {+assignmentInfo.assignmentType === AssignmentType.quiz && (
-            <QuizQuestion
-              questions={questions}
-              setQuestions={setQuestions}
-              inputFileRef={inputFileRef}
-              isUpdate={!isDuplicate}
-            />
-          )}
-          <button className="btn circle-btn" onClick={handleAddQuestion}>
-            <TiPlus className="icon" />
-          </button>
         </div>
       </div>
 

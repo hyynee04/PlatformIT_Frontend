@@ -93,7 +93,7 @@ const Header = () => {
         (message) => message.isRead === 0
       ).length;
       setUnreadMsgCount(unread > 99 ? "99+" : unread);
-      setNotifications(response.data);
+      // setNotifications(response.data);
     }
   };
 

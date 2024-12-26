@@ -97,7 +97,17 @@ const RunCode = ({
           Run code
         </button>
       </span>
-      <div className="assign-info">
+      <div
+        className="assign-info"
+        style={{
+          padding: "24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          width: "100%",
+          alignItems: "normal",
+        }}
+      >
         <div className="info">
           <span>Your code</span>
           <Form.Control

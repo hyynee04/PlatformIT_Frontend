@@ -300,16 +300,6 @@ const AssignDetail = () => {
       ) {
         return true;
       }
-
-      // // Trường hợp 3: Lọc các phần tử có status là "Submitted" khi không có `isPastDue` và không có endDate
-      // if (
-      //   statusSubmission === "submitted" &&
-      //   overviewAssignment.isPastDue === null &&
-      //   !overviewAssignment.endDate &&
-      //   submission.status === AssignmentResultStatus.submitted
-      // ) {
-      //   return true;
-      // }
       if (
         statusSubmission !== "all" &&
         submission.status !== Number(statusSubmission)
@@ -477,14 +467,15 @@ const AssignDetail = () => {
                       </button>
                     </>
                   )}
-                  {idRole === Role.student && (
-                    <label>
-                      {assignmentInfo.questionQuantity}{" "}
-                      {assignmentInfo.questionQuantity <= 1
-                        ? "question"
-                        : "questions"}
-                    </label>
-                  )}
+                  {idRole === Role.student &&
+                    assignmentInfo.assignmentType !== AssignmentType.code && (
+                      <label>
+                        {assignmentInfo.questionQuantity}{" "}
+                        {assignmentInfo.questionQuantity <= 1
+                          ? "question"
+                          : "questions"}
+                      </label>
+                    )}
                 </span>
               </div>
             </div>
@@ -691,7 +682,7 @@ const AssignDetail = () => {
                           <label className="switch">
                             <input
                               type="checkbox"
-                              checked={codeProblem.showTestcase === 1}
+                              checked={codeProblem.isShowTestcase === 1}
                               // onChange={(e) =>
                               //   handleUpdateAssignment(
                               //     "isShufflingQuestion",
@@ -769,7 +760,12 @@ const AssignDetail = () => {
                     <>
                       <div className="question-item">
                         <div className="info-row">
-                          <label className="question-idx">Problem</label>
+                          <label
+                            className="question-idx"
+                            style={{ fontSize: "20px" }}
+                          >
+                            Problem
+                          </label>
                         </div>
                         <div
                           className="info-row question-text"
@@ -812,6 +808,35 @@ const AssignDetail = () => {
                             </table>
                           </div>
                         </div>
+                      </div>
+                      <div className="question-item">
+                        <div className="info-row">
+                          <label
+                            className="question-idx"
+                            style={{ fontSize: "20px" }}
+                          >
+                            Scoring rules
+                          </label>
+                        </div>
+                        {codeProblem.isPerformanceOnTime === 1 && (
+                          <div className="info-row">
+                            <div className="info">
+                              <span style={{ color: "var(--black-color)" }}>
+                                Performance on time: {codeProblem.timeValue}s
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        {codeProblem.isPerformanceOnMemory === 1 && (
+                          <div className="info-row">
+                            <div className="info">
+                              <span style={{ color: "var(--black-color)" }}>
+                                Performance on memory: {codeProblem.memoryValue}
+                                kb
+                              </span>
+                            </div>
+                          </div>
+                        )}
                         <div className="info-row container-right-assign">
                           <div className="info" style={{ flex: "1" }}>
                             <span>

@@ -334,6 +334,8 @@ const AnswerSheet = ({
                         <thead>
                           <tr>
                             <th></th>
+                            <th>Input</th>
+                            <th>Output</th>
                             <th>Pass test case</th>
                             <th>Time</th>
                             <th>Memory</th>
@@ -347,6 +349,8 @@ const AnswerSheet = ({
                                 {" "}
                                 Case {index + 1}
                               </td>
+                              <td>{testcase.testCases.input}</td>
+                              <td>{testcase.testCases.expectedOutput}</td>
                               <td
                                 className={`isPassTestCase ${
                                   testcase.isPassTestCase ? "passed" : "failed"
@@ -356,10 +360,10 @@ const AnswerSheet = ({
                               </td>
                               <td
                                 className={`${
-                                  codeResult.isPerformanceOnTime
+                                  codeResult.isPerformanceOnTime === 1
                                     ? testcase.isTimeOut
-                                      ? "passed"
-                                      : "failed"
+                                      ? "failed"
+                                      : "passed"
                                     : ""
                                 }`}
                               >
@@ -369,10 +373,10 @@ const AnswerSheet = ({
                               </td>
                               <td
                                 className={`${
-                                  codeResult.isPerformanceOnMemory
+                                  codeResult.isPerformanceOnMemory === 1
                                     ? testcase.isOverMemory
-                                      ? "passed"
-                                      : "failed"
+                                      ? "failed"
+                                      : "passed"
                                     : ""
                                 }`}
                               >

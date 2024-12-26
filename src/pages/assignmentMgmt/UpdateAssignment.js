@@ -1657,6 +1657,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
                 timeValue={codeProblem.timeValue}
                 isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
                 memoryValue={codeProblem.memoryValue}
+                updateParentSourceCode={() => {}}
               />
             </>
           )}

@@ -63,6 +63,7 @@ const AddNewAssign = () => {
   const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
   const [isShowAnswer, setIsShowAnswer] = useState(false);
   const [isShowTestCases, setIsShowTestCases] = useState(false);
+  const [isAllowRunCode, setIsAllowRunCode] = useState(false);
   const [typeAssignment, setTypeAssignment] = useState(null);
   const [duration, setDuration] = useState(0);
   const [startDate, setStartDate] = useState("");
@@ -642,6 +643,7 @@ const AddNewAssign = () => {
       isShufflingAnswer: isShufflingAnswer,
       isShowAnswer: isShowAnswer,
       isShowTestCase: isShowTestCases,
+      isAllowRunCode: isAllowRunCode,
       idLanguage: selectedLanguage.idLanguage,
     };
     if (+typeAssignment === AssignmentType.code) {
@@ -1095,13 +1097,7 @@ const AddNewAssign = () => {
           <div className="container-right-assign">
             <span className="title-span">
               Questions
-              {+typeAssignment === AssignmentType.quiz && (
-                <LuAlignJustify
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
-                />
-              )}
-              {+typeAssignment === AssignmentType.manual && (
+              {+typeAssignment === AssignmentType.manual ? (
                 <div className="info">
                   <span>Question shuffling</span>
                   <label className="switch">
@@ -1115,66 +1111,90 @@ const AddNewAssign = () => {
                     <span className="slider"></span>
                   </label>
                 </div>
-              )}
-              {+typeAssignment === AssignmentType.code && (
-                <div className="info">
-                  <span>Show test cases on submission</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={isShowTestCases}
-                      onChange={(e) => {
-                        setIsShowTestCases(e.target.checked);
-                      }}
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
+              ) : (
+                <LuAlignJustify
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+                />
               )}
               {showOptionQuiz && (
                 <div
                   className="container-options assign-setting-option"
                   ref={optionQuizRef}
                 >
-                  <div className="item">
-                    <span>Question shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShufflingQuestion}
-                        onChange={(e) => {
-                          setIsShufflingQuestion(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Answer shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShufflingAnswer}
-                        onChange={(e) => {
-                          setIsShufflingAnswer(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Show answer on submission</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShowAnswer}
-                        onChange={(e) => {
-                          setIsShowAnswer(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
+                  {+typeAssignment === AssignmentType.quiz && (
+                    <>
+                      <div className="item">
+                        <span>Question shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShufflingQuestion}
+                            onChange={(e) => {
+                              setIsShufflingQuestion(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Answer shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShufflingAnswer}
+                            onChange={(e) => {
+                              setIsShufflingAnswer(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Show answer on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShowAnswer}
+                            onChange={(e) => {
+                              setIsShowAnswer(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
+                  {+typeAssignment === AssignmentType.code && (
+                    <>
+                      <div className="item">
+                        <span>Show test cases on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShowTestCases}
+                            onChange={(e) => {
+                              setIsShowTestCases(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Allow run code</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isAllowRunCode}
+                            onChange={(e) => {
+                              setIsAllowRunCode(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </span>
@@ -1401,22 +1421,6 @@ const AddNewAssign = () => {
                   </div>
                   <div className="info" style={{ width: "50%" }}>
                     <span>Scoring rules</span>
-                    {/* <div className="check-container">
-                      <input
-                        type="checkbox"
-                        name="isPassTestCase"
-                        checked={questions.isPassTestCase || false}
-                        onChange={(e) => {
-                          setQuestions((prevQuestions) => ({
-                            ...prevQuestions,
-                            isPassTestCase: e.target.checked,
-                          }));
-                        }}
-                      />
-                      <span style={{ color: "var(--black-color)" }}>
-                        Pass test cases
-                      </span>
-                    </div> */}
                     <div className="check-container">
                       <input
                         type="checkbox"
@@ -1489,6 +1493,7 @@ const AddNewAssign = () => {
                 timeValue={questions.timeValue}
                 isPerformanceOnMemory={questions.isPerformanceOnMemory}
                 memoryValue={questions.memoryValue}
+                updateParentSourceCode={() => {}}
               />
             </>
           )}

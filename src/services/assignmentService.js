@@ -237,6 +237,7 @@ const postAddCodeAssignment = async (requestData) => {
     isTest: requestData.isTest ? 1 : 0,
     isPublish: requestData.isPublish ? 1 : 0,
     isShowTestcase: requestData.isShowTestCase ? 1 : 0,
+    isAllowRunCode: requestData.isAllowRunCode ? 1 : 0,
     isPassTestCase: requestData.isPassTestCase ? 1 : 0,
     isPerformanceOnMemory: requestData.isPerformanceOnMemory ? 1 : 0,
     isPerformanceOnTime: requestData.isPerformanceOnTime ? 1 : 0,

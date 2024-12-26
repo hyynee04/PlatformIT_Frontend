@@ -345,8 +345,8 @@ const AssignDetail = () => {
     (idRole === Role.teacher && activeChoice === "question")
       ? questions
       : filteredSubmission;
-  const records = activeList.slice(firstIndex, lastIndex);
-  const npage = Math.ceil(activeList.length / recordsPerPage);
+  const records = activeList?.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(activeList?.length / recordsPerPage);
 
   //OPTION QUIZ
 
@@ -1314,8 +1314,8 @@ const AssignDetail = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {records.length > 0 ? (
-                            records.map((submission, index) => (
+                          {records?.length > 0 ? (
+                            records?.map((submission, index) => (
                               <tr
                                 key={index}
                                 style={{ cursor: "pointer" }}

@@ -12,6 +12,7 @@ import { getLectureDetail, postAddLecture } from "../../services/courseService";
 import { GoAlertFill } from "react-icons/go";
 import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
 import { TbNumber3Small } from "react-icons/tb";
+import DiagUpdateConfirmation from "../../components/diag/DiagUpdateConfirmation";
 
 const AddNewLecture = () => {
   const location = useLocation();
@@ -85,6 +86,39 @@ const AddNewLecture = () => {
       setLoading(false);
     }
   };
+
+  const handleUpdateLecture = (lectureData) => {
+    let keepFiles = [];
+    if (!lectureData.Title) {
+      setIsMissing(1);
+      return;
+    }
+    if (!lectureData.LectureVideo && !lectureData.MainMaterials) {
+      setIsMissing(2);
+      return;
+    }
+    if (
+      lectureData.LectureVideo &&
+      typeof lectureData.LectureVideo === "object"
+    )
+      keepFiles.push(lectureData.LectureVideo.idFile);
+    if (
+      lectureData.MainMaterials &&
+      typeof lectureData.MainMaterials === "object"
+    )
+      keepFiles.push(lectureData.MainMaterials.idFile);
+    if (lectureData.SupportMaterials?.length > 0) {
+      lectureData.SupportMaterials.forEach((item) => {
+        if (typeof item === "object" && !(item instanceof File)) {
+          keepFiles.push(item.idFile);
+        }
+      });
+    }
+    const updatedLectureData = { ...lectureData, IdFileNotDelete: keepFiles };
+    setLectureData(updatedLectureData);
+
+    setIsEdit(true);
+  };
   const clearData = () => {
     setLectureData({
       Title: "",
@@ -110,9 +144,13 @@ const AddNewLecture = () => {
           Title: response.data.lectureTitle,
           Introduction: response.data.lectureIntroduction,
           LectureVideo: response.data.videoMaterial,
-          MainMaterials: response.data.mainMaterials,
+          MainMaterials:
+            response.data.mainMaterials?.length > 0
+              ? response.data.mainMaterials[0]
+              : null,
           SupportMaterials: response.data.supportMaterials,
         });
+        setCourseTitle(response.data.courseTitle);
       } else console.error("Message: ", response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -133,9 +171,9 @@ const AddNewLecture = () => {
           idSection: state.idSection,
           idCreatedBy: idUser,
         });
+        setCourseTitle(state.courseTitle);
       }
       setSectionName(state.sectionName);
-      setCourseTitle(state.courseTitle);
     }
   }, [location.state]);
 
@@ -144,8 +182,6 @@ const AddNewLecture = () => {
       button.disabled = loading;
     });
   }, [loading]);
-
-  console.log("Lecture Detail: ", lectureData);
 
   if (loadingDisplay) {
     return (
@@ -208,10 +244,10 @@ const AddNewLecture = () => {
               {idRole === Role.teacher && (
                 <button
                   disabled={isMissing}
-                  // onClick={() => {
-                  //   setIsMissing(0);
-                  //   createNewLecture(idList, lectureData);
-                  // }}
+                  onClick={() => {
+                    setIsMissing(0);
+                    handleUpdateLecture(lectureData);
+                  }}
                 >
                   {loading && <ImSpinner2 className="icon-spin" />} Update
                 </button>
@@ -373,15 +409,14 @@ const AddNewLecture = () => {
             </div>
             <div className="sub-content">
               <label className="sub-title">Main Material</label>
-              {(!lectureData.MainMaterials || !lectureData?.MainMaterials[0]) &&
-                idRole === Role.teacher && (
-                  <button
-                    className="attach-file-button"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    <LuPaperclip /> Attach file
-                  </button>
-                )}
+              {!lectureData.MainMaterials && idRole === Role.teacher && (
+                <button
+                  className="attach-file-button"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <LuPaperclip /> Attach file
+                </button>
+              )}
               <input
                 className="file-container"
                 type="file"
@@ -395,9 +430,8 @@ const AddNewLecture = () => {
                   }
                 }}
               />
-              {console.log(lectureData.MainMaterials)}
               {(lectureData.MainMaterials instanceof File ||
-                lectureData?.MainMaterials[0]) && (
+                lectureData?.MainMaterials) && (
                 <div className="file-display">
                   <div
                     className="file-block"
@@ -502,6 +536,16 @@ const AddNewLecture = () => {
           </div>
         </div>
       </div>
+      <DiagUpdateConfirmation
+        isOpen={isEdit}
+        onClose={() => setIsEdit(false)}
+        message={"Are you sure to update these changes?"}
+        idList={idList}
+        editLecture={lectureData}
+        lectureStatus={LectureStatus.pending}
+        setLectureStatus={setLectureStatus}
+        fetchData={() => fetchLectureDetail(idList.idLecture)}
+      />
       <DiagCreateSuccessfully
         isOpen={isSucceeded}
         onClose={() => setIsSucceeded(false)}

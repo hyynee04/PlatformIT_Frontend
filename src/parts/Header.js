@@ -93,9 +93,10 @@ const Header = () => {
         (message) => message.isRead === 0
       ).length;
       setUnreadMsgCount(unread > 99 ? "99+" : unread);
-      // setNotifications(response.data);
     }
   };
+
+  const intervalRef = useRef(null);
 
   useEffect(() => {
     const fetchAvatar = async () => {
@@ -111,7 +112,11 @@ const Header = () => {
     fetchAvatar();
     fetchUserNotification(idUser);
     fetchUnreadMessageCount();
-    const interval = setInterval(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) => ({
           ...notification,
@@ -120,7 +125,9 @@ const Header = () => {
       );
     }, 60000); // Update every minute
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [dispatch, idUser]);
 
   useEffect(() => {
@@ -132,6 +139,19 @@ const Header = () => {
       }));
       setUnreadCount(updatedUnreadCount > 99 ? "99+" : updatedUnreadCount);
       setNotifications(processedData);
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      intervalRef.current = setInterval(() => {
+        setNotifications((prevNotifications) =>
+          prevNotifications.map((notification) => ({
+            ...notification,
+            relativeTime: calculateRelativeTime(notification.timestamp),
+          }))
+        );
+      }, 60000);
     } else {
       console.warn(
         "updatedNotifications is not an array or is undefined:",
@@ -139,6 +159,8 @@ const Header = () => {
       );
     }
   }, [updatedNotifications, updatedUnreadCount]);
+
+  console.log("Notifications: ", notifications);
 
   useEffect(() => {
     dispatch(countTaskOfCenterAd("qualification"));

@@ -39,7 +39,7 @@ const FetchDataUpdated = (idUser, idLecture, object) => {
             "UpdateCommentsOfLecture",
             (updateCommentsOfLecture) => {
               console.log(
-                "Received UpdateNotifications event:",
+                "Received UpdateComments event:",
                 updateCommentsOfLecture
               );
 

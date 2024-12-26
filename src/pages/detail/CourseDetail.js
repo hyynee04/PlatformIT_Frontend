@@ -35,6 +35,7 @@ import {
   parseRelativeTime,
 } from "../../functions/function";
 import {
+  getAllRatingsOfCourse,
   getCourseContentStructure,
   getCourseDetail,
   getCourseProgressByIdStudent,
@@ -42,6 +43,7 @@ import {
   getIsEnRolledCourse,
   getNotificationBoardOfCourse,
   getSectionDetail,
+  postAddReview,
   postEnrollCourse,
 } from "../../services/courseService";
 import CourseDetailTeacher from "./CourseDetailTeacher";
@@ -53,6 +55,7 @@ const CourseDetail = (props) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [loadingAddReview, setLoadingAddReview] = useState(false);
 
   const idRole = +localStorage.getItem("idRole");
   const idUser = +localStorage.getItem("idUser");
@@ -61,7 +64,11 @@ const CourseDetail = (props) => {
   const [studentProgress, setStudentProgress] = useState({});
   const [idSection, setIdSection] = useState(null);
 
+  const [isAddReview, setIsAddReview] = useState(false);
+  const [rating, setRating] = useState({ content: "", number: 0 });
+
   const [isRemoved, setIsRemoved] = useState(false);
+  const [reviewRemoved, setReviewRemoved] = useState(null);
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [isChatAvailable, setIsChatAvailable] = useState(false);
   const [showedSections, setShowedSections] = useState({});
@@ -75,8 +82,17 @@ const CourseDetail = (props) => {
     setLoading(true);
     try {
       let response = await getCourseDetail(idCourse);
-      setCourseInfo(response.data);
+
       if (response.status === APIStatus.success) {
+        setCourseInfo({
+          ...response.data,
+          rateModels: response.data.rateModels
+            .map((rate) => ({
+              ...rate,
+              timestamp: parseRelativeTime(rate.relativeTime),
+            }))
+            .sort((a, b) => b.idRating - a.idRating),
+        });
         if (idRole === Role.student || idRole === Role.teacher) {
           // Get Notification Board
           await fetchNotificationBoard(idCourse);
@@ -183,6 +199,53 @@ const CourseDetail = (props) => {
     }
   };
 
+  const addReview = async (rating) => {
+    setLoadingAddReview(true);
+    try {
+      const respone = await postAddReview(idUser, courseInfo.idCourse, rating);
+      if (respone.status === APIStatus.success) {
+        setIsAddReview(false);
+        fetchReviews(courseInfo.idCourse);
+        setRating({ content: "", number: 0 });
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    } finally {
+      setLoadingAddReview(false);
+    }
+  };
+
+  const fetchReviews = async (idCourse) => {
+    try {
+      const respone = await getAllRatingsOfCourse(idCourse);
+      if (respone.status === APIStatus.success) {
+        setCourseInfo({
+          ...courseInfo,
+          rateModels: respone.data
+            .map((rate) => ({
+              ...rate,
+              timestamp: parseRelativeTime(rate.relativeTime),
+            }))
+            .sort((a, b) => b.idRating - a.idRating),
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
+  const avgRating = (rateModels) => {
+    if (!rateModels || rateModels.length === 0) {
+      return 0; // Return 0 if the array is empty or undefined
+    }
+
+    const totalPoints = rateModels.reduce(
+      (sum, rate) => sum + rate.ratePoint,
+      0
+    );
+    return (totalPoints / rateModels.length).toFixed(1);
+  };
+
   useEffect(() => {
     if (isEnrolledCourse) {
       fetchCourseProgress(courseInfo.idCourse, idUser);
@@ -238,6 +301,14 @@ const CourseDetail = (props) => {
           relativeTime: calculateRelativeTime(notification.timestamp),
         }))
       );
+
+      setCourseInfo((prevCourseInfo) => ({
+        ...prevCourseInfo,
+        rateModels: prevCourseInfo.rateModels.map((rate) => ({
+          ...rate,
+          relativeTime: calculateRelativeTime(rate.timestamp),
+        })),
+      }));
     }, 60000); // Update every minute
 
     return () => clearInterval(interval);
@@ -284,6 +355,24 @@ const CourseDetail = (props) => {
     }
   };
 
+  const handleNavigateDetailStudent = (idStudent) => {
+    if (idRole === Role.teacher) {
+      navigate("/studentdetail", {
+        state: {
+          idStudent: idStudent,
+          idCourse: courseInfo.idCourse,
+          courseTitle: courseInfo.courseTitle,
+        },
+      });
+    } else {
+      navigate("/studentdetail", {
+        state: {
+          idStudent: idStudent,
+        },
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="loading-page">
@@ -301,9 +390,12 @@ const CourseDetail = (props) => {
             alt="course background"
           />
           <div className="biography-block">
-            <span className="biography-name center">
-              {courseInfo.courseTitle}
-            </span>
+            {courseInfo.courseTitle ? (
+              <span className="biography-name center">
+                {courseInfo.courseTitle}
+              </span>
+            ) : null}
+
             <div className="course-card-price">
               <span className="discount-price">
                 {courseInfo.discountedPrice
@@ -363,7 +455,10 @@ const CourseDetail = (props) => {
                   courseInfo.studentCount > 1 ? "students" : "student"
                 }`}
               </span>
-              <span>{courseInfo.introduction}</span>
+              {courseInfo.introduction ? (
+                <span>{courseInfo.introduction}</span>
+              ) : null}
+
               {(idRole === Role.platformAdmin ||
                 idRole === Role.centerAdmin ||
                 idRole === Role.teacher) && (
@@ -495,10 +590,13 @@ const CourseDetail = (props) => {
                   </span>
                 )}
 
-                <span className="teaching-major">
-                  <FaGraduationCap color="#757575" />{" "}
-                  {courseInfo.teachingMajor || "(no major)"}
-                </span>
+                {courseInfo.teachingMajor ? (
+                  <span className="teaching-major">
+                    <FaGraduationCap color="#757575" />{" "}
+                    {courseInfo.teachingMajor}
+                  </span>
+                ) : null}
+
                 <span className="number-course">
                   <FaRegFile color="#757575" />
                   {`${courseInfo.teacherCourseCount} ${
@@ -534,7 +632,10 @@ const CourseDetail = (props) => {
           <div className="block-container-header">
             <span className="block-container-title">Review</span>
             {idRole === Role.student && isEnrolledCourse && (
-              <button className="add-review-button">
+              <button
+                className="add-review-button"
+                onClick={() => setIsAddReview(!isAddReview)}
+              >
                 <LuPlus /> Add review
               </button>
             )}
@@ -549,7 +650,11 @@ const CourseDetail = (props) => {
                     alt="Rater Avatar"
                   />
                   <div className="review-body">
-                    <span className="review-name">{review.raterName}</span>
+                    <div className="review-header">
+                      <span className="review-name">{review.raterName}</span>
+                      <span className="review-date">{review.relativeTime}</span>
+                    </div>
+
                     <StarRatings
                       rating={review.ratePoint}
                       starRatedColor="rgb(255, 204, 0)"
@@ -559,7 +664,17 @@ const CourseDetail = (props) => {
                       name="rating"
                     />
                     <span className="review-title">{review.rateContent}</span>
-                    <span className="review-date">03/03/2024</span>
+                    {idRole === Role.platformAdmin && (
+                      <button
+                        className="delete-review"
+                        onClick={() => {
+                          setReviewRemoved(review.idRating);
+                          setIsRemoved(true);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -580,7 +695,7 @@ const CourseDetail = (props) => {
             </div>
           )}
           <div className="total-rating">
-            {courseInfo.totalRatePoint}/5
+            {avgRating(courseInfo.rateModels)}/5
             <StarRatings
               rating={1}
               starRatedColor="rgb(255, 204, 0)"
@@ -589,6 +704,49 @@ const CourseDetail = (props) => {
               numberOfStars={1}
               name="rating"
             />
+          </div>
+          <div
+            className={`add-review-container ${isAddReview ? "active" : ""}`}
+          >
+            <span>Add Review</span>
+            <StarRatings
+              rating={rating.number}
+              starRatedColor="rgb(255, 204, 0)"
+              starHoverColor="rgb(255, 204, 0)"
+              starDimension="1.3rem"
+              starSpacing="2px"
+              numberOfStars={5}
+              name="rating"
+              changeRating={(newRating) =>
+                setRating({ ...rating, number: newRating })
+              }
+            />
+            <textarea
+              placeholder="What do you think about this course..."
+              value={rating.content}
+              onChange={(e) =>
+                setRating({ ...rating, content: e.target.value })
+              }
+            ></textarea>
+            <div className="btns-containter">
+              <button
+                className="cancel"
+                onClick={() => {
+                  setRating({ content: "", number: 0 });
+                  setIsAddReview(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="post"
+                onClick={() => {
+                  addReview(rating);
+                }}
+              >
+                {loadingAddReview && <ImSpinner2 className="icon-spin" />} Post
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -779,6 +937,7 @@ const CourseDetail = (props) => {
                                         navigate("/viewLecture", {
                                           state: {
                                             idLecture: lecture.idLecture,
+                                            idCourse: courseInfo.idCourse,
                                           },
                                         });
                                     }}
@@ -919,13 +1078,28 @@ const CourseDetail = (props) => {
       <div>
         <DiagDeleteConfirmation
           isOpen={isRemoved}
-          onClose={() => setIsRemoved(false)}
-          object={{
-            id: idSection,
-            name: "section",
-            message: "Are you sure to delete this section?",
+          onClose={() => {
+            setIsRemoved(false);
+            if (reviewRemoved) setReviewRemoved(null);
           }}
-          fetchData={() => fetchCourseContentStructure(courseInfo.idCourse)}
+          object={
+            reviewRemoved
+              ? {
+                  id: reviewRemoved,
+                  name: "review",
+                  message: "Are you sure to delete this review?",
+                }
+              : {
+                  id: idSection,
+                  name: "section",
+                  message: "Are you sure to delete this section?",
+                }
+          }
+          fetchData={() =>
+            reviewRemoved
+              ? fetchReviews(courseInfo.idCourse)
+              : fetchCourseContentStructure(courseInfo.idCourse)
+          }
         />
       </div>
       <div>

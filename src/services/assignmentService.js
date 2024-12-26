@@ -1,4 +1,4 @@
-import { AssignmentType } from "../constants/constants";
+import { AssignmentType, Role } from "../constants/constants";
 import axios from "../utils/axiosCustomize";
 
 const getAllAssignmentCardOfTeacher = async () => {
@@ -19,6 +19,15 @@ const getAssignmentInfo = async (idAssignment) => {
   return await axios.get("api/Assignment/GetAssignmentInfo", {
     params: {
       idAssignment: idAssignment,
+    },
+  });
+};
+const getViewCodeAssignment = async (idAssignment) => {
+  const isTeacherView = Number(localStorage.getItem("idRole")) === Role.teacher;
+  return await axios.get("api/CodeExecution/ViewCodeAssignment", {
+    params: {
+      idAssignment: idAssignment,
+      isTeacherView: isTeacherView,
     },
   });
 };
@@ -63,6 +72,14 @@ const getTestOfCourseStudent = (idCourse, idStudent) => {
 };
 const getAllActiveLanguage = async () => {
   return await axios.get("api/CodeExecution/GetAllActiveLanguage");
+};
+const getCodeAssignmentResult = async (idAssignment, idStudent) => {
+  return await axios.get("api/CodeExecution/GetCodeAssignmentResult", {
+    params: {
+      idAssignment: idAssignment,
+      idStudent: idStudent,
+    },
+  });
 };
 const postAddManualAssignment = async (dataToSubmit) => {
   const idCreatedBy = +localStorage.getItem("idUser");
@@ -211,6 +228,38 @@ const postAddQuizAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postAddCodeAssignment = async (requestData) => {
+  requestData = {
+    ...requestData,
+    duration: requestData.duration || null,
+    startDate: requestData.startDate || null,
+    endDate: requestData.endDate || null,
+    isTest: requestData.isTest ? 1 : 0,
+    isPublish: requestData.isPublish ? 1 : 0,
+    isShowTestcase: requestData.isShowTestCase ? 1 : 0,
+    isAllowRunCode: requestData.isAllowRunCode ? 1 : 0,
+    isPassTestCase: requestData.isPassTestCase ? 1 : 0,
+    isPerformanceOnMemory: requestData.isPerformanceOnMemory ? 1 : 0,
+    isPerformanceOnTime: requestData.isPerformanceOnTime ? 1 : 0,
+    idLanguage: requestData.idLanguage,
+    timeValue: Number(requestData.timeValue),
+    createdBy: Number(localStorage.getItem("idUser")),
+  };
+  delete requestData.isShowAnswer;
+  delete requestData.isShufflingAnswer;
+  delete requestData.isShufflingQuestion;
+  console.log(requestData);
+
+  return await axios.post(
+    "api/CodeExecution/CreateCodeAssignment",
+    requestData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};
 const postPublishAssignment = async (idAssignment) => {
   const idUpdatedBy = +localStorage.getItem("idUser");
   try {
@@ -324,6 +373,37 @@ const postUpdateAssignment = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postUpdateCodeAssignment = async (requestData) => {
+  requestData = {
+    ...requestData,
+    duration: requestData.duration || null,
+    startDate: requestData.startDate || null,
+    endDate: requestData.endDate || null,
+    isTest: requestData.isTest ? 1 : 0,
+    isPublish: requestData.isPublish ? 1 : 0,
+    isShowTestcase: requestData.isShowTestcase ? 1 : 0,
+    isPassTestCase: requestData.isPassTestCase ? 1 : 0,
+    isPerformanceOnMemory: requestData.isPerformanceOnMemory ? 1 : 0,
+    isPerformanceOnTime: requestData.isPerformanceOnTime ? 1 : 0,
+    idLanguage: requestData.idLanguage,
+    timeValue: Number(requestData.timeValue),
+    createdBy: Number(localStorage.getItem("idUser")),
+  };
+  delete requestData.isShowAnswer;
+  delete requestData.isShufflingAnswer;
+  delete requestData.isShufflingQuestion;
+  console.log(requestData);
+
+  return await axios.post(
+    "api/CodeExecution/UpdateCodeAssignment",
+    requestData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+};
 
 const postSubmitQuizAssignment = async (requestData) => {
   try {
@@ -375,6 +455,19 @@ const postSubmitManualQuestion = async (dataToSubmit) => {
     console.error("Error add course:", error.response?.data || error.message);
   }
 };
+const postSubmitCodeAssignment = async (requestData) => {
+  console.log(requestData);
+
+  try {
+    return await axios.post("api/CodeExecution/SubmitCode", requestData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 const postGradingManualAssignment = async (requestData) => {
   try {
     return await axios.post(
@@ -419,18 +512,23 @@ export {
   getAllAssignmentCardOfTeacher,
   getAllTestCardOfStudent,
   getAssignmentInfo,
+  getViewCodeAssignment,
   getOverviewAssignment,
   getDetailAssignmentForStudent,
   getDetailAssignmentItemForStudent,
   getAssignmentAnswer,
   getTestOfCourseStudent,
   getAllActiveLanguage,
+  getCodeAssignmentResult,
   postAddManualAssignment,
   postAddQuizAssignment,
+  postAddCodeAssignment,
   postPublishAssignment,
   postUpdateAssignment,
+  postUpdateCodeAssignment,
   postSubmitQuizAssignment,
   postSubmitManualQuestion,
+  postSubmitCodeAssignment,
   postGradingManualAssignment,
   deleteAssignment,
   postRunCodeTest,

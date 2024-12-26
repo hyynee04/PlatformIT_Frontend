@@ -21,6 +21,7 @@ import {
 } from "../../constants/constants";
 import {
   getAllActiveLanguage,
+  postAddCodeAssignment,
   postAddManualAssignment,
   postAddQuizAssignment,
 } from "../../services/assignmentService";
@@ -61,6 +62,8 @@ const AddNewAssign = () => {
   const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
   const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
   const [isShowAnswer, setIsShowAnswer] = useState(false);
+  const [isShowTestCases, setIsShowTestCases] = useState(false);
+  const [isAllowRunCode, setIsAllowRunCode] = useState(false);
   const [typeAssignment, setTypeAssignment] = useState(null);
   const [duration, setDuration] = useState(0);
   const [startDate, setStartDate] = useState("");
@@ -387,11 +390,23 @@ const AddNewAssign = () => {
       : 0;
 
   const handleAddNewRecord = (fieldName) => {
-    setQuestions((prevQuestions) => ({
-      ...prevQuestions,
-      [fieldName]: [...prevQuestions[fieldName], { input: "", output: "" }],
-    }));
+    setQuestions((prevQuestions) => {
+      if (fieldName === "testCases") {
+        return {
+          ...prevQuestions,
+          [fieldName]: [
+            ...prevQuestions[fieldName],
+            { input: "", expectedOutput: "" },
+          ],
+        };
+      }
+      return {
+        ...prevQuestions,
+        [fieldName]: [...prevQuestions[fieldName], { input: "", output: "" }],
+      };
+    });
   };
+
   const handleDeleteRecord = (fieldName, index) => {
     setQuestions((prevQuestions) => ({
       ...prevQuestions,
@@ -614,7 +629,7 @@ const AddNewAssign = () => {
     if (!isFormValid(true)) {
       return;
     }
-    const dataToSubmit = {
+    let dataToSubmit = {
       title: title,
       idCourse: selectedCourse.idCourse,
       isTest: isTest,
@@ -627,8 +642,21 @@ const AddNewAssign = () => {
       isShufflingQuestion: isShufflingQuestion,
       isShufflingAnswer: isShufflingAnswer,
       isShowAnswer: isShowAnswer,
-      questions: questions,
+      isShowTestCase: isShowTestCases,
+      isAllowRunCode: isAllowRunCode,
+      idLanguage: selectedLanguage.idLanguage,
     };
+    if (+typeAssignment === AssignmentType.code) {
+      dataToSubmit = {
+        ...dataToSubmit,
+        ...questions,
+      };
+    } else {
+      dataToSubmit = {
+        ...dataToSubmit,
+        questions: questions,
+      };
+    }
     setLoading(true);
     try {
       let response;
@@ -637,6 +665,8 @@ const AddNewAssign = () => {
         response = await postAddManualAssignment(dataToSubmit);
       } else if (+typeAssignment === AssignmentType.quiz) {
         response = await postAddQuizAssignment(dataToSubmit);
+      } else if (+typeAssignment === AssignmentType.code) {
+        response = await postAddCodeAssignment(dataToSubmit);
       }
 
       if (response?.status === APIStatus.success) {
@@ -934,7 +964,6 @@ const AddNewAssign = () => {
                             if (selectedValue === AssignmentType.code) {
                               setQuestions({
                                 problem: "",
-                                languages: [],
                                 examples: [
                                   {
                                     input: "",
@@ -943,9 +972,9 @@ const AddNewAssign = () => {
                                 ],
                                 isPassTestCase: true,
                                 isPerformanceOnTime: false,
-                                timeValue: "",
+                                timeValue: 0,
                                 isPerformanceOnMemory: false,
-                                memoryValue: "",
+                                memoryValue: 0,
                                 testCases: [
                                   {
                                     input: "",
@@ -1068,13 +1097,7 @@ const AddNewAssign = () => {
           <div className="container-right-assign">
             <span className="title-span">
               Questions
-              {+typeAssignment === AssignmentType.quiz && (
-                <LuAlignJustify
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
-                />
-              )}
-              {+typeAssignment === AssignmentType.manual && (
+              {+typeAssignment === AssignmentType.manual ? (
                 <div className="info">
                   <span>Question shuffling</span>
                   <label className="switch">
@@ -1088,66 +1111,90 @@ const AddNewAssign = () => {
                     <span className="slider"></span>
                   </label>
                 </div>
-              )}
-              {+typeAssignment === AssignmentType.code && (
-                <div className="info">
-                  <span>Show test cases on submission</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={isShowAnswer}
-                      onChange={(e) => {
-                        setIsShowAnswer(e.target.checked);
-                      }}
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
+              ) : (
+                <LuAlignJustify
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+                />
               )}
               {showOptionQuiz && (
                 <div
                   className="container-options assign-setting-option"
                   ref={optionQuizRef}
                 >
-                  <div className="item">
-                    <span>Question shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShufflingQuestion}
-                        onChange={(e) => {
-                          setIsShufflingQuestion(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Answer shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShufflingAnswer}
-                        onChange={(e) => {
-                          setIsShufflingAnswer(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Show answer on submission</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={isShowAnswer}
-                        onChange={(e) => {
-                          setIsShowAnswer(e.target.checked);
-                        }}
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
+                  {+typeAssignment === AssignmentType.quiz && (
+                    <>
+                      <div className="item">
+                        <span>Question shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShufflingQuestion}
+                            onChange={(e) => {
+                              setIsShufflingQuestion(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Answer shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShufflingAnswer}
+                            onChange={(e) => {
+                              setIsShufflingAnswer(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Show answer on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShowAnswer}
+                            onChange={(e) => {
+                              setIsShowAnswer(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
+                  {+typeAssignment === AssignmentType.code && (
+                    <>
+                      <div className="item">
+                        <span>Show test cases on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isShowTestCases}
+                            onChange={(e) => {
+                              setIsShowTestCases(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Allow run code</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={isAllowRunCode}
+                            onChange={(e) => {
+                              setIsAllowRunCode(e.target.checked);
+                            }}
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </span>
@@ -1291,7 +1338,7 @@ const AddNewAssign = () => {
             >
               {errorAddQuestionMessage}
             </span>
-            {!(Number(typeAssignment) === AssignmentType.code) && (
+            {Number(typeAssignment) !== AssignmentType.code && (
               <button className="btn circle-btn" onClick={handleAddQuestion}>
                 <TiPlus className="icon" />
               </button>
@@ -1374,22 +1421,6 @@ const AddNewAssign = () => {
                   </div>
                   <div className="info" style={{ width: "50%" }}>
                     <span>Scoring rules</span>
-                    {/* <div className="check-container">
-                      <input
-                        type="checkbox"
-                        name="isPassTestCase"
-                        checked={questions.isPassTestCase || false}
-                        onChange={(e) => {
-                          setQuestions((prevQuestions) => ({
-                            ...prevQuestions,
-                            isPassTestCase: e.target.checked,
-                          }));
-                        }}
-                      />
-                      <span style={{ color: "var(--black-color)" }}>
-                        Pass test cases
-                      </span>
-                    </div> */}
                     <div className="check-container">
                       <input
                         type="checkbox"
@@ -1456,11 +1487,13 @@ const AddNewAssign = () => {
               <RunCode
                 selectedLanguage={selectedLanguage}
                 testCases={questions.testCases}
-                isPassTestCase={questions.isPassTestCase}
+                isPassTestCase={true}
+                isAllowRunCode={true}
                 isPerformanceOnTime={questions.isPerformanceOnTime}
                 timeValue={questions.timeValue}
                 isPerformanceOnMemory={questions.isPerformanceOnMemory}
                 memoryValue={questions.memoryValue}
+                updateParentSourceCode={() => {}}
               />
             </>
           )}

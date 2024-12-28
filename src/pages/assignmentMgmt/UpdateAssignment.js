@@ -1270,13 +1270,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
           <div className="container-right-assign">
             <span className="title-span">
               Questions
-              {+assignmentInfo.assignmentType === AssignmentType.quiz && (
-                <LuAlignJustify
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
-                />
-              )}
-              {+assignmentInfo.assignmentType === AssignmentType.manual && (
+              {+assignmentInfo.assignmentType === AssignmentType.manual ? (
                 <div className="info">
                   <span>Question shuffling</span>
                   <label className="switch">
@@ -1293,78 +1287,105 @@ const UpdateAssignment = ({ isDuplicate }) => {
                     <span className="slider"></span>
                   </label>
                 </div>
-              )}
-              {+assignmentInfo.assignmentType === AssignmentType.code && (
-                <div className="info">
-                  <span>Show test cases on submission</span>
-                  <label className="switch">
-                    <input
-                      type="checkbox"
-                      checked={codeProblem.isShowTestcase}
-                      onChange={(e) =>
-                        setCodeProblem((prevCodeProblem) => ({
-                          ...prevCodeProblem,
-                          isShowTestcase: e.target.checked,
-                        }))
-                      }
-                    />
-                    <span className="slider"></span>
-                  </label>
-                </div>
+              ) : (
+                <LuAlignJustify
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setShowOptionQuiz(!showOptionQuiz)}
+                />
               )}
               {showOptionQuiz && (
                 <div
                   className="container-options assign-setting-option"
                   ref={optionQuizRef}
                 >
-                  <div className="item">
-                    <span>Question shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.isShufflingQuestion === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "isShufflingQuestion",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Answer shuffling</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.isShufflingAnswer === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "isShufflingAnswer",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                  <div className="item">
-                    <span>Show answer on submission</span>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={assignmentInfo.showAnswer === 1}
-                        onChange={(e) =>
-                          handleUpdateAssignment(
-                            "showAnswer",
-                            e.target.checked ? 1 : 0
-                          )
-                        }
-                      />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
+                  {+assignmentInfo.assignmentType === AssignmentType.quiz && (
+                    <>
+                      <div className="item">
+                        <span>Question shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.isShufflingQuestion === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "isShufflingQuestion",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Answer shuffling</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.isShufflingAnswer === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "isShufflingAnswer",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Show answer on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={assignmentInfo.showAnswer === 1}
+                            onChange={(e) =>
+                              handleUpdateAssignment(
+                                "showAnswer",
+                                e.target.checked ? 1 : 0
+                              )
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
+                  {+assignmentInfo.assignmentType === AssignmentType.code && (
+                    <>
+                      <div className="item">
+                        <span>Show test cases on submission</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={codeProblem.isShowTestcase}
+                            onChange={(e) =>
+                              setCodeProblem((prevCodeProblem) => ({
+                                ...prevCodeProblem,
+                                isShowTestcase: e.target.checked,
+                              }))
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                      <div className="item">
+                        <span>Allow run code</span>
+                        <label className="switch">
+                          <input
+                            type="checkbox"
+                            checked={codeProblem.isAllowRunCode}
+                            onChange={(e) =>
+                              setCodeProblem((prevCodeProblem) => ({
+                                ...prevCodeProblem,
+                                isAllowRunCode: e.target.checked,
+                              }))
+                            }
+                          />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </span>

@@ -1,7 +1,6 @@
-import { useNavigate } from "react-router-dom";
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
-import { APIStatus, NotificationType, Role } from "../constants/constants";
+import { APIStatus, NotificationType } from "../constants/constants";
 import { getLectureInfoForCmtNoti } from "../services/courseService";
 
 export const getPagination = (currentPage, totalPages) => {
@@ -210,7 +209,7 @@ export const calculateRelativeTime = (timestamp) => {
   const now = new Date();
   const difference = Math.floor((now - timestamp) / 1000); // Difference in seconds
 
-  if (difference === 0) return "just now"; // Handle 0 seconds
+  if (difference === 0) return "Just now"; // Handle 0 seconds
   if (difference < 60)
     return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
   if (difference < 3600)

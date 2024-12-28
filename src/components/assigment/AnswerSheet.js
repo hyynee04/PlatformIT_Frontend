@@ -7,7 +7,6 @@ import {
 } from "../../services/assignmentService";
 import {
   APIStatus,
-  AssignmentItemAnswerType,
   AssignmentResultStatus,
   AssignmentType,
 } from "../../constants/constants";
@@ -31,7 +30,7 @@ const AnswerSheet = ({
   const [answerInfo, setAnswerInfo] = useState({});
   const [answerItems, setAnswerItems] = useState([]);
   const [codeResult, setCodeResult] = useState({});
-  const [idAssignmentResult, setIdAssignmentResult] = useState(null);
+  // const [idAssignmentResult, setIdAssignmentResult] = useState(null);
   const [gradingManualAssign, setGradingManualAssign] = useState({});
 
   useEffect(() => {
@@ -54,13 +53,13 @@ const AnswerSheet = ({
               setCodeResult(responseCode.data);
             }
           } else {
-            const responseAnswerItem = getAssignmentAnswer(
+            const responseAnswerItem = await getAssignmentAnswer(
               idAssignment,
               selectedStudent.idStudent
             );
+
             if (responseAnswerItem.status === APIStatus.success) {
               setAnswerItems(responseAnswerItem.data.detailQuestionResponses);
-              setIdAssignmentResult(responseAnswerItem.data.idAssignmentResult);
 
               setGradingManualAssign({
                 ...gradingManualAssign,
@@ -185,12 +184,10 @@ const AnswerSheet = ({
                     : "Not submitted"}
                 </label>
               </div>
-              {codeResult.totalMark && (
-                <div className="field-value">
-                  <label className="field">Result</label>
-                  <label className="value">{codeResult.totalMark * 100}%</label>
-                </div>
-              )}
+              <div className="field-value">
+                <label className="field">Result</label>
+                <label className="value">{codeResult.totalMark * 100}%</label>
+              </div>
               {codeResult.duration && (
                 <div className="field-value">
                   <label className="field">Duration</label>

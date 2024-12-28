@@ -3,7 +3,7 @@
   height: fit-content;
   position: relative;
 }
-.outside-card > svg {
+.card-container > svg {
   position: absolute;
   top: 0.8rem;
   right: 0.8rem;
@@ -13,8 +13,8 @@
 }
 .card-container-hover > svg.pin-hover {
   position: absolute;
-  top: 0.25rem;
-  right: 0.6rem;
+  top: 0.2rem;
+  right: 0.75rem;
   color: var(--red-color);
   font-size: 1.3rem;
   z-index: 3;
@@ -32,9 +32,14 @@
   height: fit-content;
 
   background-color: var(--white-color);
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   transition: background-color 0.3s ease;
   cursor: pointer;
+}
+
+.card-container.new-noti,
+.card-container-hover.new-noti {
+  box-shadow: rgba(255, 77, 0, 0.5) 0px 5px 15px;
 }
 
 .card-container.hover:hover {

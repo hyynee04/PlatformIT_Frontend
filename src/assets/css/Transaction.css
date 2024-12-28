@@ -1,0 +1,573 @@
+.transaction-page {
+  width: 100%;
+  height: fit-content;
+  height: fit-content;
+
+  background-color: #fafafa;
+}
+.transaction-page > .filter-search-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  width: 100%;
+  padding: 1rem 4.5rem;
+  position: relative;
+}
+.transaction-page .filter-search-section > .filter-sort-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 12px;
+}
+.transaction-page .filter-search-section .filter-sort-btns > .button {
+  padding: 6px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100px;
+  color: var(--main-color);
+  font-size: 14px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+
+  border-radius: 0.25rem;
+  cursor: pointer;
+  position: relative;
+  background-color: var(--white-color);
+}
+.transaction-page .filter-search-section .filter-sort-btns > .button:hover {
+  background-color: rgba(217, 217, 217, 0.2);
+}
+.transaction-page .filter-search-section .filter-sort-btns > .button.add {
+  width: fit-content;
+}
+.transaction-page .filter-search-section .filter-sort-btns .btn > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.transaction-page .filter-search-section > .search-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
+  width: 300px;
+}
+.transaction-page .filter-search-section .search-container > svg {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.transaction-page .filter-search-section .search-container > .search-field {
+  padding: 0 30px 0 16px;
+  height: 40px;
+  width: 100%;
+  border-radius: 100rem;
+  border: none;
+  color: var(--text-gray);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  font-size: 14px;
+}
+.transaction-page .filter-search-section > .filter-sort-box {
+  width: fit-content;
+  height: fit-content;
+  padding: 20px 40px;
+
+  position: absolute;
+  top: 4.5rem;
+  left: 4.5rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+
+  z-index: -1;
+  background-color: var(--white-color);
+  color: var(--black-color);
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  transition: opacity 0.05s linear;
+}
+.transaction-page .filter-search-section > .filter-sort-box.active {
+  opacity: 1;
+  z-index: 1;
+  transition: opacity 0.1s linear;
+}
+.transaction-page .filter-search-section .filter-sort-box > .box-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--second-main-color);
+}
+.transaction-page .filter-search-section .filter-sort-box > .main-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: center;
+  font-size: 14px;
+}
+.transaction-page .filter-search-section .filter-sort-box .main-box > .field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+  height: fit-content;
+  width: 100%;
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  > .field-name {
+  width: 140px;
+  text-align: left;
+  font-weight: 500;
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  > .input-number-container {
+  width: fit-content;
+  height: fit-content;
+
+  position: relative;
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  .input-number-container
+  > .input-number,
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  > .select-sortby {
+  width: 110px;
+  padding: 4px 20px 4px 12px;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-gray);
+  background-color: var(--white-color);
+  outline: none;
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  .input-number-container
+  > .input-number.date {
+  padding: 4px 12px;
+  width: 140px;
+  color: var(--text-gray);
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  .input-number-container
+  > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+
+  position: absolute;
+  top: 5px;
+  right: 3px;
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  > .input-number:focus {
+  box-shadow: 0 0 5px 0.25rem rgba(0, 0, 0, 0.2);
+  background-color: #fafafa;
+  border: 1px solid var(--border-gray);
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .main-box
+  .field
+  > .select-sortby {
+  width: 150px;
+  background-color: var(--white-color);
+}
+.transaction-page .filter-search-section .filter-sort-box > .box-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  gap: 12px;
+  margin: 1rem 0 0;
+}
+.transaction-page .filter-search-section .filter-sort-box .box-footer > button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 0.5rem;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px; */
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .box-footer
+  > button.cancel {
+  background-color: var(--white-color);
+  color: var(--text-gray);
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .box-footer
+  > button.cancel:hover {
+  background-color: rgba(217, 217, 217, 0.2);
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .box-footer
+  > button.save {
+  background-color: var(--main-color);
+  color: var(--white-color);
+}
+.transaction-page
+  .filter-search-section
+  .filter-sort-box
+  .box-footer
+  > button.save:hover {
+  background-color: rgba(57, 121, 121, 0.9);
+}
+
+.transaction-page > .main-content {
+  padding: 1rem 4.5rem;
+  width: 100%;
+}
+.transaction-page .main-content > .transaction-table {
+  width: 100%;
+  height: 32rem;
+  border: 1px solid var(--border-gray);
+  border-radius: 1rem;
+  padding: 0.5rem 0 1rem;
+}
+.transaction-page .main-content .transaction-table > table {
+  width: 100%;
+  padding: 0 1rem;
+}
+.main-content .transaction-table table tr > th {
+  height: fit-content;
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--second-main-color);
+}
+.main-content .transaction-table table tr > td {
+  padding: 0.8rem 1rem;
+  color: var(--black-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-content .transaction-table table > .header-row {
+  position: relative;
+  border: none;
+}
+.main-content .transaction-table table > .header-row::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px; /* Border thickness */
+  background: repeating-linear-gradient(
+    to right,
+    var(--border-gray) 0,
+    var(--border-gray) 5px,
+    transparent 10px,
+    transparent 10px
+  );
+}
+.main-content .transaction-table table > tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+.main-content .transaction-table table tr td > .many-items {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.main-content .transaction-table table tr td .many-items > .student-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1; /* Allow text to shrink */
+  flex-grow: 1; /* Let text fill available space */
+  min-width: 0;
+}
+.main-content .transaction-table table tr td .many-items > .ava-student {
+  height: 30px;
+  width: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+.main-content .transaction-table table tr td .many-items > svg {
+  stroke-width: 3px;
+  margin-right: 0.2rem;
+}
+.main-content .transaction-table table tr td .many-items > .currency {
+  text-decoration: underline;
+}
+.main-content .transaction-table table tr > th:nth-child(1) {
+  width: 35%;
+  padding-left: 1rem;
+}
+.main-content .transaction-table table tr > th:nth-child(2) {
+  width: 35%;
+}
+.main-content .transaction-table table tr > th:nth-child(3) {
+  width: 15%;
+}
+.main-content .transaction-table table tr > th:nth-child(4) {
+  width: 15%;
+}
+.main-content .transaction-table table tr > td:nth-child(2),
+.main-content .transaction-table table tr > td:nth-child(3) {
+  color: var(--text-gray);
+}
+.main-content .transaction-table table tr > td:nth-child(4) {
+  color: var(--green-color);
+}
+.main-content > .pagination {
+  padding: 1rem 0 0;
+}
+
+.main-content .transaction-table table tr td .many-items > .course-background {
+  height: 30px;
+  width: 45px;
+  object-fit: contain;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  border: 1px solid var(--border-gray);
+  background-color: transparent;
+}
+.main-content .transaction-table .student-transaction tr > th:nth-child(1) {
+  width: 60%;
+}
+.main-content .transaction-table .student-transaction tr > th:nth-child(2) {
+  width: 20%;
+}
+.main-content .transaction-table .student-transaction tr > th:nth-child(3) {
+  width: 20%;
+}
+.main-content .transaction-table .student-transaction tr > td:nth-child(3) {
+  color: var(--red-color);
+}
+.transacton-response-page {
+  transition: none;
+  height: 100vh;
+}
+.transacton-response-page > .header {
+  width: 100%;
+  height: 68px;
+  padding: 8px 72px;
+  background-color: var(--main-color);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: none;
+}
+.transacton-response-page .header > span {
+  color: var(--white-color);
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.transacton-response-page > .body {
+  width: 500px;
+  height: 600px;
+  border-radius: 1rem;
+  margin: 1.5rem auto;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.concentric-circles {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.circle {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+.outer-circle {
+  width: 150px;
+  height: 150px;
+}
+.middle-circle {
+  width: 120px;
+  height: 120px;
+}
+.inner-circle {
+  width: 90px;
+  height: 90px;
+}
+.center-circle {
+  width: 60px;
+  height: 60px;
+}
+.center-circle > svg {
+  width: 30px;
+  height: 30px;
+  color: var(--white-color);
+  stroke-width: 3px;
+}
+.concentric-circles > label {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.transacton-response-page .body .info-box > .transaction-info {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: none;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+.transacton-response-page .body .info-box > .after-line::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px; /* Border thickness */
+  background: repeating-linear-gradient(
+    to right,
+    var(--border-gray) 0,
+    var(--border-gray) 5px,
+    transparent 10px,
+    transparent 10px
+  );
+}
+
+.transaction-response-page .body > .after-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px; /* Border thickness */
+  background: repeating-linear-gradient(
+    to right,
+    var(--border-gray) 0,
+    var(--border-gray) 5px,
+    transparent 10px,
+    transparent 10px
+  );
+}
+
+.transacton-response-page .body .info-box .transaction-info > .info-field {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.transacton-response-page
+  .body
+  .info-box
+  .transaction-info
+  .info-field
+  > label {
+  color: var(--text-gray);
+  font-weight: 500;
+}
+.transacton-response-page .body .info-box .transaction-info .info-field > span {
+  max-width: 200px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.transacton-response-page
+  .body
+  .info-box
+  .transaction-info
+  .info-field
+  span
+  > .currency {
+  text-decoration: underline;
+}
+.transacton-response-page .body > .button-back-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+}
+.transacton-response-page .body .button-back-container > button {
+  border: none;
+  border-radius: 0.25rem;
+  padding: 4px 8px;
+  font-weight: 600;
+  background-color: transparent;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+.transacton-response-page .body .button-back-container button > svg {
+  font-size: 1.1rem;
+}
+.transacton-response-page .body .button-back-container > button:hover {
+  scale: 1.05;
+}
+.transacton-response-page .body .button-back-container > button.my-course {
+  background-color: var(--main-color);
+  color: var(--white-color);
+}
+.transacton-response-page
+  .body
+  .button-back-container
+  > button.my-course:hover {
+  background-color: rgba(57, 121, 121, 0.8);
+}
+.transacton-response-page .body .button-back-container > button.home-page {
+  color: var(--text-gray);
+}
+.transacton-response-page
+  .body
+  .button-back-container
+  > button.home-page:hover {
+  color: var(--black-color);
+  background-color: rgba(217, 217, 217, 0.5);
+}

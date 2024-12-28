@@ -281,28 +281,32 @@ const LectureView = ({
   const videoRef = useRef(null);
 
   useEffect(() => {
-    if (isFinishedLecture) return;
-    else if (!lectureDetail?.videoMaterial?.path) {
-      const timer = setTimeout(() => {
-        setIsFinishedLecture(true);
-        console.log("User has watched for 2 minutes (no video).");
-      }, 1 * 60 * 1000); // 2 minutes in milliseconds
+    if (idRole === Role.student) {
+      if (isFinishedLecture) return;
+      else if (!lectureDetail?.videoMaterial?.path) {
+        const timer = setTimeout(() => {
+          setIsFinishedLecture(true);
+          console.log("User has watched for 2 minutes (no video).");
+        }, 1 * 60 * 1000); // 2 minutes in milliseconds
 
-      return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
-    }
+        return () => clearTimeout(timer); // Cleanup the timer if the component unmounts
+      }
+    } else return;
   }, [lectureDetail.videoMaterial, isFinishedLecture]);
 
   const handleTimeUpdate = () => {
-    if (isFinishedLecture) return;
+    if (idRole === Role.student) {
+      if (isFinishedLecture) return;
 
-    const video = videoRef.current;
-    if (video) {
-      const halfwayPoint = video.duration / 2;
+      const video = videoRef.current;
+      if (video) {
+        const halfwayPoint = video.duration / 2;
 
-      // Check if the user has watched at least half
-      if (video.currentTime >= halfwayPoint && !isFinishedLecture) {
-        setIsFinishedLecture(true);
-        console.log("User has watched at least half of the video.");
+        // Check if the user has watched at least half
+        if (video.currentTime >= halfwayPoint && !isFinishedLecture) {
+          setIsFinishedLecture(true);
+          console.log("User has watched at least half of the video.");
+        }
       }
     }
   };

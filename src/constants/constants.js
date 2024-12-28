@@ -1,3 +1,5 @@
+import { redirect } from "react-router-dom";
+
 export const Role = {
   platformAdmin: 1,
   centerAdmin: 2,
@@ -33,6 +35,7 @@ export const Object = {
 };
 export const APIStatus = {
   success: 200,
+  redirect: 302,
 };
 export const AssignmentType = {
   manual: 1,

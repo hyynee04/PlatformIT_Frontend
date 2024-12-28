@@ -26,27 +26,27 @@ import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import { formatDate } from "../../functions/function";
 import {
   getCourseProgress,
-  postAddBoardNotificationForCourse,
   postAddSection,
   updateSection,
 } from "../../services/courseService";
+import { postAddBoardNotificationForCourse } from "../../services/notificationService";
 
 const CourseDetailTeacher = (props) => {
   const {
     courseInfo,
     idUser,
-    fetchCourseDetail,
     notificationBoard,
-    setAddedNotification,
     setIsRemoved,
     setIdSection,
     fetchSectionDetail,
+    fetchNotificationBoard,
+    setIdNotiRemoved,
   } = props;
 
   const navigate = useNavigate();
 
   const idRole = +localStorage.getItem("idRole");
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
   const [notificationContent, setNotificationContent] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -108,14 +108,14 @@ const CourseDetailTeacher = (props) => {
       );
       if (response.status === APIStatus.success) {
         setPopupAdd(false);
-        setAddedNotification(true);
+        fetchNotificationBoard();
       } else {
         setErrorMessage(response.data);
       }
     } catch (error) {
       console.error("Error posting data:", error);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   };
 
@@ -135,7 +135,6 @@ const CourseDetailTeacher = (props) => {
   };
 
   const fetchCourseProgress = async (idCourse) => {
-    setLoading(true);
     try {
       let response = await getCourseProgress(idCourse);
       if (response.status === APIStatus.success) {
@@ -686,7 +685,12 @@ const CourseDetailTeacher = (props) => {
                 <div key={index} className="notification">
                   {idRole === Role.teacher && (
                     <div className="delete-button">
-                      <button>
+                      <button
+                        onClick={() => {
+                          setIdNotiRemoved(notification.idNotification);
+                          setIsRemoved(true);
+                        }}
+                      >
                         <LuMinus />
                       </button>
                     </div>
@@ -744,7 +748,6 @@ const CourseDetailTeacher = (props) => {
                     notificationContent,
                     idUser
                   );
-                  fetchCourseDetail(courseInfo.idCourse);
                 }}
               >
                 {loading && <ImSpinner2 className="icon-spin" />} Post

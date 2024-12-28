@@ -5,6 +5,7 @@ import listCenterReducer from "./listCenterSlice";
 import listUserOfCenterReducer from "./listUserOfCenter";
 import taskOfCenterAdReducer from "./listTaskOfCenterAd";
 import profileCenterReducer from "./profileCenterSlice";
+import messageReducer from "./messagesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     listUserOfCenter: listUserOfCenterReducer,
     taskOfCenterAd: taskOfCenterAdReducer,
     profileCenter: profileCenterReducer,
+    message: messageReducer,
   },
 });

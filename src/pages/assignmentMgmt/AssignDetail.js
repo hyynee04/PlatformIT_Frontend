@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import Form from "react-bootstrap/Form";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   getAssignmentAnswer,
   getAssignmentInfo,
+  getCodeAssignmentResult,
   getDetailAssignmentForStudent,
   getOverviewAssignment,
   getViewCodeAssignment,
@@ -155,12 +157,22 @@ const AssignDetail = () => {
       try {
         let response;
         if (idRole === Role.student) {
-          response = await getAssignmentAnswer(
-            assignmentInfo.idAssignment,
-            Number(localStorage.getItem("idUser"))
-          );
-          if (response.status === APIStatus.success) {
-            setQuestions(response.data.detailQuestionResponses);
+          if (assignmentInfo.assignmentType === AssignmentType.code) {
+            response = await getCodeAssignmentResult(
+              assignmentInfo.idAssignment,
+              Number(localStorage.getItem("idUser"))
+            );
+            if (response.status === APIStatus.success) {
+              setCodeProblem(response.data);
+            }
+          } else {
+            response = await getAssignmentAnswer(
+              assignmentInfo.idAssignment,
+              Number(localStorage.getItem("idUser"))
+            );
+            if (response.status === APIStatus.success) {
+              setQuestions(response.data.detailQuestionResponses);
+            }
           }
         }
       } catch (error) {
@@ -408,7 +420,19 @@ const AssignDetail = () => {
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
   };
+  const handleOpenNewTab = () => {
+    // Mở một tab mới với URL và truyền tham số qua query string hoặc state
+    const url = "/startAssignment"; // Đường dẫn của trang muốn mở
+    const options = "noopener,noreferrer"; // Các tùy chọn cho cửa sổ mới (không cho phép điều hướng, reload)
 
+    // Mở một cửa sổ/tab mới với URL và các tùy chọn trên
+    const newTab = window.open(url, "_blank", options);
+
+    // Gửi state qua query string (hoặc sử dụng localStorage/sessionStorage nếu muốn lưu trạng thái giữa các tab)
+    newTab.onload = () => {
+      newTab.localStorage.setItem("idAssignment", assignmentInfo.idAssignment);
+    };
+  };
   //NOTICE NOT SUBMITTED
 
   const handleOpenNotSubmitted = () => {
@@ -1397,9 +1421,12 @@ const AssignDetail = () => {
                                     formatDuration(submission.studentDuration)}
                                 </td>
                                 <td>
-                                  {submission.studentTotalMark
+                                  {submission.studentTotalMark !== undefined &&
+                                  submission.studentTotalMark !== null
                                     ? `${submission.studentTotalMark}`
-                                    : submission.studentCodeResult
+                                    : submission.studentCodeResult !==
+                                        undefined &&
+                                      submission.studentCodeResult !== null
                                     ? `${submission.studentCodeResult * 100}%`
                                     : ""}
                                 </td>
@@ -1431,267 +1458,296 @@ const AssignDetail = () => {
           )}
           {idRole === Role.student && (
             <div className="questions-container">
-              {assignmentInfo.assignmentType === AssignmentType.code ? (
-                <>
-                  <div className="question-item">
-                    <div className="info-row">
-                      <label
-                        className="question-idx"
-                        style={{ fontSize: "20px" }}
-                      >
-                        Problem
-                      </label>
-                    </div>
-                    <div
-                      className="info-row question-text"
-                      style={{ width: "100%" }}
-                    >
-                      <p style={{ whiteSpace: "pre-wrap" }}>
-                        {codeProblem.problem.trim()}
-                      </p>
-                    </div>
-                    <div className="info-row">
-                      <span>
-                        <label>
-                          Language: <strong>{codeProblem.languageName}</strong>
-                        </label>
-                      </span>
-                    </div>
-                    <div className="info-row container-right-assign">
-                      <div className="info" style={{ flex: "1" }}>
-                        <span>
-                          <label style={{ color: "var(--black-color)" }}>
-                            Example
-                          </label>
-                        </span>
-                        <table className="result-table">
-                          <thead>
-                            <tr>
-                              <th>Input</th>
-                              <th>Output</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {codeProblem.examples.map((example, index) => (
-                              <tr key={index}>
-                                <td>{example.input}</td>
-                                <td>{example.output}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="question-item">
-                    <div className="info-row">
-                      <label
-                        className="question-idx"
-                        style={{ fontSize: "20px" }}
-                      >
-                        Scoring rules
-                      </label>
-                    </div>
-                    {codeProblem.isPerformanceOnTime === 1 && (
-                      <div className="info-row">
-                        <div className="info">
-                          <span style={{ color: "var(--black-color)" }}>
-                            Performance on time: {codeProblem.timeValue}s
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    {codeProblem.isPerformanceOnMemory === 1 && (
-                      <div className="info-row">
-                        <div className="info">
-                          <span style={{ color: "var(--black-color)" }}>
-                            Performance on memory: {codeProblem.memoryValue}
-                            kb
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    <div className="info-row container-right-assign">
-                      <div className="info" style={{ flex: "1" }}>
-                        <span>
-                          <label style={{ color: "var(--black-color)" }}>
-                            Test case
-                          </label>
-                        </span>
-                        <table className="result-table">
-                          <thead>
-                            <tr>
-                              <th>Input</th>
-                              <th>Output</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {codeProblem.testCases?.map((testCase, index) => (
-                              <tr key={index}>
-                                <td>{testCase.input}</td>
-                                <td>{testCase.expectedOutput}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="question-item" style={{ padding: "24px 0" }}>
-                    <RunCode
-                      selectedLanguage={{
-                        idLanguage: codeProblem.idLanguage,
-                        languageName: codeProblem.languageName,
-                      }}
-                      testCases={codeProblem.testCases}
-                      isPassTestCase={true}
-                      isAllowRunCode={true}
-                      isPerformanceOnTime={codeProblem.isPerformanceOnTime}
-                      timeValue={codeProblem.timeValue}
-                      isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
-                      memoryValue={codeProblem.memoryValue}
-                      updateParentSourceCode={() => {}}
-                    />
-                  </div>
-                </>
-              ) : (
-                records.map((question, index) => (
-                  <div className="question-item" key={index}>
-                    <div className="info-row">
-                      <label className="question-idx">{`Question ${
-                        firstIndex + index + 1
-                      }`}</label>
-                      <label className="question-mark">{`${
-                        question.studentMark
-                      } / ${question.questionMark}  ${
-                        question.questionMark <= 1 ? "mark" : "marks"
-                      }`}</label>
-                    </div>
-                    <div className="info-row question-text">
-                      <p style={{ whiteSpace: "pre-wrap" }}>
-                        {question.question.trim()}
-                      </p>
-                      {assignmentInfo.assignmentType === AssignmentType.quiz &&
-                        question.attachedFile && (
-                          <img
-                            className="question-img"
-                            src={question.attachedFile || default_image}
-                            alt=""
-                          />
-                        )}
-                    </div>
-                    {assignmentInfo.assignmentType ===
-                      AssignmentType.manual && (
-                      <>
+              {assignmentInfo.assignmentType === AssignmentType.code
+                ? Object.keys(codeProblem).length > 0 && (
+                    <>
+                      <div className="question-item">
                         <div className="info-row">
-                          <div className="info">
-                            {question.attachedFile && (
-                              <>
-                                <span>Reference material:</span>
-
-                                <div className="select-container">
-                                  <input
-                                    type="text"
-                                    style={{ cursor: "pointer" }}
-                                    className="input-form-pi"
-                                    title={question.nameFile}
-                                    defaultValue={
-                                      question.nameFile?.length > 54
-                                        ? question.nameFile.slice(0, 54) + "..."
-                                        : question.nameFile
-                                    }
-                                    onClick={() => {
-                                      if (
-                                        typeof question.attachedFile ===
-                                        "string"
-                                      ) {
-                                        // Kiểm tra nếu attachedFile là URL
-                                        const fileUrl = question.attachedFile;
-                                        window.open(fileUrl, "_blank");
-                                      }
-                                    }}
-                                    readOnly
-                                  />
-                                </div>
-                              </>
-                            )}
+                          <label
+                            className="question-idx"
+                            style={{ fontSize: "20px" }}
+                          >
+                            Problem
+                          </label>
+                        </div>
+                        <div
+                          className="info-row question-text"
+                          style={{ width: "100%" }}
+                        >
+                          <p style={{ whiteSpace: "pre-wrap" }}>
+                            {codeProblem.problem?.trim()}
+                          </p>
+                        </div>
+                        <div className="info-row">
+                          <span>
+                            <label>
+                              Language:{" "}
+                              <strong>{codeProblem.languageName}</strong>
+                            </label>
+                          </span>
+                        </div>
+                        <div className="info-row container-right-assign">
+                          <div className="info" style={{ flex: "1" }}>
+                            <span>
+                              <label style={{ color: "var(--black-color)" }}>
+                                Example
+                              </label>
+                            </span>
+                            <table className="result-table">
+                              <thead>
+                                <tr>
+                                  <th>Input</th>
+                                  <th>Output</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {codeProblem.examples?.map((example, index) => (
+                                  <tr key={index}>
+                                    <td>{example.input}</td>
+                                    <td>{example.output}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
-                        <div className="info-row answer-manual-type">
-                          <span>
-                            <label style={{ color: "var(--text-gray)" }}>
-                              Type of anwer:{" "}
-                            </label>
-                            <label>
-                              {question.assignmentItemAnswerType ===
-                              AssignmentItemAnswerType.attached_file
-                                ? " Attach file"
-                                : " Text"}
-                            </label>
-                          </span>
-                        </div>
-                      </>
-                    )}
-                    {assignmentInfo.assignmentType === AssignmentType.quiz && (
-                      <div className="info-row choices-container">
-                        <label style={{ fontSize: "14px", fontWeight: 800 }}>
-                          Choices
-                        </label>
-                        {question.items.map(
-                          (choice, choiceIdx) =>
-                            choice.multipleAssignmentItemStatus === 1 && (
-                              <div
-                                className="info-in-row"
-                                key={choiceIdx}
-                                style={{ width: "100%" }}
-                              >
-                                <label className="radio-choice">
-                                  <input
-                                    type={
-                                      question.isMultipleAnswer
-                                        ? "checkbox"
-                                        : "radio"
-                                    }
-                                    name={`question_${index}`}
-                                    checked={question.selectedOptions.includes(
-                                      choice.idMultipleAssignmentItem
-                                    )}
-                                    readOnly
-                                  />
-                                </label>
-                                <div className="info" style={{ flex: "1" }}>
-                                  <input
-                                    type="text"
-                                    className="input-form-pi"
-                                    placeholder="Type a choice"
-                                    defaultValue={choice.content}
-                                    style={{
-                                      backgroundColor:
-                                        question.correctOptions.includes(
-                                          choice.idMultipleAssignmentItem
-                                        )
-                                          ? "#B2E0C8" // Luôn hiển thị đáp án đúng màu xanh
-                                          : question.selectedOptions.includes(
-                                              choice.idMultipleAssignmentItem
-                                            )
-                                          ? question.correctOptions.includes(
-                                              choice.idMultipleAssignmentItem
-                                            )
-                                            ? "#B2E0C8" // Người dùng chọn đúng
-                                            : "#E6B1B0" // Người dùng chọn sai
-                                          : "rgba(217, 217, 217, 0.3)", // Các lựa chọn khác
-                                    }}
-                                    readOnly
-                                  />
-                                </div>
-                              </div>
-                            )
-                        )}
                       </div>
-                    )}
-                  </div>
-                ))
-              )}
+                      <div className="question-item">
+                        <div className="container-right-assign testing-code">
+                          <div className="assign-info" style={{ padding: 0 }}>
+                            <div className="info">
+                              <span>Answer: </span>
+                              <Form.Control
+                                as="textarea"
+                                className="input-code-area-form-pi"
+                                placeholder="Type source code here..."
+                                value={codeProblem.sourceCode}
+                                readOnly
+                              />
+                            </div>
+                            <div className="info" style={{ width: "50%" }}>
+                              <span>Language</span>
+                              <div className="select-container">
+                                <input
+                                  style={{ cursor: "default" }}
+                                  type="text"
+                                  className="input-form-pi"
+                                  value={codeProblem.languageName}
+                                  placeholder="Please select a language at questions."
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+                            <div className="info">
+                              <span>Result</span>
+                              <table className="result-table">
+                                <thead>
+                                  <tr>
+                                    <th></th>
+                                    <th>Pass test case</th>
+                                    <th>Time</th>
+                                    <th>Memory</th>
+                                    <th>Description</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {codeProblem.testCases?.map(
+                                    (testcase, index) => (
+                                      <tr key={index}>
+                                        <td style={{ width: "64px" }}>
+                                          {" "}
+                                          Case {index + 1}
+                                        </td>
+                                        <td
+                                          className={`isPassTestCase ${
+                                            testcase.isPassTestCase
+                                              ? "passed"
+                                              : "failed"
+                                          }`}
+                                        >
+                                          {testcase.isPassTestCase
+                                            ? "Passed"
+                                            : "Failed"}
+                                        </td>
+                                        <td
+                                          className={`${
+                                            codeProblem.isPerformanceOnTime ===
+                                            1
+                                              ? testcase.isTimeOut
+                                                ? "failed"
+                                                : "passed"
+                                              : ""
+                                          }`}
+                                        >
+                                          {testcase.timeExecuted
+                                            ? `${testcase.timeExecuted}kb`
+                                            : ""}
+                                        </td>
+                                        <td
+                                          className={`${
+                                            codeProblem.isPerformanceOnMemory ===
+                                            1
+                                              ? testcase.isOverMemory
+                                                ? "failed"
+                                                : "passed"
+                                              : ""
+                                          }`}
+                                        >
+                                          {testcase.memoryExecuted
+                                            ? `${testcase.memoryExecuted}kb`
+                                            : ""}
+                                        </td>
+                                        <td>{testcase.description}</td>
+                                      </tr>
+                                    )
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )
+                : records.map((question, index) => (
+                    <div className="question-item" key={index}>
+                      <div className="info-row">
+                        <label className="question-idx">{`Question ${
+                          firstIndex + index + 1
+                        }`}</label>
+                        <label className="question-mark">{`${
+                          question.studentMark
+                        } / ${question.questionMark}  ${
+                          question.questionMark <= 1 ? "mark" : "marks"
+                        }`}</label>
+                      </div>
+                      <div className="info-row question-text">
+                        <p style={{ whiteSpace: "pre-wrap" }}>
+                          {question.question.trim()}
+                        </p>
+                        {assignmentInfo.assignmentType ===
+                          AssignmentType.quiz &&
+                          question.attachedFile && (
+                            <img
+                              className="question-img"
+                              src={question.attachedFile || default_image}
+                              alt=""
+                            />
+                          )}
+                      </div>
+                      {assignmentInfo.assignmentType ===
+                        AssignmentType.manual && (
+                        <>
+                          <div className="info-row">
+                            <div className="info">
+                              {question.attachedFile && (
+                                <>
+                                  <span>Reference material:</span>
+
+                                  <div className="select-container">
+                                    <input
+                                      type="text"
+                                      style={{ cursor: "pointer" }}
+                                      className="input-form-pi"
+                                      title={question.nameFile}
+                                      defaultValue={
+                                        question.nameFile?.length > 54
+                                          ? question.nameFile.slice(0, 54) +
+                                            "..."
+                                          : question.nameFile
+                                      }
+                                      onClick={() => {
+                                        if (
+                                          typeof question.attachedFile ===
+                                          "string"
+                                        ) {
+                                          // Kiểm tra nếu attachedFile là URL
+                                          const fileUrl = question.attachedFile;
+                                          window.open(fileUrl, "_blank");
+                                        }
+                                      }}
+                                      readOnly
+                                    />
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="info-row answer-manual-type">
+                            <span>
+                              <label style={{ color: "var(--text-gray)" }}>
+                                Type of anwer:{" "}
+                              </label>
+                              <label>
+                                {question.assignmentItemAnswerType ===
+                                AssignmentItemAnswerType.attached_file
+                                  ? " Attach file"
+                                  : " Text"}
+                              </label>
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      {assignmentInfo.assignmentType ===
+                        AssignmentType.quiz && (
+                        <div className="info-row choices-container">
+                          <label style={{ fontSize: "14px", fontWeight: 800 }}>
+                            Choices
+                          </label>
+                          {question.items.map(
+                            (choice, choiceIdx) =>
+                              choice.multipleAssignmentItemStatus === 1 && (
+                                <div
+                                  className="info-in-row"
+                                  key={choiceIdx}
+                                  style={{ width: "100%" }}
+                                >
+                                  <label className="radio-choice">
+                                    <input
+                                      type={
+                                        question.isMultipleAnswer
+                                          ? "checkbox"
+                                          : "radio"
+                                      }
+                                      name={`question_${index}`}
+                                      checked={question.selectedOptions.includes(
+                                        choice.idMultipleAssignmentItem
+                                      )}
+                                      readOnly
+                                    />
+                                  </label>
+                                  <div className="info" style={{ flex: "1" }}>
+                                    <input
+                                      type="text"
+                                      className="input-form-pi"
+                                      placeholder="Type a choice"
+                                      defaultValue={choice.content}
+                                      style={{
+                                        backgroundColor:
+                                          question.correctOptions.includes(
+                                            choice.idMultipleAssignmentItem
+                                          )
+                                            ? "#B2E0C8" // Luôn hiển thị đáp án đúng màu xanh
+                                            : question.selectedOptions.includes(
+                                                choice.idMultipleAssignmentItem
+                                              )
+                                            ? question.correctOptions.includes(
+                                                choice.idMultipleAssignmentItem
+                                              )
+                                              ? "#B2E0C8" // Người dùng chọn đúng
+                                              : "#E6B1B0" // Người dùng chọn sai
+                                            : "rgba(217, 217, 217, 0.3)", // Các lựa chọn khác
+                                      }}
+                                      readOnly
+                                    />
+                                  </div>
+                                </div>
+                              )
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
             </div>
           )}
         </div>
@@ -1753,34 +1809,35 @@ const AssignDetail = () => {
                   ) && (
                     <button
                       className="btn diag-btn signout"
-                      onClick={() =>
-                        navigate("/startAssignment", {
-                          state: {
-                            idAssignment: assignmentInfo.idAssignment,
-                          },
-                        })
-                      }
-                      // onClick={() => {
-                      //   if (assignmentInfo?.isTest === 0) {
-                      //     navigate("/startAssignment", {
-                      //       state: {
-                      //         idAssignment: assignmentInfo.idAssignment,
-                      //       },
-                      //     });
-                      //   } else if (
-                      //     startAssignmentWindow &&
-                      //     !startAssignmentWindow.closed
-                      //   ) {
-                      //     return;
-                      //   }
-                      //   const newWindow = window.open(
-                      //     `/startAssignment?idAssignment=${assignmentInfo.idAssignment}`,
-                      //     "_blank",
-                      //     "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600"
-                      //   );
+                      // onClick={() =>
+                      //   navigate("/startAssignment", {
+                      //     state: {
+                      //       idAssignment: assignmentInfo.idAssignment,
+                      //     },
+                      //   })
+                      // }
+                      // onClick={() => handleOpenNewTab()}
+                      onClick={() => {
+                        if (assignmentInfo?.isTest === 0) {
+                          navigate("/startAssignment", {
+                            state: {
+                              idAssignment: assignmentInfo.idAssignment,
+                            },
+                          });
+                        } else if (
+                          startAssignmentWindow &&
+                          !startAssignmentWindow.closed
+                        ) {
+                          return;
+                        }
+                        const newWindow = window.open(
+                          `/startAssignment?idAssignment=${assignmentInfo.idAssignment}`,
+                          "_blank",
+                          "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600"
+                        );
 
-                      //   setStartAssignmentWindow(newWindow);
-                      // }}
+                        setStartAssignmentWindow(newWindow);
+                      }}
                     >
                       Start
                     </button>

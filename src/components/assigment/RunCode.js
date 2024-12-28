@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { ImSpinner2 } from "react-icons/im";
-import { postRunCodeTest } from "../../services/assignmentService";
+import {
+  postRunCodeTest,
+  postStudentRunCode,
+} from "../../services/assignmentService";
 import { APIStatus, Role } from "../../constants/constants";
 import DiagNotiWarning from "../diag/DiagNotiWarning";
 const RunCode = ({
@@ -14,6 +17,7 @@ const RunCode = ({
   isPerformanceOnMemory,
   memoryValue,
   updateParentSourceCode,
+  idAssignment,
 }) => {
   const idRole = Number(localStorage.getItem("idRole"));
   const [sourceCode, setSourceCode] = useState("");
@@ -78,12 +82,21 @@ const RunCode = ({
 
     const requestData = {
       idLanguage: selectedLanguage.idLanguage,
-      testCases: testCases,
       sourceCode: sourceCode,
+      ...(idRole === Role.student
+        ? { idAssignment: idAssignment }
+        : { testCases: testCases }),
     };
+
     setExecutingLoading(true);
     try {
-      const response = await postRunCodeTest(requestData);
+      let response;
+      if (idRole === Role.student) {
+        response = await postStudentRunCode(requestData);
+      } else {
+        response = await postRunCodeTest(requestData);
+      }
+
       if (response.status === APIStatus.success) {
         setResultOfExecution(response.data);
       }
@@ -97,7 +110,8 @@ const RunCode = ({
     <div className="container-right-assign testing-code">
       <span className="title-span">
         {idRole === Role.teacher ? "Testing with your code" : "Your answer"}
-        {isAllowRunCode && (
+        {((idRole === Role.student && isAllowRunCode === 1) ||
+          idRole === Role.teacher) && (
           <button className="btn" onClick={() => handleRunTestCode()}>
             {executingLoading && (
               <ImSpinner2 className="icon-spin" color="#d9d9d9" />
@@ -192,7 +206,9 @@ const RunCode = ({
                         ? `${result.memoryExecuted}kb`
                         : ""}
                     </td>
-                    <td>{result.failDescriptionCode_NOUSE}</td>
+                    <td>
+                      {result.failDescriptionCode_NOUSE || result.description}
+                    </td>
                   </tr>
                 ))}
               </tbody>

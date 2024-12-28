@@ -18,26 +18,36 @@ import {
 } from "../functions/function";
 import { getIsChatAvailable } from "../services/courseService";
 import { useLocation } from "react-router-dom";
+import * as signalR from "@microsoft/signalr";
+import { useDispatch } from "react-redux";
+import {
+  decrementUnreadCount,
+  incrementUnreadCount,
+  setUnreadMsgCount,
+} from "../store/messagesSlice";
 
 const Chat = () => {
+  const dispatch = useDispatch();
   const idUser = Number(localStorage.getItem("idUser"));
   const idRole = Number(localStorage.getItem("idRole"));
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(false);
   const location = useLocation();
   const [listConversations, setListConversations] = useState([]);
-  const [selectedSender, setSelectedSender] = useState({});
+  const [selectedSender, setSelectedSender] = useState(null);
   const [detailCoversation, setDetailConversation] = useState([]);
+  const [newMessagedSent, setNewMessagedSent] = useState("");
   const [isChatAvailable, setIsChatAvailable] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [contentSent, setContentSent] = useState("");
   const messagesEndRef = useRef(null);
+  const connectionRef = useRef(null);
+  const selectedSenderRef = useRef(selectedSender);
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
-
   const fetchListConversations = async () => {
     setLoading(true);
     try {
@@ -71,6 +81,7 @@ const Chat = () => {
             : conversation
         )
       );
+      dispatch(decrementUnreadCount());
     }
   };
   const fetchDetailConver = async (idSender) => {
@@ -106,11 +117,77 @@ const Chat = () => {
     return () => clearInterval(interval);
   }, []);
   useEffect(() => {
+    selectedSenderRef.current = selectedSender;
     if (selectedSender?.userId) {
       fetchDetailConver(selectedSender.userId);
       handleReadMessage(selectedSender.userId);
     }
   }, [selectedSender]);
+
+  useEffect(() => {
+    const startConnection = async () => {
+      try {
+        const connection = new signalR.HubConnectionBuilder()
+          .withUrl(
+            `http://27.71.227.212:5000/chatHub?userId=${Number(
+              localStorage.getItem("idUser")
+            )}`
+          )
+          .configureLogging(signalR.LogLevel.Information)
+          .build();
+
+        connectionRef.current = connection;
+
+        await connection.start();
+
+        connection.on("UpdateNewMessage", (updateNewMessage) => {
+          setNewMessagedSent(updateNewMessage);
+        });
+
+        connection.on("UpdateChatList", (updatedChatList) => {
+          const processedData = updatedChatList.map((conversation) => ({
+            ...conversation,
+            timestamp: parseRelativeTime(conversation.relativeTime),
+          }));
+          setListConversations(processedData);
+        });
+
+        connection.onclose(() => {
+          setTimeout(() => startConnection(), 5000);
+        });
+      } catch (error) {
+        console.error("SignalR Connection Error:", error.message);
+      }
+    };
+
+    if (connectionRef.current) {
+      connectionRef.current
+        .stop()
+        .then(() => console.log("Previous SignalR connection stopped."));
+    }
+    startConnection();
+  }, []);
+
+  useEffect(() => {
+    if (newMessagedSent) {
+      if (newMessagedSent.idSender === selectedSender?.userId) {
+        handleReadMessage(newMessagedSent.idSender);
+        setDetailConversation((prev) => [
+          ...prev,
+          {
+            ...newMessagedSent,
+            createdDate: new Date().toISOString(),
+          },
+        ]);
+      } else {
+        let unread = listConversations.filter(
+          (message) => message.isRead === 0
+        ).length;
+        dispatch(setUnreadMsgCount(unread > 99 ? "99+" : unread));
+      }
+    }
+  }, [newMessagedSent]);
+
   useEffect(() => {
     scrollToBottom();
     window.scrollTo(0, 0);
@@ -175,16 +252,17 @@ const Chat = () => {
           );
 
           if (!conversationExists) {
-            // Nếu không có, thêm một conversation mới vào listConversations
             return [
               ...prev,
               {
-                userId: selectedSender.userId,
+                userId: selectedSender.avatar,
                 avatar: selectedSender.avatar,
                 name: selectedSender.name,
+                idLastMessageSender: idUser,
                 lastMessage: contentSent,
                 lastMessageTime: new Date().toISOString(),
-                relativeTime: "Just now",
+                timeStamp: new Date().toISOString(),
+                relativeTime: calculateRelativeTime(new Date().toISOString()),
               },
             ];
           }
@@ -192,18 +270,21 @@ const Chat = () => {
             conversation.userId === selectedSender.userId
               ? {
                   ...conversation,
+                  idLastMessageSender: idUser,
                   lastMessage: contentSent,
                   lastMessageTime: new Date().toISOString(),
-                  relativeTime: "Just now",
+                  timeStamp: parseRelativeTime("Just now"),
+                  relativeTime: calculateRelativeTime(
+                    parseRelativeTime("Just now")
+                  ),
                 }
               : conversation
           );
 
-          // Sắp xếp lại để đưa conversation được cập nhật lên đầu
           const sortedConversations = updatedConversations.sort((a, b) => {
-            if (a.userId === selectedSender.userId) return -1; // Đưa lên đầu
+            if (a.userId === selectedSender.userId) return -1;
             if (b.userId === selectedSender.userId) return 1;
-            return new Date(b.lastMessageTime) - new Date(a.lastMessageTime); // Sắp xếp theo thời gian
+            return new Date(b.lastMessageTime) - new Date(a.lastMessageTime);
           });
 
           return sortedConversations;
@@ -247,6 +328,7 @@ const Chat = () => {
                   setSelectedSender(conversation);
                   handleReadMessage(conversation.userId);
                 }}
+                key={index}
               >
                 <img
                   src={conversation.avatar || default_ava}
@@ -311,7 +393,7 @@ const Chat = () => {
                       {message.idSender !== idUser &&
                         (showAvatar ? (
                           <img
-                            src={message.senderAvatar || default_ava}
+                            src={selectedSender?.avatar || default_ava}
                             alt=""
                             className="ava-img"
                           />
@@ -319,7 +401,10 @@ const Chat = () => {
                           <div style={{ width: "40px", height: "40px" }} />
                         ))}
 
-                      <label className="message-content">
+                      <label
+                        className="message-content"
+                        style={{ whiteSpace: "pre-wrap" }}
+                      >
                         {message.content}
                       </label>
                     </div>

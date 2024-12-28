@@ -407,6 +407,7 @@ const postUpdateCodeAssignment = async (requestData) => {
 };
 
 const postSubmitQuizAssignment = async (requestData) => {
+  requestData.submittedDate = requestData.submittedDate.split("+")[0];
   try {
     return await axios.post(
       "api/Assignment/SubmitQuizAssignment",
@@ -457,14 +458,16 @@ const postSubmitManualQuestion = async (dataToSubmit) => {
   }
 };
 const postSubmitCodeAssignment = async (requestData) => {
-  console.log(requestData);
+  requestData.submittedDate = requestData.submittedDate.split("+")[0];
 
   try {
-    return await axios.post("api/CodeExecution/SubmitCode", requestData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    console.log(requestData);
+
+    // return await axios.post("api/CodeExecution/SubmitCode", requestData, {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
   } catch (error) {
     throw error;
   }
@@ -508,6 +511,13 @@ const postRunCodeTest = async (requestData) => {
     },
   });
 };
+const postStudentRunCode = async (requestData) => {
+  return await axios.post("api/CodeExecution/StudentRunCode", requestData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};
 
 export {
   getAllAssignmentCardOfTeacher,
@@ -533,4 +543,5 @@ export {
   postGradingManualAssignment,
   deleteAssignment,
   postRunCodeTest,
+  postStudentRunCode,
 };

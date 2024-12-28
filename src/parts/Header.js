@@ -26,11 +26,14 @@ import { getAllNotificationOfUser } from "../services/notificationService";
 import { getAvaImg } from "../services/userService";
 import { setAvatar } from "../store/profileUserSlice";
 import { countTaskOfCenterAd } from "../store/listTaskOfCenterAd";
+import * as signalR from "@microsoft/signalr";
+import { setUnreadMsgCount } from "../store/messagesSlice";
 import { getAllUserConversations } from "../services/messageService";
 
 const Header = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const unreadMsgCount = useSelector((state) => state.message.unreadCount);
   const avaImg = useSelector((state) => state.profileUser.avaImg);
   const [showOptionAva, setShowOptionAva] = useState(false);
   const isAvatarPage = location.pathname === "/pi";
@@ -44,7 +47,7 @@ const Header = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(null);
-  const [unreadMsgCount, setUnreadMsgCount] = useState(null);
+  // const [unreadMsgCount, setUnreadMsgCount] = useState(null);
   const { updatedNotifications, updatedUnreadCount } = FetchDataUpdated(
     idUser,
     null,
@@ -92,7 +95,7 @@ const Header = () => {
       let unread = response.data.filter(
         (message) => message.isRead === 0
       ).length;
-      setUnreadMsgCount(unread > 99 ? "99+" : unread);
+      dispatch(setUnreadMsgCount(unread > 99 ? "99+" : unread));
     }
   };
 

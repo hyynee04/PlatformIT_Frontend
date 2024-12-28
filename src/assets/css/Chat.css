@@ -193,6 +193,7 @@
   padding: 8px 16px;
   background-color: rgba(57, 121, 121, 0.3);
   border-radius: 90px;
+  max-width: 50%;
 }
 .detail-body .messages-container .message-left .message-content {
   background-color: var(--border-gray);

@@ -125,23 +125,26 @@ const StartAssign = () => {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime !== null && prevTime > 0) {
-            return prevTime - 1; // Đếm ngược khi có duration
+            return prevTime - 1;
           } else if (prevTime === 0) {
-            clearInterval(interval); // Dừng khi hết thời gian
-            handleSubmitAssignment(); // Xử lý khi hết thời gian
+            clearInterval(interval);
+            handleSubmitAssignment();
+            if (window.opener) {
+              window.opener.location.reload();
+            }
+            window.close();
             return 0;
           }
           return prevTime;
         });
       }, 1000);
     } else {
-      // Nếu không có duration (timeLeft === null), đếm xuôi và tăng dần thời gian
       interval = setInterval(() => {
-        setTotalDuration((prevTotal) => prevTotal + 1); // Tăng tổng thời gian mỗi giây
+        setTotalDuration((prevTotal) => prevTotal + 1);
       }, 1000);
     }
 
-    return () => clearInterval(interval); // Cleanup interval khi component unmount
+    return () => clearInterval(interval);
   }, [timeLeft]);
 
   const minutes = Math.floor((timeLeft ?? totalDuration) / 60);
@@ -187,27 +190,33 @@ const StartAssign = () => {
   const navigate = useNavigate();
 
   // useEffect(() => {
-  //   const handleBeforeUnload = (event) => {
-  //     // Ngăn việc reload/trang bị rời bỏ
-  //     event.preventDefault();
-  //     event.returnValue =
-  //       "Your assignment will automatically be submitted if you leave.";
-  //     handleSubmitAssignment();
-  //   };
-  //   const handleVisibilityChange = () => {
-  //     if (document.visibilityState === "hidden") {
-  //       handleOpenDiag();
-  //     }
-  //   };
+  //   if (assignmentInfo.isTest === 1) {
+  //     const handleBeforeUnload = (event) => {
+  //       event.preventDefault();
+  //       event.returnValue = "You must submit the assignment before leaving.";
+  //     };
 
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-  //   document.addEventListener("visibilitychange", handleVisibilityChange);
+  //     const handlePopState = (event) => {
+  //       const confirmExit = window.confirm(
+  //         "You must submit the assignment before leaving. Are you sure you want to leave?"
+  //       );
+  //       if (confirmExit) {
+  //         handleOpenDiag();
+  //       } else {
+  //         event.preventDefault();
+  //         window.history.pushState(null, null, window.location.href);
+  //       }
+  //     };
 
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //     document.removeEventListener("visibilitychange", handleVisibilityChange);
-  //   };
-  // }, []);
+  //     window.addEventListener("beforeunload", handleBeforeUnload);
+  //     window.addEventListener("popstate", handlePopState);
+
+  //     return () => {
+  //       window.removeEventListener("beforeunload", handleBeforeUnload);
+  //       window.removeEventListener("popstate", handlePopState);
+  //     };
+  //   }
+  // }, [assignmentInfo.isTest]);
 
   // SUBMIT ASSIGNMENT
   const handleAssignmentResultStatus = (
@@ -384,7 +393,11 @@ const StartAssign = () => {
       }
 
       if (response.status === APIStatus.success) {
-        navigate(-1);
+        if (assignmentInfo.isTest === 1) {
+          navigate("/studentTest");
+        } else {
+          navigate(-1);
+        }
       } else {
         console.error("Failed to submit assignment:", response);
       }
@@ -486,6 +499,7 @@ const StartAssign = () => {
                     isPerformanceOnMemory={codeProblem.isPerformanceOnMemory}
                     memoryValue={codeProblem.memoryValue}
                     updateParentSourceCode={setSourceCodeStudent}
+                    idAssignment={codeProblem.idAssignment}
                   />
                 </div>
               </>

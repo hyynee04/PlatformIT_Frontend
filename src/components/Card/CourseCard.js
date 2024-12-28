@@ -55,11 +55,14 @@ const CourseCard = (props) => {
 
   return (
     <div className="outside-card">
-      {(course.isEnrolled ||
-        course.idTeacher === +localStorage.getItem("idUser")) &&
-        !unpinned && <BsPinAngleFill />}
-
-      <div className="card-container">
+      <div
+        className={`card-container  ${
+          course.isNewNotification !== 0 ? "new-noti" : ""
+        }`}
+      >
+        {(course.isEnrolled ||
+          course.idTeacher === +localStorage.getItem("idUser")) &&
+          !unpinned && <BsPinAngleFill />}
         <div
           className="course-card-container"
           onMouseEnter={() => setIsHover(true)}
@@ -139,7 +142,11 @@ const CourseCard = (props) => {
 
       {isHover && (
         <div
-          className="card-container card-container-hover"
+          className={`card-container card-container-hover ${
+            course.isNewNotification !== 0 && course.isEnrolled
+              ? "new-noti"
+              : ""
+          }`}
           onClick={() => {
             navigate("/courseDetail", {
               state: {

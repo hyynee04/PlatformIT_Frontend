@@ -2,7 +2,8 @@ import axios from "axios";
 
 const instance = axios.create({
   // baseURL: "http://localhost:5000/",
-  baseURL: "http://27.71.227.212:5000/",
+  // baseURL: "http://27.71.227.212:5000/",
+  baseURL: "http://myidvndut.id.vn:5000/",
 });
 
 // Add a request interceptor

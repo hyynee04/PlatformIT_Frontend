@@ -12,6 +12,7 @@ import {
   getCourseContentStructure,
   getExerciseOfLecture,
   getLectureDetail,
+  postFinishLecture,
 } from "../../services/courseService";
 import LectureView from "./LectureView";
 import SectionView from "./SectionView";
@@ -164,8 +165,21 @@ const Lecture = (props) => {
     } else {
       setIsFinishedLecture(null);
     }
-    console.log("RUN");
   };
+
+  const finishLecture = async (idLecture, idStudent) => {
+    try {
+      let response = await postFinishLecture(idLecture, idStudent);
+      if (response.status === APIStatus.success) {
+        fetchCourseContentStructure(idCourse, idStudent);
+      } else {
+        console.error(response.data);
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const state = location.state;
@@ -210,6 +224,12 @@ const Lecture = (props) => {
       FetchData(idLectureChange);
     }
   }, [idLectureChange, idSectionChange]);
+
+  useEffect(() => {
+    if (idRole === Role.student && isFinishedLecture) {
+      finishLecture(idLecture, idUser);
+    }
+  }, [isFinishedLecture]);
 
   useEffect(() => {
     const interval = setInterval(() => {

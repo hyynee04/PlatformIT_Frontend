@@ -21,7 +21,7 @@ RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge
 COPY --from=build /app/build /usr/share/nginx/html
 
 # Cấu hình nginx để phục vụ .well-known
-COPY nginx.conf /etc/nginx/nginx.conf
+#COPY nginx.conf /etc/nginx/nginx.conf
 
 # Cổng mà nginx sẽ lắng nghe
 EXPOSE 80

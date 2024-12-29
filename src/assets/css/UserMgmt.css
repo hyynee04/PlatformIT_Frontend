@@ -187,7 +187,7 @@ td {
   max-width: 300px;
   word-wrap: break-word; /* Ngắt dòng nếu nội dung quá dài */
   white-space: nowrap; /* Không ngắt dòng trong ô */
-  text-overflow: hidden;
+  text-overflow: ellipsis;
 }
 .list-container > table > tbody > tr > td > span {
   display: inline-block;

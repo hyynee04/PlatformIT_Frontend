@@ -83,6 +83,7 @@ const StudentDetail = (props) => {
     }
   };
   useEffect(() => {
+    window.scrollTo(0, 0);
     const state = location.state;
 
     if (state && state.idCourse && state.idStudent && state.courseTitle) {

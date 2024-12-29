@@ -46,6 +46,8 @@ import Lecture from "./pages/lectureMgmt/Lecture";
 import ViewAll from "./pages/ViewAll";
 import AdminCenterDetail from "./pages/detail/AdminCenterDetail";
 import Chat from "./pages/Chat";
+import Transaction from "./pages/Transaction";
+import TransactionResponse from "./pages/TransactionResponse";
 
 const Layout = (props) => {
   return (
@@ -321,6 +323,7 @@ const Layout = (props) => {
           />
 
           {/* General */}
+
           <Route
             path="/pi"
             element={
@@ -345,6 +348,14 @@ const Layout = (props) => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/transaction"
+            element={
+              <PrivateRoute>
+                <Transaction />
+              </PrivateRoute>
+            }
+          />
         </Route>
         <Route
           path="/startAssignment"
@@ -354,7 +365,16 @@ const Layout = (props) => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/transactionResponse"
+          element={
+            <PrivateRoute>
+              <TransactionResponse />
+            </PrivateRoute>
+          }
+        />
         <Route path="/login-response" element={<LoginResponse />} />
+
         {/* <Route path='admin' element={<Admin />}>
                     <Route index element={<DashBoard />} />
                     <Route path='manage-user' element={<ManageUser />} />

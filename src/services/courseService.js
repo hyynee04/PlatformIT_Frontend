@@ -282,24 +282,6 @@ const getLectureDetail = (idLecture) => {
   });
 };
 
-const getNotificationBoardOfCourse = (idCourse) => {
-  return axios.get("api/Notification/GetNotificationBoardOfCourse", {
-    params: {
-      idCourse: idCourse,
-    },
-  });
-};
-
-const postAddBoardNotificationForCourse = (idCourse, content, idCreatedBy) => {
-  return axios.post(`api/Notification/AddBoardNotificationForCourse`, null, {
-    params: {
-      idCourse: idCourse,
-      content: content,
-      idCreatedBy: idCreatedBy,
-    },
-  });
-};
-
 const getCourseProgress = (idCourse) => {
   return axios.get("api/Course/GetCourseProgress", {
     params: {
@@ -446,6 +428,14 @@ const getAllRatingsOfCourse = (idCourse) => {
     },
   });
 };
+const postFinishLecture = (idLecture, idStudent) => {
+  return axios.post(`api/Lecture/FinishLectures`, null, {
+    params: {
+      idLecture: idLecture,
+      idStudent: idStudent,
+    },
+  });
+};
 
 export {
   getAllActiveCourseOfTeacher,
@@ -464,8 +454,6 @@ export {
   getIsEnRolledCourse,
   getIsChatAvailable,
   getLectureDetail,
-  getNotificationBoardOfCourse,
-  postAddBoardNotificationForCourse,
   postAddCourse,
   postUpdateCourse,
   postAddLecture,
@@ -485,4 +473,5 @@ export {
   postAddReview,
   getAllRatingsOfCourse,
   deleteReview,
+  postFinishLecture,
 };

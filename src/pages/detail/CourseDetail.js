@@ -41,7 +41,6 @@ import {
   getCourseProgressByIdStudent,
   getIsChatAvailable,
   getIsEnRolledCourse,
-  getNotificationBoardOfCourse,
   getSectionDetail,
   postAddReview,
   postEnrollCourse,
@@ -49,6 +48,11 @@ import {
 import CourseDetailTeacher from "./CourseDetailTeacher";
 import { getTestOfCourseStudent } from "../../services/assignmentService";
 import DiagDeleteConfirmation from "../../components/diag/DiagDeleteConfirmation";
+import DiagBuyCourseConfirmation from "../../components/diag/DiagBuyCourseConfirmation";
+import {
+  getNotificationBoardOfCourse,
+  postReadNotificationBoard,
+} from "../../services/notificationService";
 
 const CourseDetail = (props) => {
   const location = useLocation();
@@ -71,6 +75,8 @@ const CourseDetail = (props) => {
   const [reviewRemoved, setReviewRemoved] = useState(null);
   const [isEnrolledCourse, setIsEnrolledCourse] = useState(false);
   const [isChatAvailable, setIsChatAvailable] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
+  const [idNotiRemoved, setIdNotiRemoved] = useState(null);
   const [showedSections, setShowedSections] = useState({});
   const handleIsShowed = (index) => {
     setShowedSections((prev) => ({
@@ -188,7 +194,7 @@ const CourseDetail = (props) => {
 
   const fetchNotificationBoard = async (idCourse) => {
     let notifications = await getNotificationBoardOfCourse(idCourse);
-    if (notifications.status === APIStatus) {
+    if (notifications.status === APIStatus.success) {
       const processedData = notifications.data.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
@@ -246,10 +252,22 @@ const CourseDetail = (props) => {
     return (totalPoints / rateModels.length).toFixed(1);
   };
 
+  const readNotificationBoard = async (idCourse, idUser) => {
+    try {
+      const response = await postReadNotificationBoard(idCourse, idUser);
+      if (response.status !== APIStatus.success) {
+        console.error(response.data);
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
+
   useEffect(() => {
     if (isEnrolledCourse) {
       fetchCourseProgress(courseInfo.idCourse, idUser);
       fetchTestOfCourseStudent(courseInfo.idCourse, idUser);
+      fetchCourseContentStructure(courseInfo.idCourse, idUser);
     }
   }, [isEnrolledCourse]);
 
@@ -286,13 +304,14 @@ const CourseDetail = (props) => {
     window.scrollTo(0, 0);
     const state = location.state;
     if (state) {
-      // setIDUser(parseInt(state.idUser));
-      // setIDRole(parseInt(state.idRole));
       fetchCourseDetail(
         state.idCourse,
         parseInt(state.idRole),
         parseInt(state.idUser)
       );
+      if (idRole === Role.student) {
+        readNotificationBoard(state.idCourse, parseInt(state.idUser));
+      }
     }
     const interval = setInterval(() => {
       setNotificationBoard((prevNotifications) =>
@@ -340,36 +359,23 @@ const CourseDetail = (props) => {
   const openSuccessModal = () => setIsModalSuccessOpen(true);
   const closeSuccessModal = () => setIsModalSuccessOpen(false);
 
-  const handleBuyCourse = async () => {
-    let idUser = +localStorage.getItem("idUser");
-    if (idUser) {
-      const response = await postEnrollCourse(courseInfo.idCourse);
-      if (response.status === APIStatus.success) {
-        openSuccessModal();
-        // fetchCourseDetail(courseInfo.idCourse, idRole);
-        setIsEnrolledCourse(true);
-      }
-      //   openSuccessModal();
-    } else {
-      navigate("/login");
-    }
-  };
-
   const handleNavigateDetailStudent = (idStudent) => {
-    if (idRole === Role.teacher) {
-      navigate("/studentdetail", {
-        state: {
-          idStudent: idStudent,
-          idCourse: courseInfo.idCourse,
-          courseTitle: courseInfo.courseTitle,
-        },
-      });
-    } else {
-      navigate("/studentdetail", {
-        state: {
-          idStudent: idStudent,
-        },
-      });
+    if (idRole !== Role.student) {
+      if (idRole === Role.teacher) {
+        navigate("/studentdetail", {
+          state: {
+            idStudent: idStudent,
+            idCourse: courseInfo.idCourse,
+            courseTitle: courseInfo.courseTitle,
+          },
+        });
+      } else {
+        navigate("/studentdetail", {
+          state: {
+            idStudent: idStudent,
+          },
+        });
+      }
     }
   };
 
@@ -518,10 +524,10 @@ const CourseDetail = (props) => {
             {(idRole === Role.student || !idRole) &&
               !isEnrolledCourse &&
               (!courseInfo.registStartDate || !courseInfo.registEndDate ? (
-                <button onClick={handleBuyCourse}>Buy Now</button>
+                <button onClick={() => setIsBuying(true)}>Buy Now</button>
               ) : new Date() >= new Date(courseInfo.registStartDate) &&
                 new Date() <= new Date(courseInfo.registEndDate) ? (
-                <button onClick={handleBuyCourse}>Buy Now</button>
+                <button onClick={() => setIsBuying(true)}>Buy Now</button>
               ) : courseInfo.maxAttendees !== null &&
                 courseInfo.studentCount >= courseInfo.maxAttendees ? (
                 <button disabled>Fully bought</button>
@@ -648,10 +654,25 @@ const CourseDetail = (props) => {
                     className="small-ava"
                     src={review.raterAvatarPath || default_image}
                     alt="Rater Avatar"
+                    onClick={() => handleNavigateDetailStudent(review.idRater)}
+                    style={{
+                      cursor: idRole !== Role.student ? "pointer" : "default",
+                    }}
                   />
                   <div className="review-body">
                     <div className="review-header">
-                      <span className="review-name">{review.raterName}</span>
+                      <span
+                        className="review-name"
+                        onClick={() =>
+                          handleNavigateDetailStudent(review.idRater)
+                        }
+                        style={{
+                          cursor:
+                            idRole !== Role.student ? "pointer" : "default",
+                        }}
+                      >
+                        {review.raterName}
+                      </span>
                       <span className="review-date">{review.relativeTime}</span>
                     </div>
 
@@ -767,6 +788,10 @@ const CourseDetail = (props) => {
             fetchSectionDetail={() =>
               fetchCourseContentStructure(courseInfo.idCourse)
             }
+            fetchNotificationBoard={() =>
+              fetchNotificationBoard(courseInfo.idCourse)
+            }
+            setIdNotiRemoved={setIdNotiRemoved}
           />
         ) : null}
 
@@ -924,16 +949,10 @@ const CourseDetail = (props) => {
                                   <div
                                     key={index}
                                     className={`lecture-content ${
-                                      isEnrolledCourse ||
-                                      idRole === Role.platformAdmin
-                                        ? ""
-                                        : "nohover"
+                                      isEnrolledCourse ? "" : "nohover"
                                     } `}
                                     onClick={() => {
-                                      if (
-                                        isEnrolledCourse ||
-                                        idRole === Role.platformAdmin
-                                      )
+                                      if (isEnrolledCourse)
                                         navigate("/viewLecture", {
                                           state: {
                                             idLecture: lecture.idLecture,
@@ -943,6 +962,7 @@ const CourseDetail = (props) => {
                                     }}
                                   >
                                     {idRole === Role.student &&
+                                      isEnrolledCourse &&
                                       lecture.isFinishedLecture && (
                                         <FaCircleCheck />
                                       )}
@@ -1074,6 +1094,22 @@ const CourseDetail = (props) => {
           </>
         ) : null}
       </div>
+      <div>
+        <DiagBuyCourseConfirmation
+          isOpen={isBuying}
+          onClose={() => setIsBuying(false)}
+          idCourse={courseInfo.idCourse}
+          status={courseInfo.discountedPrice || courseInfo.price ? 2 : 1}
+          paymentData={{
+            amount: courseInfo.discountedPrice
+              ? courseInfo.discountedPrice
+              : courseInfo.price,
+            idStudent: idUser,
+            idCourse: courseInfo.idCourse,
+          }}
+          setIsEnrolledCourse={setIsEnrolledCourse}
+        />
+      </div>
 
       <div>
         <DiagDeleteConfirmation
@@ -1081,6 +1117,7 @@ const CourseDetail = (props) => {
           onClose={() => {
             setIsRemoved(false);
             if (reviewRemoved) setReviewRemoved(null);
+            if (idNotiRemoved) setIdNotiRemoved(null);
           }}
           object={
             reviewRemoved
@@ -1088,6 +1125,12 @@ const CourseDetail = (props) => {
                   id: reviewRemoved,
                   name: "review",
                   message: "Are you sure to delete this review?",
+                }
+              : idNotiRemoved
+              ? {
+                  id: idNotiRemoved,
+                  name: "notificationBoard",
+                  message: "Are you sure to delete this notification?",
                 }
               : {
                   id: idSection,
@@ -1098,6 +1141,8 @@ const CourseDetail = (props) => {
           fetchData={() =>
             reviewRemoved
               ? fetchReviews(courseInfo.idCourse)
+              : idNotiRemoved
+              ? fetchNotificationBoard(courseInfo.idCourse)
               : fetchCourseContentStructure(courseInfo.idCourse)
           }
         />
@@ -1120,11 +1165,6 @@ const CourseDetail = (props) => {
           notification={
             "Congratulations! You have successfully enrolled in the course."
           }
-        />
-        <DiagSuccessfully
-          isOpen={addedNotification}
-          onClose={() => setAddedNotification(false)}
-          notification={"Successfully post a new notification to board."}
         />
       </div>
     </div>

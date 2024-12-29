@@ -9,6 +9,7 @@ import {
 } from "../../services/courseService";
 import { APIStatus } from "../../constants/constants";
 import { deleteComment } from "../../services/commentService";
+import { postDeleteNotificationBoard } from "../../services/notificationService";
 const DiagDeleteConfirmation = (props) => {
   const { isOpen, onClose, object, fetchData } = props;
   const navigate = useNavigate();
@@ -63,6 +64,17 @@ const DiagDeleteConfirmation = (props) => {
   const handleDeleteReview = async () => {
     try {
       const respone = await deleteReview(object.id, idUser);
+      if (respone.status === APIStatus.success) {
+        setIsSucceed(true);
+      }
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    }
+  };
+
+  const deleteNotificationBoard = async () => {
+    try {
+      const respone = await postDeleteNotificationBoard(object.id, idUser);
       if (respone.status === APIStatus.success) {
         setIsSucceed(true);
       }
@@ -148,6 +160,8 @@ const DiagDeleteConfirmation = (props) => {
                     else if (object.name === "comment") removeComment();
                     else if (object.name === "course") hanldeDeleteCourse();
                     else if (object.name === "review") handleDeleteReview();
+                    else if (object.name === "notificationBoard")
+                      deleteNotificationBoard();
                   }
                 }}
               >

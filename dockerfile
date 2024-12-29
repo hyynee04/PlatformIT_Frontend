@@ -14,8 +14,14 @@ RUN npm run build
 # Bước 2: Sử dụng nginx để chạy ứng dụng
 FROM nginx:alpine
 
+# Tạo thư mục .well-known/acme-challenge cho Let's Encrypt
+RUN mkdir -p /usr/share/nginx/html/.well-known/acme-challenge
+
 # Copy build của React app vào thư mục của nginx
 COPY --from=build /app/build /usr/share/nginx/html
+
+# Cấu hình nginx để phục vụ .well-known
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Cổng mà nginx sẽ lắng nghe
 EXPOSE 80

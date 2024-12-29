@@ -52,4 +52,4 @@ jobs:
             docker stop react-app || true
             docker rm react-app || true
             docker images ghcr.io/hyynee04/platformit_frontend/react-app --format "{{.ID}} {{.Tag}}" | grep "none" | awk '{print $1}' | xargs -r docker rmi || true &&
-            docker run -d -p 443:443 -p 80:80 --name react-app ghcr.io/hyynee04/platformit_frontend/react-app:latest
+            docker run -d -p 3000:3000 --name react-app ghcr.io/hyynee04/platformit_frontend/react-app:latest

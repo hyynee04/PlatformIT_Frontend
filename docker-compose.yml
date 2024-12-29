@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  react-app:
+    image: ghcr.io/hyynee04/platformit_frontend/react-app:latest  # Sử dụng image đã push lên registry
+    container_name: react-app-container
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /docker/nginx/certs:/etc/nginx/certs  # Chứng chỉ SSL
+    restart: always
+    networks:
+      - web
+
   nginx:
     image: nginx:alpine
     container_name: nginx-container
@@ -8,6 +20,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      #- ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - /docker/nginx/certs:/etc/nginx/certs
     restart: always
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge

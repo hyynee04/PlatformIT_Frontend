@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   LuChevronDown,
   LuFilter,
@@ -34,7 +34,9 @@ const CenterAdUserMgmt = () => {
   const [sortBy, setSortBy] = useState({ field: "fullname", order: "asc" });
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [filterVisble, setFilterVisble] = useState(false);
+  const filterButtonRef = useRef(null);
   const [sortByVisible, setSortByVisible] = useState(false);
+  const sortByButtonRef = useRef(null);
 
   const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
   const [status, setStatus] = useState(null);
@@ -63,6 +65,8 @@ const CenterAdUserMgmt = () => {
 
   const handleRoleClick = (role) => {
     dispatch(setActiveRoleUserOfCenter(role));
+    setDateRange({ startDate: "", endDate: "" });
+    setStatus(null);
   };
   const handleFilterChange = ({ dateRange, status }) => {
     setDateRange(dateRange);
@@ -148,7 +152,6 @@ const CenterAdUserMgmt = () => {
   const firstIndex = lastIndex - recordsPerPage;
   const records = filteredUser.slice(firstIndex, lastIndex);
   const npage = Math.ceil(filteredUser.length / recordsPerPage);
-  const numbers = [...Array(npage + 1).keys()].slice(1);
 
   const handleMoreIconClick = (idUser) => {
     setSelectedUserId((prevSelectedId) =>
@@ -186,7 +189,8 @@ const CenterAdUserMgmt = () => {
         </div>
         <div className="filter-search">
           <div className="filter-sort-btns">
-            <div
+            <button
+              ref={filterButtonRef}
               className="btn"
               onClick={() => {
                 setFilterVisble(!filterVisble);
@@ -195,11 +199,18 @@ const CenterAdUserMgmt = () => {
             >
               <LuFilter className="icon" />
               <span>Filter</span>
-            </div>
+            </button>
             {filterVisble && (
-              <FilterUserOfCenter onFilterChange={handleFilterChange} />
+              <FilterUserOfCenter
+                dateRange={dateRange}
+                status={status}
+                onFilterChange={handleFilterChange}
+                onClose={() => setFilterVisble(false)}
+                filterButtonRef={filterButtonRef}
+              />
             )}
-            <div
+            <button
+              ref={sortByButtonRef}
               className="btn"
               onClick={() => {
                 setSortByVisible(!sortByVisible);
@@ -208,9 +219,12 @@ const CenterAdUserMgmt = () => {
             >
               <span>Sort by</span>
               <LuChevronDown className="icon" />
-            </div>
+            </button>
             {sortByVisible && (
-              <SortByUserOfCenter onSortByChange={handleSortByChange} />
+              <SortByUserOfCenter
+                onSortByChange={handleSortByChange}
+                sortByButtonRef={sortByButtonRef}
+              />
             )}
           </div>
 

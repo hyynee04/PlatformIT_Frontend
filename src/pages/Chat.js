@@ -255,13 +255,13 @@ const Chat = () => {
             return [
               ...prev,
               {
-                userId: selectedSender.avatar,
+                userId: selectedSender.userId,
                 avatar: selectedSender.avatar,
                 name: selectedSender.name,
                 idLastMessageSender: idUser,
                 lastMessage: contentSent,
                 lastMessageTime: new Date().toISOString(),
-                timeStamp: new Date().toISOString(),
+                timeStamp: parseRelativeTime("Just now"),
                 relativeTime: calculateRelativeTime(new Date().toISOString()),
               },
             ];

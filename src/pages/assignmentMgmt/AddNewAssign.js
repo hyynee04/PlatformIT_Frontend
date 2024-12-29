@@ -62,7 +62,7 @@ const AddNewAssign = () => {
   const [isShufflingQuestion, setIsShufflingQuestion] = useState(false);
   const [isShufflingAnswer, setIsShufflingAnswer] = useState(false);
   const [isShowAnswer, setIsShowAnswer] = useState(false);
-  const [isShowTestCases, setIsShowTestCases] = useState(false);
+  const [isShowTestcase, setIsShowTestcase] = useState(false);
   const [isAllowRunCode, setIsAllowRunCode] = useState(false);
   const [typeAssignment, setTypeAssignment] = useState(null);
   const [duration, setDuration] = useState(0);
@@ -642,7 +642,7 @@ const AddNewAssign = () => {
       isShufflingQuestion: isShufflingQuestion,
       isShufflingAnswer: isShufflingAnswer,
       isShowAnswer: isShowAnswer,
-      isShowTestCase: isShowTestCases,
+      isShowTestcase: isShowTestcase,
       isAllowRunCode: isAllowRunCode,
       idLanguage: selectedLanguage.idLanguage,
     };
@@ -1172,9 +1172,9 @@ const AddNewAssign = () => {
                         <label className="switch">
                           <input
                             type="checkbox"
-                            checked={isShowTestCases}
+                            checked={isShowTestcase}
                             onChange={(e) => {
-                              setIsShowTestCases(e.target.checked);
+                              setIsShowTestcase(e.target.checked);
                             }}
                           />
                           <span className="slider"></span>

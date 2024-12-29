@@ -32,6 +32,7 @@ const StartAssign = () => {
   const [questions, setQuestions] = useState([]);
   const [codeProblem, setCodeProblem] = useState({});
   const [sourceCodeStudent, setSourceCodeStudent] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async (idAssignment) => {
@@ -186,37 +187,6 @@ const StartAssign = () => {
     }
     setDiagSubmitVisible(true);
   };
-  //HANDLE OUT OF PAGE
-  const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (assignmentInfo.isTest === 1) {
-  //     const handleBeforeUnload = (event) => {
-  //       event.preventDefault();
-  //       event.returnValue = "You must submit the assignment before leaving.";
-  //     };
-
-  //     const handlePopState = (event) => {
-  //       const confirmExit = window.confirm(
-  //         "You must submit the assignment before leaving. Are you sure you want to leave?"
-  //       );
-  //       if (confirmExit) {
-  //         handleOpenDiag();
-  //       } else {
-  //         event.preventDefault();
-  //         window.history.pushState(null, null, window.location.href);
-  //       }
-  //     };
-
-  //     window.addEventListener("beforeunload", handleBeforeUnload);
-  //     window.addEventListener("popstate", handlePopState);
-
-  //     return () => {
-  //       window.removeEventListener("beforeunload", handleBeforeUnload);
-  //       window.removeEventListener("popstate", handlePopState);
-  //     };
-  //   }
-  // }, [assignmentInfo.isTest]);
 
   // SUBMIT ASSIGNMENT
   const handleAssignmentResultStatus = (

@@ -299,10 +299,27 @@ const AddNewCourse = () => {
 
     fetchTeacher();
   }, []);
+  const showTeacherListRef = useRef(null);
+  const showTeacherListBtnRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showTeacherListRef.current &&
+        !showTeacherListRef.current.contains(event.target) &&
+        showTeacherListBtnRef.current &&
+        !showTeacherListBtnRef.current.contains(event.target)
+      ) {
+        setShowTeacherList(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showTeacherList]);
   const handleAssignClick = () => {
     setShowTeacherList((prev) => !prev);
   };
-
   const handleTeacherSelect = (teacher) => {
     setSelectedTeacher(teacher);
     setShowTeacherList(false);
@@ -692,28 +709,29 @@ const AddNewCourse = () => {
                   onClick={handleAddCourse}
                 >
                   {loadingAct && (
-                    <ImSpinner2 className="icon-spin" color="#397979" />
+                    <ImSpinner2 className="icon-spin" color="#d9d9d9" />
                   )}
                   Create Course
                 </button>
               </div>
             </div>
           </div>
-          <div className="container-info auto">
-            <span className="title-span">
+          <div className="container-info auto" style={{ position: "relative" }}>
+            <span className="title-span" style={{ padding: 0 }}>
               Teacher <span className="required">*</span>
             </span>
+            <div className="alert-option">
+              <button
+                ref={showTeacherListBtnRef}
+                className="main-action"
+                onClick={handleAssignClick}
+              >
+                {!selectedTeacher ? "Assign Teacher" : "Change Teacher"}
+              </button>
+            </div>
             {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
-            {!showTeacherList && (
-              <div className="alert-option">
-                <button className="main-action" onClick={handleAssignClick}>
-                  {!selectedTeacher ? "Assign Teacher" : "Change Teacher"}
-                </button>
-              </div>
-            )}
-
             {showTeacherList && (
-              <div className="teacher-list-dropdown">
+              <div ref={showTeacherListRef} className="teacher-list-dropdown">
                 {teacherList.map((teacher, index) => (
                   <div
                     key={index}

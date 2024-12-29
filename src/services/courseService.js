@@ -100,6 +100,8 @@ const postAddCourse = async (dataToSubmit) => {
   }
 };
 const postUpdateCourse = async (courseInfo) => {
+  console.log("courseInfo: ", courseInfo);
+
   try {
     const formData = new FormData();
     formData.append("IdCourse", courseInfo.idCourse);
@@ -129,21 +131,20 @@ const postUpdateCourse = async (courseInfo) => {
       "IsApprovedLecture",
       courseInfo.isApprovedLecture === 1 || courseInfo.isApprovedLecture ? 1 : 0
     );
-    courseInfo.tags.forEach((tag) => {
-      formData.append("Tags", tag);
-    });
-    formData.append("IdTeacher", courseInfo.idTeacher);
-    return await axios.post(
-      `api/Course/UpdateCourseInfo?idUpdatedBy=${Number(
-        localStorage.getItem("idUser")
-      )}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    courseInfo.tags.forEach((tag, index) => {
+      if (tag.idTag !== "") {
+        formData.append(`Tags[${index}].idTag`, tag.idTag);
       }
-    );
+
+      formData.append(`Tags[${index}].tagName`, tag.tagName);
+    });
+
+    formData.append("idUpdatedBy", Number(localStorage.getItem("idUser")));
+    return await axios.post("api/Course/UpdateCourseInfo", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   } catch (error) {
     throw error;
   }

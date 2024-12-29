@@ -49,7 +49,7 @@ const DiagSettingCourseForm = ({
                 </div>
               </div>
 
-              <div className="info">
+              {/* <div className="info">
                 <div className="item setting-course">
                   <label className="switch">
                     <input
@@ -63,7 +63,7 @@ const DiagSettingCourseForm = ({
                     Enforce lecture sequence completion
                   </label>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="right-diag-container"></div>
           </div>

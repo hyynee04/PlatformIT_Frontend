@@ -1,21 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/css/card/FilterCard.css";
 import { UserStatus } from "../constants/constants";
-const FilterUserOfCenter = ({ onFilterChange }) => {
-  const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
-  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
-  const [status, setStatus] = useState("all");
-  const handleFilterChange = () => {
-    onFilterChange({
-      dateRange,
-      status: status === "all" ? null : status,
-    });
+const FilterUserOfCenter = ({
+  dateRange: parentDateRange,
+  status: parentStatus,
+  onFilterChange,
+  onClose,
+  filterButtonRef,
+}) => {
+  const [localDateRange, setLocalDateRange] = useState(parentDateRange);
+  const [localStatus, setLocalStatus] = useState(parentStatus);
+  const handleSave = () => {
+    onFilterChange({ dateRange: localDateRange, status: localStatus });
+    onClose();
   };
-  if (!isFilterFormVisible) return null;
+  const filterRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(event.target) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [onClose]);
   return (
     <>
-      <div className="filter-container user">
+      <div ref={filterRef} className="filter-container user">
         <div className="title-filter">
           <span>Filter</span>
         </div>
@@ -25,18 +46,24 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
             <input
               type="date"
               className="date-picker"
-              value={dateRange.startDate}
+              value={localDateRange.startDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  startDate: e.target.value,
+                }))
               }
             />
             <LuArrowRight />
             <input
               type="date"
               className="date-picker"
-              value={dateRange.endDate}
+              value={localDateRange.endDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  endDate: e.target.value,
+                }))
               }
             />
           </div>
@@ -46,8 +73,8 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="active"
-                checked={status === UserStatus.active}
-                onChange={() => setStatus(UserStatus.active)}
+                checked={localStatus === UserStatus.active}
+                onChange={() => setLocalStatus(UserStatus.active)}
               />
               Active
             </label>
@@ -55,8 +82,8 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="inactive"
-                checked={status === UserStatus.inactive}
-                onChange={() => setStatus(UserStatus.inactive)}
+                checked={localStatus === UserStatus.inactive}
+                onChange={() => setLocalStatus(UserStatus.inactive)}
               />
               Inactive
             </label>
@@ -64,27 +91,18 @@ const FilterUserOfCenter = ({ onFilterChange }) => {
               <input
                 type="radio"
                 value="all"
-                checked={status === "all"}
-                onChange={() => setStatus("all")}
+                checked={localStatus === null}
+                onChange={() => setLocalStatus(null)}
               />
               All
             </label>
           </div>
         </div>
         <div className="btn-filter">
-          <button
-            className="btn cancel-filter"
-            onClick={() => setIsFilterFormVisible(false)}
-          >
+          <button className="btn cancel-filter" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className="btn save-filter"
-            onClick={() => {
-              handleFilterChange();
-              setIsFilterFormVisible(false);
-            }}
-          >
+          <button className="btn save-filter" onClick={handleSave}>
             Save
           </button>
         </div>

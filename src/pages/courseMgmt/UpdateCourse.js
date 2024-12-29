@@ -192,8 +192,17 @@ const UpdateCourse = () => {
 
     const tagToAdd = capitalizeWords(newTag);
 
-    if (!selectedTags.includes(tagToAdd) && selectedTags.length < 20) {
-      setSelectedTags((prevTags) => [...prevTags, tagToAdd]);
+    if (
+      !selectedTags.some((tag) => tag.tagName === tagToAdd) &&
+      selectedTags.length < 20
+    ) {
+      // setSelectedTags((prevTags) => [...prevTags, tagToAdd]);
+      const newTagObject = {
+        idTag: "",
+        tagName: tagToAdd, // Chỉ tạo tagName cho tag mới
+      };
+
+      setSelectedTags((prevTags) => [...prevTags, newTagObject]);
     }
   };
 
@@ -203,10 +212,15 @@ const UpdateCourse = () => {
     setShowDropdown(value.trim().length > 0);
   };
 
-  const handleOptionSelect = (tagName) => {
+  const handleOptionSelect = (selected) => {
     if (selectedTags.length >= 20) return;
-    if (!selectedTags.includes(tagName)) {
-      setSelectedTags((prevTags) => [...prevTags, tagName]);
+    if (!selectedTags.some((tag) => tag.idTag === selected.idTag)) {
+      const newTagObject = {
+        idTag: selected.idTag,
+        tagName: selected.tagName,
+      };
+
+      setSelectedTags((prevTags) => [...prevTags, newTagObject]);
     }
     setSearchTagQuery("");
     setShowDropdown(false);
@@ -216,8 +230,10 @@ const UpdateCourse = () => {
     if (selectedTags.length >= 20) return;
     if (e.key === "Enter") {
       const trimmedQuery = searchTagQuery.trim();
-
-      if (trimmedQuery && !selectedTags.includes(trimmedQuery)) {
+      if (
+        trimmedQuery &&
+        !selectedTags.some((tag) => tag.tagName === trimmedQuery)
+      ) {
         addNewTag(trimmedQuery);
       }
 
@@ -228,7 +244,9 @@ const UpdateCourse = () => {
   };
 
   const removeTag = (tagToRemove) => {
-    setSelectedTags(selectedTags.filter((tag) => tag !== tagToRemove));
+    setSelectedTags(
+      selectedTags.filter((tag) => tag.tagName !== tagToRemove.tagName)
+    );
   };
 
   const inputFileRef = useRef(null);
@@ -260,8 +278,6 @@ const UpdateCourse = () => {
         } else {
           blobFile = file;
         }
-
-        // Hủy URL cũ trước khi tạo URL mới
         if (coverImage.coverImgUrl) {
           URL.revokeObjectURL(coverImage.coverImgUrl);
         }
@@ -337,14 +353,6 @@ const UpdateCourse = () => {
 
     fetchTeacher();
   }, []);
-  const handleAssignClick = () => {
-    setShowTeacherList((prev) => !prev);
-  };
-
-  const handleTeacherSelect = (teacher) => {
-    setSelectedTeacher(teacher);
-    setShowTeacherList(false);
-  };
   const isFormValid = () => {
     if (courseInfo.isLimitAttendees === 1 && courseInfo.maxAttendees === "")
       return false;
@@ -385,13 +393,11 @@ const UpdateCourse = () => {
       isApprovedLecture: courseInfo.isApprovedLecture,
       maxAttendees: courseInfo.maxAttendees,
       tags: selectedTags,
-      idTeacher: selectedTeacher.idUser,
     };
     setLoadingAct(true);
     try {
       const response = await postUpdateCourse(dataToSubmit);
       if (response.status === APIStatus.success) {
-        // navigate("/centerAdCourse");
         openSuccessModal();
       }
     } catch (error) {
@@ -472,7 +478,7 @@ const UpdateCourse = () => {
                               <div
                                 key={index}
                                 className="dropdown-item-tag"
-                                onClick={() => handleOptionSelect(tag.tagName)}
+                                onClick={() => handleOptionSelect(tag)}
                               >
                                 {tag.tagName}
                               </div>
@@ -487,7 +493,7 @@ const UpdateCourse = () => {
                           className="tags"
                           disabled={hasStudent}
                         >
-                          {tag}
+                          {tag.tagName}
                           <LuX
                             className="icon"
                             onClick={() => removeTag(tag)}
@@ -753,7 +759,7 @@ const UpdateCourse = () => {
                 Teacher <span className="required">*</span>
               </span>
               {selectedTeacher && <TeacherCard teacher={selectedTeacher} />}
-              {!showTeacherList && !hasStudent && (
+              {/* {!showTeacherList && !hasStudent && (
                 <div className="alert-option">
                   <button
                     className="main-action"
@@ -791,7 +797,7 @@ const UpdateCourse = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
             </div>
             <div>
               <DiagSettingCourseForm

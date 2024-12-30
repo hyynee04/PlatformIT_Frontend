@@ -278,6 +278,12 @@ const CourseDetail = (props) => {
       }, 0)
     : 0;
 
+  const countTests = (tests) => {
+    return tests.filter(
+      (test) => test.isPublish === true || test.isPublish === null
+    ).length;
+  };
+
   const getCourseStatus = (course) => {
     const currentDate = new Date();
     const registStart = new Date(course.registStartDate);
@@ -1010,8 +1016,8 @@ const CourseDetail = (props) => {
                   <span className="block-container-title">Tests</span>
                   <span className="block-container-sub-title">
                     {courseInfo.tests
-                      ? `${courseInfo.tests.length} ${
-                          courseInfo.tests.length > 1 ? "tests" : "test"
+                      ? `${countTests(courseInfo.tests)} ${
+                          countTests(courseInfo.tests) > 1 ? "tests" : "test"
                         }`
                       : "0 test"}{" "}
                   </span>

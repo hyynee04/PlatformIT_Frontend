@@ -426,7 +426,7 @@ const Transaction = () => {
         </div>
       </div>
 
-      <div className="main-content">
+      <div className="main-content slide-to-top">
         <div className="transaction-table">
           {idRole === Role.centerAdmin ? (
             <table>

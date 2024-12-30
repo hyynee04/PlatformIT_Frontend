@@ -22,7 +22,6 @@ import * as signalR from "@microsoft/signalr";
 import { useDispatch } from "react-redux";
 import {
   decrementUnreadCount,
-  incrementUnreadCount,
   setUnreadMsgCount,
 } from "../store/messagesSlice";
 
@@ -32,6 +31,7 @@ const Chat = () => {
   const idRole = Number(localStorage.getItem("idRole"));
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(false);
+  const [loadingSendAct, setLoadingSendAct] = useState(false);
   const location = useLocation();
   const [listConversations, setListConversations] = useState([]);
   const [selectedSender, setSelectedSender] = useState(null);
@@ -129,7 +129,7 @@ const Chat = () => {
       try {
         const connection = new signalR.HubConnectionBuilder()
           .withUrl(
-            `http://27.71.227.212:5000/chatHub?userId=${Number(
+            `https://myidvndut.id.vn:5000/chatHub?userId=${Number(
               localStorage.getItem("idUser")
             )}`
           )
@@ -241,6 +241,7 @@ const Chat = () => {
       createdBy: idUser,
       createdDate: new Date().toISOString(),
     };
+    setLoadingSendAct(true);
     try {
       let respone = await postSendMessage(newMessage);
       if (respone.status === APIStatus.success) {
@@ -294,6 +295,8 @@ const Chat = () => {
       console.error("Error sending message:", error);
       alert("Failed to send message. Please try again.");
       setDetailConversation((prev) => prev.filter((msg) => msg !== newMessage));
+    } finally {
+      setLoadingSendAct(false);
     }
   };
   if (loading) {
@@ -443,11 +446,18 @@ const Chat = () => {
                     placeholder="Type a message..."
                     disabled={!isChatAvailable}
                   />
-                  <RiSendPlaneFill
-                    className="icon-send"
-                    onClick={() => handleSendMessage()}
-                    disabled={!isChatAvailable}
-                  />
+                  {loadingSendAct ? (
+                    <ImSpinner2
+                      className="icon-spin icon-send"
+                      style={{ top: "20%" }}
+                    />
+                  ) : (
+                    <RiSendPlaneFill
+                      className="icon-send"
+                      onClick={() => handleSendMessage()}
+                      disabled={!isChatAvailable}
+                    />
+                  )}
                 </div>
               </div>
             </div>

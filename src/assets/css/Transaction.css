@@ -283,11 +283,14 @@
   color: var(--black-color);
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: all 0.3s ease;
 }
 
-.main-content .transaction-table table > .header-row {
+.main-content .transaction-table table > .header-row,
+.main-content .transaction-table table > .header-row:hover {
   position: relative;
   border: none;
+  background-color: transparent;
 }
 .main-content .transaction-table table > .header-row::after {
   content: "";
@@ -306,6 +309,11 @@
 }
 .main-content .transaction-table table > tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+.main-content .transaction-table table > tr:hover {
+  background-color: rgba(217, 217, 217, 0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 .main-content .transaction-table table tr td > .many-items {
   width: 100%;
@@ -372,7 +380,7 @@
   margin-right: 0.5rem;
   flex-shrink: 0;
   border: 1px solid var(--border-gray);
-  background-color: transparent;
+  background-color: #f5f5f5;
 }
 .main-content .transaction-table .student-transaction tr > th:nth-child(1) {
   width: 60%;

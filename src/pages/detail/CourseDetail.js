@@ -278,6 +278,12 @@ const CourseDetail = (props) => {
       }, 0)
     : 0;
 
+  const countTests = (tests) => {
+    return tests.filter(
+      (test) => test.isPublish === true || test.isPublish === null
+    ).length;
+  };
+
   const getCourseStatus = (course) => {
     const currentDate = new Date();
     const registStart = new Date(course.registStartDate);
@@ -491,33 +497,39 @@ const CourseDetail = (props) => {
                         : ""
                     }`}
                   </span>
-                  {idRole === Role.centerAdmin && (
-                    <div className="setting-course">
-                      <div className="buttons-container">
-                        <button
-                          className="edit"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate("/updateCourse", {
-                              state: {
-                                idCourse: courseInfo.idCourse,
-                                hasStudent:
-                                  courseInfo.studentCount > 0 ? true : false,
-                              },
-                            });
-                          }}
-                        >
-                          <LuPenLine />
-                        </button>
-                        <button
-                          className="remove"
-                          onClick={() => openRemoveModal()}
-                        >
-                          <LuTrash2 />
-                        </button>
+                  {idRole === Role.centerAdmin ||
+                    (idRole === Role.platformAdmin && (
+                      <div className="setting-course">
+                        <div className="buttons-container">
+                          {idRole === Role.centerAdmin && (
+                            <button
+                              className="edit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate("/updateCourse", {
+                                  state: {
+                                    idCourse: courseInfo.idCourse,
+                                    hasStudent:
+                                      courseInfo.studentCount > 0
+                                        ? true
+                                        : false,
+                                  },
+                                });
+                              }}
+                            >
+                              <LuPenLine />
+                            </button>
+                          )}
+
+                          <button
+                            className="remove"
+                            onClick={() => openRemoveModal()}
+                          >
+                            <LuTrash2 />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ))}
                 </>
               )}
             </div>
@@ -1004,8 +1016,8 @@ const CourseDetail = (props) => {
                   <span className="block-container-title">Tests</span>
                   <span className="block-container-sub-title">
                     {courseInfo.tests
-                      ? `${courseInfo.tests.length} ${
-                          courseInfo.tests.length > 1 ? "tests" : "test"
+                      ? `${countTests(courseInfo.tests)} ${
+                          countTests(courseInfo.tests) > 1 ? "tests" : "test"
                         }`
                       : "0 test"}{" "}
                   </span>
@@ -1094,79 +1106,73 @@ const CourseDetail = (props) => {
           </>
         ) : null}
       </div>
-      <div>
-        <DiagBuyCourseConfirmation
-          isOpen={isBuying}
-          onClose={() => setIsBuying(false)}
-          idCourse={courseInfo.idCourse}
-          status={courseInfo.discountedPrice || courseInfo.price ? 2 : 1}
-          paymentData={{
-            amount: courseInfo.discountedPrice
-              ? courseInfo.discountedPrice
-              : courseInfo.price,
-            idStudent: idUser,
-            idCourse: courseInfo.idCourse,
-          }}
-          setIsEnrolledCourse={setIsEnrolledCourse}
-        />
-      </div>
 
-      <div>
-        <DiagDeleteConfirmation
-          isOpen={isRemoved}
-          onClose={() => {
-            setIsRemoved(false);
-            if (reviewRemoved) setReviewRemoved(null);
-            if (idNotiRemoved) setIdNotiRemoved(null);
-          }}
-          object={
-            reviewRemoved
-              ? {
-                  id: reviewRemoved,
-                  name: "review",
-                  message: "Are you sure to delete this review?",
-                }
-              : idNotiRemoved
-              ? {
-                  id: idNotiRemoved,
-                  name: "notificationBoard",
-                  message: "Are you sure to delete this notification?",
-                }
-              : {
-                  id: idSection,
-                  name: "section",
-                  message: "Are you sure to delete this section?",
-                }
-          }
-          fetchData={() =>
-            reviewRemoved
-              ? fetchReviews(courseInfo.idCourse)
-              : idNotiRemoved
-              ? fetchNotificationBoard(courseInfo.idCourse)
-              : fetchCourseContentStructure(courseInfo.idCourse)
-          }
-        />
-      </div>
-      <div>
-        <DiagDeleteConfirmation
-          isOpen={isModalRemoveOpen}
-          onClose={closeRemoveModal}
-          object={{
-            id: courseInfo.idCourse,
-            name: "course",
-          }}
-        />
-      </div>
+      <DiagBuyCourseConfirmation
+        isOpen={isBuying}
+        onClose={() => setIsBuying(false)}
+        idCourse={courseInfo.idCourse}
+        status={courseInfo.discountedPrice || courseInfo.price ? 2 : 1}
+        paymentData={{
+          amount: courseInfo.discountedPrice
+            ? courseInfo.discountedPrice
+            : courseInfo.price,
+          idStudent: idUser,
+          idCourse: courseInfo.idCourse,
+        }}
+        setIsEnrolledCourse={setIsEnrolledCourse}
+      />
 
-      <div>
-        <DiagSuccessfully
-          isOpen={isModalSuccessOpen}
-          onClose={closeSuccessModal}
-          notification={
-            "Congratulations! You have successfully enrolled in the course."
-          }
-        />
-      </div>
+      <DiagDeleteConfirmation
+        isOpen={isRemoved}
+        onClose={() => {
+          setIsRemoved(false);
+          if (reviewRemoved) setReviewRemoved(null);
+          if (idNotiRemoved) setIdNotiRemoved(null);
+        }}
+        object={
+          reviewRemoved
+            ? {
+                id: reviewRemoved,
+                name: "review",
+                message: "Are you sure to delete this review?",
+              }
+            : idNotiRemoved
+            ? {
+                id: idNotiRemoved,
+                name: "notificationBoard",
+                message: "Are you sure to delete this notification?",
+              }
+            : {
+                id: idSection,
+                name: "section",
+                message: "Are you sure to delete this section?",
+              }
+        }
+        fetchData={() =>
+          reviewRemoved
+            ? fetchReviews(courseInfo.idCourse)
+            : idNotiRemoved
+            ? fetchNotificationBoard(courseInfo.idCourse)
+            : fetchCourseContentStructure(courseInfo.idCourse)
+        }
+      />
+
+      <DiagDeleteConfirmation
+        isOpen={isModalRemoveOpen}
+        onClose={closeRemoveModal}
+        object={{
+          id: courseInfo.idCourse,
+          name: "course",
+        }}
+      />
+
+      <DiagSuccessfully
+        isOpen={isModalSuccessOpen}
+        onClose={closeSuccessModal}
+        notification={
+          "Congratulations! You have successfully enrolled in the course."
+        }
+      />
     </div>
   );
 };

@@ -85,9 +85,15 @@ const CourseMgmt = (props) => {
       }
 
       if (response.status === APIStatus.success) {
-        const sortList = response.data.sort(
-          (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
-        );
+        let sortList;
+        if (role === Role.student)
+          sortList = response.data.sort(
+            (a, b) => new Date(b.enrolmentDate) - new Date(a.enrolmentDate)
+          );
+        else
+          sortList = response.data.sort(
+            (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+          );
         setCourseList(sortList);
         setCurrentCourses(sortList);
       } else {
@@ -196,7 +202,7 @@ const CourseMgmt = (props) => {
   );
 
   const paginationNumbers = getPagination(
-    currentPage.coursePage,
+    currentPage,
     Math.ceil(currentCourses.length / itemsPerPage)
   );
 

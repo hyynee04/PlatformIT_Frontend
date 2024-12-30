@@ -17,6 +17,7 @@ const DiagBuyCourseConfirmation = ({
   const idUser = +localStorage.getItem("idUser");
   const [loading, setLoading] = useState(false);
   const [isSucceeded, setIsSucceeded] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
 
   const handleBuyCourse = async () => {
     setLoading(true);
@@ -27,12 +28,14 @@ const DiagBuyCourseConfirmation = ({
           setIsSucceeded(true);
         } else {
           console.error(response.data);
+          setIsFailed(true);
         }
       } else {
         navigate("/login");
       }
     } catch (error) {
       console.error("Error posting data: ", error);
+      setIsFailed(true);
     } finally {
       setLoading(false);
     }
@@ -57,30 +60,55 @@ const DiagBuyCourseConfirmation = ({
         className="modal-container slide-to-bottom"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="diag-header">
+        <div
+          className="diag-header"
+          style={{
+            backgroundColor: isFailed
+              ? "var(--red-color)"
+              : "var(--main-color)",
+          }}
+        >
           <div className="container-title">
-            <LuCheckCheck className="diag-icon" />
+            {!isFailed ? (
+              <LuCheckCheck className="diag-icon" />
+            ) : (
+              <LuX className="diag-icon" />
+            )}
             <span className="diag-title">
-              {isSucceeded ? "Successfully" : "Buy Confirmation"}
+              {isSucceeded
+                ? "Successfully"
+                : isFailed
+                ? "Error"
+                : "Buy Confirmation"}
             </span>
           </div>
-          <LuX className="diag-icon" onClick={onClose} />
         </div>
         <div className="diag-body">
           <span>
             {isSucceeded
               ? "Buy successfully"
+              : isFailed
+              ? "Something went wrong"
               : "Are you sure to buy this course?"}
           </span>
           <div className="str-btns">
             <div className="act-btns">
-              {isSucceeded ? (
+              {isSucceeded || isFailed ? (
                 <button
                   className="btn diag-btn signout"
+                  style={{
+                    backgroundColor: isFailed
+                      ? "var(--red-color)"
+                      : "var(--main-color)",
+                  }}
                   onClick={() => {
                     onClose();
-                    setIsEnrolledCourse(true);
-                    setIsSucceeded(false);
+                    if (isSucceeded) {
+                      setIsEnrolledCourse(true);
+                      setIsSucceeded(false);
+                    } else {
+                      setIsFailed(false);
+                    }
                   }}
                 >
                   OK

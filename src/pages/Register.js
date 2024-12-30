@@ -171,16 +171,30 @@ const Register = () => {
 
   const handleRegister = async (formData) => {
     setLoading(true);
+    let response;
     try {
-      let response = await postRegister(
-        formData.fullName,
-        formData.email,
-        formData.username,
-        formData.password,
-        formData.centerName,
-        formData.centerDescription,
-        formData.TIN
-      );
+      if (formData.isChecked) {
+        response = await postRegister(
+          formData.fullName,
+          formData.email,
+          formData.username,
+          formData.password,
+          formData.centerName,
+          formData.centerDescription,
+          formData.TIN
+        );
+      } else {
+        response = await postRegister(
+          formData.fullName,
+          formData.email,
+          formData.username,
+          formData.password,
+          "",
+          "",
+          ""
+        );
+      }
+
       let data = response.data;
       if (response.status === APIStatus.success) {
         localStorage.removeItem("verifiedEmail");

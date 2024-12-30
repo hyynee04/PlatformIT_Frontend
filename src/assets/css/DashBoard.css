@@ -260,14 +260,17 @@ table tr > .user-row {
   aspect-ratio: 1;
 }
 .dashboard-container .right-section > .section-block.teacher-ranking {
-  flex: 1;
+  /* flex: 1; */
   margin-top: 1.5rem;
   flex-direction: column;
   gap: 1rem;
+  height: 430px;
+  overflow: hidden;
 }
 .dashboard-container .right-section .teacher-ranking > .teacher-ranking-table {
   flex: 1;
   padding: 0 0.5rem;
+  overflow: hidden;
   overflow-y: auto;
 }
 .teacher-ranking .teacher-ranking-table > table {
@@ -282,6 +285,7 @@ table tr > .user-row {
 .teacher-ranking .teacher-ranking-table table tr > td {
   color: var(--black-color);
   font-weight: 400;
+  padding: 11px 8px;
 }
 /* .teacher-ranking-table table tr > th:nth-child(1) {
   width: 10%;
@@ -478,4 +482,34 @@ table tr > .user-row {
   bottom: 10px;
   right: 0;
   color: var(--red-color);
+}
+
+.dashboard-container
+  .right-section
+  .teacher-ranking
+  > .teacher-ranking-table::-webkit-scrollbar {
+  width: 6px; /* Set the scrollbar width */
+}
+
+.dashboard-container
+  .right-section
+  .teacher-ranking
+  > .teacher-ranking-table::-webkit-scrollbar-track {
+  background: var(--border-gray); /* Background color of the scrollbar track */
+}
+
+.dashboard-container
+  .right-section
+  .teacher-ranking
+  > .teacher-ranking-table::-webkit-scrollbar-thumb {
+  background-color: var(--text-gray); /* Scrollbar thumb color */
+  border-radius: 4px; /* Rounded corners for a flatter look */
+  cursor: grab;
+}
+
+.dashboard-container
+  .right-section
+  .teacher-ranking
+  > .teacher-ranking-table::-webkit-scrollbar-thumb:active {
+  cursor: grabbing; /* Changes cursor when thumb is clicked and held */
 }

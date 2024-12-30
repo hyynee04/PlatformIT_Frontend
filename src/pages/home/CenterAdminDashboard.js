@@ -115,28 +115,19 @@ const CenterAdminDashboard = () => {
                 <th>Date Time</th>
                 <th>Cost</th>
               </tr>
-              <tr>
-                <td className="user-row">
-                  <div className="avatar-container">
-                    <img src={default_ava} alt="avatar" />
-                  </div>
-                  <span>Ken Adams</span>
-                </td>
-                <td>Advanced Node.JS</td>
-                <td>10/20/2024, 22:30</td>
-                <td>300.000.000đ</td>
-              </tr>
-              <tr>
-                <td className="user-row">
-                  <div className="avatar-container">
-                    <img src={default_ava} alt="avatar" />
-                  </div>
-                  <span>Ken Adams</span>
-                </td>
-                <td>Advanced Node.JS</td>
-                <td>10/20/2024, 22:30</td>
-                <td>300.000đ</td>
-              </tr>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <tr>
+                  <td className="user-row">
+                    <div className="avatar-container">
+                      <img src={default_ava} alt="avatar" />
+                    </div>
+                    <span>Ken Adams</span>
+                  </td>
+                  <td>Advanced Node.JS</td>
+                  <td>10/20/2024, 22:30</td>
+                  <td>300.000.000đ</td>
+                </tr>
+              ))}
             </table>
           </div>
         </div>
@@ -187,33 +178,17 @@ const CenterAdminDashboard = () => {
                 <th></th>
                 <th>Total courses</th>
               </tr>
-              <tr>
-                <td className="user-row">
-                  <div className="avatar-container">
-                    <img src={default_ava} alt="avatar" />
-                  </div>
-                  <span>Duc Huy</span>
-                </td>
-                <td>600</td>
-              </tr>
-              <tr>
-                <td className="user-row">
-                  <div className="avatar-container">
-                    <img src={default_ava} alt="avatar" />
-                  </div>
-                  <span>Tuong Vy</span>
-                </td>
-                <td>400</td>
-              </tr>
-              <tr>
-                <td className="user-row">
-                  <div className="avatar-container">
-                    <img src={default_ava} alt="avatar" />
-                  </div>
-                  <span>Nhat Ha</span>
-                </td>
-                <td>500</td>
-              </tr>
+              {Array.from({ length: 10 }).map((_, index) => (
+                <tr>
+                  <td className="user-row">
+                    <div className="avatar-container">
+                      <img src={default_ava} alt="avatar" />
+                    </div>
+                    <span>Duc Huy</span>
+                  </td>
+                  <td>600</td>
+                </tr>
+              ))}
             </table>
           </div>
         </div>

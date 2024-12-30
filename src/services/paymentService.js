@@ -10,5 +10,19 @@ const getPayment = (paymentData) => {
     maxRedirects: 0,
   });
 };
+const getAllPaymentOfStudent = (idStudent) => {
+  return axios.get("api/Payment/GetAllPaymentOfStudent", {
+    params: {
+      idStudent: idStudent,
+    },
+  });
+};
+const getAllPaymentOfCenter = (idCenter) => {
+  return axios.get("api/Payment/GetAllPaymentOfCenter", {
+    params: {
+      idCenter: idCenter,
+    },
+  });
+};
 
-export { getPayment };
+export { getPayment, getAllPaymentOfStudent, getAllPaymentOfCenter };

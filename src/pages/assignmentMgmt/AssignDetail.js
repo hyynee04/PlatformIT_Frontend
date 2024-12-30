@@ -4,10 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   getAssignmentAnswer,
   getAssignmentInfo,
+  getCanDoAssignment,
   getCodeAssignmentResult,
   getDetailAssignmentForStudent,
   getOverviewAssignment,
   getViewCodeAssignment,
+  postDoingTest,
   postUpdateAssignment,
 } from "../../services/assignmentService";
 import {
@@ -42,6 +44,7 @@ import default_ava from "../../assets/img/default_ava.png";
 import "../../assets/css/AssignmentDetail.css";
 import AnswerSheet from "../../components/assigment/AnswerSheet";
 import RunCode from "../../components/assigment/RunCode";
+import DiagNotiWarning from "../../components/diag/DiagNotiWarning";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -416,22 +419,39 @@ const AssignDetail = () => {
   };
 
   //DO ASSIGNMENT
+  const [isModalInvalidOpen, setIsModalInvalidOpen] = useState(false);
+
+  const openInvalidModal = () => setIsModalInvalidOpen(true);
+  const closeInvalidModal = () => setIsModalInvalidOpen(false);
+  const handleOpenInvalidDiag = () => {
+    openInvalidModal();
+  };
+  const handleCanDoTest = async () => {
+    let response = await getCanDoAssignment(
+      assignmentInfo.idAssignment,
+      Number(localStorage.getItem("idUser"))
+    );
+    if (response.status === APIStatus.success) {
+      if (response.data === true) handleOpenStartAssign();
+      else handleOpenInvalidDiag();
+    }
+  };
 
   const handleOpenStartAssign = () => {
     setDiagStartAssign(true);
   };
-  const handleOpenNewTab = () => {
-    // Mở một tab mới với URL và truyền tham số qua query string hoặc state
-    const url = "/startAssignment"; // Đường dẫn của trang muốn mở
-    const options = "noopener,noreferrer"; // Các tùy chọn cho cửa sổ mới (không cho phép điều hướng, reload)
-
-    // Mở một cửa sổ/tab mới với URL và các tùy chọn trên
-    const newTab = window.open(url, "_blank", options);
-
-    // Gửi state qua query string (hoặc sử dụng localStorage/sessionStorage nếu muốn lưu trạng thái giữa các tab)
-    newTab.onload = () => {
-      newTab.localStorage.setItem("idAssignment", assignmentInfo.idAssignment);
-    };
+  const handleDoingTest = async () => {
+    try {
+      const response = await postDoingTest(
+        assignmentInfo.idAssignment,
+        Number(localStorage.getItem("idUser"))
+      );
+      if (response.status === APIStatus.success) {
+        return true;
+      }
+    } catch (error) {
+      throw error;
+    }
   };
   //NOTICE NOT SUBMITTED
 
@@ -673,7 +693,7 @@ const AssignDetail = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   if (assignmentInfo.isTest === 1) {
-                    handleOpenStartAssign();
+                    handleCanDoTest();
                   } else {
                     navigate("/startAssignment", {
                       state: {
@@ -1809,22 +1829,8 @@ const AssignDetail = () => {
                   ) && (
                     <button
                       className="btn diag-btn signout"
-                      // onClick={() =>
-                      //   navigate("/startAssignment", {
-                      //     state: {
-                      //       idAssignment: assignmentInfo.idAssignment,
-                      //     },
-                      //   })
-                      // }
-                      // onClick={() => handleOpenNewTab()}
                       onClick={() => {
-                        if (assignmentInfo?.isTest === 0) {
-                          navigate("/startAssignment", {
-                            state: {
-                              idAssignment: assignmentInfo.idAssignment,
-                            },
-                          });
-                        } else if (
+                        if (
                           startAssignmentWindow &&
                           !startAssignmentWindow.closed
                         ) {
@@ -1835,7 +1841,7 @@ const AssignDetail = () => {
                           "_blank",
                           "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=800,height=600"
                         );
-
+                        handleDoingTest();
                         setStartAssignmentWindow(newWindow);
                       }}
                     >
@@ -1884,6 +1890,12 @@ const AssignDetail = () => {
           </div>
         </div>
       )}
+      <DiagNotiWarning
+        isOpen={isModalInvalidOpen}
+        onClose={closeInvalidModal}
+        invalidHeader={"Notification"}
+        invalidMsg={"You have already done this assignment."}
+      />
     </div>
   );
   function changeCPage(id) {

@@ -274,6 +274,7 @@ const Header = () => {
                 <button
                   className="circle-buts"
                   onClick={() => openSignoutModal()}
+                  title="Sign out"
                 >
                   <LuLogOut className="header-icon" />
                 </button>
@@ -287,6 +288,7 @@ const Header = () => {
                         activeButton === "message" ? "clicked" : ""
                       }`}
                       onClick={() => handleButtonClick("message")}
+                      title="Chat"
                     >
                       <LuMessageCircle className="header-icon" />
                     </button>
@@ -306,6 +308,7 @@ const Header = () => {
                           : ""
                       }`}
                       onClick={() => handleButtonClick("clipboard")}
+                      title="Task on pending"
                     >
                       <LuClipboardCheck className="header-icon" />
                     </button>
@@ -323,6 +326,7 @@ const Header = () => {
                   onClick={() => {
                     setIsNotificationOpen(!isNotificationOpen);
                   }}
+                  title="Notifications"
                 >
                   <LuBell className="header-icon" />
                 </button>

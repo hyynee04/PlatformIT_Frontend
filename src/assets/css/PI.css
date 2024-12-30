@@ -697,12 +697,13 @@
 }
 .teacher-list-dropdown {
   display: flex;
-
   flex-direction: column;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
 }
 .teacher-list-dropdown {
   position: absolute;
+  top: 84px;
+  left: 232px;
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;

@@ -236,7 +236,7 @@ const postAddCodeAssignment = async (requestData) => {
     endDate: requestData.endDate || null,
     isTest: requestData.isTest ? 1 : 0,
     isPublish: requestData.isPublish ? 1 : 0,
-    isShowTestcase: requestData.isShowTestCase ? 1 : 0,
+    isShowTestcase: requestData.isShowTestcase ? 1 : 0,
     isAllowRunCode: requestData.isAllowRunCode ? 1 : 0,
     isPassTestCase: requestData.isPassTestCase ? 1 : 0,
     isPerformanceOnMemory: requestData.isPerformanceOnMemory ? 1 : 0,
@@ -406,6 +406,27 @@ const postUpdateCodeAssignment = async (requestData) => {
   );
 };
 
+const getCanDoAssignment = async (idAssignment, idStudent) => {
+  return await axios.get("api/Assignment/CanDoAssignment", {
+    params: {
+      idAssignment: idAssignment,
+      idStudent: idStudent,
+    },
+  });
+};
+const postDoingTest = async (idAssignment, idStudent) => {
+  try {
+    return await axios.post("api/Assignment/DoingAssignment", null, {
+      params: {
+        idAssignment: idAssignment,
+        idStudent: idStudent,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const postSubmitQuizAssignment = async (requestData) => {
   requestData.submittedDate = requestData.submittedDate.split("+")[0];
   try {
@@ -537,6 +558,8 @@ export {
   postPublishAssignment,
   postUpdateAssignment,
   postUpdateCodeAssignment,
+  getCanDoAssignment,
+  postDoingTest,
   postSubmitQuizAssignment,
   postSubmitManualQuestion,
   postSubmitCodeAssignment,

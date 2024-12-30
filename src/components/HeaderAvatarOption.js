@@ -20,7 +20,8 @@ const HeaderAvatarOption = ({ isOpen, onClose, optionButtonRef }) => {
       if (
         optionBoxRef.current &&
         !optionBoxRef.current.contains(event.target) &&
-        (!optionButtonRef.current || !optionButtonRef.current.contains(event.target))
+        (!optionButtonRef.current ||
+          !optionButtonRef.current.contains(event.target))
       ) {
         onClose();
       }
@@ -47,13 +48,11 @@ const HeaderAvatarOption = ({ isOpen, onClose, optionButtonRef }) => {
         )}
       </>
     );
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div>
-      <div
-        ref={optionBoxRef}
-        className="container-options headerOption">
+      <div ref={optionBoxRef} className="container-options headerOption">
         <button
           className="op-buts"
           onClick={() => {
@@ -63,9 +62,15 @@ const HeaderAvatarOption = ({ isOpen, onClose, optionButtonRef }) => {
         >
           <span>View Profile</span>
         </button>
-        {idRole === Role.student && (
-          <button className="op-buts" onClick={onClose}>
-            <span>Payment History</span>
+        {(idRole === Role.student || idRole === Role.centerAdmin) && (
+          <button
+            className="op-buts"
+            onClick={() => {
+              navigate("/transaction");
+              onClose();
+            }}
+          >
+            <span>Transaction history</span>
           </button>
         )}
 

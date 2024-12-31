@@ -165,8 +165,7 @@ const Login = () => {
     // submit email
     let response = await postForgotPassword(email);
     let data = response.data;
-    console.log(">>> Check register: ", data);
-    if (response.status !== APIStatus.success) {
+    if (data.status !== APIStatus.success) {
       setIsValid(false);
       return;
     } else {

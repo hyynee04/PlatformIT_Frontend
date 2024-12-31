@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../assets/css/DashBoard.css";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import { RiBook2Fill, RiHourglassFill, RiInfinityFill } from "react-icons/ri";
@@ -13,44 +13,99 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getCenterDashboardStatistics } from "../../services/statisticsService";
+import { APIStatus } from "../../constants/constants";
+import { getAllPaymentOfCenter } from "../../services/paymentService";
+import { ImSpinner2 } from "react-icons/im";
+import { formatDateTime } from "../../functions/function";
 
 // Register necessary chart components
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const CenterAdminDashboard = () => {
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "June",
-    "July",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const currentMonthIndex = new Date().getMonth();
+  const [loading, setLoading] = useState(false);
+  const idCenter = +localStorage.getItem("idCenter");
 
+  const [dashboard, setDashboard] = useState({});
+  const [paymentList, setPaymentList] = useState([]);
+  const [labelList, setLabelList] = useState([]);
+  const [revenueList, setRevenueList] = useState([]);
   const [data, setData] = useState({
-    labels: months,
+    labels: [],
     datasets: [
       {
-        data: [65, 59, 80, 81, 56, 55, 65, 59, 80, 81, 56, 55],
-        // backgroundColor: ["rgba(217, 217, 217, 1)"],
-        backgroundColor: months.map(
-          (_, index) =>
-            index === currentMonthIndex
-              ? "rgba(57, 121, 121, 1)" // Highlight current month
-              : "rgba(217, 217, 217, 1)" // Default color
-        ),
+        data: [],
+        backgroundColor: ["rgba(217, 217, 217, 1)"],
+        backgroundColor: [],
         borderRadius: 8, // Rounded corners for the bars
         barThickness: 45, // Custom bar width
       },
     ],
   });
+
+  const fetchCenterDashboardStatistics = async () => {
+    setLoading(true);
+    try {
+      const respone = await getCenterDashboardStatistics(idCenter);
+      if (respone.status === APIStatus.success) {
+        setDashboard(respone.data);
+        setLabelList(
+          respone.data.paymentByTime?.map(
+            (item) => `${item.month}/${item.year}`
+          )
+        );
+        setRevenueList(
+          respone.data.paymentByTime?.map((item) => item.totalPayment)
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPayment = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllPaymentOfCenter(idCenter);
+      if (response.status === APIStatus.success) {
+        const cutList = response.data
+          ?.sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate))
+          .slice(0, 8);
+
+        setPaymentList(cutList);
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCenterDashboardStatistics();
+    fetchPayment();
+  }, []);
+
+  useEffect(() => {
+    setData({
+      ...data,
+      labels: labelList,
+      datasets: [
+        {
+          ...data.datasets[0],
+          data: revenueList,
+          backgroundColor: revenueList?.map(
+            (_, index) =>
+              index === revenueList.length - 1
+                ? "rgba(57, 121, 121, 1)" // Highlight the last item
+                : "rgba(217, 217, 217, 1)" // Default color for other items
+          ),
+        },
+      ],
+    });
+  }, [labelList, revenueList]);
 
   const [options, setOptions] = useState({
     responsive: true,
@@ -71,7 +126,7 @@ const CenterAdminDashboard = () => {
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 25,
+          stepSize: 500000,
         },
         grid: {
           borderDash: [3, 3], // Dashed horizontal lines
@@ -80,6 +135,13 @@ const CenterAdminDashboard = () => {
       },
     },
   });
+  if (loading) {
+    return (
+      <div className="loading-page">
+        <ImSpinner2 color="#397979" />
+      </div>
+    ); // Show loading while waiting for API response
+  }
 
   return (
     <div className="dashboard-container admin-center">
@@ -91,12 +153,29 @@ const CenterAdminDashboard = () => {
               <label>Avg per month</label>
               <div className="statistics-number">
                 <div className="main-number">
-                  <span>44.567</span>
+                  <span>
+                    {dashboard.averagePayment
+                      ?.toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                  </span>
                   <span className="currency">đ</span>
                 </div>
                 <div className="swing-number increase">
-                  <span>16.45%</span>
-                  <IoMdArrowDropup />
+                  <span
+                    style={{
+                      color:
+                        dashboard.paymentDiffPercentage >= 0
+                          ? "var(--main-color)"
+                          : "var(--red-color)",
+                    }}
+                  >
+                    {`${dashboard.paymentDiffPercentage?.toFixed(1)}`}%
+                  </span>
+                  {dashboard.paymentDiffPercentage > 0 ? (
+                    <IoMdArrowDropup />
+                  ) : dashboard.paymentDiffPercentage < 0 ? (
+                    <IoMdArrowDropdown />
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -109,25 +188,35 @@ const CenterAdminDashboard = () => {
           <label className="section-title">Transactions</label>
           <div className="transaction-table">
             <table>
-              <tr className="header-row">
-                <th>Student</th>
-                <th>Course</th>
-                <th>Date Time</th>
-                <th>Cost</th>
-              </tr>
-              {Array.from({ length: 8 }).map((_, index) => (
-                <tr>
-                  <td className="user-row">
-                    <div className="avatar-container">
-                      <img src={default_ava} alt="avatar" />
-                    </div>
-                    <span>Ken Adams</span>
-                  </td>
-                  <td>Advanced Node.JS</td>
-                  <td>10/20/2024, 22:30</td>
-                  <td>300.000.000đ</td>
+              <thead>
+                <tr className="header-row">
+                  <th>Student</th>
+                  <th>Course</th>
+                  <th>Date Time</th>
+                  <th>Cost</th>
                 </tr>
-              ))}
+              </thead>
+              <tbody>
+                {paymentList?.length > 0 &&
+                  paymentList.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="user-row">
+                        <div className="avatar-container">
+                          <img
+                            src={payment.studdentAvatar || default_ava}
+                            alt="avatar"
+                          />
+                        </div>
+                        <span title={payment.studentName}>
+                          {payment.studentName}
+                        </span>
+                      </td>
+                      <td title={payment.courseName}>{payment.courseName}</td>
+                      <td>{formatDateTime(payment.paymentDate)}</td>
+                      <td>300.000.000đ</td>
+                    </tr>
+                  ))}
+              </tbody>
             </table>
           </div>
         </div>
@@ -139,13 +228,13 @@ const CenterAdminDashboard = () => {
           </div>
           <div className="total-info">
             <label>Total students</label>
-            <span>666.000</span>
+            <span>{dashboard.totalStudents}</span>
           </div>
         </div>
         <div className="section-block total-course">
           <div className="total-info">
             <label>Total courses</label>
-            <span>254</span>
+            <span>{dashboard.totalCourses}</span>
           </div>
           <div className="course-statistics">
             <div className="course-type">
@@ -154,7 +243,7 @@ const CenterAdminDashboard = () => {
                 <RiInfinityFill className="svg-small infinite" />
               </div>
               <div className="total-info" style={{ marginBottom: "8px" }}>
-                <span>254</span>
+                <span>{dashboard.totalUnlimitedCourses}</span>
                 <label>Unlimited courses</label>
               </div>
             </div>
@@ -164,8 +253,8 @@ const CenterAdminDashboard = () => {
                 <RiHourglassFill className="svg-small hour-glass" />
               </div>
               <div className="total-info" style={{ marginBottom: "8px" }}>
-                <span>254</span>
-                <label>Limited courses</label>
+                <span>{dashboard.totalLimitedCourses}</span>
+                <label>Limit courses</label>
               </div>
             </div>
           </div>
@@ -174,21 +263,32 @@ const CenterAdminDashboard = () => {
           <label className="section-title">Teacher courses</label>
           <div className="teacher-ranking-table">
             <table>
-              <tr className="header-row">
-                <th></th>
-                <th>Total courses</th>
-              </tr>
-              {Array.from({ length: 10 }).map((_, index) => (
-                <tr>
-                  <td className="user-row">
-                    <div className="avatar-container">
-                      <img src={default_ava} alt="avatar" />
-                    </div>
-                    <span>Duc Huy</span>
-                  </td>
-                  <td>600</td>
+              <thead>
+                <tr className="header-row">
+                  <th></th>
+                  <th>Total courses</th>
                 </tr>
-              ))}
+              </thead>
+
+              <tbody>
+                {dashboard.teacherRanking?.length > 0 &&
+                  dashboard.teacherRanking.map((teacher, index) => (
+                    <tr key={index}>
+                      <td className="user-row">
+                        <div className="avatar-container">
+                          <img
+                            src={teacher.teacherAvatar || default_ava}
+                            alt="avatar"
+                          />
+                        </div>
+                        <span title={teacher.teacherName}>
+                          {teacher.teacherName}
+                        </span>
+                      </td>
+                      <td>{teacher.totalCourses}</td>
+                    </tr>
+                  ))}
+              </tbody>
             </table>
           </div>
         </div>

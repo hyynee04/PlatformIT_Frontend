@@ -1,6 +1,10 @@
 import default_ava from "../assets/img/default_ava.png";
 import default_image from "../assets/img/default_image.png";
-import { APIStatus, NotificationType } from "../constants/constants";
+import {
+  APIStatus,
+  LectureStatus,
+  NotificationType,
+} from "../constants/constants";
 import { getLectureInfoForCmtNoti } from "../services/courseService";
 
 export const getPagination = (currentPage, totalPages) => {
@@ -143,11 +147,16 @@ export const formatDuration = (seconds) => {
 };
 export const handleNotificationNavigate = async (notification, navigate) => {
   let idCourse;
-  if (notification.idComment) {
+  let sectionName = "";
+  if (
+    notification.notificationType === NotificationType.comment ||
+    notification.notificationType === NotificationType.lecture
+  ) {
     try {
       const respone = await getLectureInfoForCmtNoti(notification.idLecture);
       if (respone.status === APIStatus.success) {
         idCourse = respone.data.idCourse;
+        sectionName = respone.data.nameSection;
       } else {
         console.error(Response.data);
       }
@@ -189,6 +198,24 @@ export const handleNotificationNavigate = async (notification, navigate) => {
         idComment: notification.idComment,
       },
     });
+  } else if (notification.notificationType === NotificationType.lecture) {
+    if (notification.content.toLowerCase().includes("approved")) {
+      navigate("/viewLecture", {
+        state: {
+          idLecture: notification.idLecture,
+          idCourse: notification.idCourse,
+        },
+      });
+    } else {
+      navigate("/addNewLecture", {
+        state: {
+          idLecture: notification.idLecture,
+          lectureStatus: LectureStatus.rejected,
+          sectionName: sectionName,
+          from: "notification",
+        },
+      });
+    }
   }
 };
 

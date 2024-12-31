@@ -213,7 +213,12 @@ const CenterAdminDashboard = () => {
                       </td>
                       <td title={payment.courseName}>{payment.courseName}</td>
                       <td>{formatDateTime(payment.paymentDate)}</td>
-                      <td>300.000.000đ</td>
+                      <td>
+                        {payment.price
+                          ?.toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                        đ
+                      </td>
                     </tr>
                   ))}
               </tbody>

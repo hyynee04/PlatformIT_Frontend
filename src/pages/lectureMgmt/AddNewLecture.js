@@ -30,6 +30,8 @@ const AddNewLecture = () => {
   const [isSucceeded, setIsSucceeded] = useState(false);
   const [isRemoved, setIsRemoved] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [fromNotification, setFromNotification] = useState(false);
+  const [reason, setReason] = useState("");
   const [errorList, setErrorList] = useState({
     0: "",
     1: "Missing section name!",
@@ -150,6 +152,7 @@ const AddNewLecture = () => {
               : null,
           SupportMaterials: response.data.supportMaterials,
         });
+        setReason(response.data.reason);
         setCourseTitle(response.data.courseTitle);
       } else console.error("Message: ", response.data);
     } catch (error) {
@@ -174,6 +177,9 @@ const AddNewLecture = () => {
         setCourseTitle(state.courseTitle);
       }
       setSectionName(state.sectionName);
+      if (state.from === "notification") {
+        setFromNotification(true);
+      }
     }
   }, [location.state]);
 
@@ -200,7 +206,20 @@ const AddNewLecture = () => {
         }`}
       >
         <div className="back-to-course">
-          <button onClick={() => navigate(-1)}>
+          <button
+            onClick={() => {
+              if (fromNotification) {
+                navigate("/courseDetail", {
+                  state: {
+                    idCourse: idList.idCourse,
+                    idUser: localStorage.getItem("idUser"),
+                    idRole: localStorage.getItem("idRole"),
+                    idSection: idList.idSection,
+                  },
+                });
+              } else navigate(-1);
+            }}
+          >
             <IoIosArrowBack />
           </button>
         </div>
@@ -223,7 +242,7 @@ const AddNewLecture = () => {
                   className="status-text rejected-color"
                   style={{ padding: "0" }}
                 >
-                  <GoAlertFill /> This lecture is rejected
+                  <GoAlertFill /> This lecture is rejected: {reason || ""}
                 </span>
               ) : null}
             </>

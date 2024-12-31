@@ -5,8 +5,16 @@ const FetchDataUpdated = (idUser, idLecture, object) => {
   const [updatedNotifications, setUpdatedNotifications] = useState([]);
   const [updatedUnreadCount, setUpdatedUnreadCount] = useState(0);
   const [updatedComments, setUpdatedComments] = useState([]);
+  const idUserBase = +localStorage.getItem("idUser");
 
   useEffect(() => {
+    if (!idUserBase) {
+      console.warn(
+        "idUserBase does not exist. SignalR connection will not start."
+      );
+      return;
+    }
+
     console.log("Attempting to connect to SignalR hub...");
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(
@@ -43,12 +51,11 @@ const FetchDataUpdated = (idUser, idLecture, object) => {
                 updateCommentsOfLecture
               );
 
-              // Update notifications and unread count
+              // Update comments
               setUpdatedComments(updateCommentsOfLecture);
             }
           );
         }
-        // Listen to 'UpdateNotifications' event
       } catch (error) {
         console.error("SignalR Connection Error:", error);
       }
@@ -67,7 +74,7 @@ const FetchDataUpdated = (idUser, idLecture, object) => {
       console.log("Stopping SignalR connection...");
       connection.stop().then(() => console.log("SignalR connection stopped."));
     };
-  }, [idUser]); // Dependency array ensures effect re-runs if idUser changes
+  }, [idUserBase]); // Dependency array ensures effect re-runs if these values change
 
   return object === "notification"
     ? {

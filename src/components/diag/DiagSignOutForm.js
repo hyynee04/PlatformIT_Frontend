@@ -6,6 +6,8 @@ import "../../assets/css/card/DiagForm.css";
 import { resetCenterPI } from "../../store/profileCenterSlice";
 import { resetUserPI } from "../../store/profileUserSlice";
 import { setActiveTypeOfTask } from "../../store/listTaskOfCenterAd";
+import { postLogout } from "../../services/authService";
+import { APIStatus } from "../../constants/constants";
 
 const DiagSignOutForm = ({
   isOpen,
@@ -15,14 +17,17 @@ const DiagSignOutForm = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleSignout = () => {
-    localStorage.clear();
-    dispatch(resetUserPI());
-    dispatch(resetCenterPI());
-    dispatch(setActiveTypeOfTask("lectures"));
-    resetUnreadCount();
-    resetNotifications();
-    navigate("/");
+  const handleSignout = async () => {
+    const response = await postLogout();
+    if (response.status === APIStatus.success) {
+      localStorage.clear();
+      dispatch(resetUserPI());
+      dispatch(resetCenterPI());
+      dispatch(setActiveTypeOfTask("lectures"));
+      resetUnreadCount();
+      resetNotifications();
+      navigate("/");
+    }
   };
   if (!isOpen) return null;
 

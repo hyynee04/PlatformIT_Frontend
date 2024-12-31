@@ -22,6 +22,7 @@ import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import { APIStatus, AssignmentType, Role } from "../../constants/constants";
 import {
+  convertToVietnamTime,
   formatDateTime,
   getVideoType,
   handleNavigateDetailStudent,
@@ -760,8 +761,10 @@ const LectureView = ({
                 lectureDetail.exercises.length > 0 &&
                 lectureDetail.exercises.map((exercise, index) => (
                   <>
-                    {(exercise.isPublish && idRole === Role.student) ||
-                    idRole === Role.teacher ? (
+                    {((exercise.isPublish && idRole === Role.student) ||
+                      idRole === Role.teacher) &&
+                    (!exercise.startDate ||
+                      new Date() >= new Date(exercise.startDate)) ? (
                       <div
                         key={`${exercise.idAssignment}-${index}`}
                         className="part-item exercise"
@@ -846,7 +849,7 @@ const LectureView = ({
                                 exercise.dueDate && (
                                   <div className="exercise-sideinfo">
                                     <span className="inform">
-                                      {formatDateTime(exercise.dueDate)}
+                                      {convertToVietnamTime(exercise.dueDate)}
                                     </span>
                                   </div>
                                 )

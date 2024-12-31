@@ -3,7 +3,7 @@ import { ImSpinner2 } from "react-icons/im";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { LuCheck, LuX } from "react-icons/lu";
 import { useLocation, useNavigate } from "react-router-dom";
-import { formatDateTime } from "../functions/function";
+import { convertToVietnamTime, formatDateTime } from "../functions/function";
 
 const TransactionResponse = () => {
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const TransactionResponse = () => {
             <div className="info-field">
               <label>Transaction time</label>
               <span>
-                {isSuccess === 0 ? "" : formatDateTime(TransactionTime)}
+                {isSuccess === 0 ? "" : convertToVietnamTime(TransactionTime)}
               </span>
             </div>
             <div className="info-field">

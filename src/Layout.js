@@ -365,14 +365,7 @@ const Layout = (props) => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/transactionResponse"
-          element={
-            <PrivateRoute>
-              <TransactionResponse />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/transactionResponse" element={<TransactionResponse />} />
         <Route path="/login-response" element={<LoginResponse />} />
 
         {/* <Route path='admin' element={<Admin />}>

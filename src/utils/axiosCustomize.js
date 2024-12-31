@@ -4,6 +4,7 @@ const instance = axios.create({
   // baseURL: "http://localhost:5000/",
   // baseURL: "http://27.71.227.212:5000/",
   baseURL: "https://myidvndut.id.vn:5000/",
+  withCredentials: true,
 });
 
 // Add a request interceptor

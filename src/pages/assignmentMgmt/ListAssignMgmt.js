@@ -118,7 +118,13 @@ const ListAssignMgmt = () => {
       } else if (idRole === Role.student) {
         let response = await getAllTestCardOfStudent();
         if (response.status === APIStatus.success) {
-          setListAssigment(response.data);
+          const filteredData = response.data.filter((assignment) => {
+            const currentDate = new Date();
+            console.log(currentDate);
+            const startDate = new Date(assignment.startDate);
+            return startDate <= currentDate;
+          });
+          setListAssigment(filteredData);
         }
       }
     } catch (error) {

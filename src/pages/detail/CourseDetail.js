@@ -249,7 +249,13 @@ const CourseDetail = (props) => {
       (sum, rate) => sum + rate.ratePoint,
       0
     );
-    return (totalPoints / rateModels.length).toFixed(1);
+
+    // Calculate the average and round it to 1 decimal place
+    const avg = totalPoints / rateModels.length;
+    const roundedAvg = Math.round(avg * 10) / 10; // Round to one decimal place
+
+    // If the decimal part is .0, return as an integer, else return the rounded value
+    return roundedAvg % 1 === 0 ? roundedAvg.toFixed(0) : roundedAvg.toFixed(1);
   };
 
   const readNotificationBoard = async (idCourse, idUser) => {

@@ -10,7 +10,7 @@ const FetchDataUpdated = (idUser, idLecture, object) => {
     console.log("Attempting to connect to SignalR hub...");
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(
-        `http://27.71.227.212:5000/notificationHub?userId=${idUser}&lectureId=${idLecture}`
+        `https://myidvndut.id.vn:5000/notificationHub?userId=${idUser}&lectureId=${idLecture}`
       )
       .configureLogging(signalR.LogLevel.Information)
       .build();

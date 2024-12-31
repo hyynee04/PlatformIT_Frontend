@@ -11,6 +11,7 @@ import { APIStatus, Role, UserStatus } from "../constants/constants";
 import { postLogin } from "../services/authService";
 import { postForgotPassword } from "../services/userService";
 import { ImSpinner2 } from "react-icons/im";
+import DiagForgotPassword from "../components/diag/DiagForgotPassword";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,13 +19,11 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isShowed, setIsShowed] = useState(false);
 
   const [isFailed, setIsFailed] = useState(false);
-  const [isValid, setIsValid] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -37,10 +36,6 @@ const Login = () => {
 
   const handleClose = () => setShow(false);
   const handleShow = () => {
-    const isValidEmail = validateEmail(username);
-    if (isValidEmail) {
-      setEmail(username);
-    }
     setShow(true);
   };
 
@@ -59,14 +54,6 @@ const Login = () => {
       setShowAlert(true);
     }
   }, [location.state]);
-
-  const validateEmail = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
 
   const handleAutoLogin = async (idUser, idRole) => {
     setLoading(true);
@@ -154,30 +141,13 @@ const Login = () => {
     }
   };
 
-  const handleForgotPassword = async () => {
-    // validate email
-    const isValidEmail = validateEmail(email);
-    if (!isValidEmail) {
-      setIsValid(false);
-      return;
-    }
-
-    // submit email
-    let response = await postForgotPassword(email);
-    let data = response.data;
-    console.log(">>> Check register: ", data);
-    if (response.status !== APIStatus.success) {
-      setIsValid(false);
-      return;
-    } else {
-      handleClose();
-    }
-  };
-
   const handleLoginThirdParty = async (base) => {
     if (base === "Google")
-      window.location.href = "http://localhost:5000/api/Authen/login-google";
-    else window.location.href = "http://localhost:5000/api/Authen/login-github";
+      window.location.href =
+        "https://myidvndut.id.vn:5000/api/Authen/login-google";
+    else
+      window.location.href =
+        "https://myidvndut.id.vn:5000/api/Authen/login-github";
   };
 
   const usernameRef = useRef(username);
@@ -332,42 +302,7 @@ const Login = () => {
         />
       )}
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Forgot Password?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="mb-3 justify-margin">
-            <LuMail color="#757575" className="icon-head" />
-            <input
-              type="text"
-              placeholder="Email"
-              className="form-control"
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-                setIsValid(true);
-              }}
-              tabIndex={1}
-              required
-            />
-          </div>
-          {!isValid && (
-            <div className="mb-3 justify-margin">
-              <span className="error-noti">Invalid Email!</span>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <button
-            className="footer-btn send-btn"
-            onClick={() => handleForgotPassword()}
-            disabled={!isValid}
-          >
-            Send
-          </button>
-        </Modal.Footer>
-      </Modal>
+      <DiagForgotPassword isOpen={show} onClose={() => setShow(false)} />
     </>
   );
 };

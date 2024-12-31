@@ -96,19 +96,22 @@
   );
 }
 .left-content-section .transaction-table table .header-row > th {
-  padding: 0 0 0.5rem;
+  padding: 0 0.5rem 0.5rem;
 }
 .left-content-section .transaction-table table tr > td {
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   color: var(--black-color);
   font-weight: 400;
   font-size: 0.9rem;
+  overflow: hidden;
 }
 table tr > .user-row {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  overflow: hidden;
+  width: 100%;
 }
 .user-row > .avatar-container {
   width: fit-content;
@@ -118,6 +121,14 @@ table tr > .user-row {
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
+}
+.user-row > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1; /* Allow text to shrink */
+  flex-grow: 1; /* Let text fill available space */
+  min-width: 0;
 }
 .section-block {
   width: 100%;
@@ -260,11 +271,10 @@ table tr > .user-row {
   aspect-ratio: 1;
 }
 .dashboard-container .right-section > .section-block.teacher-ranking {
-  /* flex: 1; */
   margin-top: 1.5rem;
   flex-direction: column;
   gap: 1rem;
-  height: 430px;
+  height: 428px;
   overflow: hidden;
 }
 .dashboard-container .right-section .teacher-ranking > .teacher-ranking-table {
@@ -285,7 +295,8 @@ table tr > .user-row {
 .teacher-ranking .teacher-ranking-table table tr > td {
   color: var(--black-color);
   font-weight: 400;
-  padding: 11px 8px;
+  padding: 11px 0px;
+  overflow: hidden;
 }
 /* .teacher-ranking-table table tr > th:nth-child(1) {
   width: 10%;
@@ -312,11 +323,15 @@ table tr > .user-row {
   -webkit-text-stroke: 1px black;
 } */
 .teacher-ranking-table table tr > th:nth-child(1) {
-  width: 60%;
+  max-width: 60%;
 }
 .teacher-ranking-table table tr > th:nth-child(2) {
-  width: 30%;
+  min-width: 35%;
   text-align: right;
+}
+.teacher-ranking-table table tr > td:nth-child(1) {
+  overflow: hidden;
+  max-width: 250px;
 }
 .teacher-ranking-table table tr > td:nth-child(2) {
   text-align: right;

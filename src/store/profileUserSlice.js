@@ -18,7 +18,6 @@ const initialState = {
 export const fetchUserProfile = createAsyncThunk(
   "profileUser/fetchUserProfile",
   async (idUser, { dispatch }) => {
-
     const response = await getPI(idUser);
     const data = response.data;
     const today = new Date().toISOString().split("T")[0];
@@ -40,7 +39,7 @@ export const fetchUserProfile = createAsyncThunk(
         name: data.fullName,
         phoneNum: data.phoneNumber,
         email: data.email,
-        gender: data.gender,
+        gender: data.gender || 0,
         dob: data.dob ? data.dob.split("T")[0] : today,
         nationality: userNationality ? userNationality.label : "",
         avaImg: data.avatar,

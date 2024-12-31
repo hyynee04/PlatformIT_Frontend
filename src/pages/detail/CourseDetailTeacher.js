@@ -41,6 +41,7 @@ const CourseDetailTeacher = (props) => {
     fetchSectionDetail,
     fetchNotificationBoard,
     setIdNotiRemoved,
+    idSectionFromNavigate,
   } = props;
 
   const navigate = useNavigate();
@@ -168,6 +169,13 @@ const CourseDetailTeacher = (props) => {
     fetchCourseProgress(courseInfo.idCourse);
   }, []);
 
+  useEffect(() => {
+    setShowedSections({
+      ...showedSections,
+      [idSectionFromNavigate]: true,
+    });
+  }, [idSectionFromNavigate]);
+
   const sortButtonRef = useRef(null);
   const sortBoxRef = useRef(null);
 
@@ -290,12 +298,15 @@ const CourseDetailTeacher = (props) => {
                     <div key={index} className="lecture">
                       <div
                         className={`lecture-header ${
-                          showedSections[index] ? "" : "change-header"
+                          showedSections[section.idSection]
+                            ? ""
+                            : "change-header"
                         } `}
                         onClick={() => {
                           setShowedSections({
                             ...showedSections,
-                            [index]: !showedSections[index],
+                            [section.idSection]:
+                              !showedSections[section.idSection],
                           });
                         }}
                       >
@@ -340,11 +351,12 @@ const CourseDetailTeacher = (props) => {
 
                                   setShowedSections({
                                     ...showedSections,
-                                    [index]: !showedSections[index],
+                                    [section.idSection]:
+                                      !showedSections[section.idSection],
                                   });
                                 }}
                               >
-                                {showedSections[index] ? (
+                                {showedSections[section.idSection] ? (
                                   <IoIosArrowUp />
                                 ) : (
                                   <IoIosArrowDown />
@@ -401,7 +413,9 @@ const CourseDetailTeacher = (props) => {
                         <div
                           key={index}
                           className={`lecture-block ${
-                            showedSections[index] ? "" : "adjust-lecture-block"
+                            showedSections[section.idSection]
+                              ? ""
+                              : "adjust-lecture-block"
                           }`}
                         >
                           {section.lectureStructures.map((lecture, index) => (

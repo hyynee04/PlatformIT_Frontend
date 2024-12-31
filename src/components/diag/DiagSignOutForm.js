@@ -10,19 +10,23 @@ import { setActiveTypeOfTask } from "../../store/listTaskOfCenterAd";
 const DiagSignOutForm = ({
   isOpen,
   onClose,
-  resetUnreadCount = () => {},
-  resetNotifications = () => {},
+  setUnreadCount = () => {},
+  setNotifications = () => {},
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSignout = () => {
-    localStorage.clear();
-    dispatch(resetUserPI());
-    dispatch(resetCenterPI());
-    dispatch(setActiveTypeOfTask("lectures"));
-    resetUnreadCount();
-    resetNotifications();
-    navigate("/");
+    try {
+      localStorage.clear();
+      dispatch(resetUserPI());
+      dispatch(resetCenterPI());
+      dispatch(setActiveTypeOfTask("lectures"));
+      setUnreadCount(null);
+      setNotifications([]);
+    } catch (error) {
+    } finally {
+      navigate("/");
+    }
   };
   if (!isOpen) return null;
 

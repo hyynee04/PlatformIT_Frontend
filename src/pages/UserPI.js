@@ -241,7 +241,7 @@ const TeacherPI = () => {
     const currentUserPI = {
       name,
       phoneNum,
-      gender,
+      gender: gender ?? null,
       dob,
       nationality,
       teachingMajor,
@@ -454,6 +454,13 @@ const TeacherPI = () => {
 
   const handleChangePassword = async () => {
     if (oldPassword && newPassword && confirmPassword) {
+      if (
+        oldPassword.length < 5 ||
+        newPassword.length < 5 ||
+        confirmPassword.length < 5
+      ) {
+        setChangePWError("Password must be at least 5 characters");
+      }
       if (newPassword === confirmPassword) {
         const idAccount = +localStorage.getItem("idAccount");
         setLoadingBtn((prevState) => ({
@@ -611,7 +618,7 @@ const TeacherPI = () => {
                       )}
                     </div>
                     <input
-                      type="text"
+                      type="number"
                       className="input-form-pi"
                       value={tempUserPI.phoneNum || ""}
                       onChange={(e) =>

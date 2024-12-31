@@ -348,7 +348,15 @@ export const processCommentList = (commentList) => {
   return { main: mainList, reply: replyObject };
 };
 
-export function convertToVietnamTime(date) {
+export const convertToVietnamTime = (date) => {
+  // Cắt bỏ phần micro giây để giữ lại mili giây
+  console.log(date);
+
+  const validDate = new Date(date.split(".")[0]); // Cắt phần sau dấu '.'
+  if (isNaN(validDate)) {
+    throw new Error("Invalid time value");
+  }
+
   const options = {
     timeZone: "Asia/Ho_Chi_Minh",
     month: "2-digit",
@@ -356,8 +364,8 @@ export function convertToVietnamTime(date) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false, // Để hiển thị định dạng 12 giờ
+    hour12: true, // Để hiển thị định dạng 12 giờ
   };
   const formatter = new Intl.DateTimeFormat("en-US", options);
-  return formatter.format(date);
-}
+  return formatter.format(validDate);
+};

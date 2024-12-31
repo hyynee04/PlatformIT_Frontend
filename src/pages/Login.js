@@ -143,8 +143,11 @@ const Login = () => {
 
   const handleLoginThirdParty = async (base) => {
     if (base === "Google")
-      window.location.href = "http://localhost:5000/api/Authen/login-google";
-    else window.location.href = "http://localhost:5000/api/Authen/login-github";
+      window.location.href =
+        "https://myidvndut.id.vn:5000/api/Authen/login-google";
+    else
+      window.location.href =
+        "https://myidvndut.id.vn:5000/api/Authen/login-github";
   };
 
   const usernameRef = useRef(username);

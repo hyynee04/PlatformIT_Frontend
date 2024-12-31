@@ -28,8 +28,8 @@ import DiagSuccessfully from "../../components/diag/DiagSuccessfully";
 import { APIStatus, LectureStatus, Role } from "../../constants/constants";
 import {
   calculateRelativeTime,
+  convertToVietnamTime,
   formatDate,
-  formatDateTime,
   getPagination,
   isPastDateTime,
   parseRelativeTime,
@@ -1035,7 +1035,9 @@ const CourseDetail = (props) => {
                   <div className="block-container-col">
                     {courseInfo.tests.map((test, index) => (
                       <>
-                        {test.isPublish ? (
+                        {test.isPublish &&
+                        (!test.startDate ||
+                          new Date() >= new Date(test.startDate)) ? (
                           <div
                             key={index}
                             className={`qualification test ${
@@ -1068,8 +1070,8 @@ const CourseDetail = (props) => {
                                       test.dueDate && (
                                         <div className="test-info">
                                           {test.dueDate
-                                            ? formatDateTime(test.dueDate)
-                                            : formatDateTime(
+                                            ? convertToVietnamTime(test.dueDate)
+                                            : convertToVietnamTime(
                                                 courseInfo.courseEndDate
                                               )}
                                         </div>

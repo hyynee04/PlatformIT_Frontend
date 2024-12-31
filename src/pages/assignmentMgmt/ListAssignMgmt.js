@@ -661,6 +661,7 @@ const ListAssignMgmt = () => {
               <button
                 className="circle-btn"
                 onClick={() => navigate("/addAssignment")}
+                title="Add assignment"
               >
                 <TiPlus className="icon" />
               </button>
@@ -674,7 +675,7 @@ const ListAssignMgmt = () => {
               const sortedAssignments = assignments.sort((a, b) => {
                 const dateA = new Date(a.updatedDate || a.createdDate || 0);
                 const dateB = new Date(b.updatedDate || b.createdDate || 0);
-                return dateB - dateA; // Gần nhất trước
+                return dateB - dateA;
               });
 
               return (

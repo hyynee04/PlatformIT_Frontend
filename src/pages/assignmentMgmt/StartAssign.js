@@ -167,6 +167,8 @@ const StartAssign = () => {
         );
       } else if (assignmentInfo.assignmentType === AssignmentType.quiz) {
         return !question.items.some((item) => item.isSelected === true);
+      } else if (assignmentInfo.assignmentType === AssignmentType.code) {
+        return !(codeProblem.sourceCode.trim() === "");
       }
       return false;
     });
@@ -180,6 +182,9 @@ const StartAssign = () => {
       }
       if (assignmentInfo.assignmentType === AssignmentType.manual) {
         setDiagMessage("Please ensure all questions have an answer.");
+      }
+      if (assignmentInfo.assignmentType === AssignmentType.code) {
+        setDiagMessage("Please fill in your source code.");
       }
     } else {
       setIsQuestionsValid(true);
@@ -364,7 +369,8 @@ const StartAssign = () => {
 
       if (response.status === APIStatus.success) {
         if (assignmentInfo.isTest === 1) {
-          navigate("/studentTest");
+          // navigate("/studentTest");
+          window.close();
         } else {
           navigate(-1);
         }

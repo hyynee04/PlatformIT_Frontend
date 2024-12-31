@@ -468,6 +468,9 @@
 .modal-container .diag-body .error-message-container > .error-noti {
   color: var(--red-color);
 }
+.modal-container .diag-body .error-message-container > .success-noti {
+  color: var(--main-color);
+}
 
 .modal-container.float-in {
   animation: slideIn 0.3s linear forwards;

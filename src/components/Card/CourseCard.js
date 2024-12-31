@@ -57,9 +57,7 @@ const CourseCard = (props) => {
     <div className="outside-card">
       <div
         className={`card-container  ${
-          course.isNewNotification !== 0 && idRole === Role.student
-            ? "new-noti"
-            : ""
+          course.isNewNotification && idRole === Role.student ? "new-noti" : ""
         }`}
       >
         {(course.isEnrolled ||
@@ -145,7 +143,7 @@ const CourseCard = (props) => {
       {isHover && (
         <div
           className={`card-container card-container-hover ${
-            course.isNewNotification !== 0 && idRole === Role.student
+            course.isNewNotification && idRole === Role.student
               ? "new-noti"
               : ""
           }`}

@@ -484,11 +484,11 @@ const postSubmitCodeAssignment = async (requestData) => {
   try {
     console.log(requestData);
 
-    // return await axios.post("api/CodeExecution/SubmitCode", requestData, {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
+    return await axios.post("api/CodeExecution/SubmitCode", requestData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } catch (error) {
     throw error;
   }

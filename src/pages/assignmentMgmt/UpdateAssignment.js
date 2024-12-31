@@ -270,6 +270,7 @@ const UpdateAssignment = ({ isDuplicate }) => {
     codeProblem,
     assignmentInfo.assignmentType,
     errorMessage,
+    isTest,
   ]);
 
   const formatTimeCourse = (courseStartDate, courseEndDate) => {

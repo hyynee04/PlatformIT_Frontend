@@ -364,7 +364,7 @@ export const convertToVietnamTime = (date) => {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true, // Để hiển thị định dạng 12 giờ
+    hour12: false, // Để hiển thị định dạng 24 giờ
   };
   const formatter = new Intl.DateTimeFormat("en-US", options);
   return formatter.format(validDate);

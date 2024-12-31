@@ -274,7 +274,7 @@ table tr > .user-row {
   margin-top: 1.5rem;
   flex-direction: column;
   gap: 1rem;
-  height: 428px;
+  height: 460px;
   overflow: hidden;
 }
 .dashboard-container .right-section .teacher-ranking > .teacher-ranking-table {

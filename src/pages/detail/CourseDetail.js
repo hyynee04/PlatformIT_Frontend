@@ -67,6 +67,7 @@ const CourseDetail = (props) => {
   const [notificationBoard, setNotificationBoard] = useState([]);
   const [studentProgress, setStudentProgress] = useState({});
   const [idSection, setIdSection] = useState(null);
+  const [idSectionFromNavigate, setIdSectionFromNavigate] = useState(null);
 
   const [isAddReview, setIsAddReview] = useState(false);
   const [rating, setRating] = useState({ content: "", number: 0 });
@@ -321,6 +322,7 @@ const CourseDetail = (props) => {
         parseInt(state.idRole),
         parseInt(state.idUser)
       );
+      if (state.idSection) setIdSectionFromNavigate(state.idSection);
       if (idRole === Role.student) {
         readNotificationBoard(state.idCourse, parseInt(state.idUser));
       }
@@ -810,6 +812,7 @@ const CourseDetail = (props) => {
               fetchNotificationBoard(courseInfo.idCourse)
             }
             setIdNotiRemoved={setIdNotiRemoved}
+            idSectionFromNavigate={idSectionFromNavigate}
           />
         ) : null}
 

@@ -12,21 +12,25 @@ import { APIStatus } from "../../constants/constants";
 const DiagSignOutForm = ({
   isOpen,
   onClose,
-  resetUnreadCount = () => {},
-  resetNotifications = () => {},
+  setUnreadCount = () => {},
+  setNotifications = () => {},
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSignout = async () => {
     const response = await postLogout();
     if (response.status === APIStatus.success) {
-      localStorage.clear();
-      dispatch(resetUserPI());
-      dispatch(resetCenterPI());
-      dispatch(setActiveTypeOfTask("lectures"));
-      resetUnreadCount();
-      resetNotifications();
-      navigate("/");
+      try {
+        localStorage.clear();
+        dispatch(resetUserPI());
+        dispatch(resetCenterPI());
+        dispatch(setActiveTypeOfTask("lectures"));
+        setUnreadCount(null);
+        setNotifications([]);
+      } catch (error) {
+      } finally {
+        navigate("/");
+      }
     }
   };
   if (!isOpen) return null;

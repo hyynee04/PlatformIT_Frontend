@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ImSpinner2 } from "react-icons/im";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../../assets/css/LectureView.css";
 import { APIStatus, Role } from "../../constants/constants";
 import {
@@ -23,6 +23,7 @@ import DiagUpdateConfirmation from "../../components/diag/DiagUpdateConfirmation
 
 const Lecture = (props) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [index, setIndex] = useState(1);
 
   const [loading, setLoading] = useState({
@@ -55,8 +56,8 @@ const Lecture = (props) => {
 
   const [isRemoved, setIsRemoved] = useState(false);
   const [isEditLecture, setIsEditLecture] = useState(false);
-  const [lectureStatus, setLectureStatus] = useState(null);
   const [isFinishedLecture, setIsFinishedLecture] = useState(null);
+  const [isFromNotification, setIsFromNotification] = useState(false);
 
   const fetchLectureDetail = async (idLecture, idUser) => {
     setLoading((prev) => ({ ...prev, lectureDetail: true }));
@@ -268,7 +269,22 @@ const Lecture = (props) => {
   return (
     <div className="lecture-container">
       <div className="lecture-content">
-        <span className="course-name">{lectureDetail.courseTitle}</span>
+        <span
+          className="course-name"
+          style={{ cursor: "pointer" }}
+          onClick={() => {
+            navigate("/courseDetail", {
+              state: {
+                idCourse: idCourse,
+                idUser: localStorage.getItem("idUser"),
+                idRole: localStorage.getItem("idRole"),
+                idSection: idSection,
+              },
+            });
+          }}
+        >
+          {lectureDetail.courseTitle}
+        </span>
         <div className="lecture-detail">
           <div className="lecture-content-section">
             {loading.lectureDetail ||

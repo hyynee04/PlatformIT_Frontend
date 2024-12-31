@@ -76,6 +76,8 @@ const Header = () => {
   const fetchUserNotification = async (idUser) => {
     let response = await getAllNotificationOfUser(idUser);
     if (response.status === APIStatus.success) {
+      console.log("get noti:", response.data.length);
+
       const processedData = response.data.map((notification) => ({
         ...notification,
         timestamp: parseRelativeTime(notification.relativeTime),
@@ -86,6 +88,8 @@ const Header = () => {
       setUnreadCount(unread > 99 ? "99+" : unread);
       setNotifications(processedData);
     } else {
+      setUnreadCount(null);
+      setNotifications([]);
       console.log(response.data);
     }
   };
@@ -113,7 +117,7 @@ const Header = () => {
       }
     };
     fetchAvatar();
-    fetchUserNotification(idUser);
+
     fetchUnreadMessageCount();
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -132,6 +136,10 @@ const Header = () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [dispatch, idUser]);
+
+  useEffect(() => {
+    fetchUserNotification(idUser);
+  }, [idUser]);
 
   useEffect(() => {
     if (Array.isArray(updatedNotifications)) {
@@ -164,6 +172,7 @@ const Header = () => {
   }, [updatedNotifications, updatedUnreadCount]);
 
   console.log("Notifications: ", notifications);
+  console.log("idUser: ", idUser);
 
   useEffect(() => {
     dispatch(countTaskOfCenterAd("qualification"));
@@ -370,8 +379,8 @@ const Header = () => {
           <DiagSignOutForm
             isOpen={isModalSignoutOpen}
             onClose={closeSignoutModal}
-            resetUnreadCount={() => setUnreadCount(null)}
-            resetNotifications={() => setNotifications([])}
+            setUnreadCount={setUnreadCount}
+            setNotifications={setNotifications}
           />
         </div>
       )}

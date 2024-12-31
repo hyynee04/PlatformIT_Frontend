@@ -68,6 +68,7 @@ export const NotificationType = {
   assignedTeacher: 2,
   notificationBoard: 3,
   comment: 4,
+  lecture: 5,
 };
 export const ExecutedCodeStatus = {
   IN_QUEUE: 1,

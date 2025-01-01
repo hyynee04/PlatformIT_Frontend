@@ -3,7 +3,7 @@ import { postChangeAvatar } from "../services/userService";
 import { useDispatch } from "react-redux";
 import { fetchUserProfile } from "../store/profileUserSlice";
 import { fetchCenterProfile } from "../store/profileCenterSlice";
-import DiagRemoveImgForm from "./diag/DiagRemoveImgForm";
+import { ImSpinner2 } from "react-icons/im";
 
 const AvatarImageOption = ({
   isAvatar,
@@ -13,9 +13,9 @@ const AvatarImageOption = ({
   optionButtonRef,
 }) => {
   const dispatch = useDispatch();
-  // const userPI = useSelector((state) => state.profileUser);
   const userId = +localStorage.getItem("idUser");
   const [isOptionVisible, setIsOptionVisible] = useState(true);
+  const [loadingBtn, setLoadingBtn] = useState(false);
 
   const optionBoxRef = useRef(null);
   useEffect(() => {
@@ -29,14 +29,11 @@ const AvatarImageOption = ({
         onClose();
       }
     };
-
-    // Attach the event listener if the options are visible
     document.addEventListener("mousedown", handleClickOutsideOptionBox);
-    // Cleanup the event listener
     return () => {
       document.removeEventListener("mousedown", handleClickOutsideOptionBox);
     };
-  }, []);
+  }, [onClose, optionButtonRef]);
   const inputFileRef = useRef(null);
   const handleChangeImg = () => {
     inputFileRef.current.click();
@@ -52,6 +49,7 @@ const AvatarImageOption = ({
     const file = event.target.files[0];
     if (file) {
       const formattedFile = formatFile(file);
+      setLoadingBtn(true);
       try {
         let blobFile;
 
@@ -76,14 +74,28 @@ const AvatarImageOption = ({
         setIsOptionVisible(false);
       } catch (error) {
         console.error("Error changing avatar:", error);
+      } finally {
+        setLoadingBtn(false);
       }
     }
   };
 
   return (
     <div>
-      <div ref={optionBoxRef} className="container-options avatarOption">
+      <div
+        ref={optionBoxRef}
+        className={`container-options ${
+          isAvatar ? "avatarOption" : "centerAvatarOption"
+        }`}
+      >
         <button className="op-buts" onClick={handleChangeImg}>
+          {loadingBtn && (
+            <ImSpinner2
+              className="icon-spin"
+              color="#397979"
+              style={{ marginRight: "2px" }}
+            />
+          )}
           {isAvatar ? (
             <span>Change avatar</span>
           ) : (
@@ -101,8 +113,8 @@ const AvatarImageOption = ({
       <input
         type="file"
         ref={inputFileRef}
-        style={{ display: "none" }} // Ẩn input file
-        accept=".png, .jpg, .jpeg" // Chỉ cho phép chọn file ảnh
+        style={{ display: "none" }}
+        accept=".png, .jpg, .jpeg"
         onChange={handleFileChange}
       />
     </div>

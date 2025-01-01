@@ -278,7 +278,6 @@ const LectureView = ({
       });
     }
   };
-
   const videoRef = useRef(null);
 
   useEffect(() => {

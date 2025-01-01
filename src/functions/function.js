@@ -349,23 +349,36 @@ export const processCommentList = (commentList) => {
 };
 
 export const convertToVietnamTime = (date) => {
-  // Cắt bỏ phần micro giây để giữ lại mili giây
-  console.log(date);
+  // Kiểm tra xem date có phải là chuỗi hợp lệ không
+  if (typeof date !== "string") {
+    throw new Error("Invalid input, expected a date string");
+  }
 
-  const validDate = new Date(date.split(".")[0]); // Cắt phần sau dấu '.'
+  // Kiểm tra nếu chuỗi không có ký tự "Z" (chỉ định thời gian UTC)
+  const dateWithZ = date.endsWith("Z") ? date : date.split(".")[0] + "Z";
+
+  // Tạo đối tượng Date từ chuỗi đã được xử lý
+  const validDate = new Date(dateWithZ);
+
+  // Kiểm tra nếu thời gian không hợp lệ
   if (isNaN(validDate)) {
     throw new Error("Invalid time value");
   }
 
+  // Các tùy chọn định dạng thời gian cho múi giờ Việt Nam
   const options = {
     timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false, // Để hiển thị định dạng 24 giờ
   };
+
+  // Sử dụng Intl.DateTimeFormat để định dạng thời gian
   const formatter = new Intl.DateTimeFormat("en-US", options);
+  console.log(formatter.format(validDate));
+
   return formatter.format(validDate);
 };

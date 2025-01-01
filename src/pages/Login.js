@@ -101,6 +101,7 @@ const Login = () => {
           localStorage.setItem("idRole", data.idRole);
           localStorage.setItem("idUser", data.idUser);
           localStorage.setItem("idAccount", data.idAccount);
+          localStorage.setItem("isPWAccount", "1");
           let roleBasesPath = "/";
           switch (data.idRole) {
             case Role.platformAdmin:
@@ -130,8 +131,7 @@ const Login = () => {
           localStorage.setItem("idUser", data.idUser);
           localStorage.setItem("idRole", data.idRole);
           localStorage.setItem("isPendingCenter", data.status);
-          localStorage.setItem("isPWAccount", true);
-
+          localStorage.setItem("isPWAccount", "1");
           navigate("/pendingCenter");
         } else if (data.status === UserStatus.inactive) {
           setErrorString("Your account had been inactive.");

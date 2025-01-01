@@ -24,14 +24,11 @@ import { APIStatus, AssignmentType, Role } from "../../constants/constants";
 import {
   formatDateTime,
   getVideoType,
-  handleNavigateDetailStudent,
   isPastDateTime,
 } from "../../functions/function";
 import { useNavigate } from "react-router-dom";
-import { IoEllipsisHorizontal } from "react-icons/io5";
 import { postAddComment } from "../../services/commentService";
 import FetchDataUpdated from "../../functions/FetchDataUpdated";
-import { Title } from "chart.js";
 
 const LectureView = ({
   lectureDetail,

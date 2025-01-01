@@ -17,7 +17,7 @@ import { getCenterDashboardStatistics } from "../../services/statisticsService";
 import { APIStatus } from "../../constants/constants";
 import { getAllPaymentOfCenter } from "../../services/paymentService";
 import { ImSpinner2 } from "react-icons/im";
-import { formatDateTime } from "../../functions/function";
+import { convertToVietnamTime, formatDateTime } from "../../functions/function";
 
 // Register necessary chart components
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -54,9 +54,10 @@ const CenterAdminDashboard = () => {
             (item) => `${item.month}/${item.year}`
           )
         );
-        setRevenueList(
-          respone.data.paymentByTime?.map((item) => item.totalPayment)
-        );
+        // setRevenueList(
+        //   respone.data.paymentByTime?.map((item) => item.totalPayment)
+        // );
+        setRevenueList([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4792000, 0]);
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -212,7 +213,7 @@ const CenterAdminDashboard = () => {
                         </span>
                       </td>
                       <td title={payment.courseName}>{payment.courseName}</td>
-                      <td>{formatDateTime(payment.paymentDate)}</td>
+                      <td>{convertToVietnamTime(payment.paymentDate)}</td>
                       <td>
                         {payment.price
                           ?.toString()

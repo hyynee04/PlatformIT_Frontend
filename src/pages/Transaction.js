@@ -16,7 +16,11 @@ import {
   getAllPaymentOfCenter,
   getAllPaymentOfStudent,
 } from "../services/paymentService";
-import { formatDateTime, getPagination } from "../functions/function";
+import {
+  convertToVietnamTime,
+  formatDateTime,
+  getPagination,
+} from "../functions/function";
 import { useAsyncError, useNavigate } from "react-router-dom";
 import { ImSpinner2 } from "react-icons/im";
 
@@ -452,7 +456,7 @@ const Transaction = () => {
                       </div>
                     </td>
                     <td className="enable-click">{payment.courseName}</td>
-                    <td>{formatDateTime(payment.paymentDate)}</td>
+                    <td>{convertToVietnamTime(payment.paymentDate)}</td>
                     <td>
                       <div className="many-items">
                         <LuPlus />
@@ -503,7 +507,7 @@ const Transaction = () => {
                         </span>
                       </div>
                     </td>
-                    <td>{formatDateTime(payment.paymentDate)}</td>
+                    <td>{convertToVietnamTime(payment.paymentDate)}</td>
                     <td>
                       <div className="many-items">
                         <LuMinus />

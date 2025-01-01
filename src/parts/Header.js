@@ -326,31 +326,39 @@ const Header = () => {
                     ) : null}
                   </>
                 )}
-                <button
-                  ref={notiButtonRef}
-                  disabled={location.pathname === buttonPaths["bell"]}
-                  className={`circle-buts ${
-                    location.pathname === buttonPaths["bell"] ? "clicked" : ""
-                  }`}
-                  onClick={() => {
-                    setIsNotificationOpen(!isNotificationOpen);
-                  }}
-                  title="Notifications"
-                >
-                  <LuBell className="header-icon" />
-                </button>
-                {unreadCount ? (
-                  <div className="number-unseen">{unreadCount}</div>
-                ) : null}
-                <Notification
-                  idUser={idUser}
-                  isOpen={isNotificationOpen}
-                  onClose={() => setIsNotificationOpen(false)}
-                  notiButtonRef={notiButtonRef}
-                  notifications={notifications}
-                  unreadCount={unreadCount}
-                  fetchUserNotification={() => fetchUserNotification(idUser)}
-                />
+                {(idRole === Role.teacher || idRole === Role.student) && (
+                  <>
+                    <button
+                      ref={notiButtonRef}
+                      disabled={location.pathname === buttonPaths["bell"]}
+                      className={`circle-buts ${
+                        location.pathname === buttonPaths["bell"]
+                          ? "clicked"
+                          : ""
+                      }`}
+                      onClick={() => {
+                        setIsNotificationOpen(!isNotificationOpen);
+                      }}
+                      title="Notifications"
+                    >
+                      <LuBell className="header-icon" />
+                    </button>
+                    {unreadCount ? (
+                      <div className="number-unseen">{unreadCount}</div>
+                    ) : null}
+                    <Notification
+                      idUser={idUser}
+                      isOpen={isNotificationOpen}
+                      onClose={() => setIsNotificationOpen(false)}
+                      notiButtonRef={notiButtonRef}
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      fetchUserNotification={() =>
+                        fetchUserNotification(idUser)
+                      }
+                    />
+                  </>
+                )}
                 <button
                   ref={optionButtonRef}
                   className={`circle-buts ${

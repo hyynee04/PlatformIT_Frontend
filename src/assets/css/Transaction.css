@@ -397,28 +397,15 @@
 .transacton-response-page {
   transition: none;
   height: 100vh;
-}
-.transacton-response-page > .header {
   width: 100%;
-  height: 68px;
-  padding: 8px 72px;
-  background-color: var(--main-color);
   display: flex;
-  flex-direction: row;
   align-items: center;
-  transition: none;
-}
-.transacton-response-page .header > span {
-  color: var(--white-color);
-  font-size: 1.5rem;
-  font-weight: bold;
-  cursor: pointer;
+  justify-content: center;
 }
 .transacton-response-page > .body {
-  width: 500px;
-  height: 600px;
+  width: 35%;
+  height: 90%;
   border-radius: 1rem;
-  margin: 1.5rem auto;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   display: flex;
   flex-direction: column;

@@ -101,7 +101,11 @@ const Lecture = (props) => {
     }
   };
 
-  const fetchCourseContentStructure = async (idCourse, idStudent) => {
+  const fetchCourseContentStructure = async (
+    idCourse,
+    idStudent,
+    idLecture
+  ) => {
     setLoading((prev) => ({ ...prev, sectionList: true }));
     try {
       const response = await getCourseContentStructure(idCourse, idStudent);
@@ -110,11 +114,8 @@ const Lecture = (props) => {
         if (response.data) {
           setSectionList(response.data);
           setIdTeacher(response.data.idTeacher);
-          getIsFinishedLectureOfStudent(
-            response.data,
-            response.data.idSection,
-            response.data.idLecture
-          );
+          console.log();
+          getIsFinishedLectureOfStudent(response.data, idLecture);
         } else {
           console.warn("Received empty data for course content structure.");
         }
@@ -154,25 +155,18 @@ const Lecture = (props) => {
     });
   };
 
-  const getIsFinishedLectureOfStudent = (sectionList, idSection, idLecture) => {
-    const section = sectionList.sectionStructures.find(
-      (sec) => sec.idSection === idSection
-    );
-    if (section) {
-      const lecture = section.lectureStructures.find(
-        (lec) => lec.idLecture === idLecture
-      );
-      setIsFinishedLecture(lecture ? lecture.isFinishedLecture : null);
-    } else {
-      setIsFinishedLecture(null);
-    }
+  const getIsFinishedLectureOfStudent = (sectionList, idLecture) => {
+    const lecture = sectionList.sectionStructures
+      ?.flatMap((section) => section.lectureStructures) // Gộp tất cả bài giảng từ các section
+      ?.find((lec) => lec.idLecture === idLecture); // Tìm bài giảng theo idLecture
+    setIsFinishedLecture(lecture ? lecture.isFinishedLecture : null);
   };
 
   const finishLecture = async (idLecture, idStudent) => {
     try {
       let response = await postFinishLecture(idLecture, idStudent);
       if (response.status === APIStatus.success) {
-        fetchCourseContentStructure(idCourse, idStudent);
+        fetchCourseContentStructure(idCourse, idStudent, idLecture);
       } else {
         console.error(response.data);
       }
@@ -194,7 +188,7 @@ const Lecture = (props) => {
       }
 
       if (idRole === Role.student) {
-        fetchCourseContentStructure(state.idCourse, idUser);
+        fetchCourseContentStructure(state.idCourse, idUser, state.idLecture);
       } else {
         fetchCourseContentStructure(state.idCourse);
       }
@@ -217,11 +211,7 @@ const Lecture = (props) => {
     if (idLecture !== idLectureChange) {
       setIdLecture(idLectureChange);
       setIdSection(idSectionChange);
-      getIsFinishedLectureOfStudent(
-        sectionList,
-        idSectionChange,
-        idLectureChange
-      );
+      getIsFinishedLectureOfStudent(sectionList, idLectureChange);
       FetchData(idLectureChange);
     }
   }, [idLectureChange, idSectionChange]);
@@ -231,6 +221,10 @@ const Lecture = (props) => {
       finishLecture(idLecture, idUser);
     }
   }, [isFinishedLecture]);
+
+  useEffect(() => {
+    //
+  }, [sectionList, idSection, idLecture]);
 
   useEffect(() => {
     const interval = setInterval(() => {

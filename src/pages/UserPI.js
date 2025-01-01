@@ -85,7 +85,7 @@ const TeacherPI = () => {
     teachingMajor: "",
     description: "",
   });
-
+  const isPwAccount = Boolean(localStorage.getItem("isPwAccount"));
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const [roleDes, setRoleDes] = useState("");
   const [activeAction, setActiveAction] = useState("basicPI");
@@ -558,13 +558,17 @@ const TeacherPI = () => {
                   Specialized Infomation
                 </div>
               )}
-              <div
-                className={`btn ${activeAction === "security" ? "active" : ""}`}
-                onClick={() => handleActionClick("security")}
-              >
-                <FaLock className="icon" />
-                Security
-              </div>
+              {isPwAccount && (
+                <div
+                  className={`btn ${
+                    activeAction === "security" ? "active" : ""
+                  }`}
+                  onClick={() => handleActionClick("security")}
+                >
+                  <FaLock className="icon" />
+                  Security
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -130,6 +130,8 @@ const Login = () => {
           localStorage.setItem("idUser", data.idUser);
           localStorage.setItem("idRole", data.idRole);
           localStorage.setItem("isPendingCenter", data.status);
+          localStorage.setItem("isPWAccount", true);
+
           navigate("/pendingCenter");
         } else if (data.status === UserStatus.inactive) {
           setErrorString("Your account had been inactive.");

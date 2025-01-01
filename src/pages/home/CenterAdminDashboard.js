@@ -17,7 +17,7 @@ import { getCenterDashboardStatistics } from "../../services/statisticsService";
 import { APIStatus } from "../../constants/constants";
 import { getAllPaymentOfCenter } from "../../services/paymentService";
 import { ImSpinner2 } from "react-icons/im";
-import { convertToVietnamTime, formatDateTime } from "../../functions/function";
+import { convertToVietnamTime } from "../../functions/function";
 
 // Register necessary chart components
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -151,7 +151,7 @@ const CenterAdminDashboard = () => {
           <label className="section-title">Revenue</label>
           <div className="revenue-statistics">
             <div className="revenue-header">
-              <label>Avg per month</label>
+              <label>Avg per month (12 months)</label>
               <div className="statistics-number">
                 <div className="main-number">
                   <span>

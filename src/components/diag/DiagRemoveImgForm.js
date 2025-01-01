@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuImageOff, LuX } from "react-icons/lu";
+import { ImSpinner2 } from "react-icons/im";
 import { useDispatch } from "react-redux";
 import "../../assets/css/card/DiagForm.css";
 import { postRemoveAvatar } from "../../services/userService";
@@ -9,7 +10,9 @@ import { fetchUserProfile } from "../../store/profileUserSlice";
 const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
   const dispatch = useDispatch();
   const userId = +localStorage.getItem("idUser");
+  const [loadingBtn, setLoadingBtn] = useState(false);
   const handleRemoveAvatar = async () => {
+    setLoadingBtn(true);
     try {
       if (isAvatar) {
         await postRemoveAvatar(true);
@@ -22,6 +25,8 @@ const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
       onClose();
     } catch (error) {
       throw error;
+    } finally {
+      setLoadingBtn(false);
     }
   };
   if (!isOpen) return null;
@@ -61,6 +66,9 @@ const DiagRemoveImgForm = ({ isOpen, onClose, isAvatar }) => {
                   handleRemoveAvatar();
                 }}
               >
+                {loadingBtn && (
+                  <ImSpinner2 className="icon-spin" color="#d9d9d9" />
+                )}
                 Yes
               </button>
             </div>

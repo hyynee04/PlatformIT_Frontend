@@ -41,6 +41,11 @@
   right: -100px;
   bottom: -62px;
 }
+.centerAvatarOption {
+  position: absolute;
+  top: 24px;
+  left: 0;
+}
 .assign-setting-option {
   position: absolute;
   right: 24px;

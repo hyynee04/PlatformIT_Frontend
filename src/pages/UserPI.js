@@ -85,7 +85,7 @@ const TeacherPI = () => {
     teachingMajor: "",
     description: "",
   });
-  const isPwAccount = Boolean(localStorage.getItem("isPwAccount"));
+  const isPWAccount = Number(localStorage.getItem("isPWAccount"));
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const [roleDes, setRoleDes] = useState("");
   const [activeAction, setActiveAction] = useState("basicPI");
@@ -460,6 +460,7 @@ const TeacherPI = () => {
         confirmPassword.length < 5
       ) {
         setChangePWError("Password must be at least 5 characters");
+        return;
       }
       if (newPassword === confirmPassword) {
         const idAccount = +localStorage.getItem("idAccount");
@@ -558,7 +559,7 @@ const TeacherPI = () => {
                   Specialized Infomation
                 </div>
               )}
-              {isPwAccount && (
+              {isPWAccount === 1 && (
                 <div
                   className={`btn ${
                     activeAction === "security" ? "active" : ""

@@ -113,6 +113,15 @@
   object-fit: cover;
   cursor: pointer;
 }
+.sub-container-ava > .change-ava-center {
+  border: none;
+  right: 0;
+  margin-left: auto;
+  padding: 0;
+}
+.sub-container-ava > .change-ava-center > svg:hover {
+  stroke-width: 4;
+}
 .sub-container-action {
   display: flex;
   flex-direction: column;

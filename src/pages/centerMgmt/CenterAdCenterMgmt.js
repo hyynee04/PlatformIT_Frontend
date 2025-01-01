@@ -4,7 +4,13 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { FaGlobe, FaInfoCircle, FaRegFilePdf } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
-import { LuCheck, LuFile, LuLock, LuTrash2 } from "react-icons/lu";
+import {
+  LuCheck,
+  LuFile,
+  LuLock,
+  LuTrash2,
+  LuMoreHorizontal,
+} from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import {
   postAddCenterLink,
@@ -24,6 +30,7 @@ import AvatarImageOption from "../../components/AvatarImageOption";
 import DiagLockCenterForm from "../../components/diag/DiagLockCenterForm";
 import DiagWorkingHourForm from "../../components/diag/DiagWorkingHourForm";
 import { APIStatus } from "../../constants/constants";
+import DiagRemoveImgForm from "../../components/diag/DiagRemoveImgForm";
 const CenterAdCenterMgmt = () => {
   const [loading, setLoading] = useState(false);
   //Center Infomation
@@ -69,10 +76,15 @@ const CenterAdCenterMgmt = () => {
   const [qualiPDFCheck, setQualiPDFCheck] = useState(false);
   const [qualiWarning, setQualiWarning] = useState("");
   const inputFileRef = useRef(null);
+  const optionButtonRef = useRef(null);
   const [showAvatarImageOption, setShowAvatarImageOption] = useState(false);
   const toggleVisibility = () => {
     setShowAvatarImageOption(!showAvatarImageOption);
   };
+  const [isModalRemoveAvaOpen, setIsModalRemoveAvaOpen] = useState(false);
+
+  const openRemoveAvaModal = () => setIsModalRemoveAvaOpen(true);
+  const closeRemoveAvaModal = () => setIsModalRemoveAvaOpen(false);
   const [isModalHourOpen, setIsModalHourOpen] = useState(false);
   const openHourModal = () => {
     setIsModalHourOpen(true);
@@ -321,13 +333,24 @@ const CenterAdCenterMgmt = () => {
         <div className="container-pi user-pi">
           <div className="container-ava">
             <div className="sub-container-ava">
+              <button className="btn change-ava-center" ref={optionButtonRef}>
+                <LuMoreHorizontal onClick={toggleVisibility} />
+              </button>
               <img
                 src={avatarPath ? avatarPath : default_image}
                 alt=""
                 className="main-center-image"
                 onClick={toggleVisibility}
               />
-              {showAvatarImageOption && <AvatarImageOption isAvatar={false} />}
+              {showAvatarImageOption && (
+                <AvatarImageOption
+                  isAvatar={false}
+                  openRemoveAvaModal={openRemoveAvaModal}
+                  isOpen={showAvatarImageOption}
+                  onClose={() => setShowAvatarImageOption(false)}
+                  optionButtonRef={optionButtonRef}
+                />
+              )}
             </div>
             <div className="sub-container-action">
               <div className="action-btn">
@@ -715,6 +738,13 @@ const CenterAdCenterMgmt = () => {
         </div>
       </div>
       <CenterAdAdminMgmt />
+      {isModalRemoveAvaOpen && (
+        <DiagRemoveImgForm
+          isOpen={isModalRemoveAvaOpen}
+          onClose={closeRemoveAvaModal}
+          isAvatar={false}
+        />
+      )}
     </>
   );
 };

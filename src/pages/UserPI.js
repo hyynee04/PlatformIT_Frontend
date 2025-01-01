@@ -518,9 +518,13 @@ const TeacherPI = () => {
               alt=""
               className="main-ava-image"
             />
-            <div className="container-icon" onClick={toggleVisibility}>
+            <button
+              ref={optionButtonRef}
+              className="container-icon"
+              onClick={toggleVisibility}
+            >
               <LuCamera className="icon" />
-            </div>
+            </button>
             {showAvatarImageOption && (
               <AvatarImageOption
                 isAvatar={true}

@@ -3,20 +3,28 @@ import { LuArrowRight } from "react-icons/lu";
 import "../assets/css/card/FilterCard.css";
 import { UserGender, UserStatus } from "../constants/constants";
 
-const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
+const FilterUser = ({
+  gender: parentGender,
+  level: parentLevel,
+  dateRange: parentDateRange,
+  status: parentStatus,
+  onFilterChange,
+  onClose,
+  filterButtonRef,
+}) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
-  const [gender, setGender] = useState("all");
-  const [level, setLevel] = useState("all");
-  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
-  const [status, setStatus] = useState("all");
+  const [localGender, setLocalGender] = useState(parentGender);
+  const [localLevel, setLocalLevel] = useState(parentLevel);
+  const [localDateRange, setLocalDateRange] = useState(parentDateRange);
+  const [localStatus, setLocalStatus] = useState(parentStatus);
   const filterRef = useRef(null);
 
   const handleFilterChange = () => {
     onFilterChange({
-      gender: gender === "all" ? null : gender,
-      level: level === "all" ? null : level,
-      dateRange,
-      status: status === "all" ? null : status,
+      gender: localGender,
+      level: localLevel,
+      dateRange: localDateRange,
+      status: localStatus,
     });
   };
   useEffect(() => {
@@ -51,8 +59,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="male"
-                checked={gender === UserGender.male}
-                onChange={() => setGender(UserGender.male)}
+                checked={localGender === UserGender.male}
+                onChange={() => setLocalGender(UserGender.male)}
               />
               Male
             </label>
@@ -60,8 +68,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="female"
-                checked={gender === UserGender.female}
-                onChange={() => setGender(UserGender.female)}
+                checked={localGender === UserGender.female}
+                onChange={() => setLocalGender(UserGender.female)}
               />
               Female
             </label>
@@ -69,17 +77,17 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="other"
-                checked={gender === UserGender.other}
-                onChange={() => setGender(UserGender.other)}
+                checked={localGender === UserGender.other}
+                onChange={() => setLocalGender(UserGender.other)}
               />
               Other
             </label>
             <label className="radio-container gender">
               <input
                 type="radio"
-                value="all"
-                checked={gender === "all"}
-                onChange={() => setGender("all")}
+                value={null}
+                checked={localGender === null}
+                onChange={() => setLocalGender(null)}
                 selected
               />
               All
@@ -91,8 +99,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="main"
-                checked={level === "main"}
-                onChange={() => setLevel("main")}
+                checked={localLevel === "main"}
+                onChange={() => setLocalLevel("main")}
               />
               Main
             </label>
@@ -100,17 +108,17 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="mem"
-                checked={level === "mem"}
-                onChange={() => setLevel("mem")}
+                checked={localLevel === "mem"}
+                onChange={() => setLocalLevel("mem")}
               />
-              Sub
+              Mem
             </label>
             <label className="radio-container level">
               <input
                 type="radio"
                 value="pending"
-                checked={level === "pending"}
-                onChange={() => setLevel("pending")}
+                checked={localLevel === "pending"}
+                onChange={() => setLocalLevel("pending")}
               />
               Pending
             </label>
@@ -118,17 +126,17 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="rejected"
-                checked={level === "rejected"}
-                onChange={() => setLevel("rejected")}
+                checked={localLevel === "rejected"}
+                onChange={() => setLocalLevel("rejected")}
               />
               Rejected
             </label>
             <label className="radio-container level">
               <input
                 type="radio"
-                value="all"
-                checked={level === "all"}
-                onChange={() => setLevel("all")}
+                value={null}
+                checked={localLevel === null}
+                onChange={() => setLocalLevel(null)}
               />
               All
             </label>
@@ -138,18 +146,24 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
             <input
               type="date"
               className="date-picker"
-              value={dateRange.startDate}
+              value={localDateRange.startDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  startDate: e.target.value,
+                }))
               }
             />
             <LuArrowRight />
             <input
               type="date"
               className="date-picker"
-              value={dateRange.endDate}
+              value={localDateRange.endDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  endDate: e.target.value,
+                }))
               }
             />
           </div>
@@ -159,8 +173,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="active"
-                checked={status === UserStatus.active}
-                onChange={() => setStatus(UserStatus.active)}
+                checked={localStatus === UserStatus.active}
+                onChange={() => setLocalStatus(UserStatus.active)}
               />
               Active
             </label>
@@ -168,8 +182,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="pending"
-                checked={status === UserStatus.pending}
-                onChange={() => setStatus(UserStatus.pending)}
+                checked={localStatus === UserStatus.pending}
+                onChange={() => setLocalStatus(UserStatus.pending)}
               />
               Pending
             </label>
@@ -177,8 +191,8 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="inactive"
-                checked={status === UserStatus.inactive}
-                onChange={() => setStatus(UserStatus.inactive)}
+                checked={localStatus === UserStatus.inactive}
+                onChange={() => setLocalStatus(UserStatus.inactive)}
               />
               Inactive
             </label>
@@ -186,17 +200,17 @@ const FilterUser = ({ onFilterChange, onClose, filterButtonRef }) => {
               <input
                 type="radio"
                 value="locked"
-                checked={status === UserStatus.locked}
-                onChange={() => setStatus(UserStatus.locked)}
+                checked={localStatus === UserStatus.locked}
+                onChange={() => setLocalStatus(UserStatus.locked)}
               />
               Locked
             </label>
             <label className="radio-container status">
               <input
                 type="radio"
-                value="all"
-                checked={status === "all"}
-                onChange={() => setStatus("all")}
+                value={null}
+                checked={localStatus === null}
+                onChange={() => setLocalStatus(null)}
               />
               All
             </label>

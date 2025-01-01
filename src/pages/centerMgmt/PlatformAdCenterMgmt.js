@@ -220,6 +220,7 @@ const PlatformAdCenterMgmt = () => {
             </button>
             {filterVisible && (
               <FilterCenter
+                dateRange={dateRange}
                 onFilterChange={handleFilterChange}
                 onClose={() => setFilterVisible(false)}
                 filterButtonRef={filterButtonRef}

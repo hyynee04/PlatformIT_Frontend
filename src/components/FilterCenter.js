@@ -2,13 +2,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { LuArrowRight } from "react-icons/lu";
 import "../assets/css/card/FilterCard.css";
 
-const FilterCenter = ({ onFilterChange, onClose, filterButtonRef }) => {
+const FilterCenter = ({
+  dateRange: parentDateRange,
+  onFilterChange,
+  onClose,
+  filterButtonRef,
+}) => {
   const [isFilterFormVisible, setIsFilterFormVisible] = useState(true);
-  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
+  const [localDateRange, setLocalDateRange] = useState(parentDateRange);
   const handleFilterChange = () => {
-    onFilterChange({
-      dateRange,
-    });
+    onFilterChange({ dateRange: localDateRange });
+    onClose();
   };
   const filterRef = useRef(null);
   useEffect(() => {
@@ -42,18 +46,24 @@ const FilterCenter = ({ onFilterChange, onClose, filterButtonRef }) => {
             <input
               type="date"
               className="date-picker"
-              value={dateRange.startDate}
+              value={localDateRange.startDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, startDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  startDate: e.target.value,
+                }))
               }
             />
             <LuArrowRight />
             <input
               type="date"
               className="date-picker"
-              value={dateRange.endDate}
+              value={localDateRange.endDate}
               onChange={(e) =>
-                setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+                setLocalDateRange((prev) => ({
+                  ...prev,
+                  endDate: e.target.value,
+                }))
               }
             />
           </div>

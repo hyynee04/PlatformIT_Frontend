@@ -24,6 +24,7 @@ const Login = () => {
   const [isShowed, setIsShowed] = useState(false);
 
   const [isFailed, setIsFailed] = useState(false);
+  const [errorStr, setErrorString] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [show, setShow] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
@@ -130,8 +131,12 @@ const Login = () => {
           localStorage.setItem("idRole", data.idRole);
           localStorage.setItem("isPendingCenter", data.status);
           navigate("/pendingCenter");
+        } else if (data.status === UserStatus.inactive) {
+          setErrorString("Your account had been inactive.");
+          setIsFailed(true);
         }
       } else {
+        setErrorString("Username or Password is incorrect!");
         setIsFailed(true);
       }
     } catch (error) {
@@ -255,9 +260,7 @@ const Login = () => {
 
               {isFailed && (
                 <div className="mb-3">
-                  <span className="error-noti">
-                    Username or Password is incorrect!
-                  </span>
+                  <span className="error-noti">{errorStr}</span>
                 </div>
               )}
             </div>

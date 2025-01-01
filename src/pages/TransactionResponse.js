@@ -11,7 +11,8 @@ const TransactionResponse = () => {
   // Parse the query parameters from location.search
   const queryParams = new URLSearchParams(location.search);
 
-  const isSuccess = queryParams.get("IsSuccess");
+  const isSuccess = +queryParams.get("IsSuccess");
+  console.log(isSuccess);
 
   const encodedName = queryParams.get("SenderName");
   const senderName = decodeURIComponent(encodedName);
@@ -21,11 +22,10 @@ const TransactionResponse = () => {
   const TransactionNo = queryParams.get("TransactionNo");
   const Amount = queryParams.get("Amount");
 
+  console.log("isSuccess: ", isSuccess, typeof isSuccess);
+
   return (
     <div className="transacton-response-page">
-      <div className="header">
-        <span>PLAIT</span>
-      </div>
       <div className="body">
         <div class="concentric-circles">
           <div

@@ -171,9 +171,6 @@ const Header = () => {
     }
   }, [updatedNotifications, updatedUnreadCount]);
 
-  console.log("Notifications: ", notifications);
-  console.log("idUser: ", idUser);
-
   useEffect(() => {
     dispatch(countTaskOfCenterAd("qualification"));
   }, [dispatch]);

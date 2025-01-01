@@ -10,9 +10,10 @@ import "../../assets/css/Detail.css";
 import default_ava from "../../assets/img/default_ava.png";
 import default_image from "../../assets/img/default_image.png";
 import Carousel from "../../components/Carousel";
-import { Object, Role } from "../../constants/constants";
+import { APIStatus, Object, Role } from "../../constants/constants";
 
 import { getTeacherDetail } from "../../services/userService";
+import { getIsChatAvailable } from "../../services/courseService";
 
 const TeacherDetail = (props) => {
   const location = useLocation();
@@ -25,6 +26,7 @@ const TeacherDetail = (props) => {
   const [idRole, setIDRole] = useState(null);
   const [idUser, setIDUser] = useState(null);
   const [teacherInfo, setTeacherInfo] = useState({});
+  const [isChatAvailable, setIsChatAvailable] = useState(false);
 
   const fetchTeacherDetail = async (idTeacher) => {
     setLoading(true);
@@ -45,6 +47,22 @@ const TeacherDetail = (props) => {
       setLoading(false);
     }
   };
+  const fetchIsChatAvailable = async (idTeacher) => {
+    setLoading(true);
+    try {
+      let responseCanChat = await getIsChatAvailable(
+        Number(localStorage.getItem("idUser")),
+        idTeacher
+      );
+      if (responseCanChat.status === APIStatus.success) {
+        setIsChatAvailable(responseCanChat.data);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,6 +71,9 @@ const TeacherDetail = (props) => {
       setIDRole(parseInt(state.idRole));
       setIDUser(parseInt(state.idUser));
       fetchTeacherDetail(state.idTeacher);
+      if (Number(localStorage.getItem("idRole")) === Role.student) {
+        fetchIsChatAvailable(state.idTeacher);
+      }
     }
   }, []);
 
@@ -101,14 +122,14 @@ const TeacherDetail = (props) => {
           </div>
         </div>
 
-        {idRole && idRole === Role.student ? (
+        {idRole && idRole === Role.student && isChatAvailable ? (
           <button
             className="contact-block"
             onClick={() =>
               navigate("/chat", {
                 state: {
                   selectedSender: {
-                    userId: teacherInfo.idTeacher,
+                    userId: teacherInfo.idTeacher || idUser,
                     name: teacherInfo.name,
                     avatar: teacherInfo.teacherAvatar,
                   },

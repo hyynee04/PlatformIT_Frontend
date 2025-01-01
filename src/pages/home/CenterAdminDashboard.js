@@ -56,10 +56,9 @@ const CenterAdminDashboard = () => {
             (item) => `${item.month}/${item.year}`
           )
         );
-        // setRevenueList(
-        //   respone.data.paymentByTime?.map((item) => item.totalPayment)
-        // );
-        setRevenueList([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4792000, 0]);
+        setRevenueList(
+          respone.data.paymentByTime?.map((item) => item.totalPayment)
+        );
       }
     } catch (error) {
       console.error("Error fetching data: ", error);

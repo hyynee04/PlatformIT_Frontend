@@ -148,7 +148,7 @@ const CourseMgmt = (props) => {
             (course.price >= parseInt(startPrice) &&
               course.price <= parseInt(endPrice))) &&
           (courseType === "All" ||
-            (courseType === "Limit" && course.isLimitedTime === 1) ||
+            (courseType === "Limited" && course.isLimitedTime === 1) ||
             (courseType === "Unlimited" && course.isLimitedTime === 0)) &&
           ((courseType !== "limit" && courseType !== "all") ||
             ((!startDate ||
@@ -414,7 +414,7 @@ const CourseMgmt = (props) => {
                   checked={courseType === "Limited"}
                   onChange={(event) => setCourseType(event.target.value)}
                 />{" "}
-                Limited
+                Limit
               </div>
               <div className="course-type">
                 <input

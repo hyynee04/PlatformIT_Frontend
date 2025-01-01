@@ -57,6 +57,7 @@ const Lecture = (props) => {
   const [isRemoved, setIsRemoved] = useState(false);
   const [isEditLecture, setIsEditLecture] = useState(false);
   const [isFinishedLecture, setIsFinishedLecture] = useState(null);
+  const [isFinishedLectureChange, setIsFinishedLectureChange] = useState(null);
   const [isFromNotification, setIsFromNotification] = useState(false);
 
   const fetchLectureDetail = async (idLecture, idUser) => {
@@ -160,6 +161,7 @@ const Lecture = (props) => {
       ?.flatMap((section) => section.lectureStructures) // Gộp tất cả bài giảng từ các section
       ?.find((lec) => lec.idLecture === idLecture); // Tìm bài giảng theo idLecture
     setIsFinishedLecture(lecture ? lecture.isFinishedLecture : null);
+    setIsFinishedLectureChange(lecture ? lecture.isFinishedLecture : null);
   };
 
   const finishLecture = async (idLecture, idStudent) => {
@@ -217,14 +219,11 @@ const Lecture = (props) => {
   }, [idLectureChange, idSectionChange]);
 
   useEffect(() => {
-    if (idRole === Role.student && isFinishedLecture) {
+    if (isFinishedLecture === isFinishedLectureChange) return;
+    if (idRole === Role.student && isFinishedLectureChange) {
       finishLecture(idLecture, idUser);
     }
-  }, [isFinishedLecture]);
-
-  useEffect(() => {
-    //
-  }, [sectionList, idSection, idLecture]);
+  }, [isFinishedLectureChange]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -305,8 +304,8 @@ const Lecture = (props) => {
                 setIsEditLecture={setIsEditLecture}
                 index={index}
                 setIndex={setIndex}
-                isFinishedLecture={isFinishedLecture}
-                setIsFinishedLecture={setIsFinishedLecture}
+                isFinishedLecture={isFinishedLectureChange}
+                setIsFinishedLecture={setIsFinishedLectureChange}
               />
             )}
           </div>

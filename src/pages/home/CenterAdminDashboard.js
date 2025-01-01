@@ -18,6 +18,7 @@ import { APIStatus } from "../../constants/constants";
 import { getAllPaymentOfCenter } from "../../services/paymentService";
 import { ImSpinner2 } from "react-icons/im";
 import { convertToVietnamTime } from "../../functions/function";
+import { useNavigate } from "react-router-dom";
 
 // Register necessary chart components
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -25,6 +26,7 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 const CenterAdminDashboard = () => {
   const [loading, setLoading] = useState(false);
   const idCenter = +localStorage.getItem("idCenter");
+  const navigate = useNavigate();
 
   const [dashboard, setDashboard] = useState({});
   const [paymentList, setPaymentList] = useState([]);
@@ -54,10 +56,9 @@ const CenterAdminDashboard = () => {
             (item) => `${item.month}/${item.year}`
           )
         );
-        // setRevenueList(
-        //   respone.data.paymentByTime?.map((item) => item.totalPayment)
-        // );
-        setRevenueList([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4792000, 0]);
+        setRevenueList(
+          respone.data.paymentByTime?.map((item) => item.totalPayment)
+        );
       }
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -279,7 +280,19 @@ const CenterAdminDashboard = () => {
               <tbody>
                 {dashboard.teacherRanking?.length > 0 &&
                   dashboard.teacherRanking.map((teacher, index) => (
-                    <tr key={index}>
+                    <tr
+                      key={index}
+                      onClick={() => {
+                        navigate("/teacherDetail", {
+                          state: {
+                            idTeacher: teacher.idTeacher,
+                            idRole: localStorage.getItem("idRole"),
+                            idUser: localStorage.getItem("idUser"),
+                          },
+                        });
+                      }}
+                      style={{ cursor: "pointer" }}
+                    >
                       <td className="user-row">
                         <div className="avatar-container">
                           <img

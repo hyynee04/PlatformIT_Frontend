@@ -22,8 +22,8 @@ const TeacherDetail = (props) => {
 
   const [listCourse, setListCourse] = useState([]);
   const [totalCourseTracks, setTotalCourseTracks] = useState(0);
-  const [idRole, setIDRole] = useState("");
-  const [idUser, setIDUser] = useState("");
+  const [idRole, setIDRole] = useState(null);
+  const [idUser, setIDUser] = useState(null);
   const [teacherInfo, setTeacherInfo] = useState({});
 
   const fetchTeacherDetail = async (idTeacher) => {
@@ -50,8 +50,8 @@ const TeacherDetail = (props) => {
     window.scrollTo(0, 0);
     const state = location.state;
     if (state) {
-      setIDRole(state.idRole);
-      setIDUser(state.idUser);
+      setIDRole(parseInt(state.idRole));
+      setIDUser(parseInt(state.idUser));
       fetchTeacherDetail(state.idTeacher);
     }
   }, []);
@@ -101,7 +101,7 @@ const TeacherDetail = (props) => {
           </div>
         </div>
 
-        {idRole && idRole === +Role.student && (
+        {idRole && idRole === Role.student ? (
           <button
             className="contact-block"
             onClick={() =>
@@ -116,9 +116,9 @@ const TeacherDetail = (props) => {
               })
             }
           >
-            Contact <RiChat3Line />
+            Chat <RiChat3Line />
           </button>
-        )}
+        ) : null}
 
         <div className="block-container">
           <span className="block-container-title">Center</span>

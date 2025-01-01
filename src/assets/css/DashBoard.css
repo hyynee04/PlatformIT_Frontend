@@ -292,6 +292,14 @@ table tr > .user-row {
 .teacher-ranking .teacher-ranking-table table .header-row > th {
   padding: 0.5rem 0;
 }
+.teacher-ranking .teacher-ranking-table table tbody > tr {
+  scale: 1;
+  transition: all 0.2s ease;
+}
+.teacher-ranking .teacher-ranking-table table tbody > tr:hover {
+  scale: 1.05;
+  transition: all 0.2s ease;
+}
 .teacher-ranking .teacher-ranking-table table tr > td {
   color: var(--black-color);
   font-weight: 400;

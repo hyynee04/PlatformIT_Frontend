@@ -259,6 +259,10 @@ const PlatformAdUserMgmt = () => {
             </button>
             {filterVisible && (
               <FilterUser
+                gender={gender}
+                level={level}
+                dateRange={dateRange}
+                status={status}
                 onFilterChange={handleFilterChange}
                 onClose={() => setFilterVisible(false)}
                 filterButtonRef={filterButtonRef}

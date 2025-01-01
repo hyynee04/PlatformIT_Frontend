@@ -42,6 +42,7 @@ const Chat = () => {
   const [contentSent, setContentSent] = useState("");
   const messagesEndRef = useRef(null);
   const connectionRef = useRef(null);
+  const textareaRef = useRef(null);
   const selectedSenderRef = useRef(selectedSender);
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
@@ -232,6 +233,12 @@ const Chat = () => {
     const diffMinutes = diffMs / (1000 * 60);
     return message.idSender !== previousMessage.idSender || diffMinutes > 15;
   };
+  const handleInputChange = (e) => {
+    setContentSent(e.target.value);
+
+    textareaRef.current.style.height = "40px";
+    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  };
   const handleSendMessage = async () => {
     if (!contentSent.trim()) return;
     const newMessage = {
@@ -247,6 +254,7 @@ const Chat = () => {
       if (respone.status === APIStatus.success) {
         setDetailConversation((prev) => [...prev, newMessage]);
         setContentSent("");
+        textareaRef.current.style.height = "40px";
         setListConversations((prev) => {
           const conversationExists = prev.some(
             (conversation) => conversation.userId === selectedSender.userId
@@ -432,11 +440,13 @@ const Chat = () => {
             <div className="input-container">
               <div className="info">
                 <div className="select-container">
-                  <input
-                    type="text"
+                  <textarea
+                    // type="text"
+                    ref={textareaRef}
                     className="input-form-pi"
                     value={contentSent}
-                    onChange={(e) => setContentSent(e.target.value)}
+                    // onChange={(e) => setContentSent(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleSendMessage(contentSent); // Gửi tin nhắn khi nhấn Enter

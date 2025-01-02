@@ -654,7 +654,7 @@ const AssignDetail = () => {
                       </label>
                     </div>
                   )}
-                  {assignmentInfo.codeResult && (
+                  {assignmentInfo.codeResult >= 0 && (
                     <div className="field-value">
                       <label className="field">Result</label>
                       <label className="value">

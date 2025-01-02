@@ -326,7 +326,7 @@ const CenterAdUserMgmt = () => {
                             statusUserSelected: user.status,
                           })}
                           onUserInactivated={() => setSelectedUserId(null)}
-                          roleUserSelected={Role.teacher}
+                          roleUserSelected={user.idRole}
                           {...(user.idRole === Role.teacher
                             ? {
                                 isReactivatable: true,

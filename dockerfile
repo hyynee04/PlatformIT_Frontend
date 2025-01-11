@@ -27,8 +27,8 @@ COPY --from=build /app/build /usr/share/nginx/html
 #COPY nginx.conf /etc/nginx/nginx.conf
 
 # Cổng mà nginx sẽ lắng nghe
-EXPOSE 80
-EXPOSE 443
+EXPOSE 3000
+EXPOSE 3001
 
 # Chạy nginx
 CMD ["nginx", "-g", "daemon off;"]

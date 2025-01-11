@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { getPI } from "../../services/userService";
 import { APIStatus } from "../../constants/constants";
 import { ImSpinner2 } from "react-icons/im";
-import { formatDate } from "../../functions/function";
+import { formatDate, getGender } from "../../functions/function";
 
 const AdminCenterDetail = (props) => {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ const AdminCenterDetail = (props) => {
             </div>
             <div className="info-line">
               <BsGenderTrans />
-              <span>{adminInfo.gender || "(Gender)"}</span>
+              <span>{(adminInfo.gender !== null && getGender(adminInfo.gender)) || "(Gender)"}</span>
             </div>
             <div className="info-line">
               <LiaBirthdayCakeSolid />

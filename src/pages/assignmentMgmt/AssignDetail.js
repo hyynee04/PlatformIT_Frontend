@@ -646,7 +646,7 @@ const AssignDetail = () => {
                         : "Submitted"}
                     </label>
                   </div>
-                  {assignmentInfo.totalMark && (
+                  {assignmentInfo.totalMark >= 0 && (
                     <div className="field-value">
                       <label className="field">Marks</label>
                       <label className="value">
@@ -654,14 +654,15 @@ const AssignDetail = () => {
                       </label>
                     </div>
                   )}
-                  {assignmentInfo.codeResult >= 0 && (
-                    <div className="field-value">
-                      <label className="field">Result</label>
-                      <label className="value">
-                        {assignmentInfo.codeResult * 100}%
-                      </label>
-                    </div>
-                  )}
+                  {assignmentInfo.assignmentType === AssignmentType.code &&
+                    assignmentInfo.codeResult >= 0 && (
+                      <div className="field-value">
+                        <label className="field">Result</label>
+                        <label className="value">
+                          {assignmentInfo.codeResult * 100}%
+                        </label>
+                      </div>
+                    )}
                   {assignmentInfo.resultDuration && (
                     <div className="field-value">
                       <label className="field">Duration</label>

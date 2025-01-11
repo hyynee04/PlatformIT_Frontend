@@ -17,7 +17,7 @@ import { APIStatus, Object, Role } from "../../constants/constants";
 import { getPI, getStudentDetail } from "../../services/userService";
 import { ImSpinner2 } from "react-icons/im";
 import { useLocation, useNavigate } from "react-router-dom";
-import { formatDate } from "../../functions/function";
+import { formatDate, getGender } from "../../functions/function";
 
 const StudentDetail = (props) => {
   const location = useLocation();
@@ -141,7 +141,7 @@ const StudentDetail = (props) => {
             </div>
             <div className="info-line">
               <BsGenderTrans />
-              <span>{studentInfo.gender || "(Gender)"}</span>
+              <span>{(studentInfo.gender !== null && getGender(studentInfo.gender)) || "(Gender)"}</span>
             </div>
             <div className="info-line">
               <LiaBirthdayCakeSolid />
@@ -185,13 +185,12 @@ const StudentDetail = (props) => {
                 <div className="progress-container">
                   <CircularProgressbar
                     strokeWidth={12}
-                    value={`${
-                      studentInfo.lectureTotal > 0
-                        ? (studentInfo.lectureProgress /
-                            studentInfo.lectureTotal) *
-                          100
-                        : 0
-                    }`}
+                    value={`${studentInfo.lectureTotal > 0
+                      ? (studentInfo.lectureProgress /
+                        studentInfo.lectureTotal) *
+                      100
+                      : 0
+                      }`}
                     text={`${studentInfo.lectureProgress} / ${studentInfo.lectureTotal}`}
                   />
                 </div>
@@ -203,18 +202,16 @@ const StudentDetail = (props) => {
                 <div className="progress-container">
                   <CircularProgressbar
                     strokeWidth={12}
-                    value={`${
-                      studentInfo.exerciseTotal + studentInfo.testTotal > 0
-                        ? ((studentInfo.exerciseProgress +
-                            studentInfo.testProgress) /
-                            (studentInfo.exerciseTotal +
-                              studentInfo.testTotal)) *
-                          100
-                        : 0
-                    }`}
-                    text={`${
-                      studentInfo.exerciseProgress + studentInfo.testProgress
-                    } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
+                    value={`${studentInfo.exerciseTotal + studentInfo.testTotal > 0
+                      ? ((studentInfo.exerciseProgress +
+                        studentInfo.testProgress) /
+                        (studentInfo.exerciseTotal +
+                          studentInfo.testTotal)) *
+                      100
+                      : 0
+                      }`}
+                    text={`${studentInfo.exerciseProgress + studentInfo.testProgress
+                      } / ${studentInfo.exerciseTotal + studentInfo.testTotal}`}
                   />
                 </div>
                 <label>Assignment</label>
@@ -246,7 +243,7 @@ const StudentDetail = (props) => {
                 object={1} //course
                 totalTracks={
                   studentInfo.courses.length > 6
-                    ? 6
+                    ? 3
                     : Math.floor(studentInfo.courses?.length / 2)
                 }
                 itemsPerTrack={2}

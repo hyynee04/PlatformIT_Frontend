@@ -646,14 +646,15 @@ const AssignDetail = () => {
                         : "Submitted"}
                     </label>
                   </div>
-                  {assignmentInfo.totalMark >= 0 && (
-                    <div className="field-value">
-                      <label className="field">Marks</label>
-                      <label className="value">
-                        {assignmentInfo.totalMark}
-                      </label>
-                    </div>
-                  )}
+                  {assignmentInfo.assignmentType !== AssignmentType.code &&
+                    assignmentInfo.totalMark >= 0 && (
+                      <div className="field-value">
+                        <label className="field">Marks</label>
+                        <label className="value">
+                          {assignmentInfo.totalMark}
+                        </label>
+                      </div>
+                    )}
                   {assignmentInfo.assignmentType === AssignmentType.code &&
                     assignmentInfo.codeResult >= 0 && (
                       <div className="field-value">

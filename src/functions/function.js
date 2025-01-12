@@ -4,6 +4,7 @@ import {
   APIStatus,
   LectureStatus,
   NotificationType,
+  UserGender,
 } from "../constants/constants";
 import { getLectureInfoForCmtNoti } from "../services/courseService";
 
@@ -240,16 +241,13 @@ export const calculateRelativeTime = (timestamp) => {
   if (difference < 60)
     return `${difference} ${difference > 1 ? "seconds" : "second"} ago`;
   if (difference < 3600)
-    return `${Math.floor(difference / 60)} ${
-      Math.floor(difference / 60) > 1 ? "minutes" : "minute"
-    } ago`;
+    return `${Math.floor(difference / 60)} ${Math.floor(difference / 60) > 1 ? "minutes" : "minute"
+      } ago`;
   if (difference < 86400)
-    return `${Math.floor(difference / 3600)} ${
-      Math.floor(difference / 3600) > 1 ? "hours" : "hour"
+    return `${Math.floor(difference / 3600)} ${Math.floor(difference / 3600) > 1 ? "hours" : "hour"
+      } ago`;
+  return `${Math.floor(difference / 86400)} ${Math.floor(difference / 86400) > 1 ? "days" : "day"
     } ago`;
-  return `${Math.floor(difference / 86400)} ${
-    Math.floor(difference / 86400) > 1 ? "days" : "day"
-  } ago`;
 };
 
 // Helper to parse "relativeTime" into a timestamp
@@ -382,3 +380,9 @@ export const convertToVietnamTime = (date) => {
 
   return formatter.format(validDate);
 };
+
+export const getGender = (value) => {
+  if (value === 0) return "Male"
+  else if (value === 1) return "Female"
+  else return "Other"
+}
